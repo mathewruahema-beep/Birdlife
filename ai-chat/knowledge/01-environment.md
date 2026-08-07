@@ -1,13 +1,14 @@
 # BirdLife Australia — ICT environment
 
-Grounding file for Zeus Assist. Upload to the Custom GPT's Knowledge, or let
-`api/chat.py` inline it.
+Grounding file for Zeus Assist. Upload to the Claude Project's knowledge, or let
+`client/chat.py` inline it.
 
 **Keep this file honest.** Anything in here the model will state as fact. If you are
 not sure of a value, mark it `TODO` rather than guessing — a `TODO` produces "I don't
 know, check X", a guess produces a confident wrong answer.
 
-Last verified: 2026-08-07.
+Last verified: 2026-08-07. The Case Type, Status and Origin values below were read
+from the live Salesforce org on that date, not transcribed from documentation.
 
 ---
 
@@ -34,23 +35,42 @@ record type `Ask Zeus` is wrong by roughly 200×.
 **Case owners:** Mathew Hema, Andrew Dunn, Keith Tsui, Nina Lewis.
 `Owner.Name = "Zeus"` is **not a person** — it is the unassigned intake queue.
 
-### Case Type picklist
+### Case Type picklist — complete
 
-Mandatory when closing. Most-used values, from the last 425 cases:
+Mandatory when closing. These are the **only** valid values. Volumes are the last
+365 days (870 cases), measured 7 Aug 2026:
 
-| Type | Recent volume |
-|---|---:|
-| IAM (identity & access) | 49 |
-| Departing Staff | 22 |
-| New User | 16 |
+| Type | Cases | Notes |
+|---|---:|---|
+| Admin | 313 | Largest bucket — account admin, licences, config changes |
+| Troubleshooting | 284 | Something broke and needs diagnosis |
+| IAM | 82 | Identity & access: MFA, lockouts, permissions |
+| New Feature | 57 | A request for something that doesn't exist yet |
+| New User | 51 | Onboarding |
+| Departing Staff | 40 | Offboarding |
+| Purchase/Renew | 29 | Licence or hardware procurement |
+| Spam | 1 | |
+| *(blank)* | 13 | The gap the close-time validation rule fixes |
 
-`TODO — paste the full Type picklist here.` Until that is done, the assistant will
-correctly refuse to invent values outside the three above.
+Identity lifecycle = IAM + New User + Departing Staff = **173 of 870, 20%**, holding
+the same proportion over a full year as over the last 425 cases.
 
-### Case Status
+Admin and Troubleshooting together are 69% of volume and are both broad. When
+choosing between them: *Troubleshooting* is "it was working and now it isn't";
+*Admin* is "please change/grant/configure something".
 
-`New` → … → `Closed`. `TODO — paste the full Status picklist and the mandatory
-close-reason values.`
+### Case Status — complete
+
+`New` → `In Progress` → `Waiting Response-External` → `Response Received` → `Closed`
+
+Only those five values exist on Ask Zeus. `Waiting Response-External` means waiting
+on the requester or a vendor — it stops the clock; `Response Received` means they
+have replied and it is back with ICT.
+
+### Origin
+
+`Email` (842 of 870, 96.8%) and `Internal` (28). There is no Web, Phone or Portal
+origin on Ask Zeus — those values in org-wide reports belong to other teams.
 
 ## The project board
 

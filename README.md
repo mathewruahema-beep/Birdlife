@@ -279,12 +279,20 @@ They have been redacted from the backup in this repo, but:
 README.md                            findings, admin runbook, routine consolidation
 dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
-ai-chat/                             Zeus Assist — OpenAI helpdesk assistant, prompt and practice
+ai-chat/                             Zeus Assist — Claude helpdesk assistant, prompt and practice
+powerbi/                             NetSuite + Salesforce datasets for Power BI
 ```
 
-`ai-chat/` is the technician-facing assistant for the Ask Zeus queue — a Custom GPT
-whose system prompt, grounding files and acceptance tests are version-controlled
-here rather than typed into a browser. See [`ai-chat/README.md`](ai-chat/README.md).
+`ai-chat/` is the technician-facing assistant for the Ask Zeus queue — a Claude
+Project whose system prompt, grounding files and acceptance tests are
+version-controlled here rather than typed into a browser. See
+[`ai-chat/README.md`](ai-chat/README.md).
+
+`powerbi/` extracts a NetSuite GL dataset and the Ask Zeus case history to CSV on a
+schedule, with the star schema and DAX for both dashboards. Both queries filter at
+source — `RecordType.DeveloperName = 'Zeus'` and `posting = 'T'` — so the scoping
+defect this repo documents cannot recur inside a binary report file. See
+[`powerbi/README.md`](powerbi/README.md).
 
 The HTML is kept for reference and as the design template the morning routine
 rebuilds against. It is not itself the live artefact — the routine republishes to

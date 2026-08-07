@@ -1,0 +1,5 @@
+SELECT Id, CaseNumber, Status, Type, Origin, Priority, Subject,
+       Owner.Name, CreatedDate, ClosedDate, IsClosed, LastModifiedDate
+FROM Case
+WHERE RecordType.DeveloperName = 'Zeus'
+ORDER BY CreatedDate DESC

@@ -1,0 +1,17 @@
+# Credentials — never commit. The WooCommerce key leak started as a value pasted
+# somewhere it was not supposed to live.
+.env
+*.env
+!.env.example
+
+# Extract output — regenerate with powerbi/extract/extract.py, don't version it.
+# These CSVs contain finance and helpdesk records.
+powerbi/extract/out/
+*.csv
+
+# Power BI working files
+*.pbix
+*.pbip
+
+__pycache__/
+*.pyc
