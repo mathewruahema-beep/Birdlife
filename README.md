@@ -224,11 +224,61 @@ consolidating to one, or dropping in favour of the dashboard.
 
 ---
 
+## Scheduled routine consolidation — 7 Aug 2026
+
+The account had **10 routines**, with the ICT dashboard being rebuilt up to 7× per
+weekday across three overlapping jobs. Two routines had **completely empty prompts**
+and had been firing on schedule doing nothing.
+
+Consolidated to one scheduled job plus an in-session loop.
+
+**Deleted (5)** — all definitions preserved in `routines/routines-backup-2026-08-07.json`:
+
+| Routine | Why |
+|---|---|
+| BirdLife ICT morning triage | empty prompt — fired weekdays 8am, did nothing |
+| BirdLife security dashboard monthly (dup) | empty prompt, duplicate of a working routine |
+| send_later 2026-08-05 | already fired, spent |
+| ICT Dashboard refresh — daytime | folded in; daytime now covered by the loop |
+| ICT Dashboard refresh — early AM | folded in; collided with the new job at the same minute |
+
+**Kept (4):** the consolidated ICT dashboard job (`trig_0126KYAM3TAaZpBQKN8UeVdk`,
+weekdays 7am AEST), Morning brief, the working security dashboard monthly, and the
+October DST fix — which is still needed for the Morning brief and skips the ICT part
+gracefully now that the separate dashboard triggers are gone.
+
+### Owner-name scoping was the other bug
+
+The deleted dashboard routines scoped by owner, not record type:
+
+```
+WHERE Owner.Name IN ('Mathew Hema','Andrew Dunn','Keith Tsui','Nina Lewis','Zeus')
+```
+
+Measured live, that returns 25 open cases — 21 Ask Zeus plus 4 that are not ICT at all
+(2 Conservation Campaigns, 1 General Enquiry, 1 Bird Week). It also silently drops any
+Zeus case assigned outside those five names. Record type is the durable filter; the
+consolidated routine says so explicitly.
+
+One thing worth keeping from those routines: `Owner.Name = "Zeus"` is the **unassigned
+intake queue**, not a person, and deserves its own group at the top of the dashboard.
+
+### ⚠️ Credential exposure — action required
+
+The deleted `ICT Dashboard refresh` routines embedded **live WooCommerce API keys in
+plaintext** in the routine prompt (`ck_…|cs_…` for `birdlife.org.au/wp-json/wc/v3`).
+They have been redacted from the backup in this repo, but:
+
+1. **Rotate those keys** in WooCommerce — they have been sitting in readable prompt text.
+2. Re-add the WooCommerce order-sync check using an environment variable, not an
+   inline credential. The check is currently marked PARKED in the consolidated routine.
+
 ## Repository layout
 
 ```
-README.md                     this file — findings and admin runbook
-dashboard/ict-dashboard.html  dashboard source as published 6 Aug 2026
+README.md                            findings, admin runbook, routine consolidation
+dashboard/ict-dashboard.html         dashboard source as published
+routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
 ```
 
 The HTML is kept for reference and as the design template the morning routine
