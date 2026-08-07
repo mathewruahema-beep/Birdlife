@@ -279,7 +279,12 @@ They have been redacted from the backup in this repo, but:
 README.md                            findings, admin runbook, routine consolidation
 dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
+ai-chat/                             Zeus Assist — OpenAI helpdesk assistant, prompt and practice
 ```
+
+`ai-chat/` is the technician-facing assistant for the Ask Zeus queue — a Custom GPT
+whose system prompt, grounding files and acceptance tests are version-controlled
+here rather than typed into a browser. See [`ai-chat/README.md`](ai-chat/README.md).
 
 The HTML is kept for reference and as the design template the morning routine
 rebuilds against. It is not itself the live artefact — the routine republishes to
