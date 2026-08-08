@@ -7,7 +7,14 @@ and measures for the two dashboards built on top.
 |---|---|
 | Queries | [`queries/`](queries/) — SuiteQL and SOQL, one file per dataset |
 | Extract | [`extract/extract.py`](extract/extract.py) — runs them, writes CSVs |
+| Budget input | [`budget/`](budget/) — the one thing NetSuite cannot supply |
 | Model + DAX | [`measures.md`](measures.md) — star schema, measures, expected baselines |
+
+**Budget vs actual:** actuals come from NetSuite; **budget figures do not exist in
+NetSuite** and must be supplied as a CSV — see [`budget/README.md`](budget/README.md).
+BirdLife's fiscal year is the **calendar year** (FY 2026 = 1 Jan – 31 Dec 2026,
+Q1 = Jan–Mar), confirmed from `accountingperiod`, so month, quarter and year-to-date
+all fall out of NetSuite's own period hierarchy.
 
 The queries in this directory were run against the live NetSuite account and
 Salesforce org on 7 August 2026 and returned the rows they claim to. They are not
@@ -150,9 +157,12 @@ report serves neither and doubles the surface where a wrong cross-filter can mis
   the ICT/finance linkage today is a hand-typed spreadsheet column
   (`ICT Priorities.xlsx`, at least four divergent copies). Don't invent a
   relationship in the model that doesn't exist in the data.
-- **`department` and `class` are null on most GL lines**, including every AR Payment.
-  Segment-level reporting will be sparse until coding discipline improves upstream —
-  that is a finance process fix, not a Power BI one.
+- **Class coverage on expense lines is 72.7%** (calendar 2026). Department coverage
+  is 99.9%, so segment reporting by department is sound; by class, expect an
+  unallocated bucket on the expense side. *An earlier version of this file said
+  department and class were null on most GL lines — that is true only of
+  balance-sheet lines like AR Payments, and wrong for the P&L lines that actually
+  matter for reporting.*
 - **Salesforce has no field history on Case Status**, so time-in-status and true SLA
   compliance cannot be computed yet. Turning on Field History Tracking is already an
   Asana task (*Field History Tracking setup*, Kate Rogerson, Backlog). `MTTR Days` in

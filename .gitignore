@@ -8,6 +8,10 @@
 # These CSVs contain finance and helpdesk records.
 powerbi/extract/out/
 *.csv
+# ...but the budget template is structure, not data.
+!powerbi/budget/budget_template.csv
+# The real budget is finance's figures — keep it out of git.
+powerbi/budget/budget.csv
 
 # Power BI working files
 *.pbix

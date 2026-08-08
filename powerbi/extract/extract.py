@@ -213,7 +213,28 @@ def main() -> int:
                 write_csv([flatten(r) for r in records],
                           args.out / f"salesforce_{soql_file.stem}.csv")
 
+    copy_budget(args.out)
     return 0
+
+
+def copy_budget(out_dir: Path) -> None:
+    """Copy the finance budget file into the output folder if it's there.
+
+    Budget figures are not in NetSuite — no budget record type exists in the
+    SuiteQL catalogue — so they arrive as a CSV finance maintains by hand. Copying
+    it here means Power BI has exactly one folder to point at, rather than one
+    source that refreshes and another that silently doesn't.
+    """
+    budget = Path(__file__).resolve().parent.parent / "budget" / "budget.csv"
+    if not budget.exists():
+        print("  ! no powerbi/budget/budget.csv — budget-vs-actual visuals will be "
+              "empty until finance supplies one (see powerbi/budget/README.md)",
+              file=sys.stderr)
+        return
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "budget.csv").write_bytes(budget.read_bytes())
+    print(f"  → {out_dir / 'budget.csv'} (copied, modified "
+          f"{time.strftime('%Y-%m-%d', time.localtime(budget.stat().st_mtime))})")
 
 
 if __name__ == "__main__":

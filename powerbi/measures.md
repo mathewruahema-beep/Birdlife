@@ -7,13 +7,32 @@ reports — the finance and helpdesk audiences share no filters and no vocabular
 
 ## Model
 
-Both models are star schemas with a **shared date table**. Create it once, mark it as
-the date table (Modeling → Mark as date table), and relate it to each fact.
+> **Correction, 2026-08-07.** An earlier version of this file built a synthetic date
+> table with a July–June financial year, on the assumption that BirdLife follows the
+> usual Australian convention. It does not. NetSuite's `accountingperiod` records
+> show **FY 2026 = 1 Jan – 31 Dec 2026** and **Q1 2026 = Jan–Mar**. The fiscal year
+> is the calendar year. Anything built on the old July–June logic would have put
+> every figure in the wrong quarter and the wrong year.
+
+Use **`netsuite_accounting_periods` as the period dimension**, not a generated
+calendar. It comes from NetSuite, so "Jan 2026" here is the same Jan 2026 the ledger
+was closed against, and month → quarter → year rolls up exactly as the GL does.
 
 ```
+netsuite_accounting_periods[period_name] ──┬─→ netsuite_pl_actuals_by_period[period_name]
+                                           └─→ budget[period_name]
+
 Date[Date] ──┬─→ netsuite_gl_transaction_lines[transaction_date]
              └─→ salesforce_zeus_cases[CreatedDate]
 ```
+
+Two period concepts, deliberately:
+
+- **`netsuite_accounting_periods`** drives everything budget-related. Periods are
+  discrete named buckets, and budget-vs-actual is a period question, not a
+  daily-dates question.
+- **`Date`** drives the daily-grain facts — GL drill-down and helpdesk cases —
+  where you want real date intelligence.
 
 ```dax
 Date =
@@ -22,17 +41,20 @@ VAR MaxDate = MAX ( netsuite_gl_transaction_lines[transaction_date] )
 RETURN
 ADDCOLUMNS (
     CALENDAR ( MinDate, MaxDate ),
-    "Year",         YEAR ( [Date] ),
-    "Month",        FORMAT ( [Date], "mmm yyyy" ),
-    "MonthSort",    YEAR ( [Date] ) * 100 + MONTH ( [Date] ),
-    "FY",           "FY" & IF ( MONTH ( [Date] ) >= 7, YEAR ( [Date] ) + 1, YEAR ( [Date] ) ),
-    "FYMonthNo",    IF ( MONTH ( [Date] ) >= 7, MONTH ( [Date] ) - 6, MONTH ( [Date] ) + 6 )
+    "Year",      YEAR ( [Date] ),
+    "Quarter",   "Q" & QUARTER ( [Date] ) & " " & YEAR ( [Date] ),
+    "Month",     FORMAT ( [Date], "mmm yyyy" ),
+    "MonthSort", YEAR ( [Date] ) * 100 + MONTH ( [Date] )
 )
 ```
 
-Australian financial year runs July–June, so `FY` and `FYMonthNo` are what finance
-will actually ask for. Sort the `Month` column by `MonthSort` or the axis orders
-alphabetically.
+Calendar quarters and calendar years, matching NetSuite. Mark it as the date table
+(Modeling → Mark as date table). Sort `Month` by `MonthSort`, or the axis orders
+alphabetically — Apr, Aug, Dec.
+
+Sort order on the period dimension: set `period_name` to sort by `period_start`,
+and `quarter_name` likewise. Without that, "Q1 2026" and "Q2 2026" sort fine but the
+months inside them do not.
 
 `netsuite_chart_of_accounts[account_number]` → `netsuite_gl_transaction_lines[account_number]`
 is a one-to-many relationship; use the dimension for slicers so accounts with no
@@ -74,6 +96,167 @@ rolling 24 months and posting lines only. Any figure on this dashboard is
 period-limited and excludes non-posting documents (quotes, unapproved bills). Put
 that on the page, in the footer, in words — a correct number under an unstated scope
 is how the Zeus dashboards went wrong in the first place.
+
+---
+
+## Budget vs actual — month, quarter, year
+
+Facts: `netsuite_pl_actuals_by_period` and `budget`, both joined to
+`netsuite_accounting_periods` on `period_name`. Both relationships are
+many-to-one, single direction, filtering from the period dimension.
+
+### Normalising the sign
+
+The GL stores income as negative and expense as positive. Finance writes budgets as
+positive for both. Rather than asking anyone to enter negative income budgets, the
+actual is flipped to match:
+
+```dax
+Actual =
+SUMX (
+    netsuite_pl_actuals_by_period,
+    IF (
+        netsuite_pl_actuals_by_period[account_type] IN { "Income", "OthIncome" },
+        -1 * netsuite_pl_actuals_by_period[actual_amount],
+        netsuite_pl_actuals_by_period[actual_amount]
+    )
+)
+
+Budget = SUM ( budget[budget_amount] )
+```
+
+`Actual` is now a positive magnitude for both income and expense, directly
+comparable to `Budget`.
+
+### Variance
+
+```dax
+Variance   = [Actual] - [Budget]
+Variance % = DIVIDE ( [Variance], [Budget] )
+```
+
+`Variance` is *not* self-describing, and this is the single most common way a
+budget report misleads people: +$10k on income is good news, +$10k on expense is
+bad news, and the number looks identical. Use the sign-aware measure for anything
+with conditional formatting or a traffic light on it:
+
+```dax
+Variance (favourable) =
+IF (
+    SELECTEDVALUE ( netsuite_pl_actuals_by_period[account_type] ) IN { "Income", "OthIncome" },
+    [Actual] - [Budget],   -- income: over budget is favourable
+    [Budget] - [Actual]    -- expense: under budget is favourable
+)
+```
+
+Positive is always good. Note it needs `account_type` in filter context — it returns
+the expense reading on a total row mixing both, so put income and expense on
+separate visuals or subtotal by account type.
+
+### The three time windows
+
+Month-to-month needs no measure — put `period_name` on the axis and the period
+dimension does it.
+
+```dax
+-- Calendar quarter (Q1 2026 = Jan-Mar). Put quarter_name on the axis;
+-- no measure needed either.
+
+-- Rolling 3 months, if that is what "3 month" means rather than the quarter.
+Actual Rolling 3M =
+VAR MaxStart = MAX ( netsuite_accounting_periods[period_start] )
+RETURN
+CALCULATE (
+    [Actual],
+    ALL ( netsuite_accounting_periods ),
+    netsuite_accounting_periods[period_start] <= MaxStart,
+    netsuite_accounting_periods[period_start] > EDATE ( MaxStart, -3 )
+)
+
+-- Year to date, Jan-Dec. year_name is NetSuite's FY, which is the calendar year.
+Actual YTD =
+VAR ThisYear = SELECTEDVALUE ( netsuite_accounting_periods[year_name] )
+VAR MaxStart = MAX ( netsuite_accounting_periods[period_start] )
+RETURN
+CALCULATE (
+    [Actual],
+    ALL ( netsuite_accounting_periods ),
+    netsuite_accounting_periods[year_name] = ThisYear,
+    netsuite_accounting_periods[period_start] <= MaxStart
+)
+
+Budget YTD =
+VAR ThisYear = SELECTEDVALUE ( netsuite_accounting_periods[year_name] )
+VAR MaxStart = MAX ( netsuite_accounting_periods[period_start] )
+RETURN
+CALCULATE (
+    [Budget],
+    ALL ( netsuite_accounting_periods ),
+    netsuite_accounting_periods[year_name] = ThisYear,
+    netsuite_accounting_periods[period_start] <= MaxStart
+)
+
+Variance YTD   = [Actual YTD] - [Budget YTD]
+Variance YTD % = DIVIDE ( [Variance YTD], [Budget YTD] )
+```
+
+`TOTALYTD` and friends are deliberately not used — they need a marked date table,
+and the period dimension is a named-bucket dimension, not a date table. Filtering on
+`year_name` is both simpler and guaranteed to agree with NetSuite's year-end.
+
+### Full-year budget vs YTD actual
+
+The comparison finance will ask for by March: how are we tracking against the whole
+year, not just the months elapsed.
+
+```dax
+Budget Full Year =
+VAR ThisYear = SELECTEDVALUE ( netsuite_accounting_periods[year_name] )
+RETURN
+CALCULATE (
+    [Budget],
+    ALL ( netsuite_accounting_periods ),
+    netsuite_accounting_periods[year_name] = ThisYear
+)
+
+Budget Consumed % = DIVIDE ( [Actual YTD], [Budget Full Year] )
+```
+
+Read `Budget Consumed %` against elapsed time: 50% consumed at the end of June is on
+track; 50% at the end of March is not.
+
+### Data-quality guard — put this on a card while building
+
+```dax
+Unmatched Budget Rows =
+COUNTROWS (
+    FILTER (
+        budget,
+        ISBLANK (
+            LOOKUPVALUE (
+                netsuite_accounting_periods[period_name],
+                netsuite_accounting_periods[period_name], budget[period_name]
+            )
+        )
+    )
+)
+```
+
+Should be zero. A budget row whose `period_name` doesn't match — `2026-01` instead of
+`Jan 2026`, a stray space, a year that hasn't been set up in NetSuite yet — silently
+contributes nothing and the totals just come in low. Nothing else in the model will
+tell you.
+
+### Known limits, worth stating on the page
+
+- **Class coverage on expense is 72.7%** (calendar 2026). Budget-vs-actual by class
+  will show an unallocated bucket on expense; by department it is 99.9% and sound.
+- **Budget is a snapshot, not a live figure.** It is whatever was last dropped in
+  `powerbi/budget/budget.csv`. Show the file's date on the page — a revised forecast
+  that never made it into the folder is invisible otherwise.
+- **The current period is partial.** The latest month will always look under budget
+  until it closes. Either exclude open periods (`is_closed = 'F'`) from the default
+  view or label them.
 
 ---
 
