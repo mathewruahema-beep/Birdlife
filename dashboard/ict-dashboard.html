@@ -12,7 +12,7 @@
     --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   @media (prefers-color-scheme:dark){
-    :root{
+    :root:not([data-theme="light"]){
       --ground:#101512; --surface:#18201C; --surface-2:#1F2924;
       --line:#2A362F; --line-strong:#3A4941;
       --ink:#E4EDE7; --ink-2:#A3B3AA; --ink-3:#758880;
@@ -97,6 +97,8 @@
   .tile .note{font-family:var(--mono); font-size:10.5px; color:var(--ink-3); margin-top:5px; line-height:1.5}
   .tile.flagged .v{color:var(--crit)}
   .tile.caution .v{color:var(--warn)}
+  .tile.ok .v{color:var(--good)}
+  .health5{display:grid; grid-template-columns:repeat(5,1fr); gap:12px}
 
   /* ---- bar rows ---- */
   .cols2{display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:start}
@@ -187,12 +189,14 @@
   @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
   @media(max-width:880px){
     .health{grid-template-columns:1fr 1fr}
+    .health5{grid-template-columns:1fr 1fr}
     .cols2{grid-template-columns:1fr}
     .stage{grid-template-columns:150px 1fr 40px}
     .bar .lab{width:110px}
   }
   @media(max-width:520px){
     .health{grid-template-columns:1fr}
+    .health5{grid-template-columns:1fr}
     .masthead{align-items:flex-start} .stamp{text-align:left}
   }
 </style>
@@ -205,7 +209,7 @@
       <div class="role">Ask Zeus helpdesk queue and the IT Operations Project Plan</div>
     </div>
     <div class="stamp">
-      Snapshot <b>Thu 6 Aug 2026</b><br>
+      Snapshot <b>Tue 11 Aug 2026 &middot; 10:40pm AEST</b><br>
       Salesforce Production &middot; Asana<br>
       Scope <b>Record Type = Ask Zeus</b>
     </div>
@@ -222,11 +226,11 @@
         Every figure below is filtered to <b>Ask Zeus</b>, the actual ICT helpdesk.
       </div>
       <table class="cmp">
-        <thead><tr><th>Measure</th><th>Unfiltered reports</th><th>Ask Zeus only</th><th>Inflation</th></tr></thead>
+        <thead><tr><th>Measure</th><th>Unfiltered reports (6 Aug)</th><th>Ask Zeus today</th><th>Inflation</th></tr></thead>
         <tbody>
-          <tr><td>Open cases</td><td class="was">4,344</td><td class="is">20</td><td class="was">217&times;</td></tr>
-          <tr><td>Sitting in New</td><td class="was">3,787</td><td class="is">8</td><td class="was">473&times;</td></tr>
-          <tr><td>Case owners in scope</td><td class="was">~60 org-wide</td><td class="is">3</td><td class="was">&mdash;</td></tr>
+          <tr><td>Open cases</td><td class="was">4,344</td><td class="is">22</td><td class="was">~200&times;</td></tr>
+          <tr><td>Sitting in New</td><td class="was">3,787</td><td class="is">11</td><td class="was">~340&times;</td></tr>
+          <tr><td>Case owners in scope</td><td class="was">~60 org-wide</td><td class="is">3 + queue</td><td class="was">&mdash;</td></tr>
         </tbody>
       </table>
     </div>
@@ -240,24 +244,24 @@
     </div>
     <div class="health">
       <div class="tile hero">
-        <div class="v num">20</div>
+        <div class="v num">22</div>
         <div class="k">Open Ask Zeus cases</div>
-        <div class="note">8 New &middot; 5 Response Rcvd &middot; 5 In Progress &middot; 2 Waiting</div>
+        <div class="note">11 New &middot; 7 Response Rcvd &middot; 3 In Progress &middot; 1 Waiting</div>
       </div>
       <div class="tile flagged">
-        <div class="v num">13</div>
+        <div class="v num">14</div>
         <div class="k">Cases with no Type</div>
-        <div class="note">65% of the open queue</div>
+        <div class="note">64% of the open queue</div>
       </div>
       <div class="tile caution">
-        <div class="v num">5</div>
+        <div class="v num">6</div>
         <div class="k">New past 2 business days</div>
-        <div class="note">Of 8 New &middot; oldest 21 days</div>
+        <div class="note">Of 11 New &middot; oldest 22 days</div>
       </div>
       <div class="tile flagged">
-        <div class="v num">69<span style="font-size:20px">d</span></div>
+        <div class="v num">342<span style="font-size:20px">d</span></div>
         <div class="k">Oldest open case</div>
-        <div class="note">00133547 &middot; since 29 May</div>
+        <div class="note">00109150 &middot; reopened &middot; since 3 Sep 2025</div>
       </div>
     </div>
   </section>
@@ -266,27 +270,28 @@
   <section>
     <div class="sec-head">
       <h2>Queue shape</h2>
-      <span class="filter">20 open cases &middot; live counts</span>
+      <span class="filter">22 open cases &middot; live counts</span>
     </div>
     <div class="cols2">
       <div class="panel">
         <div class="eyebrow" style="margin-bottom:10px">By status</div>
         <div class="bars">
-          <div class="bar" title="New — 8 of 20 (40%)"><div class="lab">New</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="v num">8</div></div>
-          <div class="bar" title="Response Received — 5 of 20 (25%)"><div class="lab">Response Received</div><div class="track"><div class="fill" style="width:62.5%"></div></div><div class="v num">5</div></div>
-          <div class="bar" title="In Progress — 5 of 20 (25%)"><div class="lab">In Progress</div><div class="track"><div class="fill" style="width:62.5%"></div></div><div class="v num">5</div></div>
-          <div class="bar" title="Waiting Response-External — 2 of 20 (10%)"><div class="lab">Waiting External</div><div class="track"><div class="fill" style="width:25%"></div></div><div class="v num">2</div></div>
+          <div class="bar" title="New — 11 of 22 (50%)"><div class="lab">New</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="v num">11</div></div>
+          <div class="bar" title="Response Received — 7 of 22 (32%)"><div class="lab">Response Received</div><div class="track"><div class="fill" style="width:63.6%"></div></div><div class="v num">7</div></div>
+          <div class="bar" title="In Progress — 3 of 22 (14%)"><div class="lab">In Progress</div><div class="track"><div class="fill" style="width:27.3%"></div></div><div class="v num">3</div></div>
+          <div class="bar" title="Waiting Response-External — 1 of 22 (5%)"><div class="lab">Waiting External</div><div class="track"><div class="fill" style="width:9.1%"></div></div><div class="v num">1</div></div>
         </div>
-        <div class="caption">New is the largest bucket. Five of those eight have been sitting more than two business days without a first touch.</div>
+        <div class="caption">Half the queue is New. Six of those eleven have been sitting more than two business days without a first touch.</div>
       </div>
       <div class="panel">
         <div class="eyebrow" style="margin-bottom:10px">By owner</div>
         <div class="bars">
-          <div class="bar" title="Andrew Dunn — 11 of 20 (55%)"><div class="lab">Andrew Dunn</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="v num">11</div></div>
-          <div class="bar" title="Keith Tsui — 8 of 20 (40%)"><div class="lab">Keith Tsui</div><div class="track"><div class="fill" style="width:72.7%"></div></div><div class="v num">8</div></div>
-          <div class="bar" title="Mathew Hema — 1 of 20 (5%)"><div class="lab">Mathew Hema</div><div class="track"><div class="fill" style="width:9.1%"></div></div><div class="v num">1</div></div>
+          <div class="bar" title="Zeus queue (unassigned) — 1 of 22"><div class="lab">Zeus (queue)</div><div class="track"><div class="fill" style="width:10%"></div></div><div class="v num">1</div></div>
+          <div class="bar" title="Andrew Dunn — 10 of 22 (45%)"><div class="lab">Andrew Dunn</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="v num">10</div></div>
+          <div class="bar" title="Keith Tsui — 10 of 22 (45%)"><div class="lab">Keith Tsui</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="v num">10</div></div>
+          <div class="bar" title="Mathew Hema — 1 of 22 (5%)"><div class="lab">Mathew Hema</div><div class="track"><div class="fill" style="width:10%"></div></div><div class="v num">1</div></div>
         </div>
-        <div class="caption">Andrew and Keith carry 95% of the open queue between them. Nina Lewis holds none today.</div>
+        <div class="caption">Andrew and Keith carry 91% of the open queue between them. One urgent case sits unassigned in the Zeus intake queue. Nina Lewis holds none today.</div>
       </div>
     </div>
   </section>
@@ -298,39 +303,50 @@
       <span class="filter">Age in days since CreatedDate &middot; untyped marked</span>
     </div>
 
-    <div class="owner"><span class="nm">Andrew Dunn</span><span class="ct">11 open &middot; 7 untyped</span></div>
+    <div class="owner"><span class="nm">Zeus (queue) &mdash; 1 unassigned, incoming work</span><span class="ct">triage &amp; assign</span></div>
     <div class="tbl-scroll">
       <table class="cases">
         <thead><tr><th>Case</th><th>Subject</th><th>Status</th><th style="text-align:right">Age</th></tr></thead>
         <tbody>
-          <tr><td class="cn">00133547</td><td class="subj">SharePoint location for vetted Aussie Bird Count data</td><td><span class="chip wait">Waiting</span></td><td class="age old">69d</td></tr>
-          <tr><td class="cn">00136539</td><td class="subj">Departing staff &mdash; Jessica Rooke<span class="chip untyped">no type</span></td><td><span class="chip resp">Response</span></td><td class="age warn">23d</td></tr>
-          <tr><td class="cn">00136659</td><td class="subj">How do I change my signature block</td><td><span class="chip resp">Response</span></td><td class="age warn">22d</td></tr>
-          <tr><td class="cn">00136723</td><td class="subj">New employee &mdash; Thea O&rsquo;Loughlin<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age warn">21d</td></tr>
-          <tr><td class="cn">00136940</td><td class="subj">Finn Saurine &mdash; offboarding<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age warn">16d</td></tr>
-          <tr><td class="cn">00137206</td><td class="subj">Resignation &mdash; Lynette Plenderleith</td><td><span class="chip prog">In Progress</span></td><td class="age">10d</td></tr>
-          <tr><td class="cn">00137230</td><td class="subj">ArcGIS annual renewal</td><td><span class="chip resp">Response</span></td><td class="age">10d</td></tr>
-          <tr><td class="cn">00137243</td><td class="subj">Laptop docking station to spare<span class="chip untyped">no type</span></td><td><span class="chip wait">Waiting</span></td><td class="age">10d</td></tr>
-          <tr><td class="cn">00137640</td><td class="subj">WA staff calendar &mdash; add new workmates<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">3d</td></tr>
-          <tr><td class="cn">00137730</td><td class="subj">Committee paper templates on Word<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">2d</td></tr>
-          <tr><td class="cn">00137801</td><td class="subj">IT equipment &mdash; mouse for Joe Douglas<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">2d</td></tr>
+          <tr><td class="cn">00138511</td><td class="subj">URGENT: Plauti invoice due<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">0d</td></tr>
         </tbody>
       </table>
     </div>
 
-    <div class="owner"><span class="nm">Keith Tsui</span><span class="ct">8 open &middot; 5 untyped</span></div>
+    <div class="owner"><span class="nm">Andrew Dunn</span><span class="ct">10 open &middot; 6 untyped</span></div>
     <div class="tbl-scroll">
       <table class="cases">
         <thead><tr><th>Case</th><th>Subject</th><th>Status</th><th style="text-align:right">Age</th></tr></thead>
         <tbody>
-          <tr><td class="cn">00134670</td><td class="subj">Update Powl Program Engagements<span class="chip untyped">no type</span></td><td><span class="chip prog">In Progress</span></td><td class="age old">51d</td></tr>
-          <tr><td class="cn">00136890</td><td class="subj">Shorebirds Program Engagement request<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age warn">17d</td></tr>
-          <tr><td class="cn">00136895</td><td class="subj">Volunteer Onboarding course PE<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age warn">17d</td></tr>
-          <tr><td class="cn">00136985</td><td class="subj">Missing EOFY receipt</td><td><span class="chip resp">Response</span></td><td class="age warn">15d</td></tr>
-          <tr><td class="cn">00137079</td><td class="subj">BOF participant log-in issue<span class="chip untyped">no type</span></td><td><span class="chip prog">In Progress</span></td><td class="age warn">14d</td></tr>
-          <tr><td class="cn">00137360</td><td class="subj">Birdata log-in issue</td><td><span class="chip resp">Response</span></td><td class="age">8d</td></tr>
-          <tr><td class="cn">00137587</td><td class="subj">Sign-in support<span class="chip untyped">no type</span></td><td><span class="chip prog">In Progress</span></td><td class="age">3d</td></tr>
-          <tr><td class="cn">00137759</td><td class="subj">RD change log error (SF to Raisely)<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">2d</td></tr>
+          <tr><td class="cn">00133547</td><td class="subj">SharePoint location for vetted Aussie Bird Count data</td><td><span class="chip wait">Waiting</span></td><td class="age old">74d</td></tr>
+          <tr><td class="cn">00136539</td><td class="subj">Departing staff &mdash; Jessica Rooke<span class="chip untyped">no type</span></td><td><span class="chip resp">Response</span></td><td class="age warn">28d</td></tr>
+          <tr><td class="cn">00136659</td><td class="subj">How do I change my signature block</td><td><span class="chip resp">Response</span></td><td class="age warn">27d</td></tr>
+          <tr><td class="cn">00136723</td><td class="subj">New employee &mdash; Thea O&rsquo;Loughlin</td><td><span class="chip prog">In Progress</span></td><td class="age warn">26d</td></tr>
+          <tr><td class="cn">00137230</td><td class="subj">ArcGIS annual renewal</td><td><span class="chip resp">Response</span></td><td class="age warn">15d</td></tr>
+          <tr><td class="cn">00137640</td><td class="subj">WA staff calendar &mdash; add new workmates<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">8d</td></tr>
+          <tr><td class="cn">00137730</td><td class="subj">Committee paper templates on Word<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">7d</td></tr>
+          <tr><td class="cn">00137801</td><td class="subj">IT equipment<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">7d</td></tr>
+          <tr><td class="cn">00138385</td><td class="subj">Computer in office issues<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">1d</td></tr>
+          <tr><td class="cn">00138430</td><td class="subj">Work phone number<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">1d</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="owner"><span class="nm">Keith Tsui</span><span class="ct">10 open &middot; 7 untyped</span></div>
+    <div class="tbl-scroll">
+      <table class="cases">
+        <thead><tr><th>Case</th><th>Subject</th><th>Status</th><th style="text-align:right">Age</th></tr></thead>
+        <tbody>
+          <tr><td class="cn">00134670</td><td class="subj">Update Powl Program Engagements<span class="chip untyped">no type</span></td><td><span class="chip prog">In Progress</span></td><td class="age old">56d</td></tr>
+          <tr><td class="cn">00136890</td><td class="subj">Shorebirds Program Engagement request<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age warn">22d</td></tr>
+          <tr><td class="cn">00136895</td><td class="subj">Volunteer Onboarding course PE<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age warn">22d</td></tr>
+          <tr><td class="cn">00136985</td><td class="subj">Missing EOFY receipt</td><td><span class="chip resp">Response</span></td><td class="age warn">21d</td></tr>
+          <tr><td class="cn">00137079</td><td class="subj">BOF participant log-in issue</td><td><span class="chip resp">Response</span></td><td class="age warn">19d</td></tr>
+          <tr><td class="cn">00137109</td><td class="subj">Urgent: log-in page unable to sign up new emails</td><td><span class="chip resp">Response</span></td><td class="age warn">19d</td></tr>
+          <tr><td class="cn">00137587</td><td class="subj">Sign-in support<span class="chip untyped">no type</span></td><td><span class="chip prog">In Progress</span></td><td class="age">9d</td></tr>
+          <tr><td class="cn">00137759</td><td class="subj">RD change log error<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">7d</td></tr>
+          <tr><td class="cn">00138381</td><td class="subj">New status reason in RD change log<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">2d</td></tr>
+          <tr><td class="cn">00138387</td><td class="subj">Report review &mdash; last month&rsquo;s donation comments<span class="chip untyped">no type</span></td><td><span class="chip new">New</span></td><td class="age">1d</td></tr>
         </tbody>
       </table>
     </div>
@@ -340,7 +356,7 @@
       <table class="cases">
         <thead><tr><th>Case</th><th>Subject</th><th>Status</th><th style="text-align:right">Age</th></tr></thead>
         <tbody>
-          <tr><td class="cn">00137892</td><td class="subj">Issue with NetSuite</td><td><span class="chip prog">In Progress</span></td><td class="age">0d</td></tr>
+          <tr><td class="cn">00109150</td><td class="subj">UTM fields from Raisely into SF &mdash; reopened legacy case</td><td><span class="chip resp">Response</span></td><td class="age old">342d</td></tr>
         </tbody>
       </table>
     </div>
@@ -350,29 +366,29 @@
   <section>
     <div class="sec-head">
       <h2>Case mix &amp; intake</h2>
-      <span class="filter">425 cases created in the last 180 days</span>
+      <span class="filter">423 cases created in the last 180 days</span>
     </div>
     <div class="cols2">
       <div class="panel">
         <div class="eyebrow" style="margin-bottom:10px">By type</div>
         <div class="bars">
-          <div class="bar" title="Admin — 152 of 425 (36%)"><div class="lab">Admin</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="v num">152</div></div>
-          <div class="bar" title="Troubleshooting — 135 of 425 (32%)"><div class="lab">Troubleshooting</div><div class="track"><div class="fill" style="width:88.8%"></div></div><div class="v num">135</div></div>
-          <div class="bar" title="IAM — 49 of 425 (12%)"><div class="lab">IAM</div><div class="track"><div class="fill" style="width:32.2%"></div></div><div class="v num">49</div></div>
-          <div class="bar" title="New Feature — 24 of 425 (6%)"><div class="lab">New Feature</div><div class="track"><div class="fill" style="width:15.8%"></div></div><div class="v num">24</div></div>
-          <div class="bar" title="Departing Staff — 22 of 425 (5%)"><div class="lab">Departing Staff</div><div class="track"><div class="fill" style="width:14.5%"></div></div><div class="v num">22</div></div>
-          <div class="bar" title="New User — 16 of 425 (4%)"><div class="lab">New User</div><div class="track"><div class="fill" style="width:10.5%"></div></div><div class="v num">16</div></div>
-          <div class="bar" title="Purchase/Renew — 13 of 425 (3%)"><div class="lab">Purchase/Renew</div><div class="track"><div class="fill" style="width:8.6%"></div></div><div class="v num">13</div></div>
-          <div class="bar" title="No type recorded — 13 of 425 (3%)"><div class="lab">No type</div><div class="track"><div class="fill" style="width:8.6%"></div></div><div class="v num">13</div></div>
-          <div class="bar" title="Spam — 1 of 425 (0.2%)"><div class="lab">Spam</div><div class="track"><div class="fill" style="width:.7%"></div></div><div class="v num">1</div></div>
+          <div class="bar" title="Admin — 153 of 423 (36%)"><div class="lab">Admin</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="v num">153</div></div>
+          <div class="bar" title="Troubleshooting — 136 of 423 (32%)"><div class="lab">Troubleshooting</div><div class="track"><div class="fill" style="width:88.9%"></div></div><div class="v num">136</div></div>
+          <div class="bar" title="IAM — 43 of 423 (10%)"><div class="lab">IAM</div><div class="track"><div class="fill" style="width:28.1%"></div></div><div class="v num">43</div></div>
+          <div class="bar" title="New Feature — 24 of 423 (6%)"><div class="lab">New Feature</div><div class="track"><div class="fill" style="width:15.7%"></div></div><div class="v num">24</div></div>
+          <div class="bar" title="Departing Staff — 22 of 423 (5%)"><div class="lab">Departing Staff</div><div class="track"><div class="fill" style="width:14.4%"></div></div><div class="v num">22</div></div>
+          <div class="bar" title="New User — 17 of 423 (4%)"><div class="lab">New User</div><div class="track"><div class="fill" style="width:11.1%"></div></div><div class="v num">17</div></div>
+          <div class="bar" title="No type recorded — 14 of 423 (3%)"><div class="lab">No type</div><div class="track"><div class="fill" style="width:9.2%"></div></div><div class="v num">14</div></div>
+          <div class="bar" title="Purchase/Renew — 13 of 423 (3%)"><div class="lab">Purchase/Renew</div><div class="track"><div class="fill" style="width:8.5%"></div></div><div class="v num">13</div></div>
+          <div class="bar" title="Spam — 1 of 423 (0.2%)"><div class="lab">Spam</div><div class="track"><div class="fill" style="width:.7%"></div></div><div class="v num">1</div></div>
         </div>
-        <div class="caption">Identity lifecycle &mdash; IAM, New User and Departing Staff combined &mdash; is 87 cases, 20% of everything ICT handled. That is the single biggest automation target.</div>
+        <div class="caption">Identity lifecycle &mdash; IAM, New User and Departing Staff combined &mdash; is 82 cases, 19% of everything ICT handled. That is the single biggest automation target.</div>
       </div>
       <div class="panel">
         <div class="eyebrow" style="margin-bottom:10px">By intake channel</div>
         <div class="bars">
-          <div class="bar" title="Email — 410 of 425 (96.5%)"><div class="lab">Email</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="v num">410</div></div>
-          <div class="bar" title="Internal — 15 of 425 (3.5%)"><div class="lab">Internal</div><div class="track"><div class="fill" style="width:3.7%"></div></div><div class="v num">15</div></div>
+          <div class="bar" title="Email — 408 of 423 (96.5%)"><div class="lab">Email</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="v num">408</div></div>
+          <div class="bar" title="Internal — 15 of 423 (3.5%)"><div class="lab">Internal</div><div class="track"><div class="fill" style="width:3.7%"></div></div><div class="v num">15</div></div>
         </div>
         <div class="caption">
           Ask Zeus is effectively a single-channel service: 96.5% arrives at zeus@birdlife.org.au. No web, phone
@@ -380,8 +396,8 @@
         </div>
         <div class="eyebrow" style="margin:18px 0 10px">Type completeness</div>
         <div class="bars">
-          <div class="bar" title="Closed and recent cases: 97% typed"><div class="lab">All 180-day cases</div><div class="track"><div class="fill" style="width:97%"></div></div><div class="v num">97%</div></div>
-          <div class="bar" title="Currently open cases: 35% typed"><div class="lab">Open cases only</div><div class="track"><div class="fill" style="width:35%"></div></div><div class="v num">35%</div></div>
+          <div class="bar" title="All 180-day cases: 97% typed"><div class="lab">All 180-day cases</div><div class="track"><div class="fill" style="width:97%"></div></div><div class="v num">97%</div></div>
+          <div class="bar" title="Currently open cases: 36% typed"><div class="lab">Open cases only</div><div class="track"><div class="fill" style="width:36%"></div></div><div class="v num">36%</div></div>
         </div>
         <div class="caption">
           Type gets filled in on the way to closure, not on arrival. That is why the open queue looks
@@ -389,6 +405,42 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- DATA-FLOW HEALTH -->
+  <section>
+    <div class="sec-head">
+      <h2>Data-flow health</h2>
+      <span class="filter">Integration checks &middot; last 24h</span>
+    </div>
+    <div class="health5">
+      <div class="tile ok">
+        <div class="v num">0</div>
+        <div class="k">Stripe&rarr;SF sync errors</div>
+        <div class="note">stripeGC sync log &middot; healthy</div>
+      </div>
+      <div class="tile caution">
+        <div class="v num">43%</div>
+        <div class="k">Gravity Forms orphan rate</div>
+        <div class="note">77 of 178 new enquiry cases with no contact &middot; amber (baseline ~25%)</div>
+      </div>
+      <div class="tile">
+        <div class="v num">1</div>
+        <div class="k">RD change log entries</div>
+        <div class="note">Recurring giving &middot; informational</div>
+      </div>
+      <div class="tile">
+        <div class="v num">&mdash;</div>
+        <div class="k">WooCommerce order sync</div>
+        <div class="note">Parked &mdash; pending credential rotation to an environment variable</div>
+      </div>
+      <div class="tile">
+        <div class="v num">&mdash;</div>
+        <div class="k">Zapier failures</div>
+        <div class="note">Zap failures alert to Microsoft Teams (Zap Manager &rarr; Teams channel)</div>
+      </div>
+    </div>
+    <div class="caption" style="border-top:none;padding-top:0">Still dark: external engine run-health, un-connected Stripe accounts&rsquo; direct API, WordPress fleet beyond main site, Ortto deep sync.</div>
   </section>
 
   <!-- ASANA -->
@@ -409,10 +461,10 @@
         <div class="stage empty" title="Sitting in Done but never marked complete — 1 task"><div class="nm">In Done, not completed</div><div class="track"><div class="fill zero" style="width:0"></div></div><div class="ct num">1</div></div>
       </div>
       <div class="caption">
-        The previous dashboard showed only three of these sections &mdash; 27 tasks. The real figure is 105.
-        Ready for Deployment and Hypercare have been empty throughout, so nothing is currently reaching
-        release: work moves from In Development straight to Done, or to Blocked.
-        A further <b>17 incomplete subtasks</b> (e-store product setup) sit outside every section and appear in no view at all.
+        Section counts reconcile to the project&rsquo;s 105 incomplete tasks. Ready for Deployment and Hypercare
+        remain empty, so nothing is currently reaching release: work moves from In Development straight to Done,
+        or to Blocked. A further <b>17 incomplete subtasks</b> (e-store product setup) sit outside every section
+        and appear in no view at all.
       </div>
     </div>
 
@@ -427,20 +479,20 @@
           <li><span>eCommerce duplicate contact cases</span><span class="who">Nina</span></li>
           <li><span>Conga bequest receipt</span><span class="who">Keith</span></li>
           <li><span>eStore feature build</span><span class="who">Mathew</span></li>
-          <li><span>Branch donations and payments</span><span class="who stale">Nina &middot; 22d</span></li>
-          <li><span>SF integration with Better Impact</span><span class="who stale">Mathew &middot; 22d</span></li>
-          <li><span>Branch and SIG membership lists</span><span class="who stale">James &middot; 22d</span></li>
-          <li><span>Squares for payments, branches and SIGs</span><span class="who stale">James &middot; 21d</span></li>
+          <li><span>Branch donations and payments</span><span class="who stale">Nina &middot; 27d</span></li>
+          <li><span>SF integration with Better Impact</span><span class="who stale">Mathew &middot; 27d</span></li>
+          <li><span>Branch and SIG membership lists</span><span class="who stale">James &middot; 27d</span></li>
+          <li><span>Squares for payments, branches and SIGs</span><span class="who stale">James &middot; 26d</span></li>
         </ul>
-        <div class="caption">Three are explicitly waiting on a <b>decision on responsibility</b>, not on technical work. Four have had no movement in three weeks.</div>
+        <div class="caption">Three are explicitly waiting on a <b>decision on responsibility</b>, not on technical work. Four have had no movement in nearly four weeks.</div>
       </div>
       <div class="panel">
         <div class="eyebrow" style="margin-bottom:8px">Overdue</div>
         <ul class="plain">
-          <li><span>ABC registration setup &amp; overall progress</span><span class="who stale">Keith &middot; 6d</span></li>
-          <li><span>Track sales &mdash; weekly update</span><span class="who stale">Sean &middot; 284d</span></li>
-          <li><span>Create bundles with other products</span><span class="who stale">Sean &middot; 339d</span></li>
-          <li><span>Add to bundles</span><span class="who stale">Sean &middot; 339d</span></li>
+          <li><span>ABC registration setup &amp; overall progress</span><span class="who stale">Keith &middot; 11d</span></li>
+          <li><span>Track sales &mdash; weekly update</span><span class="who stale">Sean &middot; 289d</span></li>
+          <li><span>Create bundles with other products</span><span class="who stale">Sean &middot; 344d</span></li>
+          <li><span>Add to bundles</span><span class="who stale">Sean &middot; 344d</span></li>
         </ul>
         <div class="caption">The three Sean Hellend items are e-store subtasks that have been overdue since 2025 and sit outside every section &mdash; nobody has seen them on a board in a year.</div>
         <div class="eyebrow" style="margin:18px 0 8px">Unassigned</div>
@@ -465,8 +517,17 @@
       <div class="flag crit">
         <div class="rail"></div>
         <div class="body">
+          <span class="lv">Intake &mdash; urgent, unassigned</span>
+          <b>00138511 &ldquo;URGENT: Plauti invoice due&rdquo; is sitting unassigned in the Zeus queue</b> (created
+          this morning). It relates to the Blocked item &ldquo;Plauti bulk merge permissions&rdquo; &mdash; the
+          invoice is due while the ownership decision is still parked. Needs triage and an owner today.
+        </div>
+      </div>
+      <div class="flag crit">
+        <div class="rail"></div>
+        <div class="body">
           <span class="lv">Data quality &mdash; blocking</span>
-          <b>13 of 20 open cases carry no Type.</b> Triage has nothing to sort on, and every category report
+          <b>14 of 22 open cases carry no Type.</b> Triage has nothing to sort on, and every category report
           downstream is computed over a field that is blank on two-thirds of the live queue. A validation rule
           requiring Type on close fixes this going forward without touching 53,000 historical records.
         </div>
@@ -475,18 +536,27 @@
         <div class="rail"></div>
         <div class="body">
           <span class="lv">Ageing</span>
-          <b>00133547 has been open 69 days</b> and 00134670 for 51. Both are waiting rather than being worked.
-          Each needs a chase or a close decision &mdash; they are distorting any resolution-time measure you build.
+          <b>00109150 (UTM fields from Raisely) has reappeared in the open queue at 342 days old</b> &mdash; a
+          reopened 2025 case now the oldest on the board. 00133547 is at 74 days (waiting external) and
+          00134670 at 56. Each needs a chase or a close decision.
         </div>
       </div>
       <div class="flag warn">
         <div class="rail"></div>
         <div class="body">
           <span class="lv">First touch</span>
-          <b>Five of the eight New cases are past two business days</b>, the oldest at 21 days
-          (00136723, new starter Thea O&rsquo;Loughlin, who starts 17 August). Two more &mdash; 00136890 and
-          00136895 &mdash; are Program Engagement requests blocked behind 00134670 but still sitting as New
-          rather than On Hold-Internal.
+          <b>Six of the eleven New cases are past two business days</b>, the oldest at 22 days &mdash;
+          00136890 and 00136895 are Program Engagement requests still queued behind 00134670 but sitting
+          as New rather than On Hold-Internal.
+        </div>
+      </div>
+      <div class="flag warn">
+        <div class="rail"></div>
+        <div class="body">
+          <span class="lv">Integration &mdash; amber</span>
+          <b>Gravity Forms orphan rate hit 43% in the last 24 hours</b> (77 of 178 new General Enquiry cases
+          created with no linked contact; baseline is ~25%, amber threshold 40%). Worth a look at the
+          matching rules before it climbs to red at 60%.
         </div>
       </div>
       <div class="flag warn">
@@ -495,14 +565,15 @@
           <span class="lv">Decision debt</span>
           <b>Three Blocked items are waiting on a decision about who owns the work</b>, not on effort:
           portal email mismatch, Plauti bulk merge permissions, and duplicate management in Salesforce.
-          These need a call in a meeting, not developer time. Four other Blocked items have not moved in three weeks.
+          These need a call in a meeting, not developer time. Four other Blocked items have not moved in
+          nearly four weeks.
         </div>
       </div>
       <div class="flag info">
         <div class="rail"></div>
         <div class="body">
           <span class="lv">Automation target</span>
-          <b>Identity lifecycle work is 20% of all ICT cases</b> &mdash; 87 of the last 425. Combined with
+          <b>Identity lifecycle work is 19% of all ICT cases</b> &mdash; 82 of the last 423. Combined with
           96.5% email intake and zero self-service channel, this is the clearest case for an
           onboarding/offboarding playbook and a request form.
         </div>
@@ -520,8 +591,12 @@
       <dd>Case WHERE RecordType.Name = 'Ask Zeus' AND CreatedDate = LAST_N_DAYS:180</dd>
       <dt>Asana</dt>
       <dd>Project 1211042432693678 &middot; IT Operations Project Plan &middot; completed = false &middot; all sections</dd>
+      <dt>Integrations</dt>
+      <dd>stripeGC__Sync_Log__c &middot; General_Enquiry_Case ContactId nulls &middot; RD_Change_Log__c &middot; LAST_N_DAYS:1</dd>
       <dt>Excluded</dt>
       <dd>18 other case record types (Powerful Owl, Swift Parrot Search, AOC, General Enquiry, KBA, Birdata, &hellip;)</dd>
+      <dt>Refresh</dt>
+      <dd>Hourly 06:00&ndash;16:00 AEST Mon&ndash;Fri (scheduled) &middot; plus a 10-minute live loop while a work session is active</dd>
     </dl>
     <div class="note">
       Every panel above states the filter it was computed under. That is deliberate: the defect in the previous

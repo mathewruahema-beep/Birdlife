@@ -6,7 +6,8 @@ and the **IT Operations Project Plan** (Asana).
 | | |
 |---|---|
 | Live dashboard | https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 |
-| Refresh | Weekdays 08:00 AEST, automated |
+| Refresh schedule & cost | https://claude.ai/code/artifact/86ac0e73-972c-477b-b863-8cdcf6c59afe |
+| Refresh | Hourly 06:00–16:00 AEST Mon–Fri, automated (see below) |
 | Salesforce org | `birdlifeaustralia.lightning.force.com` |
 | Asana project | `1211042432693678` — IT Operations Project Plan |
 
@@ -273,11 +274,44 @@ They have been redacted from the backup in this repo, but:
 2. Re-add the WooCommerce order-sync check using an environment variable, not an
    inline credential. The check is currently marked PARKED in the consolidated routine.
 
+## Hourly refresh build — 11 Aug 2026
+
+The dashboard now refreshes **hourly from 6am to 4pm AEST, Monday to Friday** (11
+scheduled runs per weekday), designed to complement — not duplicate — the existing
+consolidated daily job. One routine holds one cron expression and 6am–4pm AEST
+crosses UTC midnight, so the window is split across two new routines:
+
+| Piece | Fires (AEST) | Cron (UTC) | ID |
+|---|---|---|---|
+| Daily deep refresh + health report + push (pre-existing) | 7am Mon–Fri | `0 21 * * 0-4` | `trig_0126KYAM3TAaZpBQKN8UeVdk` |
+| Hourly refresh — early slot | 6, 8, 9am Mon–Fri | `0 20,22,23 * * 0-4` | `trig_01MFpasEr1TNqCc2kebNiTwA` |
+| Hourly refresh — daytime slot | 10am–4pm Mon–Fri | `0 0-6 * * 1-5` | `trig_017XaUd6NHewiHHaQY9wL1dh` |
+| In-session live loop (while a work session is active) | every 10 min, 7-day auto-expiry | session cron `*/10 * * * *` | job `47d38ea2` |
+
+The hourly slots deliberately skip 7am — the daily job owns that hour, along with
+the deeper data-flow report and the single morning push notification. Hourly runs
+are refresh-only and send no notifications. The October DST one-shot
+(`trig_01YY3yjtTASm7MvUCh8ceW11`) has been rewritten to shift all four pieces to
+AEDT on 5 Oct (under UTC+11 the 10am slot moves from the daytime cron into the
+early cron: `0 19,21,22,23 * * 0-4` / `0 0-5 * * 1-5`).
+
+**Known gap, same as the daily job:** the two new routines were created without
+connector grants (the org does not permit attaching connectors via API). Until
+Salesforce Production + Asana are attached in **claude.ai → Routines**, they fire
+but cannot read data — the in-session loop is the working refresh path meanwhile.
+
+**Cost** (API-equivalent at Opus-tier $5/$25 per MTok; actual runs draw on the
+claude.ai subscription's usage allowance): ~$1 per refresh → 55 scheduled
+runs/week ≈ $55–70/week (~$240–300/month), roughly 11× the old once-daily cost.
+The 10-minute loop adds ~$5–7/hour while its session is alive. Cheapest levers:
+widen the loop interval or trim the hourly window.
+
 ## Repository layout
 
 ```
 README.md                            findings, admin runbook, routine consolidation
-dashboard/ict-dashboard.html         dashboard source as published
+dashboard/ict-dashboard.html         dashboard source as published (refreshed 11 Aug 2026)
+dashboard/refresh-schedule.html      refresh schedule & cost artifact source
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
 ```
 
