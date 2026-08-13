@@ -103,31 +103,32 @@
   <header class="masthead">
     <h1>Dashboard Refresh &mdash; Build &amp; Cost</h1>
     <div class="sub">How the BirdLife ICT Operations Dashboard stays fresh, and what it costs to run</div>
-    <div class="stamp">Configured Tue 11 Aug 2026 &middot; halved the same evening to protect plan usage &middot; times in AEST (UTC+10)</div>
+    <div class="stamp">Reconfigured Thu 13 Aug 2026 &middot; both dashboards &middot; times in Melbourne AEST (UTC+10)</div>
   </header>
 
   <section>
-    <div class="sec-head"><h2>Coverage &mdash; two-hourly, 7am to 4pm, Mon&ndash;Fri</h2><span class="filter">6 scheduled refreshes / weekday</span></div>
+    <div class="sec-head"><h2>Coverage &mdash; hourly 7am&ndash;5pm Mon&ndash;Fri &middot; 7am &amp; 6pm Sat&ndash;Sun</h2><span class="filter">11 slots / weekday &middot; 2 / weekend day</span></div>
     <div class="panel">
       <div class="strip">
-        <div class="hr"><div class="cell">&middot;</div><div class="t">6a</div></div>
         <div class="hr"><div class="cell daily">D</div><div class="t">7a</div></div>
         <div class="hr"><div class="cell route">R</div><div class="t">8a</div></div>
-        <div class="hr"><div class="cell">&middot;</div><div class="t">9a</div></div>
+        <div class="hr"><div class="cell route">R</div><div class="t">9a</div></div>
         <div class="hr"><div class="cell route">R</div><div class="t">10a</div></div>
-        <div class="hr"><div class="cell">&middot;</div><div class="t">11a</div></div>
+        <div class="hr"><div class="cell route">R</div><div class="t">11a</div></div>
         <div class="hr"><div class="cell route">R</div><div class="t">12p</div></div>
-        <div class="hr"><div class="cell">&middot;</div><div class="t">1p</div></div>
+        <div class="hr"><div class="cell route">R</div><div class="t">1p</div></div>
         <div class="hr"><div class="cell route">R</div><div class="t">2p</div></div>
-        <div class="hr"><div class="cell">&middot;</div><div class="t">3p</div></div>
+        <div class="hr"><div class="cell route">R</div><div class="t">3p</div></div>
         <div class="hr"><div class="cell route">R</div><div class="t">4p</div></div>
+        <div class="hr"><div class="cell route">R</div><div class="t">5p</div></div>
       </div>
       <div class="legend">
-        <span><span class="sw a"></span>D &mdash; daily deep refresh + health report + push notification</span>
-        <span><span class="sw b"></span>R &mdash; refresh-only, and it <b>skips entirely if nothing changed</b> since the last snapshot</span>
+        <span><span class="sw a"></span>D &mdash; 7am weekdays: the durable daily routine also runs its deep report + Teams push</span>
+        <span><span class="sw b"></span>R &mdash; loop slot, both dashboards: Ops <b>skips if unchanged</b>; Monitoring always rebuilds</span>
+        <span>Weekends: 7am and 6pm slots only</span>
       </div>
     </div>
-    <p>On top of the schedule, a <b>20-minute live loop</b> runs inside the active Claude session (job <span class="num">05094fa1</span>) &mdash; each tick is a single cheap &ldquo;did anything change?&rdquo; query, and it only rebuilds the page when the answer is yes. Expires automatically after 7 days.</p>
+    <p>The hourly slots are driven by an <b>in-session loop</b> (jobs <span class="num">7fb17a66 / 053ae560 / 40627176 / 60c4495e</span>). It refreshes <b>both</b> the Operations and Monitoring dashboards. Caveat: the loop lives only while its Claude session is alive (7-day ceiling) &mdash; the durable layer is the claude.ai routines below.</p>
   </section>
 
   <section>
@@ -135,10 +136,10 @@
     <div class="tbl-scroll"><table>
       <thead><tr><th>Component</th><th>Fires</th><th>ID</th></tr></thead>
       <tbody>
-        <tr><td class="k">Daily deep refresh</td><td>7am Mon&ndash;Fri &mdash; full data-flow report, morning push (pre-existing, unchanged)</td><td class="mono">trig_0126KYAM&hellip;</td></tr>
-        <tr><td class="k">2-hourly &mdash; morning</td><td>8am Mon&ndash;Fri &mdash; freshness check first, full rebuild only on change</td><td class="mono">trig_01MFpasE&hellip;</td></tr>
-        <tr><td class="k">2-hourly &mdash; daytime</td><td>10am, 12pm, 2pm, 4pm Mon&ndash;Fri &mdash; same skip-if-unchanged check</td><td class="mono">trig_017XaUd6&hellip;</td></tr>
-        <tr><td class="k">Live loop</td><td>Every 20 min while a work session is active, delta-check only (7-day auto-expiry)</td><td class="mono">05094fa1</td></tr>
+        <tr><td class="k">Daily refresh + Teams push (routine)</td><td>7am Mon&ndash;Fri &mdash; full Ops refresh, data-flow report, Teams post; durable</td><td class="mono">trig_01QKqXyf&hellip;</td></tr>
+        <tr><td class="k">Hourly monitor (routine)</td><td>7&ndash;9am Mon&ndash;Fri &mdash; site/NetSuite/scheduler probes, heartbeat to the ICT Monitoring Teams channel; durable</td><td class="mono">trig_015SYdBt&hellip;</td></tr>
+        <tr><td class="k">Loop &mdash; weekday slots</td><td>7&ndash;9am + 10am&ndash;5pm Mon&ndash;Fri, both dashboards</td><td class="mono">7fb17a66 &middot; 053ae560</td></tr>
+        <tr><td class="k">Loop &mdash; weekend slots</td><td>7am and 6pm Sat&ndash;Sun, both dashboards</td><td class="mono">40627176 &middot; 60c4495e</td></tr>
       </tbody>
     </table></div>
     <p class="note">Two routines are needed because the window crosses UTC midnight and one routine holds one cron. Every refresh layer now opens with a cheap freshness check (one Salesforce aggregate + one Asana probe) and stops there when the queue hasn&rsquo;t moved &mdash; so a quiet slot costs a few percent of a full rebuild. The October daylight-saving one-shot has been rewritten to shift all four pieces to AEDT automatically on 5 Oct.</p>
@@ -157,12 +158,12 @@
     <div class="cost-grid">
       <div class="cost"><div class="big num">~$1</div><div class="k">per full rebuild</div>
         <div class="n">Fresh session: Salesforce + Asana pulls, tile recompute, ~50KB page republished. A skipped run (nothing changed) costs a few cents&rsquo; worth</div></div>
-      <div class="cost"><div class="big num">30<span style="font-size:15px">/wk</span></div><div class="k">scheduled runs</div>
-        <div class="n">6 per weekday &times; 5 days &mdash; down from 55 before the halving; many will skip on quiet days</div></div>
-      <div class="cost"><div class="big num">~$20&ndash;30</div><div class="k">per week, scheduled</div>
-        <div class="n">&asymp; $90&ndash;130 / month API-equivalent &mdash; less on quiet weeks, since unchanged slots skip the rebuild</div></div>
-      <div class="cost"><div class="big num">&lt;$1<span style="font-size:15px">/hr</span></div><div class="k">live loop, while running</div>
-        <div class="n">3 delta-checks/hour, full rebuild only when the queue moves; cancel anytime (CronDelete 05094fa1) or let it lapse in 7 days</div></div>
+      <div class="cost"><div class="big num">59<span style="font-size:15px">/wk</span></div><div class="k">loop slots</div>
+        <div class="n">11 &times; 5 weekdays + 2 &times; 2 weekend days &mdash; Ops skips when the queue hasn&rsquo;t moved; Monitoring rebuilds each slot</div></div>
+      <div class="cost"><div class="big num">~$35&ndash;50</div><div class="k">per week, loop</div>
+        <div class="n">&asymp; $150&ndash;215 / month API-equivalent while the loop session is alive; routines add ~$10&ndash;15/wk on top</div></div>
+      <div class="cost"><div class="big num">7<span style="font-size:15px">days</span></div><div class="k">loop lifetime ceiling</div>
+        <div class="n">Session-bound: dies if the session recycles, expires after 7 days regardless &mdash; ask Claude to re-arm it, or convert to routines for durability</div></div>
     </div>
     <p class="note">These runs draw on the claude.ai subscription&rsquo;s usage allowance rather than billing per token &mdash; the dollar figures are the equivalent API price, to show scale. After the halving this sits at roughly <b>half the original hourly build&rsquo;s cost, often less</b>, because unchanged slots stop after one cheap query. Want it lower still: drop the 8am slot or stretch to 3-hourly.</p>
   </section>
