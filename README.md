@@ -283,10 +283,30 @@ insights/                            cross-department insights model — see ins
 dashboard/fundraising-dashboard.html first department dashboard built from the model
 ```
 
-The Fundraising dashboard (published at
-https://claude.ai/code/artifact/e9debe53-58d2-4638-84ae-e3530f710811) is the first
-L3 delivery from the insights model: live SOQL, scope captions on every panel,
-the regular-giving union rule applied, and live DQ checks surfaced on the page.
+## Department dashboards (L3 of the insights model)
+
+All published 13 Aug 2026, live-queried where a connector exists, honestly marked
+where one doesn't. Source in `dashboard/`, one file per page.
+
+| Dashboard | Artifact |
+|---|---|
+| **Executive rollup** (start here) | https://claude.ai/code/artifact/60a0c115-3a75-48f4-9095-6e78ffc466be |
+| Fundraising | https://claude.ai/code/artifact/e9debe53-58d2-4638-84ae-e3530f710811 |
+| Membership | https://claude.ai/code/artifact/5465032a-70e8-4167-b0f4-7fb7a1b6ccad |
+| Finance | https://claude.ai/code/artifact/73c13fb9-0307-4898-a631-9820a44e72b1 |
+| Supporter Care & eCommerce | https://claude.ai/code/artifact/a57ebf7f-016d-4539-b10c-c77b0ad1c43c |
+| ICT (existing, routine-refreshed) | https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 |
+| Conservation Programmes | https://claude.ai/code/artifact/652830f4-648c-45f7-89c6-85976982e5cd |
+| Marketing & Engagement | https://claude.ai/code/artifact/c77c80d0-8323-48f5-8dc5-26fe5199da59 |
+| People & Culture (readiness) | https://claude.ai/code/artifact/72217cd8-c41b-497b-86d1-1b0f44d5d186 |
+| Volunteering (readiness) | https://claude.ai/code/artifact/93bf95c7-8fa2-4e67-9c5b-ec945a8cad4c |
+| Insights model overview | https://claude.ai/code/artifact/36b1f097-ff48-4da3-b686-309f59cc95a5 |
+
+Design rules carried from the ICT scope-correction work: scope captions on every
+panel, one ruled source per number, dated figures labelled as dated, and data-quality
+defects surfaced on the page (`insights/04-data-quality-register.md`). Refresh is
+point-in-time until a routine is attached — fold into the existing weekday ICT
+routine rather than adding new scheduled jobs.
 
 The `insights/` directory generalises the lesson of this dashboard (scope is a
 visible design element) into an organisation-wide semantic model: system-of-record

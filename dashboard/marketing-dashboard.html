@@ -1,0 +1,155 @@
+<title>BirdLife Marketing & Engagement</title>
+<style>
+  :root {
+    --page: #F7F6F1; --surface: #FFFFFF; --ink: #20241F; --muted: #6B6F66;
+    --line: #DCDAD0; --grid: #E9E7DE; --accent: #3D6B4F; --accent-soft: #E4EDE7;
+    --bar: #3D6B4F; --bar-dim: #9DB3A6; --flag: #B3541E; --flag-soft: #F6E9DF;
+    --good: #1E7A3C; --mono-bg: #EFEEE7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #171A16; --surface: #20241F; --ink: #E7E6DD; --muted: #A2A69B;
+      --line: #3A3E36; --grid: #2E322B; --accent: #7FB894; --accent-soft: #26352C;
+      --bar: #7FB894; --bar-dim: #4A5A50; --flag: #D98A55; --flag-soft: #3A2C20;
+      --good: #66BB80; --mono-bg: #2A2E28;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #171A16; --surface: #20241F; --ink: #E7E6DD; --muted: #A2A69B;
+    --line: #3A3E36; --grid: #2E322B; --accent: #7FB894; --accent-soft: #26352C;
+    --bar: #7FB894; --bar-dim: #4A5A50; --flag: #D98A55; --flag-soft: #3A2C20;
+    --good: #66BB80; --mono-bg: #2A2E28;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 36px 20px 64px; }
+  h1 { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 1.9rem; margin: 4px 0 4px; font-weight: 600; }
+  h2 { font-size: 1.02rem; margin: 0 0 2px; font-weight: 650; }
+  .eyebrow { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 650; }
+  .asof { color: var(--muted); font-size: .85rem; }
+  section { margin-top: 26px; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; }
+  .scope { font-size: .74rem; color: var(--muted); margin-top: 2px; }
+  .scope b { color: var(--muted); font-weight: 650; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .tile .lbl { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+  .tile .val { font-size: 1.8rem; font-weight: 650; margin-top: 4px; line-height: 1.1; }
+  .tile .cmp { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+  .up { color: var(--good); font-weight: 650; }
+  .down { color: var(--flag); font-weight: 650; }
+  .chart-wrap { padding-left: 52px; }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 180px; border-bottom: 1px solid var(--line); position: relative; }
+  .gridline { position: absolute; left: 0; right: 0; border-top: 1px solid var(--grid); font-size: .68rem; color: var(--muted); }
+  .gridline span { position: absolute; right: 100%; padding-right: 6px; top: -0.6em; white-space: nowrap; }
+  .bars-inner { display: flex; align-items: flex-end; gap: 6px; width: 100%; height: 100%; position: relative; z-index: 1; }
+  .bcol { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; min-width: 0; }
+  .bar { background: var(--bar); border-radius: 3px 3px 0 0; min-height: 2px; cursor: default; }
+  .bar.fy-prev { background: var(--bar-dim); }
+  .bar.partial { background: repeating-linear-gradient(45deg, var(--bar), var(--bar) 4px, var(--surface) 4px, var(--surface) 6px); }
+  .bar:hover, .bar:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .xlabels { display: flex; gap: 6px; margin-top: 6px; }
+  .xlabels div { flex: 1; text-align: center; font-size: .68rem; color: var(--muted); }
+  #tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--page);
+    font-size: .78rem; padding: 5px 9px; border-radius: 4px; display: none; z-index: 10; white-space: nowrap; }
+  .hrow { display: grid; grid-template-columns: minmax(150px, 250px) 1fr 110px; gap: 10px; align-items: center; padding: 5px 0; font-size: .85rem; }
+  .hrow .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hrow .trk { height: 14px; position: relative; }
+  .hrow .fill { position: absolute; inset: 0 auto 0 0; background: var(--bar); border-radius: 3px; min-width: 2px; }
+  .hrow .fill.dim { background: var(--bar-dim); }
+  .hrow .amt { text-align: right; font-variant-numeric: tabular-nums; }
+  .hrow .amt small { color: var(--muted); }
+  .note { font-size: .82rem; color: var(--muted); margin: 8px 0 0; max-width: 76ch; }
+  .callout { border-left: 3px solid var(--flag); background: var(--flag-soft); border-radius: 0 4px 4px 0; padding: 10px 14px; font-size: .84rem; margin-top: 12px; }
+  .callout.ok { border-left-color: var(--good); background: var(--accent-soft); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+  .chip { display: inline-block; font-size: .66rem; letter-spacing: .07em; text-transform: uppercase;
+    font-weight: 700; padding: 2px 8px; border-radius: 999px; vertical-align: 1px; }
+  .chip.live { background: var(--accent-soft); color: var(--accent); }
+  .chip.blocked { background: var(--flag-soft); color: var(--flag); }
+  .chip.pending { background: var(--mono-bg); color: var(--muted); }
+  .srow { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start;
+    padding: 10px 0; border-bottom: 1px solid var(--grid); font-size: .87rem; }
+  .srow:last-child { border-bottom: none; }
+  .srow .d { color: var(--muted); font-size: .8rem; margin-top: 2px; max-width: 70ch; }
+  table { border-collapse: collapse; width: 100%; font-size: .82rem; margin-top: 8px; }
+  th { text-align: left; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 5px 10px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+  td:nth-child(n+2), th:nth-child(n+2) { text-align: right; }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .82em; background: var(--mono-bg); padding: 1px 5px; border-radius: 3px; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; font-size: .78rem; color: var(--muted); }
+  footer ul { margin: 6px 0 0; padding-left: 18px; }
+  footer li { margin-top: 3px; }
+</style>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">BirdLife Australia · Insights Model · Marketing, Communications & Engagement</div>
+    <h1>Marketing & Engagement Dashboard</h1>
+    <div class="asof">Salesforce live, <b>13 August 2026</b> · Ortto/GA4/Campaign Monitor pending Zapier wiring</div>
+  </header>
+
+  <section>
+    <div class="tiles">
+      <div class="tile"><div class="lbl">Pardot hard stop</div><div class="val">18 days</div>
+        <div class="cmp"><span class="down">31 Aug 2026</span> — engagement history dies at uninstall</div>
+        <div class="scope">Export before cutover or the series breaks (DQ-23)</div></div>
+      <div class="tile"><div class="lbl">Campaign adds FYTD <span class="chip live">live</span></div><div class="val">7,829</div>
+        <div class="cmp">CampaignMember records since 1 Jul</div>
+        <div class="scope">Across 664 active campaigns</div></div>
+      <div class="tile"><div class="lbl">Attribution coverage <span class="chip live">live</span></div><div class="val">100%</div>
+        <div class="cmp">0 unattributed won gifts FYTD</div>
+        <div class="scope">Raisely gifts still code to top-level appeal only (DQ-10)</div></div>
+      <div class="tile"><div class="lbl">Ortto audience <span class="chip pending">dated</span></div><div class="val">2.04M</div>
+        <div class="cmp">records · 15.9M activities</div>
+        <div class="scope">Leads not synced; retention limit reached (DQ-16)</div></div>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Pardot → Ortto cutover checklist</h2>
+    <div class="scope">The decommission is the department's critical path — everything else on this page is steady-state</div>
+    <div class="srow"><div>Historical engagement export<div class="d">Pardot opens/clicks/scores are deleted with the uninstall — the engagement time series breaks unless exported first</div></div><span class="chip blocked">Confirm before 31 Aug</span></div>
+    <div class="srow"><div><code>AccountEngagementSync__c</code> retention<div class="d">Referenced by 3 flows, the Contact layout and 20+ reports — must be RETAINED through the uninstall</div></div><span class="chip pending">Retain</span></div>
+    <div class="srow"><div>Trigger regression (13 Contact/Lead triggers)<div class="d">Including Pardot's LogContactChange / LogLeadChange — regression-test before final uninstall approval</div></div><span class="chip pending">Open</span></div>
+    <div class="srow"><div>Ortto retention upgrade decision<div class="d">Limit already reached, blocking expanded sync; Lead object not synced at all. Plan $1,763.20/mo, renewal 12 Aug 2027</div></div><span class="chip blocked">Undecided</span></div>
+    <div class="srow"><div>Zapier Pardot connections (2)<div class="d">Dead weight after 31 Aug — remove with the decommission</div></div><span class="chip pending">Cleanup</span></div>
+  </section>
+  <section class="panel">
+    <h2>Channel metrics — wiring status</h2>
+    <div class="scope">Email engagement, web traffic and conversion land here once the Zapier paths are wired</div>
+    <div class="note" style="margin-top:6px">Ortto and Campaign Monitor both send email until CM retires — every engagement
+    figure must name its sending system. GA4 (connected as mathew.hema.admin) supplies sessions → donation/membership
+    conversion; note the Jul 2026 cart-flood incident as the precedent for bot-distorted web metrics. Event attendance
+    comes from Humanitix. None of these are wired into a scheduled pull yet — they are the next build after the
+    finance exception report.</div>
+  </section>
+
+  <footer>
+    <b>Provenance &amp; scope.</b>
+    <ul>
+      <li>Live tiles: read-only SOQL, 13 Aug 2026. CampaignMember additions are a volume proxy, not engagement — opens/clicks arrive with the Ortto wiring.</li>
+      <li>Ortto figures are dated (documented baseline) and marked as such.</li>
+      <li>Pardot countdown computed from today's date against the 31 Aug 2026 hard stop.</li>
+      <li>Post-cutover, historical Pardot engagement is unrecoverable — the export is the one irreversible deadline on this page.</li>
+    </ul>
+  </footer>
+</div>
+<div id="tip" role="status"></div>
+<script>
+  const tip = document.getElementById("tip");
+  function wireTips(container) {
+    if (!container) return;
+    container.addEventListener("mousemove", e => {
+      if (!e.target.dataset || !e.target.dataset.label) { tip.style.display = "none"; return; }
+      tip.textContent = e.target.dataset.label; tip.style.display = "block";
+      tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px";
+      tip.style.top = (e.clientY - 34) + "px";
+    });
+    container.addEventListener("mouseleave", () => tip.style.display = "none");
+  }
+
+</script>

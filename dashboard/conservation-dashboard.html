@@ -1,0 +1,165 @@
+<title>BirdLife Conservation Programmes</title>
+<style>
+  :root {
+    --page: #F7F6F1; --surface: #FFFFFF; --ink: #20241F; --muted: #6B6F66;
+    --line: #DCDAD0; --grid: #E9E7DE; --accent: #3D6B4F; --accent-soft: #E4EDE7;
+    --bar: #3D6B4F; --bar-dim: #9DB3A6; --flag: #B3541E; --flag-soft: #F6E9DF;
+    --good: #1E7A3C; --mono-bg: #EFEEE7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #171A16; --surface: #20241F; --ink: #E7E6DD; --muted: #A2A69B;
+      --line: #3A3E36; --grid: #2E322B; --accent: #7FB894; --accent-soft: #26352C;
+      --bar: #7FB894; --bar-dim: #4A5A50; --flag: #D98A55; --flag-soft: #3A2C20;
+      --good: #66BB80; --mono-bg: #2A2E28;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #171A16; --surface: #20241F; --ink: #E7E6DD; --muted: #A2A69B;
+    --line: #3A3E36; --grid: #2E322B; --accent: #7FB894; --accent-soft: #26352C;
+    --bar: #7FB894; --bar-dim: #4A5A50; --flag: #D98A55; --flag-soft: #3A2C20;
+    --good: #66BB80; --mono-bg: #2A2E28;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 36px 20px 64px; }
+  h1 { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 1.9rem; margin: 4px 0 4px; font-weight: 600; }
+  h2 { font-size: 1.02rem; margin: 0 0 2px; font-weight: 650; }
+  .eyebrow { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 650; }
+  .asof { color: var(--muted); font-size: .85rem; }
+  section { margin-top: 26px; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; }
+  .scope { font-size: .74rem; color: var(--muted); margin-top: 2px; }
+  .scope b { color: var(--muted); font-weight: 650; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .tile .lbl { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+  .tile .val { font-size: 1.8rem; font-weight: 650; margin-top: 4px; line-height: 1.1; }
+  .tile .cmp { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+  .up { color: var(--good); font-weight: 650; }
+  .down { color: var(--flag); font-weight: 650; }
+  .chart-wrap { padding-left: 52px; }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 180px; border-bottom: 1px solid var(--line); position: relative; }
+  .gridline { position: absolute; left: 0; right: 0; border-top: 1px solid var(--grid); font-size: .68rem; color: var(--muted); }
+  .gridline span { position: absolute; right: 100%; padding-right: 6px; top: -0.6em; white-space: nowrap; }
+  .bars-inner { display: flex; align-items: flex-end; gap: 6px; width: 100%; height: 100%; position: relative; z-index: 1; }
+  .bcol { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; min-width: 0; }
+  .bar { background: var(--bar); border-radius: 3px 3px 0 0; min-height: 2px; cursor: default; }
+  .bar.fy-prev { background: var(--bar-dim); }
+  .bar.partial { background: repeating-linear-gradient(45deg, var(--bar), var(--bar) 4px, var(--surface) 4px, var(--surface) 6px); }
+  .bar:hover, .bar:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .xlabels { display: flex; gap: 6px; margin-top: 6px; }
+  .xlabels div { flex: 1; text-align: center; font-size: .68rem; color: var(--muted); }
+  #tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--page);
+    font-size: .78rem; padding: 5px 9px; border-radius: 4px; display: none; z-index: 10; white-space: nowrap; }
+  .hrow { display: grid; grid-template-columns: minmax(150px, 250px) 1fr 110px; gap: 10px; align-items: center; padding: 5px 0; font-size: .85rem; }
+  .hrow .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hrow .trk { height: 14px; position: relative; }
+  .hrow .fill { position: absolute; inset: 0 auto 0 0; background: var(--bar); border-radius: 3px; min-width: 2px; }
+  .hrow .fill.dim { background: var(--bar-dim); }
+  .hrow .amt { text-align: right; font-variant-numeric: tabular-nums; }
+  .hrow .amt small { color: var(--muted); }
+  .note { font-size: .82rem; color: var(--muted); margin: 8px 0 0; max-width: 76ch; }
+  .callout { border-left: 3px solid var(--flag); background: var(--flag-soft); border-radius: 0 4px 4px 0; padding: 10px 14px; font-size: .84rem; margin-top: 12px; }
+  .callout.ok { border-left-color: var(--good); background: var(--accent-soft); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+  .chip { display: inline-block; font-size: .66rem; letter-spacing: .07em; text-transform: uppercase;
+    font-weight: 700; padding: 2px 8px; border-radius: 999px; vertical-align: 1px; }
+  .chip.live { background: var(--accent-soft); color: var(--accent); }
+  .chip.blocked { background: var(--flag-soft); color: var(--flag); }
+  .chip.pending { background: var(--mono-bg); color: var(--muted); }
+  .srow { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start;
+    padding: 10px 0; border-bottom: 1px solid var(--grid); font-size: .87rem; }
+  .srow:last-child { border-bottom: none; }
+  .srow .d { color: var(--muted); font-size: .8rem; margin-top: 2px; max-width: 70ch; }
+  table { border-collapse: collapse; width: 100%; font-size: .82rem; margin-top: 8px; }
+  th { text-align: left; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 5px 10px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+  td:nth-child(n+2), th:nth-child(n+2) { text-align: right; }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .82em; background: var(--mono-bg); padding: 1px 5px; border-radius: 3px; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; font-size: .78rem; color: var(--muted); }
+  footer ul { margin: 6px 0 0; padding-left: 18px; }
+  footer li { margin-top: 3px; }
+</style>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">BirdLife Australia · Insights Model · Conservation Programmes & Citizen Science</div>
+    <h1>Conservation Programmes Dashboard</h1>
+    <div class="asof">Queried live from Salesforce, <b>13 August 2026</b></div>
+  </header>
+
+  <section>
+    <div class="tiles">
+      <div class="tile"><div class="lbl">Open programme enquiries</div><div class="val">3,494</div>
+        <div class="cmp">Across 13 conservation &amp; citizen-science queues</div>
+        <div class="scope">These are the very cases the ICT filter excludes — same data, opposite scope</div></div>
+      <div class="tile"><div class="lbl">Largest queue</div><div class="val">Powerful Owl</div>
+        <div class="cmp">1,121 open — a third of the whole backlog</div>
+        <div class="scope">Record type <code>Powerful_Owl</code></div></div>
+      <div class="tile"><div class="lbl">Org-wide open cases</div><div class="val">4,461</div>
+        <div class="cmp">vs 22 ICT (Zeus) — context for the “4,344 open” myth</div>
+        <div class="scope">All record types, live</div></div>
+      <div class="tile"><div class="lbl">Birdata surveys</div><div class="val">—</div>
+        <div class="cmp">Not connected; only its enquiry queue is visible (88 open)</div>
+        <div class="scope">Roadmap item — never proxied</div></div>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Open enquiries by programme</h2>
+    <div class="scope">Scope: open Cases by <code>RecordType.DeveloperName</code>, conservation &amp; citizen-science types only · excludes General Enquiry (828 → Supporter Care), Participation (87), eStore (16), Fundraising (12), Zeus (22 → ICT)</div>
+    <div style="margin-top:10px">
+      <div class="hrow"><div class="nm">Powerful Owl</div><div class="trk"><div class="fill" style="width:100.0%"></div></div><div class="amt">1,121</div></div>
+      <div class="hrow"><div class="nm">Swift Parrot Search</div><div class="trk"><div class="fill" style="width:56.6%"></div></div><div class="amt">635</div></div>
+      <div class="hrow"><div class="nm">AOC</div><div class="trk"><div class="fill" style="width:44.5%"></div></div><div class="amt">499</div></div>
+      <div class="hrow"><div class="nm">Conservation Campaigns</div><div class="trk"><div class="fill" style="width:41.4%"></div></div><div class="amt">464</div></div>
+      <div class="hrow"><div class="nm">KBA</div><div class="trk"><div class="fill" style="width:24.4%"></div></div><div class="amt">273</div></div>
+      <div class="hrow"><div class="nm">Red Goshawk</div><div class="trk"><div class="fill" style="width:14.5%"></div></div><div class="amt">162</div></div>
+      <div class="hrow"><div class="nm">Birdata</div><div class="trk"><div class="fill" style="width:7.9%"></div></div><div class="amt">88</div></div>
+      <div class="hrow"><div class="nm">Great Cocky Count</div><div class="trk"><div class="fill" style="width:6.7%"></div></div><div class="amt">75</div></div>
+      <div class="hrow"><div class="nm">Great Pelican Count</div><div class="trk"><div class="fill" style="width:4.3%"></div></div><div class="amt">48</div></div>
+      <div class="hrow"><div class="nm">Great Glossy Count</div><div class="trk"><div class="fill" style="width:4.1%"></div></div><div class="amt">46</div></div>
+      <div class="hrow"><div class="nm">Bird Week</div><div class="trk"><div class="fill" style="width:4.0%"></div></div><div class="amt">45</div></div>
+      <div class="hrow"><div class="nm">Science & Cons. Planning</div><div class="trk"><div class="fill" style="width:2.9%"></div></div><div class="amt">33</div></div>
+      <div class="hrow"><div class="nm">Taxonomy</div><div class="trk"><div class="fill" style="width:0.4%"></div></div><div class="amt">5</div></div>
+    </div>
+    <p class="note">The org-wide acknowledgement backlog documented in the ICT scope-correction work lives
+    <b>here</b>, in the programme queues — not in ICT. Whether 1,121 open Powerful Owl cases represents a triage
+    gap or simply how citizen-science reports are worked is a question for the programme teams; the number has
+    never been visible per-programme before, so this page is the conversation starter.</p>
+  </section>
+  <section class="panel">
+    <h2>What this page still cannot show</h2>
+    <div class="srow"><div>Programme financials (income/spend by programme)<div class="d">Needs NetSuite auth + the org-unit mapping; ~67% of Class/Project segments are inactive with no naming convention (DQ-13) — every programme split will carry an unmapped-% figure</div></div><span class="chip pending">Pending</span></div>
+    <div class="srow"><div>Programme delivery flow (Asana team boards)<div class="d">Team boards exist (Beach-nesting Birds, Black-cockatoos, Grasswrens, …) — wiring their flow metrics is straightforward but not yet done</div></div><span class="chip pending">Next build</span></div>
+    <div class="srow"><div>Survey &amp; monitoring data (Birdata, KBA monitoring)<div class="d">Outside the connected estate entirely — flagged as roadmap, never faked with proxies</div></div><span class="chip blocked">Not connected</span></div>
+  </section>
+
+  <footer>
+    <b>Provenance &amp; scope.</b>
+    <ul>
+      <li>Live SOQL, 13 Aug 2026, read-only. Queue = open cases of that record type; open ≠ new (age analysis is the obvious follow-up).</li>
+      <li>Advocacy engagement (campaign actions) reports through the Marketing page until Ortto wiring lands.</li>
+      <li>Scope discipline per DQ-08: every count names its record type; nothing here is summed with ICT or Supporter Care queues.</li>
+    </ul>
+  </footer>
+</div>
+<div id="tip" role="status"></div>
+<script>
+  const tip = document.getElementById("tip");
+  function wireTips(container) {
+    if (!container) return;
+    container.addEventListener("mousemove", e => {
+      if (!e.target.dataset || !e.target.dataset.label) { tip.style.display = "none"; return; }
+      tip.textContent = e.target.dataset.label; tip.style.display = "block";
+      tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px";
+      tip.style.top = (e.clientY - 34) + "px";
+    });
+    container.addEventListener("mouseleave", () => tip.style.display = "none");
+  }
+
+</script>

@@ -1,0 +1,181 @@
+<title>BirdLife Membership</title>
+<style>
+  :root {
+    --page: #F7F6F1; --surface: #FFFFFF; --ink: #20241F; --muted: #6B6F66;
+    --line: #DCDAD0; --grid: #E9E7DE; --accent: #3D6B4F; --accent-soft: #E4EDE7;
+    --bar: #3D6B4F; --bar-dim: #9DB3A6; --flag: #B3541E; --flag-soft: #F6E9DF;
+    --good: #1E7A3C; --mono-bg: #EFEEE7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #171A16; --surface: #20241F; --ink: #E7E6DD; --muted: #A2A69B;
+      --line: #3A3E36; --grid: #2E322B; --accent: #7FB894; --accent-soft: #26352C;
+      --bar: #7FB894; --bar-dim: #4A5A50; --flag: #D98A55; --flag-soft: #3A2C20;
+      --good: #66BB80; --mono-bg: #2A2E28;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #171A16; --surface: #20241F; --ink: #E7E6DD; --muted: #A2A69B;
+    --line: #3A3E36; --grid: #2E322B; --accent: #7FB894; --accent-soft: #26352C;
+    --bar: #7FB894; --bar-dim: #4A5A50; --flag: #D98A55; --flag-soft: #3A2C20;
+    --good: #66BB80; --mono-bg: #2A2E28;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 36px 20px 64px; }
+  h1 { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 1.9rem; margin: 4px 0 4px; font-weight: 600; }
+  h2 { font-size: 1.02rem; margin: 0 0 2px; font-weight: 650; }
+  .eyebrow { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 650; }
+  .asof { color: var(--muted); font-size: .85rem; }
+  section { margin-top: 26px; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; }
+  .scope { font-size: .74rem; color: var(--muted); margin-top: 2px; }
+  .scope b { color: var(--muted); font-weight: 650; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .tile .lbl { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+  .tile .val { font-size: 1.8rem; font-weight: 650; margin-top: 4px; line-height: 1.1; }
+  .tile .cmp { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+  .up { color: var(--good); font-weight: 650; }
+  .down { color: var(--flag); font-weight: 650; }
+  .chart-wrap { padding-left: 52px; }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 180px; border-bottom: 1px solid var(--line); position: relative; }
+  .gridline { position: absolute; left: 0; right: 0; border-top: 1px solid var(--grid); font-size: .68rem; color: var(--muted); }
+  .gridline span { position: absolute; right: 100%; padding-right: 6px; top: -0.6em; white-space: nowrap; }
+  .bars-inner { display: flex; align-items: flex-end; gap: 6px; width: 100%; height: 100%; position: relative; z-index: 1; }
+  .bcol { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; min-width: 0; }
+  .bar { background: var(--bar); border-radius: 3px 3px 0 0; min-height: 2px; cursor: default; }
+  .bar.fy-prev { background: var(--bar-dim); }
+  .bar.partial { background: repeating-linear-gradient(45deg, var(--bar), var(--bar) 4px, var(--surface) 4px, var(--surface) 6px); }
+  .bar:hover, .bar:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .xlabels { display: flex; gap: 6px; margin-top: 6px; }
+  .xlabels div { flex: 1; text-align: center; font-size: .68rem; color: var(--muted); }
+  #tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--page);
+    font-size: .78rem; padding: 5px 9px; border-radius: 4px; display: none; z-index: 10; white-space: nowrap; }
+  .hrow { display: grid; grid-template-columns: minmax(150px, 250px) 1fr 110px; gap: 10px; align-items: center; padding: 5px 0; font-size: .85rem; }
+  .hrow .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hrow .trk { height: 14px; position: relative; }
+  .hrow .fill { position: absolute; inset: 0 auto 0 0; background: var(--bar); border-radius: 3px; min-width: 2px; }
+  .hrow .fill.dim { background: var(--bar-dim); }
+  .hrow .amt { text-align: right; font-variant-numeric: tabular-nums; }
+  .hrow .amt small { color: var(--muted); }
+  .note { font-size: .82rem; color: var(--muted); margin: 8px 0 0; max-width: 76ch; }
+  .callout { border-left: 3px solid var(--flag); background: var(--flag-soft); border-radius: 0 4px 4px 0; padding: 10px 14px; font-size: .84rem; margin-top: 12px; }
+  .callout.ok { border-left-color: var(--good); background: var(--accent-soft); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+  .chip { display: inline-block; font-size: .66rem; letter-spacing: .07em; text-transform: uppercase;
+    font-weight: 700; padding: 2px 8px; border-radius: 999px; vertical-align: 1px; }
+  .chip.live { background: var(--accent-soft); color: var(--accent); }
+  .chip.blocked { background: var(--flag-soft); color: var(--flag); }
+  .chip.pending { background: var(--mono-bg); color: var(--muted); }
+  .srow { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start;
+    padding: 10px 0; border-bottom: 1px solid var(--grid); font-size: .87rem; }
+  .srow:last-child { border-bottom: none; }
+  .srow .d { color: var(--muted); font-size: .8rem; margin-top: 2px; max-width: 70ch; }
+  table { border-collapse: collapse; width: 100%; font-size: .82rem; margin-top: 8px; }
+  th { text-align: left; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 5px 10px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+  td:nth-child(n+2), th:nth-child(n+2) { text-align: right; }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .82em; background: var(--mono-bg); padding: 1px 5px; border-radius: 3px; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; font-size: .78rem; color: var(--muted); }
+  footer ul { margin: 6px 0 0; padding-left: 18px; }
+  footer li { margin-top: 3px; }
+</style>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">BirdLife Australia · Insights Model · Membership & Participation</div>
+    <h1>Membership Dashboard</h1>
+    <div class="asof">Queried live from Salesforce, <b>13 August 2026</b> · membership status source: Payments2Us (pre-migration)</div>
+  </header>
+
+  <section>
+    <div class="tiles">
+      <div class="tile"><div class="lbl">Active members</div><div class="val">7,764</div>
+        <div class="cmp">Contacts with the P2U-maintained flag</div>
+        <div class="scope"><b>DQ-06:</b> flag dies with Payments2Us unless the rebuild takes it over</div></div>
+      <div class="tile"><div class="lbl">Membership income FYTD</div><div class="val">$38,967</div>
+        <div class="cmp">620 opps · ~flat vs $39,080 (613) SPLY</div>
+        <div class="scope">Record type <b>Membership</b>, won, 1 Jul – 13 Aug</div></div>
+      <div class="tile"><div class="lbl">Auto-renewal rate</div><div class="val">99.4%</div>
+        <div class="cmp">4,759 of 4,786 active payment agreements</div>
+        <div class="scope">Active P2U recurring payments linked to a subscription</div></div>
+      <div class="tile"><div class="lbl">Direct-debit members</div><div class="val">452</div>
+        <div class="cmp"><span class="down">Cannot migrate</span> — fresh BECS mandate needed</div>
+        <div class="scope">Payment method includes Direct Debit; <code>Is_BECS</code> flag reads 0 (unpopulated)</div></div>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Membership income by month</h2>
+    <div class="scope">Scope: won Membership opportunities, Close Date basis · FY25-26: <b>$570,285 · 8,793 opps</b> · renewal peaks Sep &amp; Jan · muted = prior FY, hatched = in progress</div>
+    <div class="chart-wrap" style="margin-top:14px">
+      <div class="bars">
+        <div class="gridline" style="bottom:100%"><span>$100K</span></div>
+        <div class="gridline" style="bottom:75%"><span>$75K</span></div>
+        <div class="gridline" style="bottom:50%"><span>$50K</span></div>
+        <div class="gridline" style="bottom:25%"><span>$25K</span></div>
+        <div class="bars-inner" id="bars"></div>
+      </div>
+      <div class="xlabels" id="xlabels"></div>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Migration to WooCommerce — acceptance watch</h2>
+    <div class="scope">The cutover acceptance metric: P2U active count vs new-platform active count, delta explained to 100%</div>
+    <div class="srow"><div>Salesforce side of the rebuild (lifecycle flow, reminders, voting, object, sync)<div class="d">Vendor Blitzm on the front end; the entire SF side was Not Built at 31 Jul</div></div><span class="chip blocked">Not built</span></div>
+    <div class="srow"><div>Staging test evidence<div class="d">All 45 tests (Blitzm 15 / miniOrange 10 / SF dev 12 / end-to-end 8) were Not Tested at 31 Jul</div></div><span class="chip blocked">Not tested</span></div>
+    <div class="srow"><div>Tier configuration<div class="d">Individual $84 · Concession $65 · Family $132 · Hardship $35 (hidden) · Free $0 — verified on staging 30 Jul; term 12m, cease +15m</div></div><span class="chip live">Confirmed</span></div>
+    <div class="srow"><div>Reminder schedule conflict<div class="d">Confirmed 31/7/1-day schedule contradicts the Conga-wired 10/37/60 timing on <code>Subscription__c</code> — two contradictory reminder streams if both ship. Escalation owner: James Vilinsky</div></div><span class="chip blocked">Escalate</span></div>
+    <div class="callout"><b>The 452 direct-debit members are a comms project, not a technical one.</b>
+      They will show as “lapsed” at cutover unless flagged and walked through a fresh mandate
+      (open decision Q10). Auto-renewals turn off in P2U at cutover — no double-charging is the hard requirement.</div>
+  </section>
+
+  <footer>
+    <b>Provenance &amp; scope.</b>
+    <ul>
+      <li>Active members: <code>Contact.Active_BL_Member__c = true</code> — maintained by Payments2Us (decommissioning). Journal (Emu) access depends on this flag (DQ-06).</li>
+      <li>Agreements: <code>AAkPay__Recurring_Payment__c</code> status Active with a linked subscription. The unmanaged <code>Subscription__c</code> object is not queried (DQ-20 collision).</li>
+      <li>Direct-debit count uses payment method because the <code>AAkPay__Is_BECS__c</code> checkbox is unpopulated — an unset boolean reads false, the checkbox cousin of DQ-04.</li>
+      <li>Org <code>birdlifeaustralia.my.salesforce.com</code>, read-only SOQL, 13 Aug 2026. Canonical queries: <code>insights/sql/extraction-queries.md</code>.</li>
+    </ul>
+  </footer>
+</div>
+<div id="tip" role="status"></div>
+<script>
+  const tip = document.getElementById("tip");
+  function wireTips(container) {
+    if (!container) return;
+    container.addEventListener("mousemove", e => {
+      if (!e.target.dataset || !e.target.dataset.label) { tip.style.display = "none"; return; }
+      tip.textContent = e.target.dataset.label; tip.style.display = "block";
+      tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px";
+      tip.style.top = (e.clientY - 34) + "px";
+    });
+    container.addEventListener("mouseleave", () => tip.style.display = "none");
+  }
+
+  const months = [
+    ["Jul 25",24884,398,"prev"],["Aug 25",52914,821,"prev"],["Sep 25",95122,1454,"prev"],
+    ["Oct 25",43071,652,"prev"],["Nov 25",27025,406,"prev"],["Dec 25",63951,945,"prev"],
+    ["Jan 26",76572,1199,"prev"],["Feb 26",40960,636,"prev"],["Mar 26",53344,833,"prev"],
+    ["Apr 26",25239,402,"prev"],["May 26",33145,517,"prev"],["Jun 26",34058,530,"prev"],
+    ["Jul 26",25360,411,"cur"],["Aug 26",13607,209,"partial"]];
+  const MAX = 100000, bars = document.getElementById("bars"), xl = document.getElementById("xlabels");
+  const fmt = n => "$" + n.toLocaleString("en-AU");
+  months.forEach(([m, amt, c, kind]) => {
+    const col = document.createElement("div"); col.className = "bcol";
+    const b = document.createElement("div");
+    b.className = "bar" + (kind === "prev" ? " fy-prev" : kind === "partial" ? " partial" : "");
+    b.style.height = (amt / MAX * 100) + "%"; b.tabIndex = 0;
+    b.dataset.label = m + (kind === "partial" ? " (to 13 Aug)" : "") + " — " + fmt(amt) + " · " + c.toLocaleString() + " opps";
+    col.appendChild(b); bars.appendChild(col);
+    const x = document.createElement("div"); x.textContent = m.split(" ")[0][0]; xl.appendChild(x);
+  });
+  wireTips(bars);
+
+</script>
