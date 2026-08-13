@@ -1,0 +1,832 @@
+<title>Te Ara Hauora</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+  /* ---- Theme tokens: light is the bare :root; dark overrides tokens only ---- */
+  :root{
+    --bg:#f7f6f1; --surface:#ffffff; --surface2:#efeee6;
+    --ink:#1c2a24; --ink2:#5c6b62; --line:#e0dfd4;
+    --accent:#0d8158; --accent-ink:#ffffff; --accent-soft:#e2f0e9;
+    --ochre:#b5502e; --ochre-soft:#f4e5de;
+    --chart-line:#0d8158; --chart-goal:#b5502e; --chart-grid:#e6e5da;
+    --good:#0d8158; --shadow:0 1px 3px rgba(28,42,36,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1c17; --surface:#182a23; --surface2:#13231d;
+      --ink:#e9efe9; --ink2:#9db0a4; --line:#27392f;
+      --accent:#4cc596; --accent-ink:#0c1f18; --accent-soft:#1d3a2e;
+      --ochre:#e08a5e; --ochre-soft:#3a271d;
+      --chart-line:#2f9e6f; --chart-goal:#cd6e42; --chart-grid:#223429;
+      --good:#4cc596; --shadow:0 1px 3px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1c17; --surface:#182a23; --surface2:#13231d;
+    --ink:#e9efe9; --ink2:#9db0a4; --line:#27392f;
+    --accent:#4cc596; --accent-ink:#0c1f18; --accent-soft:#1d3a2e;
+    --ochre:#e08a5e; --ochre-soft:#3a271d;
+    --chart-line:#2f9e6f; --chart-goal:#cd6e42; --chart-grid:#223429;
+    --good:#4cc596; --shadow:0 1px 3px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.45 -apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+    padding-bottom:calc(76px + env(safe-area-inset-bottom));
+  }
+  .wrap{max-width:640px; margin:0 auto; padding:0 14px}
+
+  /* Masthead with tāniko strip */
+  .taniko{height:7px; background:
+    repeating-linear-gradient(135deg, var(--accent) 0 7px, var(--bg) 7px 10px, var(--ochre) 10px 17px, var(--bg) 17px 20px);}
+  header.mast{padding:14px 0 6px}
+  .mast h1{font:600 26px/1.15 "Palatino Linotype",Palatino,Georgia,serif; margin:0; letter-spacing:.2px}
+  .mast .sub{color:var(--ink2); font-size:13px; text-transform:uppercase; letter-spacing:.12em; margin-top:2px}
+  .mastrow{display:flex; align-items:center; justify-content:space-between; gap:10px}
+  .gear{background:none;border:1px solid var(--line);border-radius:10px;color:var(--ink2);
+    padding:8px 10px;font-size:15px;cursor:pointer}
+
+  /* Cards */
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    box-shadow:var(--shadow); padding:14px 14px 16px; margin:12px 0}
+  .card h2{margin:0 0 2px; font:600 19px/1.2 "Palatino Linotype",Palatino,Georgia,serif}
+  .card .en{color:var(--ink2); font-size:12px; text-transform:uppercase; letter-spacing:.12em; margin:0 0 10px}
+  label{display:block; font-size:13px; color:var(--ink2); margin:10px 0 4px}
+  input[type=text],input[type=number],textarea,select{
+    width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:10px;
+    background:var(--surface2); color:var(--ink); font:inherit}
+  textarea{min-height:56px; resize:vertical}
+  input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+
+  /* Buttons & chips */
+  .btn{background:var(--accent); color:var(--accent-ink); border:0; border-radius:10px;
+    padding:11px 16px; font:600 16px/1 inherit; font-family:inherit; cursor:pointer}
+  .btn.ghost{background:var(--surface2); color:var(--ink); border:1px solid var(--line)}
+  .btn.small{padding:8px 12px; font-size:14px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
+  .chip{border:1px solid var(--line); background:var(--surface2); color:var(--ink);
+    border-radius:999px; padding:8px 14px; font-size:14px; cursor:pointer}
+  .chip.plan{border-color:var(--accent); color:var(--accent); background:var(--accent-soft)}
+
+  /* Date nav */
+  .datenav{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:10px 0 2px}
+  .datenav .d{text-align:center}
+  .datenav .maori{font:600 20px/1.2 "Palatino Linotype",Palatino,Georgia,serif}
+  .datenav .greg{color:var(--ink2); font-size:13px}
+  .navbtn{border:1px solid var(--line); background:var(--surface); color:var(--ink);
+    border-radius:10px; width:44px; height:44px; font-size:20px; cursor:pointer}
+  .todaylink{color:var(--accent); background:none; border:0; font:600 14px inherit; font-family:inherit; cursor:pointer}
+  .streak{display:inline-block; background:var(--accent-soft); color:var(--accent);
+    border-radius:999px; padding:4px 12px; font-size:13px; font-weight:600}
+
+  /* Water */
+  .waterrow{display:flex; align-items:center; gap:10px}
+  .waterrow .big{font-size:26px; font-weight:700; font-variant-numeric:tabular-nums; min-width:110px}
+  .bar{flex:1; height:10px; background:var(--surface2); border-radius:999px; overflow:hidden; border:1px solid var(--line)}
+  .bar i{display:block; height:100%; background:var(--accent); border-radius:999px}
+
+  /* Whare tapa whā tiles */
+  .whare{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px}
+  .wall{border:1px solid var(--line); border-radius:12px; padding:10px 12px; cursor:pointer;
+    background:var(--surface2); -webkit-tap-highlight-color:transparent}
+  .wall .nm{font-weight:700; font-size:15px}
+  .wall .sg{color:var(--ink2); font-size:13px; margin-top:2px}
+  .wall.done{background:var(--accent-soft); border-color:var(--accent)}
+  .wall.done .nm{color:var(--accent)}
+  .wall .tick{float:right; color:var(--accent); font-weight:700; visibility:hidden}
+  .wall.done .tick{visibility:visible}
+
+  /* Meds */
+  .medrow{display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid var(--line)}
+  .medrow:last-child{border-bottom:0}
+  .medrow input[type=checkbox]{width:24px; height:24px; accent-color:var(--accent); flex:none; margin-top:2px}
+  .medrow .t b{font-size:15px}
+  .medrow .t div{color:var(--ink2); font-size:13px}
+
+  /* Weight tab */
+  .hero{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
+  .hero .n{font-size:44px; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-.5px}
+  .hero .u{font-size:18px; color:var(--ink2)}
+  .delta{border-radius:999px; padding:4px 12px; font-size:14px; font-weight:600}
+  .delta.up{background:var(--ochre-soft); color:var(--ochre)}
+  .delta.down{background:var(--accent-soft); color:var(--accent)}
+  .ranges{display:flex; gap:6px; margin:10px 0}
+  .ranges button{flex:1; border:1px solid var(--line); background:var(--surface2); color:var(--ink2);
+    border-radius:8px; padding:7px 0; font:600 13px inherit; font-family:inherit; cursor:pointer}
+  .ranges button.on{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+  .chartbox{position:relative}
+  .chartbox svg{display:block; width:100%; height:auto}
+  .tip{position:absolute; pointer-events:none; background:var(--surface); border:1px solid var(--line);
+    border-radius:8px; box-shadow:var(--shadow); padding:6px 10px; font-size:13px; display:none; white-space:nowrap}
+  .tip b{font-variant-numeric:tabular-nums}
+  .statrow{display:flex; gap:8px; margin-top:10px}
+  .stat{flex:1; background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:8px 10px}
+  .stat .v{font-weight:700; font-size:18px; font-variant-numeric:tabular-nums}
+  .stat .k{color:var(--ink2); font-size:12px}
+
+  /* Plan tab */
+  details{border:1px solid var(--line); border-radius:12px; margin:8px 0; background:var(--surface2)}
+  summary{padding:12px 14px; font-weight:600; cursor:pointer; list-style:none;
+    display:flex; justify-content:space-between; align-items:center; gap:8px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+"; color:var(--ink2); flex:none}
+  details[open] summary::after{content:"–"}
+  details .inner{padding:0 14px 12px; font-size:15px}
+  details .inner ul{margin:6px 0; padding-left:20px}
+  details .inner li{margin:4px 0}
+  .weektable{width:100%; border-collapse:collapse; font-size:15px}
+  .weektable td{padding:8px 6px; border-bottom:1px solid var(--line); vertical-align:top}
+  .weektable td:first-child{font-weight:700; white-space:nowrap; width:92px}
+  .weektable tr.today td{background:var(--accent-soft); border-radius:8px}
+
+  /* History */
+  .hday{display:flex; align-items:center; gap:10px; padding:11px 4px; border-bottom:1px solid var(--line);
+    cursor:pointer; -webkit-tap-highlight-color:transparent}
+  .hday:last-child{border-bottom:0}
+  .hday .dt{width:104px; flex:none}
+  .hday .dt b{font-size:15px}
+  .hday .dt div{color:var(--ink2); font-size:12px}
+  .hday .wt{width:70px; flex:none; font-weight:700; font-variant-numeric:tabular-nums}
+  .dots{display:flex; gap:6px; flex-wrap:wrap}
+  .dot{font-size:12px; border-radius:999px; padding:3px 9px; background:var(--surface2); border:1px solid var(--line); color:var(--ink2)}
+  .dot.on{background:var(--accent-soft); border-color:var(--accent); color:var(--accent)}
+
+  /* Tabs */
+  nav.tabs{position:fixed; left:0; right:0; bottom:0; background:var(--surface);
+    border-top:1px solid var(--line); display:flex; z-index:30;
+    padding-bottom:env(safe-area-inset-bottom)}
+  nav.tabs button{flex:1; background:none; border:0; padding:9px 0 7px; cursor:pointer; color:var(--ink2)}
+  nav.tabs button.on{color:var(--accent)}
+  nav.tabs .ic{display:block; margin:0 auto 2px; width:24px; height:24px}
+  nav.tabs .lb{font-size:11px; font-weight:600; letter-spacing:.02em}
+
+  /* Modal */
+  .modal{position:fixed; inset:0; background:rgba(10,20,15,.5); display:none; z-index:40; overflow:auto}
+  .modal.open{display:block}
+  .sheet{background:var(--surface); max-width:560px; margin:6vh auto; border-radius:16px; padding:18px; border:1px solid var(--line)}
+  .sheet h2{margin:0 0 10px; font:600 21px "Palatino Linotype",Palatino,Georgia,serif}
+  .rowbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+
+  .toast{position:fixed; bottom:calc(84px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
+    background:var(--ink); color:var(--bg); border-radius:999px; padding:8px 18px; font-size:14px;
+    opacity:0; transition:opacity .25s; pointer-events:none; z-index:50; white-space:nowrap}
+  .toast.show{opacity:.95}
+  @media (prefers-reduced-motion: reduce){ .toast{transition:none} }
+  .note{color:var(--ink2); font-size:13px}
+  .warn{background:var(--ochre-soft); color:var(--ochre); border-radius:10px; padding:10px 12px; font-size:14px; margin:10px 0}
+  .hidden{display:none !important}
+</style>
+
+<div class="taniko"></div>
+<div class="wrap">
+  <header class="mast">
+    <div class="mastrow">
+      <div>
+        <h1>Te Ara Hauora</h1>
+        <div class="sub">The pathway of wellbeing</div>
+      </div>
+      <button class="gear" id="btnSettings" aria-label="Settings">Settings</button>
+    </div>
+  </header>
+  <div id="storageWarn" class="warn hidden">Heads up — this browser is blocking saved data, so entries won’t survive closing the page. Use Settings → Backup to keep a copy.</div>
+  <main id="view"></main>
+</div>
+
+<nav class="tabs" id="tabs"></nav>
+<div class="toast" id="toast">Kua tiakina · Saved</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h2>Ngā tautuhinga · Settings</h2>
+    <label>Your name</label><input type="text" id="sName">
+    <label>Age</label><input type="number" id="sAge" min="1" max="120">
+    <label>Goal weight (kg)</label><input type="number" id="sGoal" step="0.5">
+    <label>Daily water goal (litres)</label><input type="number" id="sWater" step="0.25">
+    <label>Morning medication</label><input type="text" id="sMedAm">
+    <label>Evening medication</label><input type="text" id="sMedPm">
+    <label>As-needed medication</label><input type="text" id="sMedPrn">
+    <div class="rowbtns">
+      <button class="btn small" id="btnSaveSettings">Save settings</button>
+      <button class="btn small ghost" id="btnClose">Close</button>
+    </div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+    <b>Backup &amp; restore</b>
+    <p class="note">Your data lives on this phone only. Save a backup file now and then — you can restore it on any device.</p>
+    <div class="rowbtns">
+      <button class="btn small ghost" id="btnExportJson">Backup (JSON)</button>
+      <button class="btn small ghost" id="btnExportCsv">Spreadsheet (CSV)</button>
+      <button class="btn small ghost" id="btnImport">Restore backup</button>
+      <input type="file" id="fileImport" accept=".json,application/json" class="hidden">
+    </div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+    <div class="rowbtns">
+      <button class="btn small ghost" id="btnWipe" style="color:var(--ochre)">Delete all data</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ================= Data ================= */
+const KEY = "teAraHauora.v1";
+const SEED_WEIGHTS = [["2023-11-15",96.1],["2023-11-16",96.1],["2023-11-17",97.8],["2023-11-18",97.7],["2023-11-19",97.6],["2023-11-20",97.5],["2023-11-21",97.5],["2023-11-22",98.0],["2023-11-23",98.0],["2023-11-24",98.0],["2023-11-25",98.0],["2023-11-26",97.7],["2023-11-27",97.5],["2023-11-28",97.5],["2023-11-29",97.5],["2023-11-30",97.5],["2023-12-01",97.2],["2024-01-08",99.2],["2024-01-09",98.1],["2024-01-10",97.3],["2024-01-11",96.3],["2024-01-12",96.7],["2024-01-13",96.5],["2024-01-14",97.1],["2024-01-15",97.6],["2024-01-16",97.2],["2024-01-17",96.6],["2024-01-18",97.1],["2024-01-19",96.8],["2024-01-20",96.8],["2024-01-21",96.8],["2024-01-22",97.3],["2024-01-23",97.0],["2024-01-24",97.0],["2024-01-25",97.0],["2024-01-26",97.0],["2024-01-27",97.0],["2024-01-28",97.2],["2024-01-29",97.5],["2024-01-30",97.0],["2024-01-31",97.0],["2024-02-01",96.8],["2024-02-02",96.3],["2024-02-03",95.5],["2024-02-04",95.6],["2024-02-05",96.5],["2024-02-06",96.2],["2024-02-07",96.0],["2024-02-08",95.5],["2024-02-09",95.5],["2024-02-10",95.8],["2024-02-11",95.9],["2024-02-12",96.0],["2024-02-13",96.0],["2024-02-14",96.0],["2024-02-15",95.6],["2024-02-16",96.0],["2024-02-17",96.0],["2024-02-18",96.1],["2024-02-19",96.7],["2024-02-20",96.3],["2024-02-21",96.4],["2024-02-22",96.3],["2024-02-23",96.1],["2024-02-24",94.9],["2024-02-25",96.1],["2024-02-26",96.1],["2024-02-27",95.1],["2024-02-28",95.5],["2024-02-29",95.2],["2024-03-01",94.7],["2024-03-02",95.1],["2024-03-03",95.3],["2024-03-04",95.3],["2024-03-05",95.4],["2024-03-06",95.3],["2024-03-07",95.2],["2024-03-08",95.3],["2024-03-09",95.4],["2024-03-10",94.7],["2024-03-11",95.1],["2024-03-12",95.1],["2024-03-13",95.0],["2024-03-14",95.1],["2024-03-15",94.7],["2024-03-16",94.8],["2024-03-17",95.1],["2024-03-18",95.2],["2024-03-19",94.7],["2024-03-20",94.6],["2024-03-21",95.0],["2024-03-22",94.8],["2024-03-23",94.8],["2024-03-24",95.1],["2024-03-25",95.3],["2024-03-26",95.3],["2024-03-27",95.3],["2024-03-28",95.4],["2024-03-29",95.4],["2024-03-30",95.3],["2024-03-31",95.4],["2024-04-01",95.5],["2024-04-02",95.5],["2024-04-03",95.5],["2024-04-04",95.5],["2024-04-05",95.5],["2024-04-06",95.7],["2024-04-07",95.8],["2024-04-08",95.7],["2024-04-09",96.0],["2024-04-10",96.3],["2024-04-11",96.3],["2024-04-12",96.0],["2024-04-13",95.5],["2024-04-14",95.7],["2024-04-15",95.7],["2024-04-16",95.7],["2024-04-17",95.8],["2024-04-18",95.8],["2024-04-19",95.8],["2024-04-20",96.0],["2024-04-21",96.0],["2024-04-22",95.8],["2024-04-23",95.7],["2024-04-24",94.7],["2024-04-25",94.5],["2024-04-26",94.9],["2024-04-27",95.2],["2024-04-28",94.8],["2024-04-29",95.2],["2024-04-30",94.8],["2024-05-01",94.4],["2024-05-02",94.8],["2024-05-03",94.5],["2024-05-04",94.5],["2024-05-05",94.6],["2024-05-06",94.8],["2024-05-07",94.6],["2024-05-08",94.8],["2024-05-09",94.7],["2024-05-10",94.5],["2024-05-11",94.8],["2024-05-12",95.2],["2024-05-13",95.5],["2024-05-14",96.1],["2024-05-15",96.1],["2024-05-16",95.9],["2024-05-17",95.2],["2024-05-18",95.2],["2024-05-19",94.4],["2024-05-20",94.8],["2024-05-21",95.0],["2024-05-22",95.0],["2024-05-23",95.0],["2024-05-24",94.9],["2024-05-25",95.0],["2024-05-26",94.7],["2024-05-27",95.0],["2024-05-28",95.1],["2024-05-29",95.3],["2024-05-30",95.2],["2024-05-31",95.2],["2024-06-01",95.2],["2024-06-02",95.5],["2024-06-03",95.5],["2024-06-04",95.4],["2024-06-05",95.4],["2024-06-06",95.2],["2024-06-07",95.2],["2024-06-08",95.2],["2024-06-09",95.0],["2024-06-10",95.0],["2024-06-11",95.1],["2024-06-12",95.1],["2024-06-13",95.1],["2024-06-14",95.2],["2024-06-15",95.2],["2024-06-16",95.2],["2024-06-17",95.2],["2024-06-18",95.2],["2024-06-19",95.1],["2024-06-20",95.1],["2024-06-21",95.1],["2024-06-22",95.2],["2024-06-23",95.8],["2024-06-24",95.8],["2024-06-25",95.8],["2024-06-26",95.8],["2024-06-27",95.9],["2024-06-28",95.6],["2024-06-29",95.8],["2024-06-30",95.2],["2024-07-01",95.1],["2024-07-02",95.6],["2024-07-03",95.7],["2024-07-04",95.6],["2024-07-05",96.2],["2024-07-06",96.3],["2024-07-07",96.3],["2024-07-08",96.4],["2024-07-09",96.4],["2024-07-10",96.4],["2024-07-11",96.4],["2024-07-12",96.4],["2024-07-13",96.4],["2024-07-14",97.1],["2024-07-15",97.2],["2024-07-16",97.2],["2024-07-17",97.2],["2024-07-18",97.2],["2024-07-19",97.2],["2024-07-20",96.9],["2024-07-21",96.5],["2024-07-22",96.2],["2024-07-23",96.3],["2024-07-24",96.3],["2024-07-25",95.9],["2024-07-26",95.8],["2024-07-27",95.8],["2024-07-28",95.8],["2024-07-29",95.9],["2024-07-30",96.0],["2024-07-31",96.1],["2024-08-01",96.1],["2024-08-02",96.2],["2024-08-03",96.2],["2024-08-04",96.2],["2024-08-05",96.5],["2024-08-06",96.2],["2024-08-07",96.2],["2024-08-08",96.4],["2024-08-09",96.5],["2024-08-10",96.2],["2024-08-11",96.2],["2024-08-12",96.2],["2024-08-13",96.2],["2024-08-14",96.4],["2024-08-15",96.3],["2024-08-16",96.4],["2024-08-17",96.0],["2024-08-18",96.0],["2024-08-19",96.0],["2024-08-20",96.0],["2024-08-21",96.2],["2024-08-22",96.2],["2024-08-23",96.3],["2024-08-24",96.3],["2024-08-25",96.2],["2024-08-26",96.2],["2024-08-27",96.2],["2024-08-28",96.2],["2024-08-29",96.3],["2024-08-30",96.2],["2024-08-31",96.4],["2024-09-01",96.1],["2024-09-02",96.3],["2024-09-03",96.3],["2024-09-04",96.2],["2024-09-05",96.3],["2024-09-06",96.4],["2024-09-07",96.2],["2024-09-08",97.1],["2024-09-09",97.1],["2024-09-10",97.2],["2024-09-11",97.3],["2024-09-12",97.3],["2024-09-13",97.2],["2024-09-14",97.4],["2024-09-15",97.2],["2024-09-16",97.2],["2024-09-17",97.2],["2024-09-18",97.3],["2024-09-19",97.5],["2024-09-20",97.3],["2024-09-21",97.2],["2024-09-22",97.2],["2024-09-23",97.2],["2024-09-24",97.6],["2024-09-25",97.2],["2024-09-26",97.4],["2024-09-27",97.2],["2024-09-28",97.4],["2024-09-29",97.5],["2024-09-30",97.2],["2024-10-01",97.3],["2024-10-02",97.4],["2024-10-03",97.4],["2024-10-04",97.2],["2024-10-05",97.3],["2024-10-06",97.1],["2024-10-07",97.2],["2024-10-08",97.5],["2024-10-09",97.4],["2024-10-10",97.2],["2024-10-11",97.3],["2024-10-12",97.4],["2024-10-13",97.3],["2024-10-14",97.4],["2024-10-15",98.1],["2024-10-16",97.9],["2024-10-17",97.2],["2024-10-18",97.3],["2024-10-19",97.2],["2024-10-20",97.4],["2024-10-21",97.5],["2024-10-22",97.3],["2024-10-23",97.4],["2024-10-24",97.3],["2024-10-25",97.5],["2024-10-26",97.2],["2024-10-27",97.3],["2024-10-28",97.4],["2024-10-29",97.3],["2024-10-30",97.4],["2024-10-31",97.3],["2024-11-01",97.5],["2024-11-02",97.2],["2024-11-03",97.5],["2024-11-04",97.2],["2024-11-05",97.3],["2024-11-06",98.2],["2024-11-07",98.3],["2024-11-08",98.4],["2024-11-09",98.2],["2024-11-10",98.3],["2024-11-11",98.4],["2024-11-12",98.2],["2024-11-13",98.2],["2024-11-14",98.4],["2024-11-15",97.3],["2024-11-16",98.2],["2024-11-17",98.3],["2024-11-18",98.5],["2024-11-19",98.4],["2024-11-20",98.3],["2024-11-21",98.2],["2024-11-22",98.2],["2024-11-23",98.4],["2024-11-24",97.8],["2024-11-25",97.5],["2024-11-26",97.6],["2024-11-27",97.8],["2024-11-28",97.5],["2024-11-29",97.6],["2024-11-30",97.8],["2024-12-01",98.5],["2024-12-02",98.6],["2024-12-03",98.8],["2024-12-04",98.7],["2024-12-05",98.7],["2024-12-06",98.8],["2024-12-07",98.6],["2024-12-08",98.5],["2024-12-09",98.6],["2024-12-10",98.2],["2024-12-11",97.2],["2024-12-12",97.5],["2024-12-13",97.4],["2024-12-14",97.5],["2024-12-15",97.2],["2024-12-16",98.1],["2024-12-17",97.6],["2024-12-18",97.5],["2024-12-19",97.6],["2024-12-20",97.6],["2024-12-21",98.1],["2024-12-22",98.2],["2024-12-23",98.1],["2024-12-24",98.1],["2024-12-25",98.1],["2024-12-26",98.1],["2024-12-27",98.1],["2024-12-28",98.1],["2024-12-29",98.1],["2024-12-30",98.1],["2024-12-31",98.1],["2025-01-01",98.1],["2025-01-02",98.1],["2025-01-03",98.1],["2025-01-04",98.1],["2025-01-05",98.1],["2025-01-06",98.1],["2025-01-07",98.2],["2025-01-08",97.8],["2025-01-09",96.8],["2025-01-10",96.8],["2025-01-11",96.7],["2025-01-12",97.5],["2025-01-13",97.4],["2025-01-14",97.5],["2025-01-15",97.1],["2025-01-16",97.5],["2025-01-17",97.5],["2025-01-18",97.4],["2025-01-19",97.6],["2025-01-20",97.5],["2025-01-21",97.5],["2025-01-22",97.6],["2025-01-23",97.5],["2025-01-24",97.4],["2025-01-25",97.5],["2025-01-26",97.5],["2025-01-27",97.5],["2025-01-28",96.5],["2025-01-29",96.5],["2025-01-30",96.7],["2025-01-31",97.2],["2025-02-01",97.2],["2025-02-02",97.3],["2025-02-03",97.4],["2025-02-04",97.5],["2025-02-05",97.6],["2025-02-06",97.5],["2025-02-07",97.6],["2025-02-08",97.5],["2025-02-09",97.6],["2025-02-10",97.4],["2025-02-11",97.6],["2025-02-12",97.5],["2025-02-13",97.5],["2025-02-14",97.6],["2025-02-15",97.8],["2025-02-16",97.6],["2025-02-17",97.6],["2025-02-18",97.6],["2025-02-19",97.8],["2025-02-20",97.6],["2025-02-21",97.8],["2025-02-22",97.6],["2025-02-23",97.6],["2025-02-24",98.2],["2025-02-25",98.1],["2025-02-26",97.6],["2025-02-27",97.6],["2025-02-28",96.3],["2025-03-01",96.4],["2025-03-02",96.2],["2025-03-03",96.5],["2025-03-04",96.4],["2025-03-05",95.0],["2025-03-06",95.1],["2025-03-07",95.2],["2025-03-08",95.3],["2025-03-09",95.3],["2025-03-10",95.1],["2025-03-11",95.0],["2025-03-12",95.1],["2025-03-13",95.2],["2025-03-14",95.1],["2025-03-15",95.2],["2025-03-16",95.2],["2025-03-31",97.0],["2025-04-01",97.0],["2025-04-02",96.5],["2025-04-03",94.8],["2025-04-04",94.8],["2025-04-05",94.5],["2025-04-06",94.0],["2025-04-07",94.4],["2025-04-08",94.5],["2025-04-09",94.5],["2025-04-10",94.0],["2025-04-11",93.0],["2025-04-12",93.0],["2025-04-13",92.8],["2025-04-14",92.7],["2025-04-15",93.2],["2025-04-16",93.4],["2025-04-17",94.1],["2025-04-18",94.1],["2025-04-19",95.0],["2025-04-20",95.0],["2025-04-21",94.3],["2025-04-22",94.5],["2025-04-23",94.5],["2025-04-24",94.2],["2025-04-25",94.9],["2025-04-26",94.9],["2025-04-27",94.9],["2025-04-28",94.9],["2025-04-29",94.9],["2025-04-30",94.9],["2025-05-01",94.9],["2025-05-02",94.9],["2025-05-03",95.0],["2025-05-04",95.2],["2025-05-05",95.2],["2025-05-06",95.5],["2025-05-07",95.5],["2025-05-08",95.5],["2025-05-09",95.5],["2025-05-10",95.5],["2025-05-11",95.5],["2025-05-12",95.5],["2025-05-13",95.8],["2025-05-14",96.2],["2025-05-15",96.1],["2025-05-16",95.8],["2025-05-17",95.8],["2025-05-18",96.0],["2025-05-19",96.0],["2025-05-20",96.1],["2025-05-21",96.3],["2025-05-22",96.5],["2025-05-23",96.6],["2025-05-24",96.5],["2025-05-25",96.7],["2025-05-26",96.5],["2025-05-27",96.7],["2025-05-28",96.8],["2025-05-29",96.7],["2025-05-30",96.8],["2025-05-31",96.7],["2025-06-01",96.9],["2025-06-02",96.8],["2025-06-03",96.8],["2025-06-04",96.8],["2025-06-05",96.9],["2025-06-06",97.2],["2025-06-07",97.2],["2025-06-08",97.2],["2025-06-18",97.2],["2025-06-19",97.3],["2025-06-20",96.8],["2025-06-21",96.2],["2025-06-22",96.4],["2025-06-23",96.5],["2025-06-24",96.4],["2025-06-25",96.7],["2025-06-26",96.8],["2025-06-27",96.7],["2025-06-28",97.0],["2025-06-29",96.4],["2025-06-30",96.5],["2025-07-01",96.7],["2025-07-02",96.8],["2025-07-03",96.7],["2025-07-04",96.5],["2025-07-05",96.5],["2025-07-06",96.5],["2025-07-07",96.7],["2025-07-08",96.8],["2025-07-09",96.5],["2025-07-10",96.7],["2025-07-11",96.5],["2025-07-12",96.6],["2025-07-13",96.5],["2025-07-14",96.7],["2025-07-15",96.8],["2025-07-16",96.8],["2025-07-17",97.2],["2025-07-18",97.1],["2025-07-19",96.5],["2025-07-20",96.6],["2025-07-21",96.7],["2025-07-22",96.5],["2025-07-23",96.5],["2025-07-24",96.8],["2025-07-25",96.5],["2025-07-26",96.8],["2025-07-27",96.8],["2025-07-28",96.7],["2025-07-29",96.5],["2025-07-30",96.4],["2025-07-31",96.7],["2025-08-01",96.8],["2025-08-02",96.7],["2025-08-03",96.8],["2025-08-04",96.5],["2025-08-05",96.8],["2025-08-06",97.5],["2025-08-07",97.9],["2025-08-08",97.9],["2025-08-09",97.8],["2025-08-10",97.8],["2025-08-11",98.2],["2025-08-12",98.5],["2025-08-13",98.6],["2025-08-14",98.7],["2025-08-15",98.9],["2025-08-16",98.6],["2025-08-17",98.7],["2025-08-18",98.5],["2025-08-19",98.6],["2025-08-20",98.6],["2025-08-21",98.7],["2025-08-22",98.6],["2025-08-23",98.5],["2025-08-24",98.7],["2025-08-25",98.5],["2025-08-26",98.6],["2025-08-27",98.7],["2025-08-28",98.6],["2025-08-29",98.5],["2025-08-30",98.4],["2025-08-31",98.6],["2025-09-01",98.7],["2025-09-02",98.8],["2025-09-03",98.6],["2025-09-04",98.5],["2025-09-05",98.7],["2025-09-06",98.5],["2025-09-07",98.6],["2025-09-08",98.7],["2025-09-09",98.7],["2025-09-10",98.7],["2025-09-11",98.7],["2025-09-12",98.7],["2025-09-13",98.6],["2025-09-14",98.5],["2025-09-15",98.6],["2025-09-16",98.5],["2025-09-17",98.4],["2025-09-18",98.4],["2025-09-19",98.7],["2025-09-20",98.6],["2025-09-21",98.5],["2025-09-22",98.1],["2025-09-23",98.2],["2025-09-24",98.3],["2025-09-25",98.2],["2025-09-26",98.3],["2025-09-27",98.4],["2025-09-28",98.2],["2025-09-29",98.8],["2025-09-30",98.7],["2025-10-01",98.6],["2025-10-02",98.8],["2025-10-03",98.6],["2025-10-04",98.9],["2025-10-05",99.1],["2025-10-06",97.6],["2025-10-07",98.1],["2025-10-08",98.5],["2025-10-09",98.6],["2025-10-10",98.7],["2025-10-11",98.5],["2025-10-12",98.7],["2025-10-13",98.6],["2025-10-14",98.7],["2025-10-15",98.6],["2025-10-16",98.7],["2025-10-17",98.7],["2025-10-18",98.5],["2025-10-19",98.6],["2025-10-20",98.7],["2025-10-21",98.6],["2025-10-22",98.7],["2025-10-23",98.8],["2025-10-24",98.7],["2025-10-25",98.6],["2025-10-26",98.5],["2025-10-27",98.6],["2025-10-28",98.7],["2025-10-29",98.8],["2025-10-30",98.8],["2025-10-31",98.9],["2025-11-01",98.8],["2025-11-02",98.7],["2025-11-03",98.6],["2025-11-04",98.6],["2025-11-05",98.7],["2025-11-06",98.8],["2025-11-07",98.8],["2025-11-08",98.5],["2025-11-09",98.6],["2025-11-10",98.7],["2025-11-11",98.6],["2025-11-12",98.7],["2025-11-13",98.9],["2025-11-14",98.7],["2025-11-15",98.6],["2025-11-16",98.7],["2025-11-17",98.6],["2025-11-18",98.7],["2025-11-19",98.6],["2025-11-20",98.5],["2025-11-21",98.7],["2025-11-22",98.7],["2025-11-23",98.6],["2025-11-24",98.6],["2025-11-25",98.6],["2025-11-26",98.4],["2025-11-27",98.6],["2025-11-28",98.5],["2025-11-29",98.6],["2025-11-30",98.6],["2025-12-01",98.3],["2025-12-02",98.4],["2025-12-03",98.6],["2025-12-04",98.5],["2025-12-05",98.6],["2025-12-06",98.6],["2025-12-07",98.7],["2025-12-08",98.8],["2025-12-09",98.5],["2025-12-10",98.7],["2025-12-11",98.6],["2025-12-12",98.6],["2025-12-13",98.7],["2025-12-14",98.8],["2025-12-15",98.6],["2025-12-16",98.5],["2025-12-17",98.6],["2025-12-18",98.5],["2025-12-19",98.6],["2025-12-20",98.5],["2025-12-21",98.0],["2025-12-22",98.0],["2025-12-23",98.6],["2025-12-24",98.2],["2025-12-25",98.5],["2025-12-26",98.3],["2025-12-27",98.3],["2025-12-28",98.5],["2025-12-29",98.5],["2025-12-30",98.5],["2025-12-31",98.5],["2026-01-01",98.5],["2026-01-02",98.5],["2026-01-03",98.5],["2026-01-04",98.5],["2026-01-05",98.7],["2026-01-06",98.6],["2026-01-07",99.5],["2026-01-08",99.1],["2026-01-09",99.1],["2026-01-10",99.1],["2026-01-11",99.1],["2026-01-12",99.5],["2026-01-13",98.8],["2026-01-14",98.7],["2026-01-15",98.4],["2026-01-16",99.2],["2026-01-17",99.0],["2026-01-18",98.4],["2026-01-19",98.7],["2026-01-20",98.5],["2026-01-21",98.4],["2026-01-22",98.5],["2026-01-23",97.8],["2026-01-24",97.5],["2026-01-25",97.6],["2026-01-26",97.5],["2026-01-27",97.2],["2026-01-28",97.4],["2026-01-29",96.8],["2026-01-30",97.2],["2026-01-31",96.8],["2026-02-01",96.3],["2026-02-02",98.8],["2026-02-03",98.4],["2026-02-04",97.1],["2026-02-05",97.0],["2026-02-06",97.1],["2026-02-07",97.0],["2026-02-08",96.8],["2026-02-09",96.9],["2026-02-10",97.8],["2026-02-11",97.6],["2026-02-12",97.8],["2026-02-13",98.2],["2026-02-14",98.5],["2026-02-15",98.1],["2026-02-16",97.8],["2026-02-17",98.1],["2026-02-18",97.8],["2026-02-19",97.7],["2026-02-20",97.6],["2026-02-21",97.8],["2026-02-22",97.5],["2026-02-23",97.8],["2026-02-24",97.5],["2026-02-25",97.6],["2026-02-26",97.7],["2026-02-27",97.6],["2026-02-28",97.8],["2026-03-01",97.7],["2026-03-02",96.4],["2026-03-03",96.5],["2026-03-04",96.7],["2026-03-05",96.5],["2026-03-06",96.5],["2026-03-07",96.5],["2026-03-08",96.5],["2026-03-09",96.4],["2026-03-10",96.4],["2026-03-11",96.5],["2026-03-12",96.8],["2026-03-13",96.9],["2026-03-14",96.9],["2026-03-15",96.5],["2026-03-16",96.8],["2026-03-17",96.9],["2026-03-18",96.8],["2026-03-19",96.7],["2026-03-21",97.2],["2026-03-22",97.1],["2026-03-23",97.2],["2026-03-24",97.1],["2026-03-25",97.1],["2026-03-26",97.2],["2026-03-27",97.1],["2026-03-28",97.1],["2026-03-29",97.0],["2026-03-30",97.0],["2026-03-31",97.2],["2026-04-01",97.5],["2026-04-02",97.5],["2026-04-03",97.0],["2026-04-04",96.6],["2026-04-05",96.4],["2026-04-06",96.3],["2026-04-07",96.7],["2026-04-08",97.0],["2026-04-09",97.0],["2026-04-10",97.0],["2026-04-11",97.0],["2026-04-12",97.0],["2026-04-13",97.0],["2026-04-14",96.6],["2026-04-15",97.5],["2026-04-16",97.6],["2026-04-17",97.5],["2026-04-18",97.5],["2026-04-19",97.5],["2026-04-20",97.5],["2026-04-21",98.0],["2026-04-22",98.0],["2026-04-23",98.0],["2026-04-24",98.0],["2026-04-25",98.0],["2026-04-26",98.0],["2026-04-27",98.0],["2026-04-28",97.9],["2026-04-29",97.8],["2026-04-30",97.8],["2026-05-01",98.0],["2026-05-02",97.0],["2026-05-03",97.0],["2026-05-04",97.0],["2026-05-05",97.0],["2026-05-06",97.0],["2026-05-07",97.0],["2026-05-08",97.0],["2026-05-09",97.0],["2026-05-10",97.0],["2026-05-11",97.2],["2026-05-12",97.0],["2026-05-13",97.0],["2026-05-14",97.0],["2026-05-15",97.0],["2026-05-16",97.0],["2026-05-17",97.0],["2026-05-18",97.0],["2026-05-19",97.0],["2026-05-20",97.0],["2026-05-21",97.0],["2026-05-22",97.0],["2026-05-23",97.0],["2026-05-24",97.0],["2026-06-11",96.2]]; /* [ [ "YYYY-MM-DD", kg ], ... ] from Goals & Tracking.xlsx */
+
+const DAYS_M  = ["Rātapu","Rāhina","Rātū","Rāapa","Rāpare","Rāmere","Rāhoroi"];
+const DAYS_E  = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MONTHS  = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+/* Weekly rhythm — from the "New Job 12th May" plan in the spreadsheet (Sun..Sat) */
+const WEEK_PLAN = [
+  "Stretching",
+  "Bike 1 hour",
+  "Bike 1 hour",
+  "Pilates · Golf",
+  "Boxing · Pilates",
+  "Weights · Golf",
+  "Basketball · Pilates"
+];
+
+/* Te Whare Tapa Whā daily suggestions — from the Energy sheet (Sun..Sat) */
+const WHARE_PLAN = [
+  {t:"Rest or light stretch", h:"Gratitude list",              w:"Karakia & plan the week",     f:"Church & whānau day"},
+  {t:"30-min walk + stretch", h:"Call a whānau member",        w:"Karakia morning & night",     f:"Call one of the boys"},
+  {t:"Bodyweight workout",    h:"Listen to Māori music",       w:"Walk barefoot on grass",      f:"Message a mate"},
+  {t:"Swim or yoga",          h:"Journaling",                  w:"Watch Māori TV / YouTube",    f:"Time with Cynthia"},
+  {t:"Hīkoi — long walk",     h:"Learn a new kupu (word)",     w:"Light a candle & reflect",    f:"Dinner at the table together"},
+  {t:"Strength training",     h:"Laugh — watch a comedy",      w:"Stargaze if you can",         f:"Date night with Cynthia"},
+  {t:"Group sport or dance",  h:"Whanaungatanga — meet friends", w:"Get out into nature",       f:"Whānau time — sport together"}
+];
+
+const QUICK_EX = ["Walk / Hīkoi","Gym","Golf","Bike","Pilates","Boxing","Basketball","Stretching","Rest"];
+
+let storageOk = true;
+function loadState(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ storageOk = false; }
+  return null;
+}
+function defaultState(){
+  const entries = {};
+  for(const [d,w] of SEED_WEIGHTS){ entries[d] = { w:w }; }
+  return {
+    profile:{
+      name:"Mathew", age:56, goalWeight:90, waterGoal:2,
+      medAm:"2 puffs Trimbow", medPm:"Vitamin D · Prostate · Sleeping pills · 2 puffs Trimbow",
+      medPrn:"Ventolin (puffs as needed)"
+    },
+    entries: entries
+  };
+}
+let state = loadState() || defaultState();
+let saveTimer = null;
+function persist(showToast){
+  try{
+    localStorage.setItem(KEY, JSON.stringify(state));
+    if(showToast) toast("Kua tiakina · Saved");
+  }catch(e){
+    storageOk = false;
+    document.getElementById("storageWarn").classList.remove("hidden");
+  }
+}
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>persist(true), 500);
+}
+if(!storageOk) document.getElementById("storageWarn").classList.remove("hidden");
+
+/* ================= Helpers ================= */
+function iso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function fromIso(s){ const p=s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+function todayIso(){ return iso(new Date()); }
+function entry(d){ if(!state.entries[d]) state.entries[d] = {}; return state.entries[d]; }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function hasLog(e){
+  if(!e) return false;
+  return !!( (e.kai&&(e.kai.b||e.kai.l||e.kai.d||e.kai.s)) || e.ex || e.wai || e.moe || e.notes ||
+             (e.med&&(e.med.am||e.med.pm||e.med.prn)) || (e.whare&&(e.whare.t||e.whare.h||e.whare.w||e.whare.f)) );
+}
+function streak(){
+  let n=0; const d=new Date();
+  for(;;){
+    const e = state.entries[iso(d)];
+    if(hasLog(e)){ n++; d.setDate(d.getDate()-1); }
+    else if(n===0 && iso(d)===todayIso()){ d.setDate(d.getDate()-1); } /* today not logged yet — check yesterday */
+    else break;
+    if(n>3650) break;
+  }
+  return n;
+}
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"), 1600);
+}
+function weightSeries(){
+  return Object.keys(state.entries)
+    .filter(d=>typeof state.entries[d].w === "number")
+    .sort()
+    .map(d=>({d:d, w:state.entries[d].w}));
+}
+
+/* ================= Tabs ================= */
+const ICONS = {
+  ra:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5 5l2.1 2.1M16.9 16.9L19 19M19 5l-2.1 2.1M7.1 16.9L5 19"/></svg>',
+  plan:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M4 10h16M8.5 14.5h3M8.5 17.5h5"/></svg>',
+  wt:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 19.5h18"/><path d="M4 16.5l4.5-5 3.6 3 4.4-6.5 3.5 4"/></svg>',
+  hist:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.7"/><path d="M12 7v5.3l3.5 2.2"/></svg>'
+};
+const TABS = [
+  {id:"ra",   m:"Rā",      e:"Today",   ic:ICONS.ra},
+  {id:"plan", m:"Kaupapa", e:"Plan",    ic:ICONS.plan},
+  {id:"wt",   m:"Taumaha", e:"Weight",  ic:ICONS.wt},
+  {id:"hist", m:"Hītori",  e:"History", ic:ICONS.hist}
+];
+let tab = "ra";
+let cursor = todayIso();   /* the day shown on the Today tab */
+let chartRange = 90;
+
+function renderTabs(){
+  document.getElementById("tabs").innerHTML = TABS.map(t=>
+    `<button data-tab="${t.id}" class="${tab===t.id?"on":""}" aria-label="${t.e}">${t.ic}<span class="lb">${t.m}</span></button>`
+  ).join("");
+}
+document.getElementById("tabs").addEventListener("click", ev=>{
+  const b = ev.target.closest("button[data-tab]");
+  if(!b) return;
+  tab = b.dataset.tab;
+  render();
+});
+
+/* ================= Today tab ================= */
+function greeting(){
+  const h = new Date().getHours();
+  if(h<11) return "Mōrena";        /* morning */
+  if(h<17) return "Kia ora";
+  return "Pō mārie";               /* evening */
+}
+function renderToday(){
+  const d  = fromIso(cursor);
+  const e  = entry(cursor);
+  const dow= d.getDay();
+  const isToday = cursor===todayIso();
+  const kai = e.kai || {};
+  const med = e.med || {};
+  const wh  = e.whare || {};
+  const sug = WHARE_PLAN[dow];
+  const wt  = typeof e.w==="number" ? e.w : "";
+  const goal= state.profile.goalWeight;
+  const wai = e.wai || 0;
+  const waiGoal = state.profile.waterGoal || 2;
+  const st = streak();
+
+  return `
+  <div class="datenav">
+    <button class="navbtn" id="dPrev" aria-label="Previous day">‹</button>
+    <div class="d">
+      <div class="maori">${DAYS_M[dow]} <span style="color:var(--ink2);font-size:14px">· ${DAYS_E[dow]}</span></div>
+      <div class="greg">${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}
+        ${isToday ? "" : '&nbsp; <button class="todaylink" id="dToday">back to today</button>'}</div>
+    </div>
+    <button class="navbtn" id="dNext" aria-label="Next day" ${isToday?"disabled style='opacity:.35'":""}>›</button>
+  </div>
+  ${isToday ? `<p style="margin:6px 0 0">${greeting()}, <b>${esc(state.profile.name)}</b>.
+     ${st>0?`<span class="streak">${st} day streak</span>`:""}</p>` : ""}
+
+  <div class="card">
+    <h2>Taumaha</h2><p class="en">Weight</p>
+    <div style="display:flex;gap:10px;align-items:center">
+      <input type="number" step="0.1" inputmode="decimal" id="inW" value="${wt}" placeholder="kg" style="max-width:130px;font-size:22px;font-weight:700">
+      <span class="note" id="wNote">${wt!=="" ? weightNote(wt,goal) : "Goal "+goal+" kg"}</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Wai</h2><p class="en">Water</p>
+    <div class="waterrow">
+      <button class="navbtn" id="waiMinus" aria-label="Less water">−</button>
+      <span class="big">${wai.toFixed(2).replace(/\.?0+$/,"")} / ${waiGoal} L</span>
+      <button class="navbtn" id="waiPlus" aria-label="Add a glass">+</button>
+      <div class="bar"><i style="width:${Math.min(100, wai/waiGoal*100)}%"></i></div>
+    </div>
+    <p class="note" style="margin:8px 0 0">+ adds a glass (250 ml)</p>
+  </div>
+
+  <div class="card">
+    <h2>Korikori</h2><p class="en">Exercise</p>
+    <p class="note" style="margin:0 0 4px">On the plan today: <b style="color:var(--accent)">${WEEK_PLAN[dow]}</b></p>
+    <textarea id="inEx" placeholder="What did you do? e.g. Golf 18 holes — Centenary Park">${esc(e.ex)}</textarea>
+    <div class="chips">${QUICK_EX.map(x=>`<button class="chip" data-ex="${esc(x)}">${esc(x)}</button>`).join("")}</div>
+  </div>
+
+  <div class="card">
+    <h2>Kai</h2><p class="en">Food</p>
+    <label>Parakuihi · Breakfast</label><input type="text" id="inKb" value="${esc(kai.b)}">
+    <label>Tina · Lunch</label><input type="text" id="inKl" value="${esc(kai.l)}">
+    <label>Hapa · Dinner</label><input type="text" id="inKd" value="${esc(kai.d)}">
+    <label>Paramanawa · Snacks</label><input type="text" id="inKs" value="${esc(kai.s)}">
+  </div>
+
+  <div class="card">
+    <h2>Rongoā</h2><p class="en">Medication</p>
+    <div class="medrow"><input type="checkbox" id="inMa" ${med.am?"checked":""}>
+      <div class="t"><b>Ata · Morning</b><div>${esc(state.profile.medAm)}</div></div></div>
+    <div class="medrow"><input type="checkbox" id="inMp" ${med.pm?"checked":""}>
+      <div class="t"><b>Pō · Evening</b><div>${esc(state.profile.medPm)}</div></div></div>
+    <div class="medrow" style="align-items:center">
+      <div class="t" style="flex:1"><b>Other</b><div>${esc(state.profile.medPrn)}</div></div>
+      <input type="text" id="inMo" value="${esc(med.prn)}" placeholder="e.g. 3 puffs" style="max-width:130px">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Moe</h2><p class="en">Sleep &amp; stress</p>
+    <textarea id="inMoe" placeholder="Bed time, how you slept, stress and what helped…">${esc(e.moe)}</textarea>
+  </div>
+
+  <div class="card">
+    <h2>Te Whare Tapa Whā</h2><p class="en">The four cornerstones — tap what you honoured today</p>
+    <div class="whare">
+      <div class="wall ${wh.t?"done":""}" data-wall="t"><span class="tick">✓</span><div class="nm">Taha tinana</div><div class="sg">${sug.t}</div></div>
+      <div class="wall ${wh.h?"done":""}" data-wall="h"><span class="tick">✓</span><div class="nm">Taha hinengaro</div><div class="sg">${sug.h}</div></div>
+      <div class="wall ${wh.w?"done":""}" data-wall="w"><span class="tick">✓</span><div class="nm">Taha wairua</div><div class="sg">${sug.w}</div></div>
+      <div class="wall ${wh.f?"done":""}" data-wall="f"><span class="tick">✓</span><div class="nm">Taha whānau</div><div class="sg">${sug.f}</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>He kōrero anō</h2><p class="en">Notes</p>
+    <textarea id="inNotes" placeholder="Anything else about today…">${esc(e.notes)}</textarea>
+  </div>`;
+}
+function weightNote(w, goal){
+  const diff = +(w-goal).toFixed(1);
+  if(diff>0)  return diff+" kg to go — kia kaha!";
+  if(diff===0)return "Right on your goal!";
+  return "Below goal by "+Math.abs(diff)+" kg — ka rawe!";
+}
+function bindToday(){
+  const e = entry(cursor);
+  const $ = id=>document.getElementById(id);
+  $("dPrev").onclick = ()=>{ const d=fromIso(cursor); d.setDate(d.getDate()-1); cursor=iso(d); render(); };
+  const nx=$("dNext"); if(!nx.disabled) nx.onclick = ()=>{ const d=fromIso(cursor); d.setDate(d.getDate()+1); cursor=iso(d); render(); };
+  const tl=$("dToday"); if(tl) tl.onclick = ()=>{ cursor=todayIso(); render(); };
+
+  $("inW").oninput = ev=>{
+    const v = parseFloat(ev.target.value);
+    if(isFinite(v)) e.w=v; else delete e.w;
+    document.getElementById("wNote").textContent = isFinite(v)? weightNote(v, state.profile.goalWeight) : "Goal "+state.profile.goalWeight+" kg";
+    scheduleSave();
+  };
+  $("waiPlus").onclick  = ()=>{ e.wai=+(((e.wai||0)+0.25).toFixed(2)); scheduleSave(); render(); };
+  $("waiMinus").onclick = ()=>{ e.wai=Math.max(0,+(((e.wai||0)-0.25).toFixed(2))); scheduleSave(); render(); };
+
+  $("inEx").oninput = ev=>{ e.ex=ev.target.value; scheduleSave(); };
+  document.querySelectorAll("[data-ex]").forEach(c=>c.onclick=()=>{
+    const t=$("inEx");
+    t.value = t.value ? t.value.replace(/\s*$/,"") + (t.value.trim()?", ":"") + c.dataset.ex : c.dataset.ex;
+    e.ex=t.value; scheduleSave();
+  });
+
+  const kai = e.kai || (e.kai={});
+  $("inKb").oninput=ev=>{kai.b=ev.target.value; scheduleSave();};
+  $("inKl").oninput=ev=>{kai.l=ev.target.value; scheduleSave();};
+  $("inKd").oninput=ev=>{kai.d=ev.target.value; scheduleSave();};
+  $("inKs").oninput=ev=>{kai.s=ev.target.value; scheduleSave();};
+
+  const med = e.med || (e.med={});
+  $("inMa").onchange=ev=>{med.am=ev.target.checked; scheduleSave();};
+  $("inMp").onchange=ev=>{med.pm=ev.target.checked; scheduleSave();};
+  $("inMo").oninput=ev=>{med.prn=ev.target.value; scheduleSave();};
+
+  $("inMoe").oninput=ev=>{e.moe=ev.target.value; scheduleSave();};
+  $("inNotes").oninput=ev=>{e.notes=ev.target.value; scheduleSave();};
+
+  document.querySelectorAll("[data-wall]").forEach(wl=>wl.onclick=()=>{
+    const wh = e.whare || (e.whare={});
+    wh[wl.dataset.wall] = wh[wl.dataset.wall] ? 0 : 1;
+    scheduleSave(); render();
+  });
+}
+
+/* ================= Plan tab ================= */
+function renderPlan(){
+  const dow = new Date().getDay();
+  const rows = [1,2,3,4,5,6,0].map(i=>
+    `<tr class="${i===dow?"today":""}"><td>${DAYS_M[i]}<br><span class="note">${DAYS_E[i].slice(0,3)}</span></td><td>${WEEK_PLAN[i]}</td><td class="note">${WHARE_PLAN[i].w}</td></tr>`
+  ).join("");
+  return `
+  <div class="card">
+    <h2>Tō wiki</h2><p class="en">Your weekly rhythm</p>
+    <table class="weektable">
+      <tr><td class="note" style="font-weight:400">Day</td><td class="note">Movement</td><td class="note">Wairua</td></tr>
+      ${rows}
+    </table>
+  </div>
+  <div class="card">
+    <h2>Ngā mahi whakapakari</h2><p class="en">Training template — 4 strength days + 3 active days</p>
+    <p class="note">Progressive overload: note the weight for each lift, and each week add ~2.5 kg, get 1–2 more reps, or improve form. Leave 1–3 reps in reserve — don’t train to failure every set.</p>
+    <details><summary>Day 1 — Chest, triceps &amp; pushing (Mon)</summary><div class="inner"><ul>
+      <li>Incline dumbbell press — 4 × 10–12</li><li>Bench press — 3 × 8–10</li>
+      <li>Chest flys (machine/cable) — 3 × 12–15</li><li>Tricep pushdowns — 3 × 12–15</li>
+      <li>Finisher: boxing 600–800 punches, or push-ups 3 sets near-failure</li></ul></div></details>
+    <details><summary>Day 2 — Back, biceps &amp; posture (Tue)</summary><div class="inner"><ul>
+      <li>Lat pulldowns, wide grip — 4 × 8–10</li><li>Seated cable rows — 4 × 10–12</li>
+      <li>Single-arm dumbbell rows — 3 × 10–12 each</li><li>Back flys — 3 × 15–20</li>
+      <li>Bicep curls — 3 × 12–15</li><li>Core: mountain climbers 4 × 25, leg lifts 3 × 15</li></ul></div></details>
+    <details><summary>Day 3 — Active recovery / sport (Wed)</summary><div class="inner"><ul>
+      <li>Option A: walk 3–5 km + 30 min Pilates or stretching</li>
+      <li>Option B: 18 holes of golf (skip the cart) or light basketball</li>
+      <li>Option C: 30 min full-body stretch + meditation</li></ul></div></details>
+    <details><summary>Day 4 — Legs &amp; core (Thu)</summary><div class="inner"><ul>
+      <li>Barbell or goblet squats — 4 × 8–12</li><li>Romanian deadlifts — 3 × 10–12</li>
+      <li>Walking lunges — 3 × 10–12 steps each leg</li><li>Calf raises — 4 × 15–20</li>
+      <li>Core circuit ×2: plank 60 s, sit-ups ×20, wall sit 60 s</li></ul></div></details>
+    <details><summary>Day 5 — Shoulders &amp; conditioning (Fri)</summary><div class="inner"><ul>
+      <li>Seated dumbbell shoulder press — 4 × 8–10</li><li>Lateral raises — 4 × 12–15 (light, perfect form)</li>
+      <li>Front raises — 3 × 12–15</li>
+      <li>Blast: heavy bag 4 × 90 s with 2 kg weights, or 1 200 punches in rounds</li></ul></div></details>
+    <details><summary>Day 6 — Sport (Sat)</summary><div class="inner"><ul>
+      <li>Basketball — full game or pickup. Enjoy it!</li><li>After: 15 min light stretch, legs and shoulders</li></ul></div></details>
+    <details><summary>Day 7 — Complete rest (Sun)</summary><div class="inner"><ul>
+      <li>Protein and whole foods, plenty of water</li><li>Aim for 8+ hours sleep</li>
+      <li>Optional 10–15 min gentle stretch or foam roll</li></ul></div></details>
+  </div>
+  <div class="card">
+    <h2>Pukapuka mahi</h2><p class="en">Session library — from your programme</p>
+    <details><summary>Full body</summary><div class="inner"><ul>
+      <li>Shoulders 3 × 12 · Chest 3 × 12 · Back 3 × 12</li>
+      <li>Squats 3 × 20 · Lunges 3 × 24 · Core ×3</li><li>Extra: burpees or running</li></ul></div></details>
+    <details><summary>Shoulders</summary><div class="inner"><ul>
+      <li>Lat raises 3 × 12 · Forward raises 3 × 12 · Shoulder raises 3 × 12</li>
+      <li>Upright lifts 3 × 12 · Bent-over rows 3 × 12 · Bent-over lateral raises ×3</li></ul></div></details>
+    <details><summary>Chest</summary><div class="inner"><ul>
+      <li>Bench press 3 × 12 · Incline bench 3 × 12 · Incline fly 3 × 12</li>
+      <li>Cable crossover 3 × 12 · Cable fly 3 × 12 · Dips 3 × 12</li></ul></div></details>
+    <details><summary>Back</summary><div class="inner"><ul>
+      <li>Wide pulldown 3 × 12 · Bent-over rows 3 × 12 · Dumbbell pullovers 3 × 12</li>
+      <li>Close pulldown 3 × 12 · Reverse fly 3 × 12 · Superman 3 × 12</li></ul></div></details>
+    <details><summary>Legs</summary><div class="inner"><ul>
+      <li>Body squats 3 × 30 · Lunges 3 × 24 · Leg extension 3 × 12</li>
+      <li>Leg press 3 × 12 · Hamstring machine 3 × 12 · Hip machine 3 × 12</li></ul></div></details>
+    <details><summary>Core</summary><div class="inner"><ul>
+      <li>Plank 3 × 1 min · Crunches 3 × 20 · Cable crunch 3 × 15 · Bicycle crunches 3 × 20</li>
+      <li>Russian twist 3 × 12 · Bridge 3 × 1 min · Flutter kicks 3 × 1 min · Superman 3 × 1 min</li></ul></div></details>
+    <p class="note">Start every session with a 15-minute walk or 10-minute bike.</p>
+  </div>
+  <div class="card">
+    <h2>Whakatūpato</h2><p class="en">Energy drainers to watch</p>
+    <ul style="margin:4px 0;padding-left:20px;font-size:15px">
+      <li>Less alcohol, processed kai and late-night scrolling</li>
+      <li>Blood test worth checking: iron, vitamin D, B12</li>
+      <li>Small wins count — even 10 minutes of movement or a short karakia</li>
+    </ul>
+  </div>`;
+}
+
+/* ================= Weight tab ================= */
+function renderWeight(){
+  const s = weightSeries();
+  const last = s.length? s[s.length-1] : null;
+  const goal = state.profile.goalWeight;
+  let deltaHtml = "";
+  if(s.length>=2){
+    const prev = s[s.length-2].w;
+    const ch = +(last.w-prev).toFixed(1);
+    deltaHtml = ch===0 ? `<span class="delta down">steady</span>`
+      : ch<0 ? `<span class="delta down">▼ ${Math.abs(ch)} kg</span>`
+             : `<span class="delta up">▲ ${ch} kg</span>`;
+  }
+  const cut = new Date(); cut.setDate(cut.getDate()-7);
+  const wk = s.filter(p=>p.d>=iso(cut));
+  const avg7 = wk.length? (wk.reduce((a,p)=>a+p.w,0)/wk.length) : null;
+
+  return `
+  <div class="card">
+    <h2>Taumaha</h2><p class="en">Weight — goal ${goal} kg</p>
+    <div class="hero">
+      <span class="n">${last? last.w.toFixed(1) : "—"}</span><span class="u">kg</span>
+      ${deltaHtml}
+      ${last? `<span class="note">last entry ${fmtShort(last.d)}</span>`:""}
+    </div>
+    <div class="ranges">
+      ${[[30,"30 d"],[90,"90 d"],[365,"1 yr"],[0,"All"]].map(([r,l])=>
+        `<button data-range="${r}" class="${chartRange===r?"on":""}">${l}</button>`).join("")}
+    </div>
+    <div class="chartbox" id="chartbox">${chartSvg(s)}<div class="tip" id="tip"></div></div>
+    <div class="statrow">
+      <div class="stat"><div class="v">${avg7? avg7.toFixed(1):"—"}</div><div class="k">7-day average</div></div>
+      <div class="stat"><div class="v">${last? (last.w-goal>0?"+":"")+ (last.w-goal).toFixed(1):"—"}</div><div class="k">vs goal</div></div>
+      <div class="stat"><div class="v">${s.length}</div><div class="k">entries</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Ngā uara hou</h2><p class="en">Recent entries</p>
+    ${s.slice(-10).reverse().map(p=>`<div class="hday" data-day="${p.d}">
+        <div class="dt"><b>${fmtShort(p.d)}</b><div>${DAYS_M[fromIso(p.d).getDay()]}</div></div>
+        <div class="wt">${p.w.toFixed(1)} kg</div></div>`).join("") || '<p class="note">No entries yet — add today’s weight on the Rā tab.</p>'}
+  </div>`;
+}
+function fmtShort(d){ const x=fromIso(d); return x.getDate()+" "+MONTHS[x.getMonth()]+" "+String(x.getFullYear()).slice(2); }
+let chartPts = [];
+function chartSvg(series){
+  const W=640,H=270,L=44,R=14,T=16,B=30;
+  let s = series;
+  if(chartRange>0){
+    const cut=new Date(); cut.setDate(cut.getDate()-chartRange);
+    s = series.filter(p=>p.d>=iso(cut));
+  }
+  chartPts = [];
+  if(s.length<2) return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weight chart"><text x="${W/2}" y="${H/2}" text-anchor="middle" fill="var(--ink2)" font-size="15">Not enough entries in this range yet</text></svg>`;
+  const goal = state.profile.goalWeight;
+  const t0 = fromIso(s[0].d).getTime(), t1 = fromIso(s[s.length-1].d).getTime();
+  const ws = s.map(p=>p.w);
+  let lo = Math.min(goal, ...ws), hi = Math.max(goal, ...ws);
+  const pad=(hi-lo)*0.08||1; lo-=pad; hi+=pad;
+  const X = t => L + (t-t0)/((t1-t0)||1) * (W-L-R);
+  const Y = w => T + (hi-w)/(hi-lo) * (H-T-B);
+  chartPts = s.map(p=>({x:X(fromIso(p.d).getTime()), y:Y(p.w), d:p.d, w:p.w}));
+
+  /* y grid: 4 steps */
+  let grid="", n=4;
+  for(let i=0;i<=n;i++){
+    const w = lo + (hi-lo)*i/n, y=Y(w);
+    grid += `<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="var(--chart-grid)" stroke-width="1"/>
+             <text x="${L-6}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--ink2)" font-variant-numeric="tabular-nums">${w.toFixed(1)}</text>`;
+  }
+  /* x labels: 4 ticks */
+  let xl="";
+  for(let i=0;i<=3;i++){
+    const t=t0+(t1-t0)*i/3, x=X(t), dt=new Date(t);
+    xl += `<text x="${x}" y="${H-8}" text-anchor="${i===0?"start":i===3?"end":"middle"}" font-size="11" fill="var(--ink2)">${dt.getDate()} ${MONTHS[dt.getMonth()]}${chartRange===0||chartRange>300?" "+String(dt.getFullYear()).slice(2):""}</text>`;
+  }
+  const path = chartPts.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)).join("");
+  const area = path + `L${chartPts[chartPts.length-1].x.toFixed(1)} ${H-B}L${chartPts[0].x.toFixed(1)} ${H-B}Z`;
+  const gy = Y(goal);
+  const lastP = chartPts[chartPts.length-1];
+  const goalInView = gy>T-2 && gy<H-B+2;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weight over time, goal ${goal} kilograms">
+    ${grid}${xl}
+    <path d="${area}" fill="var(--chart-line)" opacity="0.08"/>
+    <path d="${path}" fill="none" stroke="var(--chart-line)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${goalInView?`<line x1="${L}" x2="${W-R}" y1="${gy}" y2="${gy}" stroke="var(--chart-goal)" stroke-width="1.6" stroke-dasharray="6 5"/>
+    <text x="${W-R}" y="${gy-6}" text-anchor="end" font-size="12" font-weight="600" fill="var(--chart-goal)">Whāinga ${goal} kg</text>`:""}
+    <line id="xhair" x1="0" x2="0" y1="${T}" y2="${H-B}" stroke="var(--ink2)" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/>
+    <circle id="hoverdot" r="5" fill="var(--chart-line)" stroke="var(--surface)" stroke-width="2" visibility="hidden"/>
+    <circle cx="${lastP.x}" cy="${lastP.y}" r="4.5" fill="var(--chart-line)" stroke="var(--surface)" stroke-width="2"/>
+  </svg>`;
+}
+function bindWeight(){
+  document.querySelectorAll("[data-range]").forEach(b=>b.onclick=()=>{ chartRange=+b.dataset.range; render(); });
+  document.querySelectorAll(".hday[data-day]").forEach(r=>r.onclick=()=>{ cursor=r.dataset.day; tab="ra"; render(); });
+  const box=document.getElementById("chartbox");
+  if(!box) return;
+  const svg=box.querySelector("svg"), tip=document.getElementById("tip");
+  const xh=svg.querySelector("#xhair"), hd=svg.querySelector("#hoverdot");
+  function move(clientX, clientY){
+    if(!chartPts.length) return;
+    const r=svg.getBoundingClientRect();
+    const sx=(clientX-r.left)*640/r.width;
+    let best=chartPts[0], bd=Infinity;
+    for(const p of chartPts){ const d=Math.abs(p.x-sx); if(d<bd){bd=d;best=p;} }
+    xh.setAttribute("x1",best.x); xh.setAttribute("x2",best.x); xh.setAttribute("visibility","visible");
+    hd.setAttribute("cx",best.x); hd.setAttribute("cy",best.y); hd.setAttribute("visibility","visible");
+    tip.style.display="block";
+    tip.innerHTML=`${fmtShort(best.d)} — <b>${best.w.toFixed(1)} kg</b>`;
+    const bx=box.getBoundingClientRect();
+    let tx=(best.x/640)*bx.width+10;
+    if(tx>bx.width-120) tx-=130;
+    tip.style.left=tx+"px";
+    tip.style.top=Math.max(0,(best.y/270)*bx.height-40)+"px";
+  }
+  function hide(){ tip.style.display="none"; xh.setAttribute("visibility","hidden"); hd.setAttribute("visibility","hidden"); }
+  svg.addEventListener("pointermove", ev=>move(ev.clientX, ev.clientY));
+  svg.addEventListener("pointerdown", ev=>move(ev.clientX, ev.clientY));
+  svg.addEventListener("pointerleave", hide);
+}
+
+/* ================= History tab ================= */
+function renderHistory(){
+  const days=[];
+  const d=new Date();
+  for(let i=0;i<30;i++){
+    const k=iso(d);
+    days.push([k, state.entries[k]]);
+    d.setDate(d.getDate()-1);
+  }
+  const rows = days.map(([k,e])=>{
+    const dd=fromIso(k);
+    const w = e && typeof e.w==="number" ? e.w.toFixed(1)+" kg" : "—";
+    const dot=(on,lbl)=>`<span class="dot ${on?"on":""}">${lbl}</span>`;
+    return `<div class="hday" data-day="${k}">
+      <div class="dt"><b>${dd.getDate()} ${MONTHS[dd.getMonth()]}</b><div>${DAYS_M[dd.getDay()]}</div></div>
+      <div class="wt">${w}</div>
+      <div class="dots">
+        ${dot(e&&e.kai&&(e.kai.b||e.kai.l||e.kai.d||e.kai.s),"Kai")}
+        ${dot(e&&e.ex,"Korikori")}
+        ${dot(e&&e.med&&(e.med.am||e.med.pm),"Rongoā")}
+        ${dot(e&&e.whare&&(e.whare.t||e.whare.h||e.whare.w||e.whare.f),"Whare")}
+      </div></div>`;
+  }).join("");
+  return `<div class="card">
+    <h2>Hītori</h2><p class="en">Last 30 days — tap a day to view or edit it</p>
+    ${rows}
+  </div>`;
+}
+function bindHistory(){
+  document.querySelectorAll(".hday[data-day]").forEach(r=>r.onclick=()=>{ cursor=r.dataset.day; tab="ra"; render(); });
+}
+
+/* ================= Render ================= */
+function render(){
+  renderTabs();
+  const v=document.getElementById("view");
+  if(tab==="ra"){ v.innerHTML=renderToday(); bindToday(); }
+  else if(tab==="plan"){ v.innerHTML=renderPlan(); }
+  else if(tab==="wt"){ v.innerHTML=renderWeight(); bindWeight(); }
+  else { v.innerHTML=renderHistory(); bindHistory(); }
+  window.scrollTo(0,0);
+}
+
+/* ================= Settings, backup & restore ================= */
+const modal=document.getElementById("modal");
+document.getElementById("btnSettings").onclick=()=>{
+  const p=state.profile, $=id=>document.getElementById(id);
+  $("sName").value=p.name; $("sAge").value=p.age; $("sGoal").value=p.goalWeight; $("sWater").value=p.waterGoal;
+  $("sMedAm").value=p.medAm; $("sMedPm").value=p.medPm; $("sMedPrn").value=p.medPrn;
+  modal.classList.add("open");
+};
+document.getElementById("btnClose").onclick=()=>modal.classList.remove("open");
+modal.addEventListener("click",ev=>{ if(ev.target===modal) modal.classList.remove("open"); });
+document.getElementById("btnSaveSettings").onclick=()=>{
+  const p=state.profile, $=id=>document.getElementById(id);
+  p.name=$("sName").value||"e hoa"; p.age=+$("sAge").value||p.age;
+  p.goalWeight=+$("sGoal").value||p.goalWeight; p.waterGoal=+$("sWater").value||p.waterGoal;
+  p.medAm=$("sMedAm").value; p.medPm=$("sMedPm").value; p.medPrn=$("sMedPrn").value;
+  persist(true); modal.classList.remove("open"); render();
+};
+
+async function offerFile(filename, data, fallbackExt){
+  if(window.claude && window.claude.downloads){
+    try{ await window.claude.downloads.save({filename:filename, data:data}); toast("Saved "+filename); return; }
+    catch(err){
+      if(err && err.code==="extension_not_enabled" && fallbackExt){
+        try{ const alt=filename.replace(/\.[^.]+$/, "."+fallbackExt);
+          await window.claude.downloads.save({filename:alt, data:data}); toast("Saved "+alt); return;
+        }catch(e2){ err=e2; }
+      }
+      if(err && err.code==="declined") return;
+      toast("Couldn’t save the file here");
+      return;
+    }
+  }
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([data],{type:"text/plain"}));
+  a.download=filename; document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1000);
+}
+document.getElementById("btnExportJson").onclick=()=>{
+  offerFile("te-ara-hauora-backup-"+todayIso()+".json", JSON.stringify(state,null,1));
+};
+document.getElementById("btnExportCsv").onclick=()=>{
+  const q=s=>'"'+String(s==null?"":s).replace(/"/g,'""')+'"';
+  const rows=[["date","weight_kg","water_l","breakfast","lunch","dinner","snacks","exercise","meds_am","meds_pm","meds_other","sleep","tinana","hinengaro","wairua","whanau","notes"].join(",")];
+  for(const d of Object.keys(state.entries).sort()){
+    const e=state.entries[d], k=e.kai||{}, m=e.med||{}, w=e.whare||{};
+    rows.push([d, e.w!=null?e.w:"", e.wai!=null?e.wai:"", q(k.b),q(k.l),q(k.d),q(k.s), q(e.ex),
+      m.am?1:"", m.pm?1:"", q(m.prn), q(e.moe), w.t?1:"", w.h?1:"", w.w?1:"", w.f?1:"", q(e.notes)].join(","));
+  }
+  offerFile("te-ara-hauora-"+todayIso()+".csv", rows.join("\n"), "txt");
+};
+document.getElementById("btnImport").onclick=()=>document.getElementById("fileImport").click();
+document.getElementById("fileImport").onchange=ev=>{
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const data=JSON.parse(r.result);
+      if(!data.entries || !data.profile) throw new Error("bad file");
+      let added=0;
+      for(const d in data.entries){ if(!hasLog(state.entries[d]) ) { state.entries[d]=Object.assign({}, state.entries[d], data.entries[d]); added++; } }
+      state.profile=Object.assign({}, state.profile, data.profile);
+      persist(true); render(); toast("Restored — "+added+" days merged");
+    }catch(e){ toast("That file doesn’t look like a Te Ara Hauora backup"); }
+  };
+  r.readAsText(f);
+  ev.target.value="";
+};
+document.getElementById("btnWipe").onclick=()=>{
+  if(confirm("Delete ALL data on this device? This can’t be undone. Save a backup first.")){
+    if(confirm("Really sure? Everything will be gone.")){
+      state=defaultState();
+      try{ localStorage.removeItem(KEY); }catch(e){}
+      persist(false); modal.classList.remove("open"); render(); toast("All data cleared");
+    }
+  }
+};
+
+render();
+</script>
