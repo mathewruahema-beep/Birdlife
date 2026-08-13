@@ -15,8 +15,36 @@ Everything lives in `index.html` — no build step, no server, no accounts.
 - **Moe / Sleep & stress** — free-text nightly notes.
 - **Te Whare Tapa Whā** — four daily tap-to-complete cornerstones, each with the day's suggestion from the Energy plan (karakia, whanaungatanga, hīkoi, whānau time…).
 
+- **Portions & targets** (from *Food Log v2*) — hand-portion counters (protein palms, veg
+  fists, carb cupped hands, fat thumbs, sugary/diet drinks) with live estimated kcal and
+  protein against Mifflin-St Jeor targets computed from height, latest weight, age,
+  activity factor and chosen loss rate, floored at BMR.
+- **Peptides** — per-compound syringe-unit logging (Tesamorelin, Retatrutide, BPC/TB) with
+  a vial dose calculator (mg ÷ ml → mg/ml; units ÷ 100 × concentration = dose), plus daily
+  readings: waist (primary metric, target = height ÷ 2), resting HR, BP, appetite, energy,
+  nausea, reflux, night wakings and side-effect notes.
+- **Ngākau / Heart check** — daily gratitude, happiness rating (1–5), improvement and
+  service notes, gathered into a browsable "kete" on the Review tab.
+- **Wairua / Spiritual** — karakia, scriptures read, talks, Come Follow Me, calling
+  contact and temple attendance, with the 2026 spiritual goals shown on the Plan tab.
+- **Tuhinga / Journal** — free-text daily journal.
+- **Arotake / Weekly review** — per-week days-logged, average kcal vs target, protein-hit
+  days, sugary drinks, water, weight, waist, happiness, gratitude/service counts, and the
+  Food Log v2 verdict rules ("Not enough days logged…", "OVER target…", "protein short…",
+  "On track").
+
 The **Kaupapa / Plan** tab carries the weekly training rhythm, the 4-day strength +
-3-day active split, and the full session library from the spreadsheet.
+3-day active split, the full session library, the hand-portion guide with calibration
+examples, and the peptide dose calculator.
+
+## Google Drive sync
+
+When opened as a claude.ai artifact, the Review tab offers **Save to Drive** and
+**Restore from Drive**, using the viewer's own Google Drive connector
+(`create_file` / `search_files` / `download_file_content`). Backups are plain JSON files
+named `te-ara-hauora-backup-YYYY-MM-DD.json` in the user's Drive, so the data lives
+outside the app and any Claude conversation with Drive access can read it back for
+review. Outside claude.ai the buttons hide and the local JSON backup in Settings remains.
 
 ## Using it on a Samsung phone
 
