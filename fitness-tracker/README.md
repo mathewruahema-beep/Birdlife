@@ -37,14 +37,30 @@ The **Kaupapa / Plan** tab carries the weekly training rhythm, the 4-day strengt
 3-day active split, the full session library, the hand-portion guide with calibration
 examples, and the peptide dose calculator.
 
+## Offline use
+
+Everything logs to local storage, so the page keeps working through connectivity drops
+(an offline banner appears; Drive sync resumes automatically on the `online` event).
+For a fully installable offline app, the folder ships `manifest.webmanifest`, `sw.js`
+(stale-while-revalidate cache) and `icon.svg`: host the folder over HTTPS — e.g. GitHub
+Pages (repo Settings → Pages → deploy from branch, then open
+`/Birdlife/fitness-tracker/`) — and "Add to Home screen" installs it with offline cache.
+The service worker only registers when served over http(s), so the claude.ai artifact
+build is unaffected.
+
 ## Google Drive sync
 
-When opened as a claude.ai artifact, the Review tab offers **Save to Drive** and
-**Restore from Drive**, using the viewer's own Google Drive connector
-(`create_file` / `search_files` / `download_file_content`). Backups are plain JSON files
-named `te-ara-hauora-backup-YYYY-MM-DD.json` in the user's Drive, so the data lives
-outside the app and any Claude conversation with Drive access can read it back for
-review. Outside claude.ai the buttons hide and the local JSON backup in Settings remains.
+When opened as a claude.ai artifact, the app syncs to the viewer's own Google Drive
+connector (`create_file` / `search_files` / `download_file_content`):
+
+- **Daily auto-sync** — once per day, on first load/edit while online, it writes both
+  `te-ara-hauora-backup-YYYY-MM-DD.json` (full state) and
+  `te-ara-hauora-log-YYYY-MM-DD.csv` (the complete day-by-day record, opens in Excel).
+- **Manual** — Save to Drive / Restore from Drive buttons on the Review tab.
+
+The data therefore lives outside the app in the user's Drive, and any Claude
+conversation with Drive access can read it back for review. Outside claude.ai the
+buttons hide and the local JSON/CSV backup in Settings remains.
 
 ## Using it on a Samsung phone
 
