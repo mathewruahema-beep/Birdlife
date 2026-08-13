@@ -279,7 +279,13 @@ They have been redacted from the backup in this repo, but:
 README.md                            findings, admin runbook, routine consolidation
 dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
+insights/                            cross-department insights model — see insights/README.md
 ```
+
+The `insights/` directory generalises the lesson of this dashboard (scope is a
+visible design element) into an organisation-wide semantic model: system-of-record
+rulings, a conformed dimensional model, a per-department metrics catalog, a data
+quality register, and the canonical extraction queries for every base number.
 
 The HTML is kept for reference and as the design template the morning routine
 rebuilds against. It is not itself the live artefact — the routine republishes to
