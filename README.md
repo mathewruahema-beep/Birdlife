@@ -6,8 +6,9 @@ and the **IT Operations Project Plan** (Asana).
 | | |
 |---|---|
 | Live dashboard | https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 |
+| ICT Monitoring dashboard | https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b |
 | Refresh schedule & cost | https://claude.ai/code/artifact/86ac0e73-972c-477b-b863-8cdcf6c59afe |
-| Refresh | 2-hourly 07:00–16:00 AEST Mon–Fri with skip-if-unchanged, automated (see below) |
+| Refresh | Hourly 07:00–18:00 AEST 7 days (in-session loop, 13 Aug) — see routine notes below |
 | Salesforce org | `birdlifeaustralia.lightning.force.com` |
 | Asana project | `1211042432693678` — IT Operations Project Plan |
 

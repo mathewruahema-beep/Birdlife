@@ -1,0 +1,259 @@
+<title>BirdLife ICT Monitoring Dashboard</title>
+<style>
+  :root{
+    --ground:#F6F8F6; --surface:#FFFFFF; --surface-2:#EFF3F0;
+    --line:#DCE4DF; --line-strong:#C3D0C8;
+    --ink:#17211C; --ink-2:#4A5A52; --ink-3:#7B8C83;
+    --accent:#0E6E5A; --accent-soft:#D6EAE3;
+    --good:#2E7D52; --good-soft:#DCEDE3;
+    --warn:#9A6410; --warn-soft:#F6ECD8;
+    --crit:#A03A31; --crit-soft:#F7E2DF;
+    --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#101512; --surface:#18201C; --surface-2:#1F2924;
+      --line:#2A362F; --line-strong:#3A4941;
+      --ink:#E4EDE7; --ink-2:#A3B3AA; --ink-3:#758880;
+      --accent:#4FC0A2; --accent-soft:#1B3830;
+      --good:#5FBF88; --good-soft:#17301F;
+      --warn:#D9A441; --warn-soft:#33290F;
+      --crit:#E0796E; --crit-soft:#38201C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#101512; --surface:#18201C; --surface-2:#1F2924;
+    --line:#2A362F; --line-strong:#3A4941;
+    --ink:#E4EDE7; --ink-2:#A3B3AA; --ink-3:#758880;
+    --accent:#4FC0A2; --accent-soft:#1B3830;
+    --good:#5FBF88; --good-soft:#17301F;
+    --warn:#D9A441; --warn-soft:#33290F;
+    --crit:#E0796E; --crit-soft:#38201C;
+  }
+  :root[data-theme="light"]{
+    --ground:#F6F8F6; --surface:#FFFFFF; --surface-2:#EFF3F0;
+    --line:#DCE4DF; --line-strong:#C3D0C8;
+    --ink:#17211C; --ink-2:#4A5A52; --ink-3:#7B8C83;
+    --accent:#0E6E5A; --accent-soft:#D6EAE3;
+    --good:#2E7D52; --good-soft:#DCEDE3;
+    --warn:#9A6410; --warn-soft:#F6ECD8;
+    --crit:#A03A31; --crit-soft:#F7E2DF;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--ground); color:var(--ink); font-family:var(--sans); line-height:1.5;
+    padding:30px 20px 64px; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px; margin:0 auto; display:flex; flex-direction:column; gap:34px}
+  .masthead{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap;
+    border-bottom:2px solid var(--ink); padding-bottom:13px}
+  h1{margin:0; font-size:23px; font-weight:640; letter-spacing:-.02em; text-wrap:balance}
+  .role{color:var(--ink-2); font-size:13px; margin-top:3px}
+  .stamp{font-family:var(--mono); font-size:10.5px; color:var(--ink-3); text-align:right; line-height:1.7;
+    text-transform:uppercase; letter-spacing:.05em}
+  .stamp b{color:var(--ink-2); font-weight:500}
+  .eyebrow{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.13em;
+    color:var(--ink-3); font-weight:500}
+  section{display:flex; flex-direction:column; gap:12px}
+  h2{margin:0; font-size:14.5px; font-weight:620}
+  .sec-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap;
+    border-bottom:1px solid var(--line); padding-bottom:7px}
+  .filter{font-family:var(--mono); font-size:10px; color:var(--ink-3); white-space:nowrap}
+  .num{font-family:var(--mono); font-variant-numeric:tabular-nums}
+  .grid4{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+  .tile{background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:15px 17px;
+    display:flex; flex-direction:column; gap:2px}
+  .tile .v{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:30px; font-weight:600;
+    letter-spacing:-.02em; line-height:1.15}
+  .tile .k{font-size:12.5px; color:var(--ink-2); font-weight:520}
+  .tile .note{font-family:var(--mono); font-size:10px; color:var(--ink-3); margin-top:5px; line-height:1.5}
+  .tile.ok .v{color:var(--good)} .tile.ok{border-color:var(--good); background:var(--good-soft)}
+  .tile.flagged .v{color:var(--crit)} .tile.flagged{border-color:var(--crit); background:var(--crit-soft)}
+  .tile.caution .v{color:var(--warn)} .tile.caution{border-color:var(--warn); background:var(--warn-soft)}
+  .tile.dim .v{color:var(--ink-3); font-size:24px}
+  .flags{display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line);
+    border-radius:4px; padding:6px 20px}
+  .flag{display:grid; grid-template-columns:5px 1fr; gap:14px; padding:13px 0; border-bottom:1px solid var(--line)}
+  .flag:last-child{border-bottom:none}
+  .flag .rail{border-radius:3px; background:var(--ink-3)}
+  .flag.crit .rail{background:var(--crit)} .flag.warn .rail{background:var(--warn)} .flag.info .rail{background:var(--accent)}
+  .flag .body{font-size:13px; color:var(--ink-2); line-height:1.55; max-width:76ch}
+  .flag .body b{color:var(--ink); font-weight:620}
+  .flag .lv{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; display:block; margin-bottom:2px}
+  .flag.crit .lv{color:var(--crit)} .flag.warn .lv{color:var(--warn)} .flag.info .lv{color:var(--accent)}
+  .prov{border-top:2px solid var(--ink); padding-top:15px; display:flex; flex-direction:column; gap:10px}
+  .prov dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:5px 18px; font-size:11.5px; align-items:baseline}
+  .prov dt{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-3)}
+  .prov dd{margin:0; font-family:var(--mono); font-size:11px; color:var(--ink-2); word-break:break-word}
+  .prov .note{font-size:11.5px; color:var(--ink-3); line-height:1.6; max-width:80ch}
+  a{color:var(--accent)}
+  @media(max-width:800px){ .grid4{grid-template-columns:1fr 1fr} .grid3{grid-template-columns:1fr 1fr} }
+  @media(max-width:480px){ .grid4{grid-template-columns:1fr 1fr} .grid3{grid-template-columns:1fr} .masthead{align-items:flex-start} .stamp{text-align:left} }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <h1>BirdLife ICT Monitoring Dashboard</h1>
+      <div class="role">Engine health, data inflow and integration checks &mdash; the systems behind the helpdesk</div>
+    </div>
+    <div class="stamp">
+      Snapshot <b>Thu 13 Aug 2026 &middot; 11:55am AEST</b><br>
+      Salesforce Production &middot; web probes<br>
+      Window <b>last 24 hours</b>
+    </div>
+  </header>
+
+  <!-- ENGINE -->
+  <section>
+    <div class="sec-head">
+      <h2>Salesforce engine</h2>
+      <span class="filter">CronTrigger &middot; AsyncApexJob &middot; LAST_N_DAYS:1</span>
+    </div>
+    <div class="grid4">
+      <div class="tile ok">
+        <div class="v num">121</div>
+        <div class="k">Scheduled jobs waiting</div>
+        <div class="note">All in WAITING state &middot; healthy</div>
+      </div>
+      <div class="tile flagged">
+        <div class="v num">8</div>
+        <div class="k">Apex job failures</div>
+        <div class="note">Of 3,320 async jobs in 24h &middot; needs review</div>
+      </div>
+      <div class="tile dim">
+        <div class="v num">212</div>
+        <div class="k">Apex jobs aborted</div>
+        <div class="note">Often routine (dedupe/batch re-queues) &middot; watch trend</div>
+      </div>
+      <div class="tile dim">
+        <div class="v num">3,099</div>
+        <div class="k">Apex jobs completed</div>
+        <div class="note">Plus 1 queued at snapshot</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INFLOW -->
+  <section>
+    <div class="sec-head">
+      <h2>Data inflow</h2>
+      <span class="filter">Records created &middot; LAST_N_DAYS:1</span>
+    </div>
+    <div class="grid3">
+      <div class="tile">
+        <div class="v num">95</div>
+        <div class="k">Opportunities created</div>
+        <div class="note">Donations, memberships, orders &middot; normal range</div>
+      </div>
+      <div class="tile">
+        <div class="v num">89</div>
+        <div class="k">Payments created</div>
+        <div class="note">npe01__OppPayment__c &middot; normal range</div>
+      </div>
+      <div class="tile dim">
+        <div class="v num">2</div>
+        <div class="k">RD change log entries</div>
+        <div class="note">Recurring giving &middot; informational</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTEGRATIONS -->
+  <section>
+    <div class="sec-head">
+      <h2>Integration &amp; site checks</h2>
+      <span class="filter">Last 24h &middot; thresholds per check</span>
+    </div>
+    <div class="grid4">
+      <div class="tile flagged">
+        <div class="v num">4</div>
+        <div class="k">Stripe&rarr;SF sync errors</div>
+        <div class="note">stripeGC sync log &middot; healthy is 0 &middot; red</div>
+      </div>
+      <div class="tile caution">
+        <div class="v num">41%</div>
+        <div class="k">Gravity Forms orphan rate</div>
+        <div class="note">25 of 61 enquiry cases with no contact &middot; amber &ge;40%</div>
+      </div>
+      <div class="tile dim">
+        <div class="v num">?</div>
+        <div class="k">birdlife.org.au</div>
+        <div class="note">Unverified &mdash; probe blocked by egress proxy, not evidence of outage</div>
+      </div>
+      <div class="tile dim">
+        <div class="v num">&mdash;</div>
+        <div class="k">WooCommerce order sync</div>
+        <div class="note">Parked &mdash; pending credential rotation to an environment variable</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLAGS -->
+  <section>
+    <div class="sec-head">
+      <h2>Flags</h2>
+      <span class="filter">Generated from the checks above</span>
+    </div>
+    <div class="flags">
+      <div class="flag crit">
+        <div class="rail"></div>
+        <div class="body">
+          <span class="lv">Stripe sync &mdash; red</span>
+          <b>4 Stripe&rarr;Salesforce sync errors in the last 24 hours</b> (threshold for healthy is zero, and
+          the 11&ndash;12 Aug sweeps reported none). Open the stripeGC sync log and check whether these are one
+          payment retried four times or four distinct payments &mdash; either way donations may be sitting
+          outside Salesforce until re-synced.
+        </div>
+      </div>
+      <div class="flag crit">
+        <div class="rail"></div>
+        <div class="body">
+          <span class="lv">Apex &mdash; new failures</span>
+          <b>8 async Apex jobs failed in the last 24 hours</b> against a "no failures" baseline in this week&rsquo;s
+          daily sweeps. Worth pulling the failed jobs by Apex class (Setup &rarr; Apex Jobs) &mdash; if they share a
+          class with the Stripe sync errors above, it&rsquo;s one incident, not two.
+        </div>
+      </div>
+      <div class="flag warn">
+        <div class="rail"></div>
+        <div class="body">
+          <span class="lv">Gravity Forms &mdash; amber</span>
+          <b>Orphan rate is 41%</b> (25 of 61 new General Enquiry cases created without a linked contact;
+          baseline ~25%, amber at 40%). Second amber reading this week &mdash; the contact-matching rules
+          deserve a look before this becomes the new normal.
+        </div>
+      </div>
+      <div class="flag info">
+        <div class="rail"></div>
+        <div class="body">
+          <span class="lv">Coverage</span>
+          <b>Website probes cannot run from this environment</b> (network egress is restricted), so
+          birdlife.org.au shows as unverified rather than up or down &mdash; the same limitation noted in the
+          daily sweep posts. Zapier failures alert separately to Microsoft Teams (Zap Manager &rarr; Teams
+          channel), and external engine run-health, un-connected Stripe accounts and the wider WordPress fleet
+          remain dark.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROVENANCE -->
+  <footer class="prov">
+    <div class="eyebrow">Provenance</div>
+    <dl>
+      <dt>Scheduler</dt><dd>CronTrigger GROUP BY State</dd>
+      <dt>Apex</dt><dd>AsyncApexJob WHERE CreatedDate = LAST_N_DAYS:1 GROUP BY Status</dd>
+      <dt>Inflow</dt><dd>Opportunity &middot; npe01__OppPayment__c &middot; RD_Change_Log__c &middot; CreatedDate = LAST_N_DAYS:1</dd>
+      <dt>Integrations</dt><dd>stripeGC__Sync_Log__c errors &middot; General_Enquiry_Case ContactId nulls &middot; LAST_N_DAYS:1</dd>
+      <dt>Refresh</dt><dd>Hourly 07:00&ndash;18:00 AEST, 7 days a week (in-session loop) &middot; companion to the ICT Operations Dashboard</dd>
+    </dl>
+    <div class="note">
+      Every tile states the query it was computed under. Counts are live at snapshot time; the 24-hour window
+      rolls, so numbers move between refreshes even when nothing is wrong. Ambers and reds compare against the
+      thresholds shown on each tile, and against this week&rsquo;s daily ICT sweep baselines.
+    </div>
+  </footer>
+
+</div>
