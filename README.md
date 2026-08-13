@@ -280,7 +280,13 @@ README.md                            findings, admin runbook, routine consolidat
 dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
 insights/                            cross-department insights model — see insights/README.md
+dashboard/fundraising-dashboard.html first department dashboard built from the model
 ```
+
+The Fundraising dashboard (published at
+https://claude.ai/code/artifact/e9debe53-58d2-4638-84ae-e3530f710811) is the first
+L3 delivery from the insights model: live SOQL, scope captions on every panel,
+the regular-giving union rule applied, and live DQ checks surfaced on the page.
 
 The `insights/` directory generalises the lesson of this dashboard (scope is a
 visible design element) into an organisation-wide semantic model: system-of-record

@@ -1,0 +1,295 @@
+<title>BirdLife Fundraising</title>
+<style>
+  :root {
+    --page: #F7F6F1; --surface: #FFFFFF; --ink: #20241F; --muted: #6B6F66;
+    --line: #DCDAD0; --grid: #E9E7DE; --accent: #3D6B4F; --accent-soft: #E4EDE7;
+    --bar: #3D6B4F; --bar-dim: #9DB3A6; --flag: #B3541E; --flag-soft: #F6E9DF;
+    --good: #1E7A3C; --mono-bg: #EFEEE7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #171A16; --surface: #20241F; --ink: #E7E6DD; --muted: #A2A69B;
+      --line: #3A3E36; --grid: #2E322B; --accent: #7FB894; --accent-soft: #26352C;
+      --bar: #7FB894; --bar-dim: #4A5A50; --flag: #D98A55; --flag-soft: #3A2C20;
+      --good: #66BB80; --mono-bg: #2A2E28;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #171A16; --surface: #20241F; --ink: #E7E6DD; --muted: #A2A69B;
+    --line: #3A3E36; --grid: #2E322B; --accent: #7FB894; --accent-soft: #26352C;
+    --bar: #7FB894; --bar-dim: #4A5A50; --flag: #D98A55; --flag-soft: #3A2C20;
+    --good: #66BB80; --mono-bg: #2A2E28;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 36px 20px 64px; }
+  h1 { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; font-size: 1.9rem; margin: 4px 0 4px; font-weight: 600; }
+  h2 { font-size: 1.02rem; margin: 0 0 2px; font-weight: 650; }
+  .eyebrow { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 650; }
+  .asof { color: var(--muted); font-size: .85rem; }
+  section { margin-top: 30px; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; }
+  .scope { font-size: .74rem; color: var(--muted); margin-top: 2px; }
+  .scope b { color: var(--muted); font-weight: 650; }
+  /* stat tiles */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .tile .lbl { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+  .tile .val { font-size: 1.8rem; font-weight: 650; margin-top: 4px; line-height: 1.1; }
+  .tile .cmp { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+  .up { color: var(--good); font-weight: 650; }
+  .down { color: var(--flag); font-weight: 650; }
+  /* monthly bar chart */
+  .chart { margin-top: 14px; }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 190px; border-bottom: 1px solid var(--line); position: relative; }
+  .gridline { position: absolute; left: 0; right: 0; border-top: 1px solid var(--grid); font-size: .68rem; color: var(--muted); }
+  .gridline span { position: absolute; right: 100%; padding-right: 6px; top: -0.6em; white-space: nowrap; }
+  .bars-inner { display: flex; align-items: flex-end; gap: 6px; width: 100%; height: 100%; position: relative; z-index: 1; }
+  .bcol { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; min-width: 0; }
+  .bar { background: var(--bar); border-radius: 3px 3px 0 0; min-height: 2px; cursor: default; }
+  .bar.fy-prev { background: var(--bar-dim); }
+  .bar.partial { background: repeating-linear-gradient(45deg, var(--bar), var(--bar) 4px, var(--surface) 4px, var(--surface) 6px); }
+  .bar:hover, .bar:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .xlabels { display: flex; gap: 6px; margin-top: 6px; }
+  .xlabels div { flex: 1; text-align: center; font-size: .68rem; color: var(--muted); }
+  .chart-wrap { padding-left: 52px; }
+  #tip {
+    position: fixed; pointer-events: none; background: var(--ink); color: var(--page);
+    font-size: .78rem; padding: 5px 9px; border-radius: 4px; display: none; z-index: 10;
+    white-space: nowrap;
+  }
+  /* horizontal bar lists */
+  .hrow { display: grid; grid-template-columns: minmax(150px, 240px) 1fr 110px; gap: 10px; align-items: center; padding: 5px 0; font-size: .85rem; }
+  .hrow .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hrow .trk { height: 14px; position: relative; }
+  .hrow .fill { position: absolute; inset: 0 auto 0 0; background: var(--bar); border-radius: 3px; min-width: 2px; }
+  .hrow .fill.dim { background: var(--bar-dim); }
+  .hrow .amt { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .hrow .amt small { color: var(--muted); }
+  .note { font-size: .82rem; color: var(--muted); margin: 8px 0 0; max-width: 76ch; }
+  .callout { border-left: 3px solid var(--flag); background: var(--flag-soft); border-radius: 0 4px 4px 0; padding: 10px 14px; font-size: .84rem; margin-top: 12px; }
+  .callout.ok { border-left-color: var(--good); background: var(--accent-soft); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+  table { border-collapse: collapse; width: 100%; font-size: .82rem; margin-top: 8px; }
+  th { text-align: left; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 5px 10px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+  td:nth-child(n+2), th:nth-child(n+2) { text-align: right; }
+  details summary { cursor: pointer; font-size: .8rem; color: var(--muted); margin-top: 10px; }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .82em; background: var(--mono-bg); padding: 1px 5px; border-radius: 3px; }
+  footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; font-size: .78rem; color: var(--muted); }
+  footer ul { margin: 6px 0 0; padding-left: 18px; }
+  footer li { margin-top: 3px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">BirdLife Australia · Insights Model · L3 Delivery</div>
+    <h1>Fundraising Dashboard</h1>
+    <div class="asof">Queried live from Salesforce, <b>13 August 2026</b> · Australian FY basis (1 Jul – 30 Jun) · Opportunity Close Date, won only</div>
+  </header>
+
+  <!-- ============ headline tiles ============ -->
+  <section>
+    <div class="tiles">
+      <div class="tile">
+        <div class="lbl">Donation income FYTD</div>
+        <div class="val">$375,720</div>
+        <div class="cmp"><span class="down">▼ 21.9%</span> vs $481,156 same period FY25-26</div>
+        <div class="scope">Record type <b>Donation</b> · 1 Jul – 13 Aug</div>
+      </div>
+      <div class="tile">
+        <div class="lbl">Donors FYTD</div>
+        <div class="val">2,943</div>
+        <div class="cmp"><span class="up">▲ 24.4%</span> vs 2,365 · household grain</div>
+        <div class="scope">Distinct accounts, Donation gifts</div>
+      </div>
+      <div class="tile">
+        <div class="lbl">Gifts / average gift</div>
+        <div class="val">3,359 · $112</div>
+        <div class="cmp">was 2,696 · $178 — more, smaller gifts</div>
+        <div class="scope">Includes regular-giving instalments</div>
+      </div>
+      <div class="tile">
+        <div class="lbl">Bequests FYTD</div>
+        <div class="val">$65,000</div>
+        <div class="cmp">3 gifts · ~flat vs $64,185 (3)</div>
+        <div class="scope">Record type <b>Bequest</b></div>
+      </div>
+    </div>
+    <p class="note">The income dip against the donor rise is a mix shift, not a collapse:
+    volume is up a quarter (driven by 1,218 WILDBIRD regular-giving instalments and early
+    Tax Appeal 2026 receipts) while the same 44 days last year carried larger one-off gifts.
+    Membership income ($38,967, 620 opps, ~flat) is shown in the Membership dashboard, not here.</p>
+  </section>
+
+  <!-- ============ monthly trend ============ -->
+  <section class="panel">
+    <h2>Monthly won income — all record types</h2>
+    <div class="scope">Scope: <b>IsWon = true</b>, all record types incl. membership · FY25-26 total <b>$9,579,782</b> · muted bars = prior FY · hatched = month in progress (to 13 Aug)</div>
+    <div class="chart chart-wrap">
+      <div class="bars">
+        <div class="gridline" style="bottom:100%"><span>$2.5M</span></div>
+        <div class="gridline" style="bottom:80%"><span>$2.0M</span></div>
+        <div class="gridline" style="bottom:60%"><span>$1.5M</span></div>
+        <div class="gridline" style="bottom:40%"><span>$1.0M</span></div>
+        <div class="gridline" style="bottom:20%"><span>$0.5M</span></div>
+        <div class="bars-inner" id="bars"></div>
+      </div>
+      <div class="xlabels" id="xlabels"></div>
+    </div>
+    <details>
+      <summary>Data table</summary>
+      <table>
+        <tr><th>Month</th><th>Gifts</th><th>Amount</th></tr>
+        <tbody id="tbody"></tbody>
+      </table>
+    </details>
+  </section>
+
+  <!-- ============ campaigns + regular giving ============ -->
+  <section class="grid2">
+    <div class="panel">
+      <h2>Campaign income FYTD</h2>
+      <div class="scope">Scope: won, 1 Jul – 13 Aug 2026, top campaigns by income · <b>100% of gifts carry a campaign</b></div>
+      <div id="campaigns" style="margin-top:10px"></div>
+      <p class="note">The Tax Appeal 2026 family (T26 + direct-mail waves W1/W2) totals
+      <b>$140,336 across 879 gifts</b>. Online community-fundraising gifts attribute to the
+      top-level appeal only (DQ-10) — segment-level ROI is not measurable for that channel.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Regular giving — the union rule</h2>
+      <div class="scope">Scope: <b>active agreements</b>, NPSP Recurring Donations ∪ Payments2Us Recurring Payments excl. membership auto-renewals (DQ-05)</div>
+      <div style="margin-top:10px">
+        <div class="hrow"><div class="nm">NPSP Recurring Donations</div>
+          <div class="trk"><div class="fill" style="width:100%"></div></div>
+          <div class="amt">$63,019<small>/mo · 2,234</small></div></div>
+        <div class="hrow"><div class="nm">Payments2Us (giving only)</div>
+          <div class="trk"><div class="fill" style="width:26.6%"></div></div>
+          <div class="amt">$16,739<small>/mo · 513</small></div></div>
+        <div class="hrow" style="border-top:1px solid var(--line); font-weight:650">
+          <div class="nm">Union — regular giving</div>
+          <div class="trk"></div>
+          <div class="amt">$79,758<small>/mo · 2,747</small></div></div>
+        <div class="hrow"><div class="nm" style="color:var(--muted)">Excluded: membership auto-renewals</div>
+          <div class="trk"><div class="fill dim" style="width:44.6%"></div></div>
+          <div class="amt" style="color:var(--muted)">$28,111<small>/mo · 4,786</small></div></div>
+      </div>
+      <p class="note">≈ <b>$957K annualised</b>. Yearly NPSP agreements (410, $68,274/yr)
+      are normalised to monthly. Documented Jun-2026 baselines (1,778 + 392) are stale
+      against today's live counts — recompute, never re-quote.</p>
+      <div class="callout">
+        <b>538 suspended agreements worth $4,061/mo</b> sit in “max retries exceeded”, and
+        35 more await account verification. That is ≈ $48K/yr of committed giving
+        recoverable by a card-update save campaign — the P2U card-expiry emails and URL
+        tokens already exist for exactly this.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ data quality ============ -->
+  <section class="panel">
+    <h2>Data quality affecting these numbers</h2>
+    <div class="scope">Live checks, cross-referenced to <code>insights/04-data-quality-register.md</code></div>
+    <div class="callout" style="margin-top:10px">
+      <b>DQ-03 — 78 opportunities sit in invalid stage “refunded”.</b> The WooCommerce
+      refund flow writes raw strings instead of picklist values and refund payments post
+      positive. Refund truth for any figure on this page lives in Stripe, not Salesforce.
+    </div>
+    <div class="callout ok">
+      <b>Positives:</b> campaign attribution is 100% on FYTD won gifts; both regular-giving
+      objects are present in the union (provenance check passes); bequest and membership
+      income are tracking level with last year.
+    </div>
+  </section>
+
+  <footer>
+    <b>Provenance.</b> Org <code>birdlifeaustralia.my.salesforce.com</code>, read-only SOQL,
+    13 Aug 2026 (AEST). Canonical queries: <code>insights/sql/extraction-queries.md</code>.
+    <ul>
+      <li>Donor/gift tiles: record type Donation only; memberships and bequests shown separately.</li>
+      <li>Regular giving: <code>npe03__Recurring_Donation__c</code> status Active ∪
+          <code>AAkPay__Recurring_Payment__c</code> status Active with no linked subscription.</li>
+      <li>Excluded from this page: the NetSuite GL view (connector not authorised in this
+          session — reconciled income and the $671K backlog are reported on the Finance
+          dashboard once connected) and Stripe-side refund matching (DQ-03).</li>
+      <li>Same-period comparison uses 1 Jul – 13 Aug in both years.</li>
+    </ul>
+  </footer>
+</div>
+
+<div id="tip" role="status"></div>
+
+<script>
+  const months = [
+    ["Jul 25", 538822, 2670, "prev"], ["Aug 25", 235562, 3137, "prev"],
+    ["Sep 25", 371528, 4304, "prev"], ["Oct 25", 772637, 5970, "prev"],
+    ["Nov 25", 845642, 3087, "prev"], ["Dec 25", 588585, 3955, "prev"],
+    ["Jan 26", 342717, 4220, "prev"], ["Feb 26", 477795, 3248, "prev"],
+    ["Mar 26", 1286673, 4122, "prev"], ["Apr 26", 394789, 3214, "prev"],
+    ["May 26", 1281215, 3304, "prev"], ["Jun 26", 2443819, 7488, "prev"],
+    ["Jul 26", 354312, 2936, "cur"], ["Aug 26", 125375, 1046, "partial"]
+  ];
+  const MAX = 2500000;
+  const bars = document.getElementById("bars");
+  const xl = document.getElementById("xlabels");
+  const tb = document.getElementById("tbody");
+  const tip = document.getElementById("tip");
+  const fmt = n => "$" + n.toLocaleString("en-AU");
+  months.forEach(([m, amt, gifts, kind]) => {
+    const col = document.createElement("div"); col.className = "bcol";
+    const b = document.createElement("div");
+    b.className = "bar" + (kind === "prev" ? " fy-prev" : kind === "partial" ? " partial" : "");
+    b.style.height = (amt / MAX * 100) + "%";
+    b.tabIndex = 0;
+    b.dataset.label = m + (kind === "partial" ? " (to 13 Aug)" : "") + " — " + fmt(amt) + " · " + gifts.toLocaleString() + " gifts";
+    col.appendChild(b); bars.appendChild(col);
+    const x = document.createElement("div"); x.textContent = m.split(" ")[0][0]; xl.appendChild(x);
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + m + (kind === "partial" ? " (partial)" : "") + "</td><td>" + gifts.toLocaleString() + "</td><td>" + fmt(amt) + "</td>";
+    tb.appendChild(tr);
+  });
+  bars.addEventListener("mousemove", e => {
+    if (!e.target.classList.contains("bar")) { tip.style.display = "none"; return; }
+    tip.textContent = e.target.dataset.label;
+    tip.style.display = "block";
+    tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px";
+    tip.style.top = (e.clientY - 34) + "px";
+  });
+  bars.addEventListener("mouseleave", () => tip.style.display = "none");
+  bars.addEventListener("focusin", e => {
+    if (!e.target.classList.contains("bar")) return;
+    const r = e.target.getBoundingClientRect();
+    tip.textContent = e.target.dataset.label;
+    tip.style.display = "block";
+    tip.style.left = Math.min(r.left, innerWidth - 220) + "px";
+    tip.style.top = (r.top - 34) + "px";
+  });
+  bars.addEventListener("focusout", () => tip.style.display = "none");
+
+  const camps = [
+    ["Tax Appeal 2026 (T26)", 103036, 761],
+    ["Bequest Income", 65000, 3],
+    ["Australian Bird Fund", 64000, 3],
+    ["MGD26 Major Donor Pool", 50000, 1],
+    ["WILDBIRD (regular giving)", 44419, 1218],
+    ["BirdLife Memberships", 36948, 525],
+    ["T26 DM Wave 1", 26575, 68],
+    ["T26 DM Wave 2", 10725, 50],
+    ["Community Fundraising", 10173, 10],
+    ["MGD26 High Value Pool", 10000, 1]
+  ];
+  const cmax = 103036;
+  const cwrap = document.getElementById("campaigns");
+  camps.forEach(([n, amt, c]) => {
+    const row = document.createElement("div"); row.className = "hrow";
+    row.innerHTML = '<div class="nm" title="' + n + '">' + n + '</div>' +
+      '<div class="trk"><div class="fill" style="width:' + (amt / cmax * 100).toFixed(1) + '%"></div></div>' +
+      '<div class="amt">' + fmt(amt) + ' <small>· ' + c.toLocaleString() + '</small></div>';
+    cwrap.appendChild(row);
+  });
+</script>
