@@ -1,0 +1,276 @@
+<title>BirdLife Security Dashboard</title>
+<style>
+  :root{
+    --ground:#F6F8F6; --surface:#FFFFFF; --surface-2:#EFF3F0;
+    --line:#DCE4DF; --line-strong:#C3D0C8;
+    --ink:#17211C; --ink-2:#4A5A52; --ink-3:#7B8C83;
+    --accent:#0E6E5A; --accent-soft:#D6EAE3;
+    --good:#2E7D52; --good-soft:#DCEDE3;
+    --warn:#9A6410; --warn-soft:#F6ECD8;
+    --crit:#A03A31; --crit-soft:#F7E2DF;
+    --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#101512; --surface:#18201C; --surface-2:#1F2924;
+      --line:#2A362F; --line-strong:#3A4941;
+      --ink:#E4EDE7; --ink-2:#A3B3AA; --ink-3:#758880;
+      --accent:#4FC0A2; --accent-soft:#1B3830;
+      --good:#5FBF88; --good-soft:#17301F;
+      --warn:#D9A441; --warn-soft:#33290F;
+      --crit:#E0796E; --crit-soft:#38201C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#101512; --surface:#18201C; --surface-2:#1F2924;
+    --line:#2A362F; --line-strong:#3A4941;
+    --ink:#E4EDE7; --ink-2:#A3B3AA; --ink-3:#758880;
+    --accent:#4FC0A2; --accent-soft:#1B3830;
+    --good:#5FBF88; --good-soft:#17301F;
+    --warn:#D9A441; --warn-soft:#33290F;
+    --crit:#E0796E; --crit-soft:#38201C;
+  }
+  :root[data-theme="light"]{
+    --ground:#F6F8F6; --surface:#FFFFFF; --surface-2:#EFF3F0;
+    --line:#DCE4DF; --line-strong:#C3D0C8;
+    --ink:#17211C; --ink-2:#4A5A52; --ink-3:#7B8C83;
+    --accent:#0E6E5A; --accent-soft:#D6EAE3;
+    --good:#2E7D52; --good-soft:#DCEDE3;
+    --warn:#9A6410; --warn-soft:#F6ECD8;
+    --crit:#A03A31; --crit-soft:#F7E2DF;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--ground); color:var(--ink); font-family:var(--sans); line-height:1.5;
+    padding:30px 20px 64px; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px; margin:0 auto; display:flex; flex-direction:column; gap:34px}
+  .masthead{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap;
+    border-bottom:2px solid var(--ink); padding-bottom:13px}
+  h1{margin:0; font-size:23px; font-weight:640; letter-spacing:-.02em; text-wrap:balance}
+  .role{color:var(--ink-2); font-size:13px; margin-top:3px}
+  .stamp{font-family:var(--mono); font-size:10.5px; color:var(--ink-3); text-align:right; line-height:1.7;
+    text-transform:uppercase; letter-spacing:.05em}
+  .stamp b{color:var(--ink-2); font-weight:500}
+  .conf{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.12em;
+    color:var(--crit); border:1px solid var(--crit); border-radius:3px; padding:2px 8px; display:inline-block; margin-top:6px}
+  .eyebrow{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.13em;
+    color:var(--ink-3); font-weight:500}
+  section{display:flex; flex-direction:column; gap:12px}
+  h2{margin:0; font-size:14.5px; font-weight:620}
+  .sec-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap;
+    border-bottom:1px solid var(--line); padding-bottom:7px}
+  .filter{font-family:var(--mono); font-size:10px; color:var(--ink-3); white-space:nowrap}
+  .num{font-family:var(--mono); font-variant-numeric:tabular-nums}
+  .grid4{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
+  .tile{background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:15px 17px;
+    display:flex; flex-direction:column; gap:2px}
+  .tile .v{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:30px; font-weight:600;
+    letter-spacing:-.02em; line-height:1.15}
+  .tile .k{font-size:12.5px; color:var(--ink-2); font-weight:520}
+  .tile .note{font-family:var(--mono); font-size:10px; color:var(--ink-3); margin-top:5px; line-height:1.5}
+  .tile.ok .v{color:var(--good)} .tile.ok{border-color:var(--good); background:var(--good-soft)}
+  .tile.flagged .v{color:var(--crit)} .tile.flagged{border-color:var(--crit); background:var(--crit-soft)}
+  .tile.caution .v{color:var(--warn)} .tile.caution{border-color:var(--warn); background:var(--warn-soft)}
+  .tile.dim .v{color:var(--ink-3); font-size:24px}
+  .tbl-scroll{overflow-x:auto; background:var(--surface); border:1px solid var(--line); border-radius:4px}
+  table{border-collapse:collapse; width:100%; font-size:12.5px}
+  th{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.09em; color:var(--ink-3);
+    font-weight:500; text-align:left; padding:10px 14px; border-bottom:1px solid var(--line-strong); white-space:nowrap}
+  td{padding:9px 14px; border-bottom:1px solid var(--line); vertical-align:top; color:var(--ink-2)}
+  tr:last-child td{border-bottom:none}
+  td.m{color:var(--ink); font-weight:560}
+  .pill{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.07em; border-radius:3px;
+    padding:2px 7px; white-space:nowrap; display:inline-block}
+  .pill.live{color:var(--good); background:var(--good-soft); border:1px solid var(--good)}
+  .pill.reverify{color:var(--warn); background:var(--warn-soft); border:1px solid var(--warn)}
+  .pill.crit{color:var(--crit); background:var(--crit-soft); border:1px solid var(--crit)}
+  .pill.due{color:var(--ink-2); background:var(--surface-2); border:1px solid var(--line-strong)}
+  .flags{display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line);
+    border-radius:4px; padding:6px 20px}
+  .flag{display:grid; grid-template-columns:5px 1fr; gap:14px; padding:13px 0; border-bottom:1px solid var(--line)}
+  .flag:last-child{border-bottom:none}
+  .flag .rail{border-radius:3px; background:var(--ink-3)}
+  .flag.crit .rail{background:var(--crit)} .flag.warn .rail{background:var(--warn)} .flag.info .rail{background:var(--accent)}
+  .flag .body{font-size:13px; color:var(--ink-2); line-height:1.55; max-width:76ch}
+  .flag .body b{color:var(--ink); font-weight:620}
+  .flag .lv{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; display:block; margin-bottom:2px}
+  .flag.crit .lv{color:var(--crit)} .flag.warn .lv{color:var(--warn)} .flag.info .lv{color:var(--accent)}
+  .prov{border-top:2px solid var(--ink); padding-top:15px; display:flex; flex-direction:column; gap:10px}
+  .prov dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:5px 18px; font-size:11.5px; align-items:baseline}
+  .prov dt{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-3)}
+  .prov dd{margin:0; font-family:var(--mono); font-size:11px; color:var(--ink-2); word-break:break-word}
+  .prov .note{font-size:11.5px; color:var(--ink-3); line-height:1.6; max-width:80ch}
+  a{color:var(--accent)}
+  @media(max-width:800px){ .grid4{grid-template-columns:1fr 1fr} }
+  @media(max-width:480px){ .grid4{grid-template-columns:1fr 1fr} .masthead{align-items:flex-start} .stamp{text-align:left} }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <h1>BirdLife Security Dashboard</h1>
+      <div class="role">Number wall from the Digital Ecosystem Security Framework, section 7.2. Weekly refresh for the monthly security review.</div>
+      <span class="conf">Confidential: per-system weakness detail</span>
+    </div>
+    <div class="stamp">
+      Data as at <b>Thu 13 Aug 2026 &middot; 3:20pm AEST</b><br>
+      Live: Salesforce Production<br>
+      Baselines: Jun&ndash;Aug 2026 reviews<br>
+      Next refresh <b>Mon 17 Aug &middot; 12:00am</b>
+    </div>
+  </header>
+
+  <!-- LIVE SALESFORCE -->
+  <section>
+    <div class="sec-head">
+      <h2>Live from Salesforce</h2>
+      <span class="filter">User WHERE Profile.Name='System Administrator' &middot; queried at snapshot</span>
+    </div>
+    <div class="grid4">
+      <div class="tile flagged">
+        <div class="v num">12</div>
+        <div class="k">Active System Administrators</div>
+        <div class="note">Was 14 at the June review &middot; 3 are bot accounts &middot; 4 are vendor accounts</div>
+      </div>
+      <div class="tile flagged">
+        <div class="v num">12.6%</div>
+        <div class="k">Admin ratio (target max 5%)</div>
+        <div class="note">12 of 95 active Standard users &middot; was 15% in June &middot; still 2.5x target</div>
+      </div>
+      <div class="tile caution">
+        <div class="v num">26</div>
+        <div class="k">Inactive sysadmin accounts</div>
+        <div class="note">Deactivated but not deprovisioned &middot; was 23 in June (3 more deactivated since: right direction)</div>
+      </div>
+      <div class="tile caution">
+        <div class="v num">32</div>
+        <div class="k">Active users, no login 30+ days</div>
+        <div class="note">Of 95 active Standard users &middot; June review found 68</div>
+      </div>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Active System Administrator</th><th>Username</th><th>Last login</th><th>Note</th></tr>
+        <tr><td class="m">Keith Tsui</td><td class="num">keith.tsui@</td><td class="num">13 Aug 2026</td><td>Staff</td></tr>
+        <tr><td class="m">Mathew Hema</td><td class="num">mathew.hema@</td><td class="num">13 Aug 2026</td><td>Staff</td></tr>
+        <tr><td class="m">Nina Lewis</td><td class="num">nina.lewis@</td><td class="num">13 Aug 2026</td><td>Staff</td></tr>
+        <tr><td class="m">Ross James</td><td class="num">ross.james@&hellip;.admin</td><td class="num">13 Aug 2026</td><td>Dedicated admin account (good pattern)</td></tr>
+        <tr><td class="m">Andrew Dunn</td><td class="num">andrew.dunn@</td><td class="num">13 Aug 2026</td><td>Staff; only admin fully MFA-covered at June review</td></tr>
+        <tr><td class="m">Karishma Soni</td><td class="num">karishma.soni@</td><td class="num">10 Aug 2026</td><td>New account, created 30 Jun 2026; MFA status unverified</td></tr>
+        <tr><td class="m">Ayush Saxena</td><td class="num">ayush.saxena@</td><td class="num">24 Jun 2026</td><td>Vendor (Envision CP); 7 weeks since login</td></tr>
+        <tr><td class="m">Bird Bot</td><td class="num">birdbot1@</td><td class="num">10 May 2026</td><td>Bot with sysadmin; June review says strip the role</td></tr>
+        <tr><td class="m">Atharvaa Bhadbhade</td><td class="num">&hellip;@xecurify.com</td><td class="num">17 Mar 2026</td><td>Vendor (miniOrange SSO); 5 months since login</td></tr>
+        <tr><td class="m">Bird Bot</td><td class="num">birdbot5@</td><td class="num">10 Feb 2026</td><td>Bot with sysadmin; 6 months since login</td></tr>
+        <tr><td class="m">Bird Bot</td><td class="num">birdbot6@</td><td class="num">4 Aug 2025</td><td>Bot with sysadmin; over a year since login</td></tr>
+        <tr><td class="m">Krish Gupta</td><td class="num">krish@blitzm.com</td><td class="num">17 Jul 2025</td><td>Vendor (Blitzm); 13 months since login, still active</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- NUMBER WALL -->
+  <section>
+    <div class="sec-head">
+      <h2>The number wall</h2>
+      <span class="filter">Framework s7.2 &middot; board metrics &middot; baseline vs current vs target</span>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Metric</th><th>Baseline (Jun/Aug 2026)</th><th>Current reading</th><th>Target</th><th>Status</th></tr>
+        <tr><td class="m">Tenant MFA enforcement</td><td>No enforced tenant-wide CA policy; 7.9% capable</td><td>Baseline, evidence 23 Jun</td><td>100% under enforced CA MFA by end Sep 2026</td><td><span class="pill reverify">Re-verify</span></td></tr>
+        <tr><td class="m">Privileged accounts without MFA</td><td>SF 9 of 14, WP 25 of 25, AWS root 1, Google 348 no-2SV</td><td>SF pool now 12 admins (live); MFA per admin not readable from this connector, evidence 21 Jun</td><td>Zero by end Oct 2026</td><td><span class="pill crit">Critical</span></td></tr>
+        <tr><td class="m">Microsoft Secure Score</td><td class="num">48.19%</td><td>Baseline, evidence 21 Jun</td><td class="num">65% by Dec 2026, 75% by Jun 2027</td><td><span class="pill reverify">Re-verify</span></td></tr>
+        <tr><td class="m">Essential Eight maturity</td><td>Below ML1 on 6 of 8</td><td>Baseline, evidence 21 Jun</td><td>ML1 all eight by Feb 2027; ML2 by Aug 2027</td><td><span class="pill reverify">Re-verify</span></td></tr>
+        <tr><td class="m">Devices encrypted (BitLocker)</td><td>0 policies deployed</td><td>Baseline, evidence 19&ndash;21 Jun</td><td>100% of managed fleet by Dec 2026</td><td><span class="pill crit">Critical</span></td></tr>
+        <tr><td class="m">Global Administrators</td><td>6, of which 2 shared</td><td>Baseline, evidence 21 Jun</td><td>4 or fewer, none shared, by Oct 2026</td><td><span class="pill reverify">Re-verify</span></td></tr>
+        <tr><td class="m">Exploited-vuln patch SLA (48h)</td><td>Breached: CVE-2026-12440 on 109/115 devices</td><td>Baseline, evidence 21 Jun</td><td>100% within SLA, reported monthly</td><td><span class="pill crit">Critical</span></td></tr>
+        <tr><td class="m">Stale / unowned accounts &amp; apps</td><td>23 inactive SF admins, 18 unassigned apps, 6 test accounts</td><td><b>26</b> inactive SF admins (live); apps &amp; test accounts baseline 21&ndash;30 Jun</td><td>Zero known stale privileged accounts by Nov 2026</td><td><span class="pill live">Part live</span></td></tr>
+        <tr><td class="m">Restoration tests passed</td><td>0 evidenced</td><td>0 evidenced</td><td>4 systems tested by Jan 2027</td><td><span class="pill reverify">Stalled</span></td></tr>
+        <tr><td class="m">Incident response</td><td>No plan</td><td>Not evidenced this cycle</td><td>Plan adopted Sep 2026; tabletop by Jan 2027</td><td><span class="pill crit">Critical</span></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- HARD DEADLINES -->
+  <section>
+    <div class="sec-head">
+      <h2>Hard deadlines, next 60 days</h2>
+      <span class="filter">From framework s5 &amp; s6 &middot; counted from 13 Aug 2026</span>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Date</th><th>In</th><th>Deadline</th><th>Owner (framework)</th></tr>
+        <tr><td class="num">13 Jul 2026</td><td><span class="pill crit">31 days overdue</span></td><td class="m">Salesforce release update: Transaction Security Policies restriction</td><td>SF admin + developer</td></tr>
+        <tr><td class="num">21 Aug 2026</td><td><span class="pill crit">8 days</span></td><td class="m">Vevox Dashboard SAML certificate expires (SSO breakage)</td><td>ICT Manager</td></tr>
+        <tr><td class="num">1 Sep 2026</td><td><span class="pill due">19 days</span></td><td class="m">Four Salesforce security release updates enforce (OAuth u/p retirement, instanced URLs, Authorized Email Domains, Profile Filtering); MoveData at risk</td><td>SF admin + developer</td></tr>
+        <tr><td class="num">8 Sep 2026</td><td><span class="pill due">26 days</span></td><td class="m">Second Vevox SAML certificate expires</td><td>ICT Manager</td></tr>
+        <tr><td class="num">~15 Sep 2026</td><td><span class="pill due">33 days</span></td><td class="m">Tenant-wide MFA CA enforcement target (Phase 0.7)</td><td>ICT Manager + L1</td></tr>
+        <tr><td class="num">17 Sep 2026</td><td><span class="pill due">35 days</span></td><td class="m">NetSuite OAuth2 M2M certificate expires (orphaned, owners departed)</td><td>ICT Manager + finance systems</td></tr>
+        <tr><td class="num">19 Sep 2026</td><td><span class="pill due">37 days</span></td><td class="m">Enterprise app access review due (129 apps; June sign-off still blank)</td><td>ICT Manager</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- FLAGS -->
+  <section>
+    <div class="sec-head">
+      <h2>Flags</h2>
+      <span class="filter">Frank reading of this snapshot</span>
+    </div>
+    <div class="flags">
+      <div class="flag crit">
+        <div class="rail"></div>
+        <div class="body">
+          <span class="lv">Vevox certificate: 8 days</span>
+          <b>The Vevox Dashboard SAML certificate expires 21 August.</b> This is the nearest hard deadline on the wall and it breaks SSO when it lapses. Renewal is Phase 0.3, owner ICT Manager.
+        </div>
+      </div>
+      <div class="flag crit">
+        <div class="rail"></div>
+        <div class="body">
+          <span class="lv">Salesforce release updates</span>
+          <b>Transaction Security Policies is now 31 days overdue</b>, and four more security updates enforce on 1 September with MoveData explicitly at risk. All five were at 0% in the June review; no completion evidence has been sighted since.
+        </div>
+      </div>
+      <div class="flag warn">
+        <div class="rail"></div>
+        <div class="body">
+          <span class="lv">Admin surface, live reading</span>
+          <b>12 active sysadmins is progress (was 14), but the ratio is still 2.5x the 5% target</b>, three bot accounts still hold System Administrator, and two vendor accounts (Blitzm 13 months, miniOrange 5 months) have not logged in for extended periods while active. Karishma Soni is a new admin since 30 June with no recorded MFA verification.
+        </div>
+      </div>
+      <div class="flag warn">
+        <div class="rail"></div>
+        <div class="body">
+          <span class="lv">Baseline staleness</span>
+          <b>Most of the number wall still reads from June evidence, now 7+ weeks old.</b> The framework requires figures older than 30 days to be re-measured before board reporting: Secure Score, MFA capability, Global Admin count and the device numbers all need a fresh export at the next monthly review.
+        </div>
+      </div>
+      <div class="flag info">
+        <div class="rail"></div>
+        <div class="body">
+          <span class="lv">What moved since June</span>
+          Active sysadmins 14 to 12, admin ratio 15% to 12.6%, three more stale admin accounts deactivated (23 to 26 inactive), stale-login users 68 to 32. Direction is right on the Salesforce identity metrics; everything not measurable from this connector is unchanged on paper.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROVENANCE -->
+  <footer class="prov">
+    <div class="eyebrow">Provenance</div>
+    <dl>
+      <dt>Live</dt><dd>User WHERE IsActive=true AND Profile.Name='System Administrator' &middot; inactive same profile &middot; active Standard users &middot; LastLoginDate &lt; LAST_N_DAYS:30</dd>
+      <dt>Baselines</dt><dd>Digital Ecosystem Security Framework v1.0 (5 Aug 2026) s5&ndash;s7 &middot; security knowledge digest (2 Aug 2026) &middot; June 2026 review cycle (19&ndash;30 Jun)</dd>
+      <dt>Not readable</dt><dd>Secure Score, Entra MFA/CA state, Intune/BitLocker, Defender vulns, WP admin 2FA, AWS root MFA, Google 2SV &mdash; shown as dated baselines, never as current</dd>
+      <dt>Refresh</dt><dd>Weekly &middot; Monday 12:00am Melbourne &middot; claude.ai routine &middot; also published to the ICT Teams channel Files</dd>
+    </dl>
+    <div class="note">
+      Every figure carries its evidence date. Live figures are queried at snapshot time from Salesforce Production;
+      everything else is the last verified baseline and is marked re-verify rather than presented as current.
+      Classification: confidential. Contains per-system security weakness detail; do not circulate beyond the ICT team
+      and the security review attendees.
+    </div>
+  </footer>
+
+</div>
