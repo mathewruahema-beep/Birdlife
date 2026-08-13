@@ -37,6 +37,11 @@ The **Kaupapa / Plan** tab carries the weekly training rhythm, the 4-day strengt
 3-day active split, the full session library, the hand-portion guide with calibration
 examples, and the peptide dose calculator.
 
+## Live site
+
+Deployed via `.github/workflows/pages.yml`, which publishes this folder to the
+`gh-pages` branch on every push: **https://mathewruahema-beep.github.io/Birdlife/**
+
 ## Offline use
 
 Everything logs to local storage, so the page keeps working through connectivity drops
