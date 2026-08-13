@@ -233,6 +233,7 @@
 <div class="modal" id="modal">
   <div class="sheet">
     <h2>Ngā tautuhinga · Settings</h2>
+    <p class="note">Each day runs 12:00 am – 11:59 pm in your phone's time zone (<span id="tzName"></span>) and switches at midnight.</p>
     <label>Your name</label><input type="text" id="sName">
     <label>Age</label><input type="number" id="sAge" min="1" max="120">
     <label>Height (cm)</label><input type="number" id="sHeight" min="100" max="230">
@@ -1289,6 +1290,47 @@ window.addEventListener("offline", ()=>setOffline(true));
 setOffline(navigator.onLine===false);
 attemptAutoSync();
 
+/* ============ Day rollover — 12:00 am to 11:59 pm in the phone's local time zone ============ */
+/* All dates use local calendar parts (iso()/todayIso()), so the day boundary is local
+   midnight wherever the phone is. This watcher flips the open app to the new day at
+   midnight, and re-checks when the phone wakes or the app regains focus. */
+let appToday = todayIso();
+let midnightTimer = null;
+function msToNextMidnight(){
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0, 0, 1);
+  return next - now;
+}
+function armMidnightTimer(){
+  clearTimeout(midnightTimer);
+  midnightTimer = setTimeout(checkRollover, Math.min(msToNextMidnight(), 2147000000));
+}
+function editingNow(){
+  const a = document.activeElement;
+  return !document.hidden && !!a && (a.tagName==="INPUT" || a.tagName==="TEXTAREA");
+}
+function checkRollover(){
+  const now = todayIso();
+  if(now !== appToday){
+    if(editingNow()){            /* mid-sentence at midnight — finish the thought first */
+      setTimeout(checkRollover, 30000);
+      armMidnightTimer();
+      return;
+    }
+    const wasOnToday = (cursor === appToday);
+    appToday = now;
+    if(wasOnToday) cursor = now; /* follow onto the new day; a day being back-edited stays put */
+    render();
+    attemptAutoSync();
+    toast("He rā hou · New day");
+  }
+  armMidnightTimer();
+}
+setInterval(checkRollover, 30000);
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) checkRollover(); });
+window.addEventListener("focus", checkRollover);
+armMidnightTimer();
+
 /* Offline install (PWA) — only registers where the app is hosted with sw.js alongside */
 if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
   navigator.serviceWorker.register("sw.js").catch(()=>{});
@@ -1301,6 +1343,7 @@ document.getElementById("btnSettings").onclick=()=>{
   $("sName").value=p.name; $("sAge").value=p.age; $("sHeight").value=p.height; $("sGoal").value=p.goalWeight; $("sWater").value=p.waterGoal;
   $("sAct").value=String(p.activity); $("sLoss").value=String(p.lossRate); $("sPpk").value=p.proteinPerKg;
   $("sMedAm").value=p.medAm; $("sMedPm").value=p.medPm; $("sMedPrn").value=p.medPrn;
+  try{ $("tzName").textContent=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(e){ $("tzName").textContent="local time"; }
   modal.classList.add("open");
 };
 document.getElementById("btnClose").onclick=()=>modal.classList.remove("open");
