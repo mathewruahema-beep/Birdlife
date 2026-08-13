@@ -273,10 +273,20 @@ They have been redacted from the backup in this repo, but:
 2. Re-add the WooCommerce order-sync check using an environment variable, not an
    inline credential. The check is currently marked PARKED in the consolidated routine.
 
+## Agents pending approval — 13 Aug 2026
+
+Four new agents are built and created as **disabled** routines, awaiting Mathew's
+review: Zeus triage & first-touch drafter, identity lifecycle pack-to-plan,
+unreconciled income exception report, and the meeting actions collector. Full
+definitions, verbatim prompts, write postures and approval checklists are in
+[`agents/`](agents/README.md). None will fire until reviewed, connectors are
+attached in the Routines UI, and each is enabled.
+
 ## Repository layout
 
 ```
 README.md                            findings, admin runbook, routine consolidation
+agents/                              agent definitions pending approval (disabled routines)
 dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
 ```
