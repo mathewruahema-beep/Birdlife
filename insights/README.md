@@ -4,6 +4,9 @@ A single, versioned definition of **what BirdLife measures, where each number co
 from, and what is known to distort it** — spanning every connected system, for every
 department.
 
+> Shareable overview for department stakeholders:
+> https://claude.ai/code/artifact/36b1f097-ff48-4da3-b686-309f59cc95a5
+
 This is a *semantic model*, not a BI tool. It exists so that when Fundraising,
 Finance, Membership, ICT, People & Culture or a programme team asks "how many / how
 much / how fast", the answer is computed the same way every time, from the agreed
