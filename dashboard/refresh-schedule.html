@@ -123,12 +123,12 @@
         <div class="hr"><div class="cell route">R</div><div class="t">5p</div></div>
       </div>
       <div class="legend">
-        <span><span class="sw a"></span>D &mdash; 7am weekdays: the durable daily routine also runs its deep report + Teams push</span>
-        <span><span class="sw b"></span>R &mdash; loop slot, both dashboards: Ops <b>skips if unchanged</b>; Monitoring always rebuilds</span>
+        <span><span class="sw a"></span>D &mdash; 7am weekdays: the daily routine also runs its deep report + Teams push</span>
+        <span><span class="sw b"></span>R &mdash; hourly routine slot, both dashboards: Ops <b>skips if unchanged</b>; Monitoring always rebuilds</span>
         <span>Weekends: 7am and 6pm slots only</span>
       </div>
     </div>
-    <p>The hourly slots are driven by an <b>in-session loop</b> (jobs <span class="num">7fb17a66 / 053ae560 / 40627176 / 60c4495e</span>). It refreshes <b>both</b> the Operations and Monitoring dashboards. Caveat: the loop lives only while its Claude session is alive (7-day ceiling) &mdash; the durable layer is the claude.ai routines below.</p>
+    <p>Every slot is now a <b>durable claude.ai routine</b> &mdash; they survive session restarts and have no expiry, replacing the earlier in-session loop (which died twice with session recycles). All refresh both the Operations and Monitoring dashboards.</p>
   </section>
 
   <section>
@@ -138,8 +138,10 @@
       <tbody>
         <tr><td class="k">Daily refresh + Teams push (routine)</td><td>7am Mon&ndash;Fri &mdash; full Ops refresh, data-flow report, Teams post; durable</td><td class="mono">trig_01QKqXyf&hellip;</td></tr>
         <tr><td class="k">Hourly monitor (routine)</td><td>7&ndash;9am Mon&ndash;Fri &mdash; site/NetSuite/scheduler probes, heartbeat to the ICT Monitoring Teams channel; durable</td><td class="mono">trig_015SYdBt&hellip;</td></tr>
-        <tr><td class="k">Loop &mdash; weekday slots</td><td>7&ndash;9am + 10am&ndash;5pm Mon&ndash;Fri, both dashboards</td><td class="mono">7fb17a66 &middot; 053ae560</td></tr>
-        <tr><td class="k">Loop &mdash; weekend slots</td><td>7am and 6pm Sat&ndash;Sun, both dashboards</td><td class="mono">40627176 &middot; 60c4495e</td></tr>
+        <tr><td class="k">Hourly routine &mdash; weekday mornings</td><td>7/8/9am Mon&ndash;Fri (7am does Monitoring only &mdash; the daily routine owns the 7am Ops refresh)</td><td class="mono">trig_01HhAKnE&hellip;</td></tr>
+        <tr><td class="k">Hourly routine &mdash; weekday daytime</td><td>10am&ndash;5pm Mon&ndash;Fri, both dashboards</td><td class="mono">trig_01Egd8XC&hellip;</td></tr>
+        <tr><td class="k">Routine &mdash; weekend morning</td><td>7am Sat&ndash;Sun, both dashboards</td><td class="mono">trig_01CUkTdA&hellip;</td></tr>
+        <tr><td class="k">Routine &mdash; weekend evening</td><td>6pm Sat&ndash;Sun, both dashboards</td><td class="mono">trig_01HaRnkd&hellip;</td></tr>
       </tbody>
     </table></div>
     <p class="note">Two routines are needed because the window crosses UTC midnight and one routine holds one cron. Every refresh layer now opens with a cheap freshness check (one Salesforce aggregate + one Asana probe) and stops there when the queue hasn&rsquo;t moved &mdash; so a quiet slot costs a few percent of a full rebuild. The October daylight-saving one-shot has been rewritten to shift all four pieces to AEDT automatically on 5 Oct.</p>
@@ -158,12 +160,12 @@
     <div class="cost-grid">
       <div class="cost"><div class="big num">~$1</div><div class="k">per full rebuild</div>
         <div class="n">Fresh session: Salesforce + Asana pulls, tile recompute, ~50KB page republished. A skipped run (nothing changed) costs a few cents&rsquo; worth</div></div>
-      <div class="cost"><div class="big num">59<span style="font-size:15px">/wk</span></div><div class="k">loop slots</div>
+      <div class="cost"><div class="big num">59<span style="font-size:15px">/wk</span></div><div class="k">scheduled slots</div>
         <div class="n">11 &times; 5 weekdays + 2 &times; 2 weekend days &mdash; Ops skips when the queue hasn&rsquo;t moved; Monitoring rebuilds each slot</div></div>
-      <div class="cost"><div class="big num">~$35&ndash;50</div><div class="k">per week, loop</div>
-        <div class="n">&asymp; $150&ndash;215 / month API-equivalent while the loop session is alive; routines add ~$10&ndash;15/wk on top</div></div>
-      <div class="cost"><div class="big num">7<span style="font-size:15px">days</span></div><div class="k">loop lifetime ceiling</div>
-        <div class="n">Session-bound: dies if the session recycles, expires after 7 days regardless &mdash; ask Claude to re-arm it, or convert to routines for durability</div></div>
+      <div class="cost"><div class="big num">~$40&ndash;55</div><div class="k">per week</div>
+        <div class="n">&asymp; $175&ndash;240 / month API-equivalent including the daily deep-refresh and 7&ndash;9am monitor routines; less on quiet weeks</div></div>
+      <div class="cost"><div class="big num">1<span style="font-size:15px">step</span></div><div class="k">to switch them on</div>
+        <div class="n">claude.ai &rarr; Routines &rarr; each of the four new &ldquo;BirdLife dashboards&rdquo; routines &rarr; attach Salesforce Production + Asana (API cannot attach connectors)</div></div>
     </div>
     <p class="note">These runs draw on the claude.ai subscription&rsquo;s usage allowance rather than billing per token &mdash; the dollar figures are the equivalent API price, to show scale. After the halving this sits at roughly <b>half the original hourly build&rsquo;s cost, often less</b>, because unchanged slots stop after one cheap query. Want it lower still: drop the 8am slot or stretch to 3-hourly.</p>
   </section>
