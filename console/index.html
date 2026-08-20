@@ -337,7 +337,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   // ============================================================
   // QUEUE — live data via the artifact mcp capability
   // ============================================================
-  var SF_SERVER = 'Salesforce_Production', ASANA_SERVER = 'Asana';
+  var SF_SERVER = 'Salesforce Production', ASANA_SERVER = 'Asana';
   var SOQL = "SELECT CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE RecordType.DeveloperName = 'Zeus' AND IsClosed = false ORDER BY CreatedDate ASC LIMIT 200";
   var ASANA_INPUT = { completed: false, projects_any: "1211042432693678", limit: 100,
     opt_fields: "name,assignee.name,due_on,memberships.section.name,permalink_url" };
@@ -441,7 +441,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         });
       });
     } else {
-      sfArea.innerHTML = '<div class="secterr">Waiting for Salesforce…</div>';
+      sfArea.innerHTML = '<div class="secterr">Waiting for Salesforce… If claude.ai asks to let this page use your connectors, choose <b>Allow</b> — that is the whole connection.</div>';
     }
 
     // asana list
@@ -492,7 +492,21 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     }
     window.claude.use('mcp').then(function (mcp) {
       if (!mcp) { offline('Live data not available in this view'); return; }
-      mcp.watchTool(SF_SERVER, 'soqlQuery', { q: SOQL }, function (ev) {
+      // Resolve the connector names this viewer actually has (display names
+      // can differ from the registered ones), then start the watches.
+      try {
+        mcp.listTools().then(function (res) {
+          var names = (res.servers || []).map(function (s) { return s.server; });
+          var sf = names.find(function (n) { return /salesforce/i.test(n); }) || SF_SERVER;
+          var as = names.find(function (n) { return /asana/i.test(n); }) || ASANA_SERVER;
+          startWatches(mcp, sf, as);
+        }).catch(function () { startWatches(mcp, SF_SERVER, ASANA_SERVER); });
+      } catch (e) { startWatches(mcp, SF_SERVER, ASANA_SERVER); }
+    });
+  })();
+
+  function startWatches(mcp, sfServer, asanaServer) {
+      mcp.watchTool(sfServer, 'soqlQuery', { q: SOQL }, function (ev) {
         if (ev.type === 'data') {
           var p = ev.result.payload;
           if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
@@ -507,7 +521,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         renderQueue();
       }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
 
-      mcp.watchTool(ASANA_SERVER, 'search_tasks', ASANA_INPUT, function (ev) {
+      mcp.watchTool(asanaServer, 'search_tasks', ASANA_INPUT, function (ev) {
         if (ev.type === 'data') {
           var p = ev.result.payload;
           if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
@@ -530,8 +544,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         }
         renderQueue();
       }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
-    });
-  })();
+  }
 
   // ============================================================
   // LAUNCH — prompt builder
