@@ -60,7 +60,7 @@
   nav button[aria-selected="true"] { color: var(--euc-ink); border-bottom-color: var(--euc); }
   nav button:focus-visible { outline: 2px solid var(--euc); outline-offset: 2px; }
   h2 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 28px 0 12px; }
-  .chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 1px 7px; border-radius: 99px; vertical-align: 1px; }
+  .chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 1px 7px; border-radius: 99px; vertical-align: 1px; white-space: nowrap; }
   .t1 { background: var(--euc-soft); color: var(--euc-ink); }
   .t2 { background: var(--wattle-soft); color: var(--wattle); }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
@@ -71,41 +71,57 @@
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--slate); flex: none; }
   .dot.live { background: var(--euc); }
   .dot.err { background: var(--red); }
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 14px; }
-  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
-  .tile .n { font: 600 26px "Fraunces", Georgia, serif; font-variant-numeric: tabular-nums; line-height: 1.1; }
-  .tile .l { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
-  .tile.warn .n { color: var(--red); }
-  .grp { margin-bottom: 4px; }
-  .grp h3 { font-size: 14px; margin: 14px 0 6px; font-weight: 700; }
-  .caserow {
-    display: flex; align-items: baseline; gap: 8px; padding: 8px 0;
-    border-bottom: 1px solid var(--line); font-size: 14.5px;
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 16px; }
+  .tile {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 12px; text-align: left; cursor: pointer;
+    font-family: inherit; color: inherit;
   }
-  .caserow:last-child { border-bottom: none; }
-  .caserow .cn { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 13px; flex: none; }
-  .caserow .subj { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .caserow .age { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); flex: none; }
-  .caserow .age.old { color: var(--red); font-weight: 700; }
-  .badge { flex: none; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 99px; }
+  .tile:hover { border-color: var(--euc); }
+  .tile[aria-pressed="true"] { border-color: var(--euc); box-shadow: inset 0 0 0 1px var(--euc); }
+  .tile .n { font: 600 26px "Fraunces", Georgia, serif; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .tile .l { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .tile.warn .n { color: var(--red); }
+  .tile.still { cursor: default; }
+  .filterbar { font-size: 13.5px; color: var(--muted); margin: -6px 0 12px; }
+  .filterbar b { color: var(--euc-ink); }
+  .filterbar button { border: none; background: none; color: var(--euc-ink); font: 600 13.5px "Source Sans 3", sans-serif; cursor: pointer; text-decoration: underline; padding: 0; }
+
+  .next, .caseitem {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .next summary, .caseitem summary {
+    display: flex; align-items: baseline; gap: 8px; padding: 10px 12px;
+    cursor: pointer; list-style: none; font-size: 14.5px;
+  }
+  .next summary::-webkit-details-marker, .caseitem summary::-webkit-details-marker { display: none; }
+  .ttl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  .sub { color: var(--muted); font-weight: 400; }
+  .plan { padding: 2px 12px 12px; }
+  .plan .why-full { font-size: 14px; color: var(--muted); margin: 0 0 8px; }
+  .plan .preview { margin-bottom: 10px; min-height: 0; }
+  .c-reply { background: var(--euc-soft); color: var(--euc-ink); }
+  .c-assign { background: var(--blue-soft); color: var(--blue); }
+  .c-touch { background: var(--blue-soft); color: var(--blue); }
+  .c-chase { background: var(--wattle-soft); color: var(--wattle); }
+  .c-review { background: var(--red-soft); color: var(--red); }
+  .c-board { background: var(--slate-soft); color: var(--slate); }
+  .badge { flex: none; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 99px; white-space: nowrap; }
   .s-New { background: var(--blue-soft); color: var(--blue); }
   .s-InProgress { background: var(--euc-soft); color: var(--euc-ink); }
   .s-Waiting { background: var(--wattle-soft); color: var(--wattle); }
   .s-Response { background: var(--euc-soft); color: var(--euc-ink); }
   .s-Other { background: var(--slate-soft); color: var(--slate); }
-  .askbtn {
-    flex: none; border: 1px solid var(--line); background: none; color: var(--muted);
-    border-radius: 6px; font: 600 11.5px "Source Sans 3", sans-serif; padding: 2px 8px; cursor: pointer;
-  }
-  .askbtn:hover { border-color: var(--euc); color: var(--euc-ink); }
+  .age { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); flex: none; }
+  .age.old { color: var(--red); font-weight: 700; }
+  .grp h3 { font-size: 14px; margin: 16px 0 8px; font-weight: 700; }
   .secterr { font-size: 13.5px; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
-  .taskrow { display: flex; gap: 8px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
-  .taskrow:last-child { border-bottom: none; }
-  .taskrow .who { color: var(--muted); font-size: 13px; flex: none; }
+  .taskitem { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }
   .install { margin-top: 24px; font-size: 13.5px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
   .install b { color: var(--ink); }
 
-  /* ---- builder / runbooks / reference (unchanged design) ---- */
+  /* ---- builder / runbooks / reference ---- */
   .actions { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
   .actions button {
     background: var(--surface); border: 1px solid var(--line); border-radius: 99px;
@@ -113,6 +129,7 @@
   }
   .actions button:hover { border-color: var(--euc); }
   .actions button[aria-pressed="true"] { background: var(--euc); border-color: var(--euc); color: var(--btn-ink); }
+  .actions button:focus-visible { outline: 2px solid var(--euc); outline-offset: 2px; }
   .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px; }
   .field label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
   .field input, .field select, .field textarea {
@@ -137,6 +154,7 @@
     border: 1px solid var(--euc); background: var(--euc); color: var(--btn-ink);
   }
   .btn.ghost { background: none; color: var(--euc-ink); }
+  .btn.sm { padding: 6px 12px; font-size: 13.5px; }
   .btn:focus-visible { outline: 2px solid var(--euc); outline-offset: 2px; }
   .hint { font-size: 13.5px; color: var(--muted); margin-top: 10px; }
   .step { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
@@ -175,76 +193,80 @@
   <header>
     <div class="kicker">BirdLife Australia · ICT</div>
     <h1>BirdLife ICT Console</h1>
-    <p class="lede">Live queue, prompt cockpit and runbooks for the AI ICT Assistant.</p>
+    <p class="lede">Your helpdesk at a glance — what's waiting, what to do about it,
+    and the words to make it happen. Tap anything to dig in.</p>
   </header>
 
   <nav role="tablist" aria-label="Console sections">
-    <button role="tab" aria-selected="true" data-panel="queue">Queue</button>
-    <button role="tab" aria-selected="false" data-panel="launch">Launch</button>
+    <button role="tab" aria-selected="true" data-panel="queue">Today</button>
+    <button role="tab" aria-selected="false" data-panel="launch">Ask</button>
     <button role="tab" aria-selected="false" data-panel="runbooks">Runbooks</button>
     <button role="tab" aria-selected="false" data-panel="reference">Reference</button>
   </nav>
 
-  <!-- ============ QUEUE (live) ============ -->
+  <!-- ============ TODAY (live) ============ -->
   <section class="panel" id="panel-queue">
     <div class="livebar"><span class="dot" id="live-dot"></span><span id="live-status">Connecting to live data…</span></div>
     <div class="tiles" id="tiles"></div>
+    <div class="filterbar" id="filterbar" hidden></div>
+    <div id="next-area"></div>
     <div id="sf-area"></div>
     <h2>Project board</h2>
     <div id="asana-area"></div>
     <div class="install"><b>Make it an app:</b> in Samsung Internet tap ≡ → <b>Add page to</b> →
     <b>Home screen</b>; in Chrome tap ⋮ → <b>Add to Home screen</b>. It opens full-screen
-    from its own icon. Live data needs you signed in to claude.ai in that browser.</div>
+    from its own icon. Live data needs you signed in to claude.ai in that browser —
+    if it asks to let this page use your connectors, choose <b>Allow</b>.</div>
   </section>
 
-  <!-- ============ LAUNCH ============ -->
+  <!-- ============ ASK ============ -->
   <section class="panel" id="panel-launch" hidden>
+    <p class="hint" style="margin:0 0 14px">Pick what you want done, fill in the blanks, and
+    copy the request. Paste it to Claude — it checks the details, shows you exactly what it
+    will change, and only acts when you say go.</p>
     <div class="actions" id="action-list" role="group" aria-label="Choose an action"></div>
     <div class="card">
       <div class="fields" id="field-area"></div>
-      <label class="toggle"><input type="checkbox" id="dryrun"> Dry run — preview the changes, write nothing</label>
+      <label class="toggle"><input type="checkbox" id="dryrun"> Just show me what would change — don't do it</label>
       <div class="preview" id="preview" aria-live="polite"></div>
       <div class="btnrow">
-        <button class="btn" id="copy-prompt">Copy prompt</button>
+        <button class="btn" id="copy-prompt">Copy request</button>
         <a class="btn ghost" href="https://claude.ai/new" target="_blank" rel="noopener">Open Claude ↗</a>
         <a class="btn ghost" href="https://claude.ai/code" target="_blank" rel="noopener">Open on the repo ↗</a>
       </div>
       <p class="hint" id="tier-hint"></p>
     </div>
-    <p class="hint">Copy first, then open Claude and paste. A session started on
-    <b>mathewruahema-beep/Birdlife</b> at claude.ai/code loads the full knowledge base;
-    in the plain Claude app your account-synced skills cover the same ground.</p>
   </section>
 
   <!-- ============ RUNBOOKS ============ -->
   <section class="panel" id="panel-runbooks" hidden>
-    <h2>Offboarding <span class="chip t2">T2 · admin runs the commands</span></h2>
+    <h2>When someone leaves <span class="chip t2">an admin runs the commands</span></h2>
     <div class="card">
+      <p class="hint" style="margin:0 0 12px">Type the leaver's details and this builds the
+      full step-by-step, with each command ready to copy. The order matters — it's baked in.</p>
       <div class="fields">
         <div class="field"><label for="ob-name">Full name</label><input id="ob-name" placeholder="Jane Nguyen"></div>
-        <div class="field"><label for="ob-upn">UPN (email)</label><input id="ob-upn" placeholder="jane.nguyen@birdlife.org.au"></div>
+        <div class="field"><label for="ob-upn">Work email</label><input id="ob-upn" placeholder="jane.nguyen@birdlife.org.au"></div>
         <div class="field"><label for="ob-date">Last day</label><input id="ob-date" type="date"></div>
       </div>
       <div id="ob-steps"></div>
       <div class="btnrow">
         <button class="btn" id="ob-copy-all">Copy full runbook</button>
-        <button class="btn ghost" id="ob-copy-prompt">Copy as assistant prompt</button>
+        <button class="btn ghost" id="ob-copy-prompt">Ask the assistant to run it</button>
       </div>
-      <p class="hint">Order matters: revoke before disable, convert the mailbox to
-      shared <em>before</em> reclaiming the licence. Connect first with
-      <code>Connect-MgGraph -Scopes "User.ReadWrite.All","Group.ReadWrite.All"</code>.
-      Manual steps outside Graph: Asana seat, Campaign Monitor login, any SaaS outside SSO.</p>
+      <p class="hint">Also remove by hand (outside Microsoft): their Asana seat, Campaign
+      Monitor login, and any app they used that isn't behind the Microsoft sign-in.</p>
     </div>
 
-    <h2>Onboarding <span class="chip t2">T2</span></h2>
+    <h2>When someone joins <span class="chip t2"></span></h2>
     <div class="card">
       <ul class="tight">
-        <li>Start in <b>Employment Hero</b> — "Add Employee", never CSV Quick-add. BLA### worker code is mandatory; capture the <b>personal</b> email at invite.</li>
-        <li>Email format <code>firstname.lastname@birdlife.org.au</code>; licence is <b>M365 Business Premium</b>.</li>
-        <li>Create the Entra user, assign the licence, add groups/DLs, set manager, notify IT + manager.</li>
-        <li>Rehires get <b>reactivated</b>, never duplicated.</li>
+        <li>Start in <b>Employment Hero</b> — use "Add Employee", never the CSV quick-add. The BLA### worker code is required; use their <b>personal</b> email for the invite.</li>
+        <li>Their address will be <code>firstname.lastname@birdlife.org.au</code>; they get an <b>M365 Business Premium</b> licence.</li>
+        <li>Create the account, add the licence, put them in the right groups and lists, set their manager, and tell IT + their manager it's done.</li>
+        <li>If they've worked here before, <b>reactivate</b> the old account — never make a duplicate.</li>
       </ul>
-      <div class="btnrow"><button class="btn ghost" id="onb-copy-prompt">Copy as assistant prompt</button></div>
+      <div class="btnrow"><button class="btn ghost" id="onb-copy-prompt">Ask the assistant to run it</button></div>
     </div>
   </section>
 
@@ -252,21 +274,33 @@
   <section class="panel" id="panel-reference" hidden>
     <h2>Closing a case — the trap</h2>
     <div class="card">
-      <p style="margin:0 0 8px">A close is <b>two fields together</b> — <code>Status = "Closed"</code>
-      <em>and</em> <code>Case_Closed_Reason__c</code>. Status alone fails validation. Valid reasons:</p>
+      <p style="margin:0 0 8px">A case won't close with just the status — you must set <b>two things
+      together</b>: <code>Status = "Closed"</code> <em>and</em> a close reason
+      (<code>Case_Closed_Reason__c</code>). The valid reasons:</p>
       <p style="margin:0; font-size:14px; color:var(--muted)">Closed - Resolved · Closed - Resolved First Call ·
       Closed - Email Sent · Closed - Email Edited &amp; Sent · Closed - Phone Call ·
       Closed - No Action Required · Closed - Internal Follow up · Closed - Duplicate ·
       Closed - Spam · Closed - Abandoned · Closed - Autoreply · Closed - Returned Letter</p>
     </div>
 
-    <h2>Case statuses</h2>
-    <div class="card"><p style="margin:0; font-size:14.5px">New → In Progress → Pending / On Hold-Internal /
-    Waiting Response-External → Response Received → Closed.
-    <span style="color:var(--muted)"><code>Owner.Name = 'Zeus'</code> is the unassigned intake queue, not a person.
-    Always scope reporting with <code>RecordType.DeveloperName = 'Zeus'</code> — unscoped counts are ~200× inflated.</span></p></div>
+    <h2>What the statuses mean</h2>
+    <div class="card tablewrap">
+      <table>
+        <thead><tr><th>Salesforce says</th><th>Plain English</th></tr></thead>
+        <tbody>
+          <tr><td>New</td><td>Just arrived — nobody has replied yet</td></tr>
+          <tr><td>In Progress</td><td>Being worked on</td></tr>
+          <tr><td>Waiting Response-External</td><td>Waiting on them (the requester)</td></tr>
+          <tr><td>Response Received</td><td>They replied — the ball is back with us</td></tr>
+          <tr><td>Pending / On Hold-Internal</td><td>Parked for now</td></tr>
+        </tbody>
+      </table>
+      <p class="hint"><code>Owner = 'Zeus'</code> means nobody owns it yet — it's the intake
+      queue, not a person. And always count cases with the Ask Zeus record type filter;
+      without it you're counting every team's cases (~200× too many).</p>
+    </div>
 
-    <h2>Useful SOQL</h2>
+    <h2>Useful queries</h2>
     <div class="cmd"><pre id="soql-open">SELECT CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate
 FROM Case
 WHERE RecordType.DeveloperName = 'Zeus' AND IsClosed = false
@@ -274,8 +308,8 @@ ORDER BY Owner.Name, CreatedDate ASC</pre><button data-copy="#soql-open">copy</b
     <div style="height:8px"></div>
     <div class="cmd"><pre id="soql-user">SELECT Id, Name, IsActive, Username FROM User
 WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user">copy</button></div>
-    <p class="hint">Run the second one before any reassignment — every ICT staffer has
-    multiple active User records; never hardcode an Id.</p>
+    <p class="hint">Run the second one before reassigning a case — team members have more
+    than one active user record, so never guess the ID.</p>
 
     <h2>Asana — IT Operations Project Plan</h2>
     <div class="card tablewrap">
@@ -304,10 +338,10 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     </ul>
   </section>
 
-  <div class="safety"><strong>Standing rules:</strong> the assistant never sends email
-  in your name without showing the draft, never bulk-updates or deletes, confirms the
-  staff record before reassigning, and hands anything security-, finance- or
-  PII-sensitive to you with the action prepared. This page itself only reads.</div>
+  <div class="safety"><strong>The rules the assistant lives by:</strong> it never sends
+  email in your name without showing you the draft, never changes things in bulk, checks
+  it has the right person before reassigning, and hands anything sensitive (security,
+  money, personal data) to you with the fix prepared. This page itself only reads.</div>
 
   <footer>Source of truth: <code>console/index.html</code> in the
   <a href="https://github.com/mathewruahema-beep/Birdlife" target="_blank" rel="noopener">Birdlife repo</a>.
@@ -333,12 +367,14 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   function copyText(text, btn, doneText) {
     navigator.clipboard.writeText(text).then(function () { if (btn) flash(btn, doneText); });
   }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
   // ============================================================
-  // QUEUE — live data via the artifact mcp capability
+  // TODAY — live data via the artifact mcp capability
   // ============================================================
   var SF_SERVER = 'Salesforce Production', ASANA_SERVER = 'Asana';
-  var SOQL = "SELECT CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE RecordType.DeveloperName = 'Zeus' AND IsClosed = false ORDER BY CreatedDate ASC LIMIT 200";
+  var SOQL = "SELECT CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate, LastModifiedDate FROM Case WHERE RecordType.DeveloperName = 'Zeus' AND IsClosed = false ORDER BY CreatedDate ASC LIMIT 200";
   var ASANA_INPUT = { completed: false, projects_any: "1211042432693678", limit: 100,
     opt_fields: "name,assignee.name,due_on,memberships.section.name,permalink_url" };
   var SECTION_NAMES = {
@@ -350,25 +386,31 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   var liveDot = document.getElementById('live-dot');
   var liveStatus = document.getElementById('live-status');
   var tilesEl = document.getElementById('tiles');
+  var filterbar = document.getElementById('filterbar');
+  var nextArea = document.getElementById('next-area');
   var sfArea = document.getElementById('sf-area');
   var asanaArea = document.getElementById('asana-area');
   var sfState = { data: null, storedAt: null, error: null };
   var asState = { data: null, storedAt: null, error: null };
+  var caseFilter = 'all';
+  var FILTER_LABELS = { all: '', neu: 'just arrived', unassigned: 'nobody owns them yet', old: 'open more than a month' };
 
   function fixCopy(err, server) {
     if (!err) return '';
-    if (err.code === 'needs_reauth') return 'Reconnect ' + server + ' in claude.ai Settings → Connectors.';
-    if (err.code === 'server_not_connected') return 'Add ' + server + ' in claude.ai Settings → Connectors.';
-    if (err.code === 'selection_required') return 'Choose which ' + server + ' connector to use when claude.ai prompts you.';
-    if (err.code === 'approval_required') return server + ' needs org approval for this call.';
-    if (err.code === 'blocked_by_policy') return 'Org policy blocks this ' + server + ' call.';
-    return server + ': ' + (err.message || err.code) + '.';
+    if (err.code === 'needs_reauth') return 'Your ' + server + ' login has lapsed — reconnect it in claude.ai Settings → Connectors, then reopen this page.';
+    if (err.code === 'server_not_connected') return server + ' isn’t connected to your claude.ai account — add it in Settings → Connectors.';
+    if (err.code === 'selection_required') return 'You have more than one ' + server + ' connector — pick one when claude.ai asks.';
+    if (err.code === 'approval_required') return server + ' needs your organisation’s approval for this.';
+    if (err.code === 'blocked_by_policy') return 'Your organisation’s policy blocks this ' + server + ' call.';
+    return server + ' hiccup: ' + (err.message || err.code) + '.';
   }
   var AUTHZ = { needs_reauth: 1, server_not_connected: 1, blocked_by_policy: 1, approval_required: 1 };
 
-  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
-    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-
+  var PLAIN_STATUS = {
+    'New': 'Just arrived', 'In Progress': 'Being worked on', 'Pending': 'Parked',
+    'On Hold-Internal': 'Parked', 'Waiting Response-External': 'Waiting on them',
+    'Response Received': 'They replied'
+  };
   function statusClass(s) {
     if (s === 'New') return 's-New';
     if (s === 'In Progress') return 's-InProgress';
@@ -376,101 +418,200 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     if (s === 'Response Received') return 's-Response';
     return 's-Other';
   }
-  function shortStatus(s) {
-    return ({ 'Waiting Response-External': 'Waiting ext', 'Response Received': 'Response rcvd',
-      'On Hold-Internal': 'On hold', 'In Progress': 'In progress' })[s] || s;
+  function daysAgo(iso, now) { return Math.floor((now - Date.parse(iso)) / 864e5); }
+
+  // The advice engine: one plain-English recommendation per case.
+  function adviceFor(r, now) {
+    var cn = r.CaseNumber, subj = r.Subject || '';
+    var age = daysAgo(r.CreatedDate, now);
+    var quiet = r.LastModifiedDate ? daysAgo(r.LastModifiedDate, now) : age;
+    var owner = (r.Owner && r.Owner.Name) || '';
+    if (r.Status === 'Response Received') return {
+      p: 1, cat: 'They replied', cls: 'c-reply',
+      why: 'The requester has answered — the ball is back with us' + (quiet ? ' (' + quiet + 'd ago)' : '') + '.',
+      action: 'Read their reply and decide: fix, answer, or close.',
+      prompt: 'Summarise the latest reply on case ' + cn + ' ("' + subj + '") and propose the next step' };
+    if (owner === 'Zeus') return {
+      p: 2, cat: 'Needs an owner', cls: 'c-assign',
+      why: 'It’s sitting in the intake queue — nobody has picked it up.',
+      action: 'Read it and give it to the right person.',
+      prompt: 'Triage case ' + cn + ' ("' + subj + '") and suggest who on the ICT team should own it' };
+    if (r.Status === 'New' && age >= 3) return {
+      p: 3, cat: 'Say hello', cls: 'c-touch',
+      why: 'Still untouched after ' + age + ' days — the requester hasn’t heard from us.',
+      action: 'Send a quick acknowledgement so they know it’s in hand.',
+      prompt: 'Draft an acknowledgement reply to the requester on case ' + cn + ' ("' + subj + '") — show me the draft first' };
+    if (r.Status === 'Waiting Response-External' && quiet >= 7) return {
+      p: 4, cat: 'Give them a nudge', cls: 'c-chase',
+      why: 'We’ve been waiting on the requester for ' + quiet + ' days.',
+      action: 'A friendly reminder, or close it if they’ve gone quiet for good.',
+      prompt: 'Draft a friendly nudge to the requester on case ' + cn + ' ("' + subj + '") — it’s been ' + quiet + ' days. Show me the draft first' };
+    if (age > 30 && r.Status !== 'Waiting Response-External') return {
+      p: 5, cat: 'Time to decide', cls: 'c-review',
+      why: 'Open for ' + age + ' days — it needs a push or a decision.',
+      action: 'Finish it, park it deliberately, or close it.',
+      prompt: 'Review case ' + cn + ' ("' + subj + '") — open ' + age + ' days. Should we push it forward, park it, or close it? Propose the move' };
+    return null;
+  }
+  function defaultAdvice(r) {
+    return { action: 'Get the story before touching anything.',
+      prompt: 'Summarise case ' + r.CaseNumber + ' ("' + (r.Subject || '') + '") and how to resolve it' };
+  }
+
+  function planHtml(a, extra) {
+    return '<div class="plan">' +
+      (a.why ? '<p class="why-full">' + esc(a.why) + ' ' + esc(a.action || '') + '</p>'
+             : '<p class="why-full">' + esc(a.action || '') + '</p>') +
+      '<div class="preview">' + esc(a.prompt) + '</div>' +
+      '<div class="btnrow" style="margin-top:0">' +
+      '<button class="btn sm copyplan">Copy &amp; ask Claude</button>' +
+      (extra || '') + '</div></div>';
   }
 
   function renderQueue() {
     var now = Date.now();
-    // tiles
+    var recs = sfState.data ? (sfState.data.records || []) : null;
+    var tasks = asState.data;
+
+    // ---- tiles (tap to filter the case list) ----
     var t = [];
-    if (sfState.data) {
-      var recs = sfState.data.records || [];
-      var open = recs.length;
+    if (recs) {
       var neu = recs.filter(function (r) { return r.Status === 'New'; }).length;
       var zeus = recs.filter(function (r) { return r.Owner && r.Owner.Name === 'Zeus'; }).length;
-      var old = recs.filter(function (r) { return (now - Date.parse(r.CreatedDate)) / 864e5 > 30; }).length;
-      t.push({ n: open, l: 'Open cases' }, { n: neu, l: 'New' }, { n: zeus, l: 'Unassigned' },
-             { n: old, l: '&gt;30 days', warn: old > 0 });
+      var old = recs.filter(function (r) { return daysAgo(r.CreatedDate, now) > 30; }).length;
+      t.push({ n: recs.length, l: 'Open cases', f: 'all' },
+             { n: neu, l: 'Just arrived', f: 'neu' },
+             { n: zeus, l: 'No owner yet', f: 'unassigned', warn: zeus > 0 },
+             { n: old, l: 'Over a month', f: 'old', warn: old > 0 });
     }
-    if (asState.data) {
-      var tasks = asState.data;
+    if (tasks) {
       var blocked = tasks.filter(function (x) { return x.section === 'Blocked'; }).length;
       var overdue = tasks.filter(function (x) { return x.due_on && x.due_on < new Date(now).toISOString().slice(0, 10); }).length;
-      t.push({ n: blocked, l: 'Blocked', warn: blocked > 0 }, { n: overdue, l: 'Overdue', warn: overdue > 0 });
+      t.push({ n: blocked, l: 'Stuck', warn: blocked > 0 }, { n: overdue, l: 'Past due', warn: overdue > 0 });
     }
     tilesEl.innerHTML = t.map(function (x) {
-      return '<div class="tile' + (x.warn ? ' warn' : '') + '"><div class="n">' + x.n + '</div><div class="l">' + x.l + '</div></div>';
+      var press = x.f ? ' aria-pressed="' + (caseFilter === x.f && x.f !== 'all' ? 'true' : 'false') + '" data-filter="' + x.f + '"' : '';
+      return '<button class="tile' + (x.warn ? ' warn' : '') + (x.f ? '' : ' still') + '"' + press + '>' +
+        '<div class="n">' + x.n + '</div><div class="l">' + esc(x.l) + '</div></button>';
     }).join('');
+    tilesEl.querySelectorAll('[data-filter]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        caseFilter = (caseFilter === b.dataset.filter) ? 'all' : b.dataset.filter;
+        renderQueue();
+        if (caseFilter !== 'all') sfArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+    if (caseFilter !== 'all') {
+      filterbar.hidden = false;
+      filterbar.innerHTML = 'Showing only cases that are <b>' + esc(FILTER_LABELS[caseFilter]) + '</b> — <button id="clearf">show everything</button>';
+      var cf = document.getElementById('clearf');
+      if (cf) cf.addEventListener('click', function () { caseFilter = 'all'; renderQueue(); });
+    } else { filterbar.hidden = true; filterbar.innerHTML = ''; }
 
-    // salesforce list
-    if (sfState.error && !sfState.data) {
+    // ---- what to do next ----
+    if (recs || tasks) {
+      var items = [];
+      (recs || []).forEach(function (r) {
+        var a = adviceFor(r, now);
+        if (a) items.push({ p: a.p, cls: a.cls, cat: a.cat, title: r.CaseNumber + ' · ' + (r.Subject || ''), a: a,
+          link: '<a class="btn sm ghost" target="_blank" rel="noopener" href="https://birdlifeaustralia.lightning.force.com/lightning/r/Case/' + esc((r.attributes && r.attributes.url || '').split('/').pop()) + '/view">Open in Salesforce ↗</a>' });
+      });
+      (tasks || []).forEach(function (x) {
+        var today = new Date(now).toISOString().slice(0, 10);
+        if (x.due_on && x.due_on < today) items.push({ p: 6, cls: 'c-review', cat: 'Past due', title: x.name,
+          a: { why: 'This task’s due date (' + x.due_on + ') has passed.', action: 'Re-date it honestly or get it moving.',
+               prompt: 'The Asana task "' + x.name + '" is past its due date (' + x.due_on + '). Propose a realistic plan: new date, new owner, or done' },
+          link: '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(x.url) + '">Open in Asana ↗</a>' });
+        else if (x.section === 'Blocked') items.push({ p: 7, cls: 'c-board', cat: 'Stuck', title: x.name,
+          a: { why: 'This task is sitting in Blocked' + (x.assignee ? ' with ' + x.assignee : '') + '.',
+               action: 'Most blocked items need a decision, not more work — name whose call it is.',
+               prompt: 'Look at the Asana task "' + x.name + '" — what exactly is it blocked on, whose decision is it, and what would unblock it?' },
+          link: '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(x.url) + '">Open in Asana ↗</a>' });
+      });
+      items.sort(function (a, b) { return a.p - b.p; });
+      var top = items.slice(0, 6);
+      nextArea.innerHTML = (top.length ? '<h2 style="margin-top:4px">What to do next</h2>' : '') +
+        top.map(function (it) {
+          return '<details class="next"><summary><span class="chip ' + it.cls + '">' + esc(it.cat) + '</span>' +
+            '<span class="ttl">' + esc(it.title) + '</span></summary>' + planHtml(it.a, it.link) + '</details>';
+        }).join('') +
+        (items.length > top.length ? '<p class="hint">…and ' + (items.length - top.length) + ' more further down the list.</p>' : '');
+      wireCopyPlans(nextArea);
+    } else { nextArea.innerHTML = ''; }
+
+    // ---- the queue, grouped by owner ----
+    if (sfState.error && !recs) {
       sfArea.innerHTML = '<div class="secterr">' + esc(fixCopy(sfState.error, 'Salesforce')) + '</div>';
-    } else if (sfState.data) {
-      var recs2 = sfState.data.records || [];
+    } else if (recs) {
+      var shown = recs.filter(function (r) {
+        if (caseFilter === 'neu') return r.Status === 'New';
+        if (caseFilter === 'unassigned') return r.Owner && r.Owner.Name === 'Zeus';
+        if (caseFilter === 'old') return daysAgo(r.CreatedDate, now) > 30;
+        return true;
+      });
       var groups = {};
-      recs2.forEach(function (r) {
+      shown.forEach(function (r) {
         var o = (r.Owner && r.Owner.Name) || 'Unknown';
         (groups[o] = groups[o] || []).push(r);
       });
       var order = Object.keys(groups).sort(function (a, b) {
         if (a === 'Zeus') return -1; if (b === 'Zeus') return 1; return a.localeCompare(b);
       });
-      sfArea.innerHTML = order.map(function (o) {
+      sfArea.innerHTML = '<h2>The queue — who has what</h2>' + (order.length ? order.map(function (o) {
         var rows = groups[o].map(function (r) {
           var id = (r.attributes && r.attributes.url || '').split('/').pop();
-          var age = Math.floor((now - Date.parse(r.CreatedDate)) / 864e5);
-          return '<div class="caserow">' +
-            '<a class="cn" target="_blank" rel="noopener" href="https://birdlifeaustralia.lightning.force.com/lightning/r/Case/' + esc(id) + '/view">' + esc(r.CaseNumber) + '</a>' +
-            '<span class="subj" title="' + esc(r.Subject) + '">' + esc(r.Subject) + (r.Type ? '' : ' <span style="color:var(--wattle)" title="No Type set">•</span>') + '</span>' +
-            '<span class="badge ' + statusClass(r.Status) + '">' + esc(shortStatus(r.Status)) + '</span>' +
+          var age = daysAgo(r.CreatedDate, now);
+          var a = adviceFor(r, now) || defaultAdvice(r);
+          var link = '<a class="btn sm ghost" target="_blank" rel="noopener" href="https://birdlifeaustralia.lightning.force.com/lightning/r/Case/' + esc(id) + '/view">Open in Salesforce ↗</a>';
+          return '<details class="caseitem"><summary>' +
+            '<span class="ttl">' + esc(r.CaseNumber) + ' <span class="sub">· ' + esc(r.Subject) + '</span></span>' +
+            '<span class="badge ' + statusClass(r.Status) + '">' + esc(PLAIN_STATUS[r.Status] || r.Status) + '</span>' +
             '<span class="age' + (age > 30 ? ' old' : '') + '">' + age + 'd</span>' +
-            '<button class="askbtn" data-case="' + esc(r.CaseNumber) + '">ask</button>' +
-            '</div>';
+            '</summary>' + planHtml(a, link) + '</details>';
         }).join('');
-        var head = o === 'Zeus' ? 'Zeus queue — unassigned intake (' + groups[o].length + ')' : esc(o) + ' (' + groups[o].length + ')';
+        var head = o === 'Zeus' ? 'Nobody’s yet — the intake queue (' + groups[o].length + ')' : esc(o) + ' (' + groups[o].length + ')';
         return '<div class="grp"><h3>' + head + '</h3>' + rows + '</div>';
-      }).join('');
+      }).join('') : '<div class="secterr">Nothing matches this filter.</div>');
       if (sfState.error) {
-        sfArea.innerHTML += '<div class="secterr">Refresh failed — showing last data. ' + esc(fixCopy(sfState.error, 'Salesforce')) + '</div>';
+        sfArea.innerHTML += '<div class="secterr">Couldn’t refresh just now — this is the last good data. ' + esc(fixCopy(sfState.error, 'Salesforce')) + '</div>';
       }
-      sfArea.querySelectorAll('.askbtn').forEach(function (b) {
-        b.addEventListener('click', function () {
-          copyText('Summarise case ' + b.dataset.case + ' and how to resolve it', b, '✓');
-        });
-      });
+      wireCopyPlans(sfArea);
     } else {
       sfArea.innerHTML = '<div class="secterr">Waiting for Salesforce… If claude.ai asks to let this page use your connectors, choose <b>Allow</b> — that is the whole connection.</div>';
     }
 
-    // asana list
-    if (asState.error && !asState.data) {
+    // ---- project board ----
+    if (asState.error && !tasks) {
       asanaArea.innerHTML = '<div class="secterr">' + esc(fixCopy(asState.error, 'Asana')) + '</div>';
-    } else if (asState.data) {
+    } else if (tasks) {
       var byS = {};
-      asState.data.forEach(function (x) { byS[x.section] = (byS[x.section] || 0) + 1; });
+      tasks.forEach(function (x) { byS[x.section] = (byS[x.section] || 0) + 1; });
       var summary = Object.keys(byS).sort().map(function (s) { return esc(s) + ' ' + byS[s]; }).join(' · ');
-      var blockedRows = asState.data.filter(function (x) { return x.section === 'Blocked'; }).map(function (x) {
-        return '<div class="taskrow"><a target="_blank" rel="noopener" href="' + esc(x.url) + '">' + esc(x.name) + '</a>' +
-          '<span class="who">' + esc(x.assignee || 'Unassigned') + '</span></div>';
+      var blockedRows = tasks.filter(function (x) { return x.section === 'Blocked'; }).map(function (x) {
+        var a = { why: 'Sitting in Blocked' + (x.assignee ? ' with ' + x.assignee : '') + '.',
+          action: 'Most blocked items need a decision, not more work.',
+          prompt: 'Look at the Asana task "' + x.name + '" — what exactly is it blocked on, whose decision is it, and what would unblock it?' };
+        return '<details class="taskitem next"><summary><span class="ttl">' + esc(x.name) + '</span>' +
+          '<span class="age">' + esc(x.assignee || 'No owner') + '</span></summary>' +
+          planHtml(a, '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(x.url) + '">Open in Asana ↗</a>') + '</details>';
       }).join('');
       asanaArea.innerHTML = '<p class="hint" style="margin-top:0">' + summary +
         (asState.truncated ? ' · first 100 shown' : '') + '</p>' +
-        (blockedRows ? '<div class="grp"><h3>Blocked</h3>' + blockedRows + '</div>' : '');
+        (blockedRows ? '<div class="grp"><h3>Stuck — tap one to see how to unstick it</h3>' + blockedRows + '</div>' : '');
       if (asState.error) {
-        asanaArea.innerHTML += '<div class="secterr">Refresh failed — showing last data. ' + esc(fixCopy(asState.error, 'Asana')) + '</div>';
+        asanaArea.innerHTML += '<div class="secterr">Couldn’t refresh just now — this is the last good data. ' + esc(fixCopy(asState.error, 'Asana')) + '</div>';
       }
+      wireCopyPlans(asanaArea);
     } else {
       asanaArea.innerHTML = '<div class="secterr">Waiting for Asana…</div>';
     }
 
-    // status line
+    // ---- status line ----
     var errs = [sfState.error, asState.error].filter(Boolean);
-    if (sfState.data || asState.data) {
+    if (recs || tasks) {
       var at = sfState.storedAt || asState.storedAt;
       liveDot.className = 'dot ' + (errs.length ? 'err' : 'live');
-      liveStatus.textContent = 'Live · Ask Zeus record type only · updated ' +
+      liveStatus.textContent = 'Live · ICT cases only (Ask Zeus) · updated ' +
         (at ? new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'just now');
     } else if (errs.length === 2) {
       liveDot.className = 'dot err';
@@ -478,11 +619,21 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     }
   }
 
+  function wireCopyPlans(root) {
+    root.querySelectorAll('.copyplan').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var pv = b.closest('.plan').querySelector('.preview');
+        copyText(pv.textContent, b, 'Copied ✓ — paste it to Claude');
+      });
+    });
+  }
+
   function offline(msg) {
     liveDot.className = 'dot';
     liveStatus.textContent = msg;
     sfArea.innerHTML = '<div class="secterr">Open this page from its claude.ai link (signed in) to see the live queue. Everything else on this console works offline.</div>';
     asanaArea.innerHTML = '';
+    nextArea.innerHTML = '';
   }
 
   (function initLive() {
@@ -547,7 +698,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   }
 
   // ============================================================
-  // LAUNCH — prompt builder
+  // ASK — request builder
   // ============================================================
   var CLOSE_REASONS = ["Closed - Resolved","Closed - Resolved First Call","Closed - Email Sent",
     "Closed - Email Edited & Sent","Closed - Phone Call","Closed - No Action Required",
@@ -647,8 +798,8 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     if (dryrun.checked) text += " (dry run — show me what you would change first)";
     preview.textContent = text;
     tierHint.textContent = current.tier === 'T2'
-      ? 'T2 — Entra/Exchange admin isn’t connected yet, so the assistant prepares the exact commands for an admin and updates the ticket.'
-      : 'T1 — the assistant executes this after showing you the exact change and getting your go-ahead.';
+      ? 'For this one, Claude prepares the exact fix for an admin to run (it doesn’t have Microsoft admin access yet) and updates the ticket.'
+      : 'Claude will do this for you — it shows you the exact change and waits for your go-ahead first.';
   }
   dryrun.addEventListener('change', renderPreview);
   document.getElementById('copy-prompt').addEventListener('click', function () {
@@ -665,19 +816,19 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     var upn = obUpn.value.trim() || '<upn>@birdlife.org.au';
     var name = obName.value.trim() || '<name>';
     return [
-      { t: 'Revoke sessions (security — do this first)', d: 'Kills every active token immediately.',
+      { t: 'Sign them out everywhere (do this first)', d: 'Cuts off every active login immediately — the security step.',
         c: "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.com/v1.0/users/" + upn + "/revokeSignInSessions'" },
-      { t: 'Disable the account', d: 'Blocks all sign-in.',
+      { t: 'Switch off the account', d: 'Stops any new sign-in.',
         c: 'Update-MgUser -UserId "' + upn + '" -AccountEnabled:$false' },
-      { t: 'Convert mailbox to shared', d: 'Before reclaiming the licence, so mail is kept. Exchange Online PowerShell.',
+      { t: 'Turn their mailbox into a shared one', d: 'Do this before removing the licence, so no mail is lost.',
         c: 'Set-Mailbox "' + upn + '" -Type Shared' },
-      { t: 'Reclaim the licence', d: 'Only after the mailbox is shared.',
+      { t: 'Take back the licence', d: 'Only after the mailbox is shared.',
         c: '$sku = Get-MgUserLicenseDetail -UserId "' + upn + '"\nSet-MgUserLicense -UserId "' + upn + '" -RemoveLicenses $sku.SkuId -AddLicenses @()' },
-      { t: 'Remove group + DL memberships', d: 'List first, then remove each (DLs via Exchange PowerShell).',
+      { t: 'Remove them from groups and lists', d: 'List memberships first, then remove each one.',
         c: 'Get-MgUserMemberOf -UserId "' + upn + '" | Select-Object -ExpandProperty AdditionalProperties' },
-      { t: 'Manual — outside Graph', d: 'Asana seat, Campaign Monitor login, any SaaS outside SSO. Set a 90-day delete reminder.',
+      { t: 'The by-hand bits', d: 'Asana seat, Campaign Monitor login, anything not behind the Microsoft sign-in. Set a 90-day reminder to delete the account.',
         c: '# ' + name + ' — check Asana admin, Campaign Monitor, and the enterprise-app assignments' },
-      { t: 'Log it on the case', d: 'CaseComment on the offboarding case: what was done, when, by whom. Type = Departing Staff.', c: null }
+      { t: 'Write it on the ticket', d: 'A comment on the case: what was done, when, by whom. Set the case Type to Departing Staff.', c: null }
     ];
   }
 
