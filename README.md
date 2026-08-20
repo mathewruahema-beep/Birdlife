@@ -273,11 +273,37 @@ They have been redacted from the backup in this repo, but:
 2. Re-add the WooCommerce order-sync check using an environment variable, not an
    inline credential. The check is currently marked PARKED in the consolidated routine.
 
+## Systems Insights dashboard — 20 Aug 2026
+
+A second, broader dashboard sits alongside the ICT one: **BirdLife Systems Insights**
+(https://claude.ai/code/artifact/2d46cb6f-8691-4645-8cf3-e265415e1275), a single
+cross-system view built from all 16 claude.ai connectors — Salesforce, Stripe,
+NetSuite, Asana, Microsoft 365, Gmail/Calendar/Drive, Granola, Zoom, Zapier,
+Cloudflare, Atlassian (Confluence), Canva, Miro and GitHub.
+
+Panels: fundraising & membership (donation income by month, gift-type mix, recurring
+donors), eCommerce payments (Stripe weekly series, payouts, refunds), ICT helpdesk
+(Ask Zeus queue), IT Ops delivery (Asana pipeline and blocked list), finance
+operations (NetSuite transaction mix and the account 11104 reconciliation exposure),
+work rhythm (meeting load, inbox counts), and the SaaS estate (Zapier surface,
+Cloudflare, Confluence, Canva, repo activity).
+
+Same design principle as the ICT dashboard: every panel states the filter it was
+computed under, and the footer lists exclusions (notably: Stripe covers the eCommerce
+account only — four other live accounts exist; 11104's net is a computed GL sum, not
+a trial balance).
+
+It is a point-in-time pull, refreshed by asking Claude to "refresh the systems
+insights dashboard" against `dashboard/insights-dashboard.html`. It can be wired to a
+routine the same way as the ICT dashboard — with the same caveat that connector
+grants must be added manually in the claude.ai Routines UI.
+
 ## Repository layout
 
 ```
 README.md                            findings, admin runbook, routine consolidation
-dashboard/ict-dashboard.html         dashboard source as published
+dashboard/ict-dashboard.html         ICT dashboard source as published
+dashboard/insights-dashboard.html    cross-system Systems Insights dashboard source
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
 ```
 

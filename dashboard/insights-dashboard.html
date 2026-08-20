@@ -1,0 +1,520 @@
+<title>BirdLife Systems Insights</title>
+<style>
+  :root{
+    --ground:#F6F8F6; --surface:#FFFFFF; --surface-2:#EFF3F0;
+    --line:#DCE4DF; --line-strong:#C3D0C8;
+    --ink:#17211C; --ink-2:#4A5A52; --ink-3:#7B8C83;
+    --accent:#0E6E5A; --accent-soft:#D6EAE3;
+    --good:#2E7D52; --good-soft:#DCEDE3;
+    --warn:#9A6410; --warn-soft:#F6ECD8;
+    --crit:#A03A31; --crit-soft:#F7E2DF;
+    --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#101512; --surface:#18201C; --surface-2:#1F2924;
+      --line:#2A362F; --line-strong:#3A4941;
+      --ink:#E4EDE7; --ink-2:#A3B3AA; --ink-3:#758880;
+      --accent:#4FC0A2; --accent-soft:#1B3830;
+      --good:#5FBF88; --good-soft:#17301F;
+      --warn:#D9A441; --warn-soft:#33290F;
+      --crit:#E0796E; --crit-soft:#38201C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#101512; --surface:#18201C; --surface-2:#1F2924;
+    --line:#2A362F; --line-strong:#3A4941;
+    --ink:#E4EDE7; --ink-2:#A3B3AA; --ink-3:#758880;
+    --accent:#4FC0A2; --accent-soft:#1B3830;
+    --good:#5FBF88; --good-soft:#17301F;
+    --warn:#D9A441; --warn-soft:#33290F;
+    --crit:#E0796E; --crit-soft:#38201C;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:32px 20px 72px;
+  }
+  .wrap{max-width:1100px; margin:0 auto; display:flex; flex-direction:column; gap:38px}
+
+  .masthead{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap;
+    border-bottom:2px solid var(--ink); padding-bottom:14px}
+  h1{margin:0; font-size:25px; font-weight:640; letter-spacing:-.02em; text-wrap:balance}
+  .masthead .role{color:var(--ink-2); font-size:13.5px; margin-top:3px; max-width:62ch}
+  .stamp{font-family:var(--mono); font-size:11px; color:var(--ink-3); text-align:right; line-height:1.7;
+    text-transform:uppercase; letter-spacing:.05em}
+  .stamp b{color:var(--ink-2); font-weight:500}
+
+  .eyebrow{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.13em;
+    color:var(--ink-3); font-weight:500}
+  section{display:flex; flex-direction:column; gap:12px}
+  h2{margin:0; font-size:15px; font-weight:620; letter-spacing:-.005em}
+  .sec-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap;
+    border-bottom:1px solid var(--line); padding-bottom:7px}
+  .filter{font-family:var(--mono); font-size:10.5px; color:var(--ink-3); white-space:nowrap}
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:18px 20px}
+  .panel h3{margin:0 0 10px; font-size:13px; font-weight:620}
+  .num{font-family:var(--mono); font-variant-numeric:tabular-nums}
+
+  /* headline tiles */
+  .health{display:grid; grid-template-columns:1.35fr 1fr 1fr 1fr 1fr; gap:12px}
+  .tile{background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:16px 18px;
+    display:flex; flex-direction:column; gap:2px}
+  .tile.hero{background:var(--accent-soft); border-color:var(--accent)}
+  .tile .v{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:30px; font-weight:600;
+    letter-spacing:-.02em; line-height:1.15}
+  .tile.hero .v{font-size:40px; color:var(--accent)}
+  .tile .k{font-size:12.5px; color:var(--ink-2); font-weight:520}
+  .tile .note{font-family:var(--mono); font-size:10.5px; color:var(--ink-3); margin-top:5px; line-height:1.5}
+  .tile.flagged .v{color:var(--crit)}
+  .tile.caution .v{color:var(--warn)}
+
+  /* attention band */
+  .signals{background:var(--warn-soft); border:1px solid var(--warn); border-radius:4px; padding:18px 20px;
+    display:flex; flex-direction:column; gap:10px}
+  .signals ul{margin:0; padding-left:19px; display:flex; flex-direction:column; gap:7px; font-size:13.5px}
+  .signals li{max-width:88ch}
+  .signals b{font-weight:640}
+  .signals .src{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--ink-3); margin-left:6px; white-space:nowrap}
+
+  /* bar rows */
+  .cols2{display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:start}
+  .bars{display:flex; flex-direction:column; gap:2px}
+  .bar{display:flex; align-items:center; gap:10px; font-size:12.5px; padding:3px 0}
+  .bar .lab{width:150px; flex-shrink:0; color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .bar .track{flex:1; height:15px; background:var(--surface-2); border-radius:2px; overflow:hidden; min-width:40px}
+  .bar .fill{height:100%; background:var(--accent); border-radius:0 4px 4px 0}
+  .bar .fill.warn{background:var(--warn)}
+  .bar .fill.crit{background:var(--crit)}
+  .bar .fill.zero{background:var(--line-strong)}
+  .bar .v{width:74px; text-align:right; font-family:var(--mono); font-variant-numeric:tabular-nums;
+    font-weight:600; font-size:12px}
+  .caption{font-size:11.5px; color:var(--ink-3); margin-top:9px; padding-top:9px; border-top:1px solid var(--line);
+    line-height:1.5}
+
+  /* column chart */
+  .colchart{display:flex; align-items:flex-end; gap:4px; height:130px; margin-top:6px}
+  .colchart .col{flex:1; display:flex; flex-direction:column; justify-content:flex-end; height:100%; min-width:0}
+  .colchart .stick{background:var(--accent); border-radius:3px 3px 0 0; min-height:2px}
+  .colchart .col.dim .stick{background:var(--line-strong)}
+  .colchart .col.hi .stick{background:var(--warn)}
+  .xlabels{display:flex; gap:4px; margin-top:6px}
+  .xlabels span{flex:1; font-family:var(--mono); font-size:9.5px; color:var(--ink-3); text-align:center;
+    overflow:hidden; white-space:nowrap}
+
+  /* tables */
+  .tbl-scroll{overflow-x:auto}
+  table.data{width:100%; border-collapse:collapse; font-size:12.5px; min-width:560px}
+  table.data th{text-align:left; font-family:var(--mono); font-size:10px; text-transform:uppercase;
+    letter-spacing:.1em; color:var(--ink-3); font-weight:500; padding:0 12px 6px 0;
+    border-bottom:1px solid var(--line-strong)}
+  table.data td{padding:6px 12px 6px 0; border-bottom:1px solid var(--line); vertical-align:baseline}
+  table.data tr:last-child td{border-bottom:none}
+  table.data td.r, table.data th.r{text-align:right}
+  .pill{display:inline-block; font-family:var(--mono); font-size:10px; padding:2px 7px; border-radius:9px;
+    text-transform:uppercase; letter-spacing:.05em; white-space:nowrap}
+  .pill.good{background:var(--good-soft); color:var(--good)}
+  .pill.warn{background:var(--warn-soft); color:var(--warn)}
+  .pill.crit{background:var(--crit-soft); color:var(--crit)}
+  .pill.mut{background:var(--surface-2); color:var(--ink-3)}
+
+  .kv{display:flex; flex-direction:column; gap:6px; font-size:12.5px}
+  .kv .row{display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid var(--line); padding-bottom:6px}
+  .kv .row:last-child{border-bottom:none; padding-bottom:0}
+  .kv .k{color:var(--ink-2)}
+  .kv .v{font-family:var(--mono); font-variant-numeric:tabular-nums; font-weight:600; text-align:right; white-space:nowrap}
+
+  footer{border-top:2px solid var(--ink); padding-top:14px; display:flex; flex-direction:column; gap:10px;
+    font-size:11.5px; color:var(--ink-3); line-height:1.6}
+  footer b{color:var(--ink-2); font-weight:560}
+  footer ul{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:4px}
+  @media (max-width:900px){ .health{grid-template-columns:1fr 1fr} .cols2{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion:no-preference){ .bar .fill{transition:width .3s ease} }
+</style>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <div>
+      <h1>BirdLife Systems Insights</h1>
+      <div class="role">One view across fundraising, payments, helpdesk, delivery, finance and the SaaS estate —
+        every panel states the scope it was computed under.</div>
+    </div>
+    <div class="stamp">
+      Data pulled <b>Wed 20 Aug 2026</b> · 16 connectors<br>
+      Sources: Salesforce · Stripe · NetSuite · Asana · M365 ·<br>
+      Granola · Zapier · Cloudflare · Confluence · Canva · GitHub
+    </div>
+  </div>
+
+  <!-- headline -->
+  <div class="health">
+    <div class="tile hero">
+      <div class="v">$948k</div>
+      <div class="k">Donation income, last 30 days</div>
+      <div class="note">3,221 closed-won gifts · Salesforce, all record types</div>
+    </div>
+    <div class="tile">
+      <div class="v">2,258</div>
+      <div class="k">Active recurring donors</div>
+      <div class="note">NPSP Enhanced RD status = Active</div>
+    </div>
+    <div class="tile">
+      <div class="v">19</div>
+      <div class="k">Open ICT cases</div>
+      <div class="note">Ask Zeus record type · 177 closed / 30d</div>
+    </div>
+    <div class="tile caution">
+      <div class="v">113</div>
+      <div class="k">IT Ops tasks incomplete</div>
+      <div class="note">11 blocked · 27 completed / 30d · Asana</div>
+    </div>
+    <div class="tile">
+      <div class="v">40</div>
+      <div class="k">Meetings, last 14 days</div>
+      <div class="note">Granola capture · zero on Zoom</div>
+    </div>
+  </div>
+
+  <!-- signals -->
+  <section>
+    <div class="sec-head">
+      <h2>Signals worth acting on</h2>
+      <span class="filter">cross-system, ranked by leverage</span>
+    </div>
+    <div class="signals">
+      <ul>
+        <li><b>Account 11104 nets −A$45.4M across 30,539 GL lines</b> — the Salesforce→NetSuite
+          reconciliation gap has a measurable balance sitting in a bank-type clearing account. The only
+          reconciliation saved searches in NetSuite are payroll ones; income has none.<span class="src">NetSuite</span></li>
+        <li><b>4 of 11 blocked delivery items are decisions, not dev work</b> — Plauti merge permissions,
+          duplicate management, portal email mismatch, plus branch payments stalled 36 days. They need a call
+          in a meeting; there were 40 meetings in the last fortnight to make it in.<span class="src">Asana · Granola</span></li>
+        <li><b>105 of 113 open IT Ops tasks carry no due date</b> and 75 sit in Backlog — "overdue = 0" is
+          an artifact of nothing being dated, not of being on time.<span class="src">Asana</span></li>
+        <li><b>9 of 19 open ICT cases have no Type</b> (47%) — the close-time validation rule proposed in the
+          repo README remains the fix; category reporting is still computed over blanks.<span class="src">Salesforce</span></li>
+        <li><b>Ready for Deployment and Hypercare are still empty</b> — work continues to move from
+          In Development straight to Done or Blocked, so nothing gets a release gate.<span class="src">Asana</span></li>
+        <li><b>June EOFY concentration: $2.44M</b> — 2.9× the median month. July fell to $354k, August is
+          already at $837k month-to-date, tracking well above July.<span class="src">Salesforce</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- fundraising -->
+  <section>
+    <div class="sec-head">
+      <h2>Fundraising &amp; membership</h2>
+      <span class="filter">Salesforce · Opportunity IsWon · CloseDate windows as labelled</span>
+    </div>
+    <div class="panel">
+      <h3>Donation income by month <span class="filter">(Feb–Jul closed months; Aug = month-to-date)</span></h3>
+      <div class="colchart" role="img" aria-label="Monthly donation income February to August 2026">
+        <div class="col" title="Feb 2026 — $477,795 · 3,248 gifts"><div class="stick" style="height:20%"></div></div>
+        <div class="col" title="Mar 2026 — $1,286,673 · 4,122 gifts"><div class="stick" style="height:53%"></div></div>
+        <div class="col" title="Apr 2026 — $394,789 · 3,214 gifts"><div class="stick" style="height:16%"></div></div>
+        <div class="col" title="May 2026 — $1,281,215 · 3,304 gifts"><div class="stick" style="height:52%"></div></div>
+        <div class="col hi" title="Jun 2026 — $2,443,819 · 7,488 gifts (EOFY)"><div class="stick" style="height:100%"></div></div>
+        <div class="col" title="Jul 2026 — $354,312 · 2,936 gifts"><div class="stick" style="height:14%"></div></div>
+        <div class="col dim" title="Aug 2026 to date — $836,648 · 2,509 gifts"><div class="stick" style="height:34%"></div></div>
+      </div>
+      <div class="xlabels"><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug*</span></div>
+      <div class="caption">June carries EOFY giving at $2.44M. August month-to-date ($837k on 20 days) is already
+        2.4× all of July — hover any column for exact figures. *partial month.</div>
+    </div>
+    <div class="cols2">
+      <div class="panel">
+        <h3>Last 90 days by gift type <span class="filter">(by amount)</span></h3>
+        <div class="bars">
+          <div class="bar"><span class="lab">Donation</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="v">$3.54M</span></div>
+          <div class="bar"><span class="lab">Bequest</span><div class="track"><div class="fill" style="width:20%"></div></div><span class="v">$708k</span></div>
+          <div class="bar"><span class="lab">Major Gift</span><div class="track"><div class="fill" style="width:4%"></div></div><span class="v">$140k</span></div>
+          <div class="bar"><span class="lab">Membership</span><div class="track"><div class="fill" style="width:3%"></div></div><span class="v">$97k</span></div>
+        </div>
+        <div class="caption">$4.49M over 13,639 gifts. Nine bequests produced $708k — 16% of 90-day income from
+          0.07% of gift volume. Memberships: 1,520 at ~$64 average.</div>
+      </div>
+      <div class="panel">
+        <h3>Supporter base</h3>
+        <div class="kv">
+          <div class="row"><span class="k">Contacts, total</span><span class="v">481,112</span></div>
+          <div class="row"><span class="k">Contacts created, last 30 days</span><span class="v">+1,775</span></div>
+          <div class="row"><span class="k">Recurring donations — Active</span><span class="v">2,258</span></div>
+          <div class="row"><span class="k">— Lapsed</span><span class="v">78</span></div>
+          <div class="row"><span class="k">— Paused</span><span class="v">3</span></div>
+          <div class="row"><span class="k">— Closed (historic)</span><span class="v">2,390</span></div>
+        </div>
+        <div class="caption">Recurring status read from NPSP Enhanced RD (npsp__Status__c); the legacy
+          Open-Ended Status field is stale and was ignored.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- payments -->
+  <section>
+    <div class="sec-head">
+      <h2>eCommerce payments</h2>
+      <span class="filter">Stripe · "BirdLife Australia — eCommerce" account only · AUD</span>
+    </div>
+    <div class="cols2">
+      <div class="panel">
+        <h3>Weekly gross charges <span class="filter">(13 weeks, wk starting Mon)</span></h3>
+        <div class="colchart" style="height:110px" role="img" aria-label="Weekly Stripe gross charges May to August 2026">
+          <div class="col" title="18 May — $2,365 · 35 charges"><div class="stick" style="height:17%"></div></div>
+          <div class="col hi" title="25 May — $13,880 · 188 charges"><div class="stick" style="height:100%"></div></div>
+          <div class="col" title="1 Jun — $5,581 · 65"><div class="stick" style="height:40%"></div></div>
+          <div class="col" title="8 Jun — $3,103 · 36"><div class="stick" style="height:22%"></div></div>
+          <div class="col" title="15 Jun — $5,060 · 68"><div class="stick" style="height:36%"></div></div>
+          <div class="col" title="22 Jun — $2,401 · 33"><div class="stick" style="height:17%"></div></div>
+          <div class="col" title="29 Jun — $2,025 · 20"><div class="stick" style="height:15%"></div></div>
+          <div class="col" title="6 Jul — $1,387 · 18"><div class="stick" style="height:10%"></div></div>
+          <div class="col" title="13 Jul — $2,083 · 24"><div class="stick" style="height:15%"></div></div>
+          <div class="col" title="20 Jul — $1,026 · 15"><div class="stick" style="height:7%"></div></div>
+          <div class="col" title="27 Jul — $3,202 · 41"><div class="stick" style="height:23%"></div></div>
+          <div class="col" title="3 Aug — $2,029 · 27"><div class="stick" style="height:15%"></div></div>
+          <div class="col hi" title="10 Aug — $11,645 · 145 charges"><div class="stick" style="height:84%"></div></div>
+          <div class="col dim" title="17 Aug (partial) — $7,320 · 92"><div class="stick" style="height:53%"></div></div>
+        </div>
+        <div class="xlabels"><span>May</span><span></span><span>Jun</span><span></span><span></span><span></span><span></span><span>Jul</span><span></span><span></span><span></span><span>Aug</span><span></span><span></span></div>
+        <div class="caption">Two spikes — late May and the week of 10 Aug ($11.6k, 145 charges) — against a
+          quiet July floor. Hover for exact weeks.</div>
+      </div>
+      <div class="panel">
+        <h3>Last 30 days</h3>
+        <div class="kv">
+          <div class="row"><span class="k">Successful charges</span><span class="v">318 · $25,047</span></div>
+          <div class="row"><span class="k">Stripe fees (incl GST)</span><span class="v">$450</span></div>
+          <div class="row"><span class="k">Refunds</span><span class="v">1 · $50</span></div>
+          <div class="row"><span class="k">Open disputes</span><span class="v">0</span></div>
+          <div class="row"><span class="k">Latest payout (19 Aug)</span><span class="v">$2,771 · paid</span></div>
+          <div class="row"><span class="k">Payouts, last 5</span><span class="v">all paid</span></div>
+        </div>
+        <div class="caption">Scope: eCommerce account only. Four other live BirdLife Stripe accounts (BLP,
+          Ausbirdfund, eStore/AOC, Memberships) are excluded from every figure on this panel.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- helpdesk -->
+  <section>
+    <div class="sec-head">
+      <h2>ICT helpdesk</h2>
+      <span class="filter">Salesforce · RecordType.DeveloperName = 'Zeus' only</span>
+    </div>
+    <div class="cols2">
+      <div class="panel">
+        <h3>Open queue by status <span class="filter">(19 open)</span></h3>
+        <div class="bars">
+          <div class="bar"><span class="lab">In Progress</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="v">5</span></div>
+          <div class="bar"><span class="lab">Response Received</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="v">5</span></div>
+          <div class="bar"><span class="lab">Waiting Resp.–External</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="v">5</span></div>
+          <div class="bar"><span class="lab">New</span><div class="track"><div class="fill warn" style="width:80%"></div></div><span class="v">4</span></div>
+        </div>
+        <div class="caption">4 in New include today's unassigned intake (00139254, Zeus queue). Oldest open:
+          00133547 SharePoint file location, 83 days (29 May); 00134670 Powl engagements, 65 days.</div>
+      </div>
+      <div class="panel">
+        <h3>Open queue by owner</h3>
+        <div class="bars">
+          <div class="bar"><span class="lab">Andrew Dunn</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="v">11</span></div>
+          <div class="bar"><span class="lab">Keith Tsui</span><div class="track"><div class="fill" style="width:36%"></div></div><span class="v">4</span></div>
+          <div class="bar"><span class="lab">Nina Lewis</span><div class="track"><div class="fill" style="width:18%"></div></div><span class="v">2</span></div>
+          <div class="bar"><span class="lab">Mathew Hema</span><div class="track"><div class="fill" style="width:9%"></div></div><span class="v">1</span></div>
+          <div class="bar"><span class="lab">Zeus (unassigned)</span><div class="track"><div class="fill warn" style="width:9%"></div></div><span class="v">1</span></div>
+        </div>
+        <div class="caption">Andrew Dunn carries 58% of the open queue. Throughput is healthy: 177 Zeus cases
+          closed in 30 days against 97 new — the queue is draining. Intake context: Ask Zeus was 97 of 2,332
+          org-wide cases created in 30 days (4.2%); General Enquiry alone was 1,606.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- delivery -->
+  <section>
+    <div class="sec-head">
+      <h2>IT Ops delivery</h2>
+      <span class="filter">Asana · IT Operations Project Plan · incomplete tasks</span>
+    </div>
+    <div class="cols2">
+      <div class="panel">
+        <h3>Pipeline by section <span class="filter">(113 incomplete)</span></h3>
+        <div class="bars">
+          <div class="bar"><span class="lab">Backlog / Requests</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="v">75</span></div>
+          <div class="bar"><span class="lab">In Development</span><div class="track"><div class="fill" style="width:29%"></div></div><span class="v">22</span></div>
+          <div class="bar"><span class="lab">Blocked</span><div class="track"><div class="fill crit" style="width:15%"></div></div><span class="v">11</span></div>
+          <div class="bar"><span class="lab">Awaiting Response</span><div class="track"><div class="fill" style="width:3%"></div></div><span class="v">2</span></div>
+          <div class="bar"><span class="lab">Scoping</span><div class="track"><div class="fill" style="width:1%"></div></div><span class="v">1</span></div>
+          <div class="bar"><span class="lab">Ready for Deployment</span><div class="track"><div class="fill zero" style="width:2%"></div></div><span class="v">0</span></div>
+          <div class="bar"><span class="lab">Hypercare</span><div class="track"><div class="fill zero" style="width:2%"></div></div><span class="v">0</span></div>
+          <div class="bar"><span class="lab">Parked in Done</span><div class="track"><div class="fill warn" style="width:3%"></div></div><span class="v">2</span></div>
+        </div>
+        <div class="caption">Hygiene: 105 of 113 tasks undated · 5 unassigned · 2 incomplete tasks sit in the
+          Done section (Spring Cocky Count 2026, ABC Registrations Open). 27 tasks completed in 30 days,
+          including Pardot Decommissioning and Salesforce–Stripe integration.</div>
+      </div>
+      <div class="panel">
+        <h3>Blocked — 11 items, all undated</h3>
+        <div class="tbl-scroll"><table class="data">
+          <tr><th>Task</th><th>Assignee</th><th class="r">Stale</th></tr>
+          <tr><td>Branch and SIG membership lists</td><td>James Vilinsky</td><td class="r"><span class="pill crit">36d</span></td></tr>
+          <tr><td>Branch donations and payments</td><td>Nina Lewis</td><td class="r"><span class="pill crit">36d</span></td></tr>
+          <tr><td>Better Impact ↔ Salesforce integration</td><td>Mathew Hema</td><td class="r"><span class="pill crit">36d</span></td></tr>
+          <tr><td>Squares for branch/SIG payments</td><td>James Vilinsky</td><td class="r"><span class="pill crit">35d</span></td></tr>
+          <tr><td>Conga Bequest Receipt</td><td>Keith Tsui</td><td class="r"><span class="pill warn">16d</span></td></tr>
+          <tr><td>RGs not coding to GAU Wildbird</td><td>Nina Lewis</td><td class="r"><span class="pill warn">15d</span></td></tr>
+          <tr><td>eCommerce duplicate-contact cases</td><td>Nina Lewis</td><td class="r"><span class="pill warn">15d</span></td></tr>
+          <tr><td>Plauti bulk merge — decision*</td><td>Nina Lewis</td><td class="r"><span class="pill warn">15d</span></td></tr>
+          <tr><td>More eStore features</td><td>Mathew Hema</td><td class="r"><span class="pill warn">15d</span></td></tr>
+          <tr><td>Duplicate management — decision*</td><td>Mathew Hema</td><td class="r"><span class="pill warn">15d</span></td></tr>
+          <tr><td>Portal email mismatch — decision*</td><td>Nina Lewis</td><td class="r"><span class="pill good">1d</span></td></tr>
+        </table></div>
+        <div class="caption">*Governance items explicitly waiting on a "decision on responsibility" —
+          meeting agenda material, not developer time. Stale = days since last modification.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- finance ops -->
+  <section>
+    <div class="sec-head">
+      <h2>Finance operations</h2>
+      <span class="filter">NetSuite OneWorld · subsidiary "Birdlife Australia"</span>
+    </div>
+    <div class="cols2">
+      <div class="panel">
+        <h3>Transaction volume by type <span class="filter">(last 30 days, 581 txns)</span></h3>
+        <div class="bars">
+          <div class="bar"><span class="lab">Vendor Payment</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="v">162</span></div>
+          <div class="bar"><span class="lab">Vendor Bill</span><div class="track"><div class="fill" style="width:62%"></div></div><span class="v">100</span></div>
+          <div class="bar"><span class="lab">Expense Report</span><div class="track"><div class="fill" style="width:50%"></div></div><span class="v">81</span></div>
+          <div class="bar"><span class="lab">Journal</span><div class="track"><div class="fill" style="width:44%"></div></div><span class="v">71</span></div>
+          <div class="bar"><span class="lab">Customer Payment</span><div class="track"><div class="fill" style="width:28%"></div></div><span class="v">46</span></div>
+          <div class="bar"><span class="lab">Customer Invoice</span><div class="track"><div class="fill" style="width:27%"></div></div><span class="v">44</span></div>
+          <div class="bar"><span class="lab">Check</span><div class="track"><div class="fill" style="width:25%"></div></div><span class="v">41</span></div>
+          <div class="bar"><span class="lab">Deposit</span><div class="track"><div class="fill" style="width:14%"></div></div><span class="v">22</span></div>
+          <div class="bar"><span class="lab">Cash Sale</span><div class="track"><div class="fill" style="width:9%"></div></div><span class="v">14</span></div>
+        </div>
+        <div class="caption">Payables-heavy mix: 343 of 581 transactions (59%) are vendor payments, bills and
+          expense reports. Only 22 deposits recorded against 3,200+ Salesforce gifts in the same window —
+          income lands in NetSuite as summaries, which is where reconciliation lives or dies.</div>
+      </div>
+      <div class="panel">
+        <h3>Reconciliation exposure — account 11104</h3>
+        <div class="kv">
+          <div class="row"><span class="k">Account</span><span class="v">11104 Bank NAT 118636581</span></div>
+          <div class="row"><span class="k">Posted GL lines (all-time)</span><span class="v">30,539</span></div>
+          <div class="row"><span class="k">Debits</span><span class="v">$82.93M</span></div>
+          <div class="row"><span class="k">Credits</span><span class="v">$128.32M</span></div>
+          <div class="row"><span class="k">Net</span><span class="v" style="color:var(--crit)">−$45.39M</span></div>
+          <div class="row"><span class="k">Income recon saved searches</span><span class="v">0</span></div>
+        </div>
+        <div class="caption">Computed GL sum, not an official trial balance — but a bank-type account this far
+          negative is consistent with its role as the Salesforce→NetSuite clearing account. The three
+          "reconciliation" saved searches that do exist are all payroll. 23 bank-family accounts in the 111xx
+          range, including 11114 Undeposited Funds.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- work rhythm -->
+  <section>
+    <div class="sec-head">
+      <h2>Work rhythm</h2>
+      <span class="filter">Granola · Outlook (mathew.hema@birdlife.org.au) · counts only, no content</span>
+    </div>
+    <div class="cols2">
+      <div class="panel">
+        <h3>Meeting load, last 14 days <span class="filter">(40 meetings)</span></h3>
+        <div class="bars">
+          <div class="bar"><span class="lab">Salesforce Standup</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="v">9</span></div>
+          <div class="bar"><span class="lab">Memberships / Blitzm</span><div class="track"><div class="fill" style="width:67%"></div></div><span class="v">6</span></div>
+          <div class="bar"><span class="lab">H5 Bird Flu coordination</span><div class="track"><div class="fill" style="width:33%"></div></div><span class="v">3</span></div>
+          <div class="bar"><span class="lab">FBI leadership</span><div class="track"><div class="fill" style="width:22%"></div></div><span class="v">2</span></div>
+          <div class="bar"><span class="lab">Other</span><div class="track"><div class="fill zero" style="width:56%"></div></div><span class="v">20</span></div>
+        </div>
+        <div class="caption">Half the calendar is four recurring threads — Salesforce delivery, the membership
+          rebuild, avian-flu response and FBI leadership. Zoom shows zero meetings or recordings in the same
+          window; everything is captured through Granola.</div>
+      </div>
+      <div class="panel">
+        <h3>Inbox &amp; week ahead</h3>
+        <div class="kv">
+          <div class="row"><span class="k">Work email received, 7 days</span><span class="v">97</span></div>
+          <div class="row"><span class="k">— unread</span><span class="v">18</span></div>
+          <div class="row"><span class="k">— mentioning Zeus / cases</span><span class="v">16 / 25+</span></div>
+          <div class="row"><span class="k">Meetings this week</span><span class="v">18</span></div>
+          <div class="row"><span class="k">Leave</span><span class="v">Thu 20 – Fri 21 Aug</span></div>
+          <div class="row"><span class="k">All Staff Gathering</span><span class="v">26–27 Aug</span></div>
+        </div>
+        <div class="caption">Unread cluster is mostly machine mail: 10 Microsoft licence-invoice notices,
+          3 Asana digests, 2 NetSuite time approvals. Personal Gmail holds ~201 unread over 7 days, almost
+          entirely newsletters — no action items surfaced.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- estate -->
+  <section>
+    <div class="sec-head">
+      <h2>SaaS estate &amp; automation</h2>
+      <span class="filter">Zapier · Cloudflare · Confluence · Canva · Miro · GitHub</span>
+    </div>
+    <div class="cols2">
+      <div class="panel">
+        <h3>Automation surface</h3>
+        <div class="kv">
+          <div class="row"><span class="k">Zapier connected apps</span><span class="v">18</span></div>
+          <div class="row"><span class="k">— enabled actions</span><span class="v">310</span></div>
+          <div class="row"><span class="k">— saved workflow skills</span><span class="v">0</span></div>
+          <div class="row"><span class="k">Cloudflare Workers / R2 / D1 / KV</span><span class="v">0 · both accounts</span></div>
+          <div class="row"><span class="k">Jira</span><span class="v">not provisioned</span></div>
+          <div class="row"><span class="k">Confluence spaces</span><span class="v">8 (1 working: ICT)</span></div>
+        </div>
+        <div class="caption">Zapier reaches Raisely, Ortto, Humanitix, Award Force, LearnUpon, Campaign
+          Monitor, Content Workflow and more — 310 actions enabled but no saved workflows yet: the bridge to
+          every system without a native connector is built and idle. Cloudflare's role here is CDN/DNS in
+          front of WP Engine; the developer platform is unused and its zones aren't exposed to this view.</div>
+      </div>
+      <div class="panel">
+        <h3>Content &amp; code activity</h3>
+        <div class="kv">
+          <div class="row"><span class="k">Canva designs touched 18–19 Aug</span><span class="v">10</span></div>
+          <div class="row"><span class="k">— theme</span><span class="v">Aussie Bird Count 2026</span></div>
+          <div class="row"><span class="k">Miro boards</span><span class="v">4</span></div>
+          <div class="row"><span class="k">Drive: membership model docs</span><span class="v">upd 19 Aug</span></div>
+          <div class="row"><span class="k">GitHub (birdlife repo) open PRs</span><span class="v">2</span></div>
+          <div class="row"><span class="k">— open issues</span><span class="v">0</span></div>
+        </div>
+        <div class="caption">Design output is fully pointed at ABC 2026 — participation packs for schools,
+          councils and businesses, email banners, the Bank Australia co-branded page. Open PRs: the AI ICT
+          assistant charter and the digital ecosystem integration map.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><b>Provenance.</b> Pulled read-only on Wed 20 Aug 2026 via 16 claude.ai connectors. Every panel
+      states its filter; where a system was queried and had nothing, that is shown as zero rather than
+      omitted (Zoom, Cloudflare developer platform, Jira).</div>
+    <div><b>Exclusions &amp; caveats:</b></div>
+    <ul>
+      <li>Stripe figures cover the eCommerce account only; four other live BirdLife Stripe accounts are excluded. The account key lacks reporting permissions, so the series was rebuilt from 901 balance transactions.</li>
+      <li>Account 11104's net is a computed GL sum over posted lines, not an official trial balance.</li>
+      <li>Salesforce donation figures span all record types org-wide; ICT case figures are Ask Zeus only.</li>
+      <li>Asana counts exclude ~21 Spring Cocky Count subtasks that surface in search but aren't project members.</li>
+      <li>Email and calendar panels report counts and senders only — no message content. Personal accounts contribute a single unread count.</li>
+      <li>WordPress/WooCommerce, Raisely and Ortto have no native connector; they are reachable via the idle Zapier actions above but were not queried for this pull.</li>
+    </ul>
+    <div><b>Refresh.</b> This page is a point-in-time pull. To refresh, ask Claude to "refresh the systems
+      insights dashboard" — or wire it to a routine with the needed connectors attached (connector grants
+      must be added in the claude.ai Routines UI, as with the ICT dashboard routine). Source:
+      <span class="num">dashboard/insights-dashboard.html</span> in the birdlife repo.</div>
+  </footer>
+
+</div>
