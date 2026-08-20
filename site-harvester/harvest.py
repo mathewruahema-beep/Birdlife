@@ -282,8 +282,15 @@ def run(args):
     pages, assets, links = [], [], []
     html_samples = []
     errors = []
+    deadline = time.monotonic() + args.max_seconds if args.max_seconds else None
 
     while queue and len(pages) + len(assets) < args.max_pages:
+        if deadline and time.monotonic() > deadline:
+            print(f"max-seconds reached with {len(queue)} URLs still queued; "
+                  "stopping cleanly and writing outputs", file=sys.stderr)
+            errors.append(("(crawl stopped early)",
+                           f"max-seconds budget hit; {len(queue)} URLs unfetched"))
+            break
         url = queue.popleft()
         if robots and not robots.can_fetch(UA, url):
             errors.append((url, "blocked by robots.txt"))
@@ -429,6 +436,8 @@ if __name__ == "__main__":
     ap.add_argument("--out", required=True, help="Output directory")
     ap.add_argument("--max-pages", type=int, default=2000, help="Fetch cap (pages+assets)")
     ap.add_argument("--delay", type=float, default=0.5, help="Seconds between requests")
+    ap.add_argument("--max-seconds", type=int, default=0,
+                    help="Stop crawling cleanly after this many seconds (0 = no limit)")
     ap.add_argument("--include-subdomains", action="store_true")
     ap.add_argument("--extra-root", action="append",
                     help="Additional root URL treated as in-scope (repeatable)")

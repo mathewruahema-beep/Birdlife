@@ -68,7 +68,8 @@ jobs:
           python3 site-harvester/harvest.py "${{ inputs.url }}" \
             --out "harvest/${{ inputs.name }}" \
             --max-pages "${{ inputs.max_pages }}" \
-            --delay "${{ inputs.delay }}" $EXTRA_FLAGS
+            --delay "${{ inputs.delay }}" \
+            --max-seconds 18000 $EXTRA_FLAGS
 
       - name: Show audit in run summary
         if: always()
@@ -78,6 +79,7 @@ jobs:
           fi
 
       - name: Upload raw mirror as downloadable artifact (too big for git)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.name }}-raw-mirror
@@ -86,6 +88,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Commit results to this branch (everything except raw mirror)
+        if: always()
         run: |
           rm -rf "harvest/${{ inputs.name }}/raw"
           git config user.name  "github-actions[bot]"
