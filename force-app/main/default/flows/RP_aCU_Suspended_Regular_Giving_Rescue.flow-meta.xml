@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Send_Payment_Failure_Email</name>
+        <label>Send payment failure email to donor</label>
+        <locationX>176</locationX>
+        <locationY>431</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Create_Rescue_Task</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>$Record.AAkPay__Contact__r.Email</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>We couldn't process your BirdLife Australia payment</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>DonorFailureEmailBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>sendRichBody</name>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <versionSegment>1</versionSegment>
+    </actionCalls>
+    <apiVersion>61.0</apiVersion>
+    <decisions>
+        <name>Can_Email_Donor</name>
+        <label>Can we email the donor?</label>
+        <locationX>176</locationX>
+        <locationY>311</locationY>
+        <defaultConnector>
+            <targetReference>Create_Rescue_Task_No_Email</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No email possible - task only</defaultConnectorLabel>
+        <rules>
+            <name>Email_OK</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.AAkPay__Contact__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.AAkPay__Contact__r.Email</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.AAkPay__Contact__r.npsp__Deceased__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.AAkPay__Contact__r.HasOptedOutOfEmail</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Payment_Failure_Email</targetReference>
+            </connector>
+            <label>Email OK</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Still_Suspended</name>
+        <label>Still suspended after 14 days?</label>
+        <locationX>578</locationX>
+        <locationY>431</locationY>
+        <defaultConnectorLabel>Recovered or cancelled - no action</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Still_Suspended</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Current_RP.AAkPay__Recurring_Payment_Status__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Suspended - Max retries exceeded</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Create_Escalation_Task</targetReference>
+            </connector>
+            <label>Yes - still suspended</label>
+        </rules>
+    </decisions>
+    <description>Regular Giving &amp; Membership Renewal Recovery. Fires when a Payments2Us Recurring Payment transitions to "Suspended - Max retries exceeded": emails the donor a self-service payment-update link (guarded for deceased/opt-out/no-email), creates a follow-up Task for the record owner, and escalates via a 14-day scheduled path if the payment is still suspended. Read-only against the Recurring Payment record; creates Tasks and sends one email only. Built 20 Aug 2026 as Draft - see docs/fundraising/02-automation-regular-giving-recovery.md for the activation gate.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>DueIn3Days</name>
+        <dataType>Date</dataType>
+        <expression>{!$Flow.CurrentDate} + 3</expression>
+    </formulas>
+    <formulas>
+        <name>DueIn7Days</name>
+        <dataType>Date</dataType>
+        <expression>{!$Flow.CurrentDate} + 7</expression>
+    </formulas>
+    <interviewLabel>RP aCU - Suspended Regular Giving Rescue {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>RP aCU - Suspended Regular Giving Rescue</label>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Create_Escalation_Task</name>
+        <label>Create escalation task (phone donor)</label>
+        <locationX>578</locationX>
+        <locationY>551</locationY>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>DueIn3Days</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>EscalationTaskDescription</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>High</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Not Started</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Regular giving still suspended after 14 days - phone the donor</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhoId</field>
+            <value>
+                <elementReference>$Record.AAkPay__Contact__c</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+    </recordCreates>
+    <recordCreates>
+        <name>Create_Rescue_Task</name>
+        <label>Create rescue task (donor emailed)</label>
+        <locationX>176</locationX>
+        <locationY>551</locationY>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>DueIn7Days</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>RescueTaskDescription</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>High</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Not Started</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Regular giving suspended - donor emailed - check for recovery</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhoId</field>
+            <value>
+                <elementReference>$Record.AAkPay__Contact__c</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+    </recordCreates>
+    <recordCreates>
+        <name>Create_Rescue_Task_No_Email</name>
+        <label>Create rescue task (no email possible)</label>
+        <locationX>440</locationX>
+        <locationY>431</locationY>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>DueIn7Days</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>NoEmailTaskDescription</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>High</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Not Started</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Regular giving suspended - no email on file - contact donor by phone or mail</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+    </recordCreates>
+    <recordLookups>
+        <name>Get_Current_RP</name>
+        <label>Get current recurring payment</label>
+        <locationX>578</locationX>
+        <locationY>311</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Still_Suspended</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>AAkPay__Recurring_Payment__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Can_Email_Donor</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AAkPay__Recurring_Payment_Status__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Suspended - Max retries exceeded</stringValue>
+            </value>
+        </filters>
+        <object>AAkPay__Recurring_Payment__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <scheduledPaths>
+            <name>Fourteen_Days_After_Suspension</name>
+            <connector>
+                <targetReference>Get_Current_RP</targetReference>
+            </connector>
+            <label>14 days after suspension</label>
+            <offsetNumber>14</offsetNumber>
+            <offsetUnit>Days</offsetUnit>
+            <timeSource>RecordTriggerEvent</timeSource>
+        </scheduledPaths>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Draft</status>
+    <textTemplates>
+        <name>DonorFailureEmailBody</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear {!$Record.AAkPay__Contact__r.FirstName},
+
+Thank you for supporting BirdLife Australia. Unfortunately we haven't been able to process your recent recurring payment of ${!$Record.AAkPay__Payment_Amount__c} ({!$Record.AAkPay__Frequency__c}), and after several attempts your payment has been paused.
+
+This usually happens when a card has expired or been replaced, or bank details have changed. You can update your payment details securely in a couple of minutes here:
+
+https://{!$Record.AAkPay__Email_Card_Update__c}
+
+Once your details are updated, your support will resume automatically - there is nothing else you need to do.
+
+If you'd rather talk it through, or if you'd like to change or pause your giving, just reply to this email or call us and we'll happily help.
+
+Your ongoing support makes a real difference for Australia's birds - thank you.
+
+Warm regards,
+BirdLife Australia Supporter Services</text>
+    </textTemplates>
+    <textTemplates>
+        <name>EscalationTaskDescription</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>This recurring payment is STILL "Suspended - Max retries exceeded" 14 days after the automatic recovery email was sent (or after suspension, if no email was possible).
+
+Recurring payment: {!$Record.Name} ({!$Record.AAkPay__Recurring_Payment_No__c})
+Amount: ${!$Record.AAkPay__Payment_Amount__c} {!$Record.AAkPay__Frequency__c}
+Last declined: {!$Record.AAkPay__Last_Declined_Date__c}
+
+Next step: phone the donor to update payment details (a new card can be taken via the Card Update action on the Recurring Payment record), or agree to cancel and record the cancellation reason. If this is a membership, remember a lapse also affects member benefits including Emu journal access.</text>
+    </textTemplates>
+    <textTemplates>
+        <name>NoEmailTaskDescription</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>This recurring payment has gone to "Suspended - Max retries exceeded" and the donor could NOT be emailed automatically (no contact/email on file, deceased, or email opt-out).
+
+Recurring payment: {!$Record.Name} ({!$Record.AAkPay__Recurring_Payment_No__c})
+Amount: ${!$Record.AAkPay__Payment_Amount__c} {!$Record.AAkPay__Frequency__c}
+Last declined: {!$Record.AAkPay__Last_Declined_Date__c}
+
+Next step: contact the donor by phone or mail to update payment details, or confirm cancellation and record the cancellation reason. Check the Contact record first for deceased/do-not-contact flags.</text>
+    </textTemplates>
+    <textTemplates>
+        <name>RescueTaskDescription</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>This recurring payment has gone to "Suspended - Max retries exceeded" after repeated failed payment attempts. The donor has been emailed a self-service payment-update link automatically.
+
+Recurring payment: {!$Record.Name} ({!$Record.AAkPay__Recurring_Payment_No__c})
+Amount: ${!$Record.AAkPay__Payment_Amount__c} {!$Record.AAkPay__Frequency__c}
+Last declined: {!$Record.AAkPay__Last_Declined_Date__c}
+
+Next step: check in 7 days whether the status has returned to Active. If it has, close this task. If not, an escalation task will be created automatically at day 14 - use it to phone the donor.</text>
+    </textTemplates>
+</Flow>
