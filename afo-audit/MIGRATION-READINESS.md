@@ -31,21 +31,22 @@ Compiled 20 August 2026 from the automated cloud harvest (GitHub Actions run of
 | Published articles (authoritative, via OAI-PMH) | **2,354 records** | `harvest/afo-oai/articles.csv` |
 | Article landing pages crawled | 2,321 | `harvest/afo/pages.csv`, `content/` |
 | Issue tables of contents | **215 issues** | pages.csv (`/issue/view/<id>`) |
-| Article PDFs (3.0 GB) | 1,535 | run artifact `afo-raw-mirror` |
-| Total pages / assets | 6,402 / 1,598 | `harvest/afo/manifest.json` |
-| Internal link graph | 86,311 links | `harvest/afo/links.csv` |
-| Per-page clean markdown | 6,402 files | `harvest/afo/content/` |
-| WordPress import file (fallback only) | 6,402 items, 23 MB | `harvest/afo/wordpress-export.xml` |
-| Fetch errors | **0** | AUDIT.md |
+| Article PDFs (5.0 GB) | **2,311 of 2,321 (99.6%)** | run artifact `afo-raw-mirror` |
+| Total pages / assets | 7,184 / 2,374 | `harvest/afo/manifest.json` |
+| Internal link graph | 95,639 links | `harvest/afo/links.csv` |
+| Per-page clean markdown | 7,184 files | `harvest/afo/content/` |
+| WordPress import file (fallback only) | 7,184 items | `harvest/afo/wordpress-export.xml` |
+| Fetch errors | 2 (of 9,558 fetches) | AUDIT.md |
 
 Publication history: content from 2003 onward under the AFO title (first published
 1959 as *The Australian Bird Watcher*); the journal went online-only in 2016, when
 the pre-2016 archive was bulk-digitised (1,967 OAI records carry 2016 upload dates).
 
-**Coverage gap (being closed now):** the first crawl stopped at its 8,000-fetch
-safety cap with ~530 article PDFs and some galley pages still queued. A second
-sweep run with a 12,000 cap is in progress; its results overwrite `harvest/afo/`
-and the raw-mirror artifact. Landing-page coverage is already 99%+.
+**Coverage: complete.** The first crawl hit its 8,000-fetch safety cap; the
+follow-up sweep (12,000 cap) exhausted the crawl queue naturally at 9,558 fetches.
+All 215 issues and 2,321 article landing pages are captured, with 2,311 PDFs
+(99.6% — the handful without a PDF appear to have no galley on the live site;
+the list to spot-check is derivable from pages.csv vs assets.csv).
 
 ## 3. URL patterns → redirect map
 
@@ -83,7 +84,6 @@ disappears. Any other platform means 6,400 redirects.
 | OJS 2.4.6 is EOL and internet-exposed **today** | High | Migrate promptly; until then keep the host patched at OS level |
 | 2.x → 3.x upgrade is a big jump (schema rewrite) | Medium | Official staged upgrade path (2.4.6 → 3.2 → 3.5); rehearse on a copy first; full DB+files backup before each step. Fallback: fresh 3.x + Native XML import |
 | Editorial-side data (users, in-flight submissions, review history) not yet audited | Medium | Run the admin audit (`PROMPT-A-admin-chrome.md`) before cutover; freeze new submissions during migration week |
-| ~530 PDFs beyond first crawl's cap | Low | Sweep run in progress; verify new manifest totals |
 | Hosting: WP Engine and Cloudflare can't host PHP/OJS | Low | Small LAMP VPS or shared host (~AU$10–30/mo); keep Cloudflare in front for DNS/CDN |
 | Custom theme/plugins on the old site | Low | 2.x themes don't port to 3.x anyway; 3.x default themes are modern — restyle with journal branding |
 | No DOIs registered | Info | Simplifies migration; consider adding via Crossref after |
@@ -123,7 +123,7 @@ it waiting on the staged upgrade scripts and spot-checking issues.
 
 ## 7. What remains before cutover can be scheduled
 
-- [ ] Sweep run completes (remaining PDFs) — automated, in progress
+- [x] Sweep run complete — 2,311/2,321 PDFs (99.6%), 5.0 GB banked in the run artifact
 - [ ] Admin audit via Prompt A (user counts, in-flight submissions, exports)
 - [ ] Decision: self-host vs PKP vs library partner (one enquiry email)
 - [ ] Provision staging host and rehearse the staged upgrade
