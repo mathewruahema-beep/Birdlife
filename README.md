@@ -294,6 +294,16 @@ pre-approved and just logged; emergencies are done first, logged same day, and
 reviewed retrospectively. Payments/donations changes are minimum Medium, and
 nothing is approvable without a rollback plan.
 
+**Register seeded 20 Aug 2026** from a live survey of the non-Google
+connectors (Salesforce, Cloudflare, NetSuite, M365, Zapier, Atlassian, Canva,
+Miro, Granola, Zoom) cross-referenced against the Asana IT Operations Project
+Plan (113 incomplete tasks reviewed): 23 change requests — 3 High
+(SPF/Salesforce DKIM, Stripe refund flows, Plauti bulk merge), 11 Medium,
+9 Low — each with risk score, rollback plan and Asana permalink where one
+exists. The remaining ~50 backlog CHANGE-classified Asana tasks stay in Asana
+until they are ready to implement; changes enter the register when they are
+about to become real.
+
 **The tool** is a self-contained shared artifact: the page itself is the
 register. Submissions and CAB decisions publish new versions attributed to
 whoever made them, it scores risk live, warns when a planned date lands in a
