@@ -287,6 +287,8 @@ They have been redacted from the backup in this repo, but:
 
 ```
 CLAUDE.md                            the AI ICT Assistant charter — loads into every session on this repo
+console/index.html                   the ICT Console — interactive prompt builder, runbook generator, quick reference
+                                     (published at https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e)
 .claude/skills/                      the nine birdlife-* operator-knowledge skills (versioned)
 docs/using-the-assistant.md          remote access channels + prompt playbook
 README.md                            findings, admin runbook, routine consolidation

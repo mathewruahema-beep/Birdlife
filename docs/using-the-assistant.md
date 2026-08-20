@@ -7,6 +7,18 @@ Stripe, Zapier, Cloudflare) make it *your* ICT assistant. It proposes every
 production change and waits for your approval before writing. Add "dry run" to any
 prompt to preview without writing.
 
+## The online console
+
+**https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e** — bookmark
+this on your phone. It's an interactive cockpit: pick an action, fill in the case
+number or leaver's name, and it composes the exact prompt to paste into a Claude
+session; the Runbooks tab generates the full offboarding PowerShell sequence from
+a name and UPN; the Reference tab carries close reasons, Asana section gids, and
+the scoped SOQL. Source lives at `console/index.html` in this repo — tell any
+assistant session "update the console" to change it. (Don't enable GitHub Pages
+for it on a free plan: Pages would make the page public, and it names internal
+systems. The artifact URL is private to you.)
+
 ## Ways to reach it
 
 **1. Phone or any browser — claude.ai/code.** Start a new session on
