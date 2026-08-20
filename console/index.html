@@ -118,6 +118,25 @@
   .grp h3 { font-size: 14px; margin: 16px 0 8px; font-weight: 700; }
   .secterr { font-size: 13.5px; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
   .taskitem { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }
+  .workbench { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 12px; }
+  .workbench textarea {
+    width: 100%; background: var(--paper); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px;
+    font: 400 15px "Source Sans 3", sans-serif; resize: vertical; min-height: 84px;
+  }
+  .workbench textarea:focus { outline: 2px solid var(--euc); outline-offset: 1px; }
+  .workbench .row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin: 10px 0; font-size: 14px; color: var(--muted); }
+  .workbench select {
+    background: var(--paper); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 7px; padding: 6px 8px; font: 400 14px "Source Sans 3", sans-serif;
+  }
+  .workbench label { display: flex; align-items: center; gap: 6px; }
+  .workbench input[type="checkbox"] { accent-color: var(--euc); width: 15px; height: 15px; }
+  .wbmsg { font-size: 14px; margin-top: 10px; }
+  .wbmsg.ok { color: var(--euc-ink); font-weight: 600; }
+  .wbmsg.bad { color: var(--red); }
+  .btn.danger { border-color: var(--red); background: var(--red); color: #fff; }
+  .btn[disabled] { opacity: .55; cursor: default; }
   .install { margin-top: 24px; font-size: 13.5px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
   .install b { color: var(--ink); }
 
@@ -393,6 +412,13 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   var sfState = { data: null, storedAt: null, error: null };
   var asState = { data: null, storedAt: null, error: null };
   var caseFilter = 'all';
+  var live = { mcp: null, sf: SF_SERVER };
+  var caseIndex = {};
+  var wbOpen = false;
+  var CLOSE_REASONS_ALL = ["Closed - Resolved","Closed - Resolved First Call","Closed - Email Sent",
+    "Closed - Email Edited & Sent","Closed - Phone Call","Closed - No Action Required",
+    "Closed - Internal Follow up","Closed - Duplicate","Closed - Spam","Closed - Abandoned"];
+  var TYPE_OPTS = ["Admin","Troubleshooting","IAM","New User","Departing Staff","New Feature","Purchase/Renew","Spam"];
   var FILTER_LABELS = { all: '', neu: 'just arrived', unassigned: 'nobody owns them yet', old: 'open more than a month' };
 
   function fixCopy(err, server) {
@@ -458,17 +484,20 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       prompt: 'Summarise case ' + r.CaseNumber + ' ("' + (r.Subject || '') + '") and how to resolve it' };
   }
 
-  function planHtml(a, extra) {
+  function planHtml(a, extra, caseId) {
     return '<div class="plan">' +
       (a.why ? '<p class="why-full">' + esc(a.why) + ' ' + esc(a.action || '') + '</p>'
              : '<p class="why-full">' + esc(a.action || '') + '</p>') +
       '<div class="preview">' + esc(a.prompt) + '</div>' +
       '<div class="btnrow" style="margin-top:0">' +
       '<button class="btn sm copyplan">Copy &amp; ask Claude</button>' +
-      (extra || '') + '</div></div>';
+      (caseId && live.mcp ? '<button class="btn sm ghost workbtn" data-id="' + esc(caseId) + '">Respond / close…</button>' : '') +
+      (extra || '') + '</div>' +
+      (caseId ? '<div class="wbslot"></div>' : '') + '</div>';
   }
 
   function renderQueue() {
+    if (wbOpen) return; // don't redraw under an open respond/close form
     var now = Date.now();
     var recs = sfState.data ? (sfState.data.records || []) : null;
     var tasks = asState.data;
@@ -513,8 +542,10 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       var items = [];
       (recs || []).forEach(function (r) {
         var a = adviceFor(r, now);
-        if (a) items.push({ p: a.p, cls: a.cls, cat: a.cat, title: r.CaseNumber + ' · ' + (r.Subject || ''), a: a,
-          link: '<a class="btn sm ghost" target="_blank" rel="noopener" href="https://birdlifeaustralia.lightning.force.com/lightning/r/Case/' + esc((r.attributes && r.attributes.url || '').split('/').pop()) + '/view">Open in Salesforce ↗</a>' });
+        var cid = (r.attributes && r.attributes.url || '').split('/').pop();
+        caseIndex[cid] = r;
+        if (a) items.push({ p: a.p, cls: a.cls, cat: a.cat, title: r.CaseNumber + ' · ' + (r.Subject || ''), a: a, cid: cid,
+          link: '<a class="btn sm ghost" target="_blank" rel="noopener" href="https://birdlifeaustralia.lightning.force.com/lightning/r/Case/' + esc(cid) + '/view">Open in Salesforce ↗</a>' });
       });
       (tasks || []).forEach(function (x) {
         var today = new Date(now).toISOString().slice(0, 10);
@@ -533,7 +564,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       nextArea.innerHTML = (top.length ? '<h2 style="margin-top:4px">What to do next</h2>' : '') +
         top.map(function (it) {
           return '<details class="next"><summary><span class="chip ' + it.cls + '">' + esc(it.cat) + '</span>' +
-            '<span class="ttl">' + esc(it.title) + '</span></summary>' + planHtml(it.a, it.link) + '</details>';
+            '<span class="ttl">' + esc(it.title) + '</span></summary>' + planHtml(it.a, it.link, it.cid) + '</details>';
         }).join('') +
         (items.length > top.length ? '<p class="hint">…and ' + (items.length - top.length) + ' more further down the list.</p>' : '');
       wireCopyPlans(nextArea);
@@ -560,6 +591,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       sfArea.innerHTML = '<h2>The queue — who has what</h2>' + (order.length ? order.map(function (o) {
         var rows = groups[o].map(function (r) {
           var id = (r.attributes && r.attributes.url || '').split('/').pop();
+          caseIndex[id] = r;
           var age = daysAgo(r.CreatedDate, now);
           var a = adviceFor(r, now) || defaultAdvice(r);
           var link = '<a class="btn sm ghost" target="_blank" rel="noopener" href="https://birdlifeaustralia.lightning.force.com/lightning/r/Case/' + esc(id) + '/view">Open in Salesforce ↗</a>';
@@ -567,7 +599,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
             '<span class="ttl">' + esc(r.CaseNumber) + ' <span class="sub">· ' + esc(r.Subject) + '</span></span>' +
             '<span class="badge ' + statusClass(r.Status) + '">' + esc(PLAIN_STATUS[r.Status] || r.Status) + '</span>' +
             '<span class="age' + (age > 30 ? ' old' : '') + '">' + age + 'd</span>' +
-            '</summary>' + planHtml(a, link) + '</details>';
+            '</summary>' + planHtml(a, link, id) + '</details>';
         }).join('');
         var head = o === 'Zeus' ? 'Nobody’s yet — the intake queue (' + groups[o].length + ')' : esc(o) + ' (' + groups[o].length + ')';
         return '<div class="grp"><h3>' + head + '</h3>' + rows + '</div>';
@@ -626,6 +658,132 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         copyText(pv.textContent, b, 'Copied ✓ — paste it to Claude');
       });
     });
+    root.querySelectorAll('.workbtn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var slot = b.closest('.plan').querySelector('.wbslot');
+        if (slot.innerHTML) { slot.innerHTML = ''; wbOpen = false; renderQueue(); return; }
+        openWorkbench(slot, b.dataset.id);
+      });
+    });
+  }
+
+  // ---- the workbench: respond on the case and close it, with your confirmation ----
+  function openWorkbench(slot, cid) {
+    var r = caseIndex[cid];
+    if (!r) return;
+    wbOpen = true; // pause background re-renders while you're typing
+    var reasonOpts = CLOSE_REASONS_ALL.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('');
+    var typeSel = !r.Type
+      ? '<label>Set a type too: <select class="wb-type"><option value="">leave blank</option>' +
+        TYPE_OPTS.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('') + '</select></label>'
+      : '';
+    slot.innerHTML = '<div class="workbench">' +
+      '<textarea class="wb-text" placeholder="Write your response here — what was done, or what the requester should do next…"></textarea>' +
+      '<div class="row"><label><input type="checkbox" class="wb-pub" checked> Visible to the requester on the case</label></div>' +
+      '<div class="row"><label>Close reason: <select class="wb-reason">' + reasonOpts + '</select></label>' + typeSel + '</div>' +
+      '<div class="btnrow" style="margin-top:4px">' +
+      '<button class="btn sm wb-post">Post response only</button>' +
+      '<button class="btn sm danger wb-close">Post &amp; close the case</button>' +
+      '<button class="btn sm ghost wb-cancel">Cancel</button></div>' +
+      '<p class="hint" style="margin-top:8px">A case comment is not an email — the requester sees it on the case (and gets a notification only if case alerts are on). For an emailed reply, use Ask → Draft a reply. Every button asks you to tap twice — nothing is written on the first tap.</p>' +
+      '<div class="wbmsg" aria-live="polite"></div></div>';
+    var text = slot.querySelector('.wb-text'), pub = slot.querySelector('.wb-pub'),
+        reason = slot.querySelector('.wb-reason'), typeEl = slot.querySelector('.wb-type'),
+        msg = slot.querySelector('.wbmsg'),
+        postBtn = slot.querySelector('.wb-post'), closeBtn = slot.querySelector('.wb-close');
+    slot.querySelector('.wb-cancel').addEventListener('click', function () {
+      slot.innerHTML = ''; wbOpen = false; renderQueue();
+    });
+    function arm(btn, armedText, run) {
+      btn.addEventListener('click', function () {
+        if (btn.dataset.armed !== '1') {
+          btn.dataset.armed = '1'; btn.textContent = armedText;
+          setTimeout(function () { if (btn.dataset.armed === '1') { btn.dataset.armed = ''; btn.textContent = btn.dataset.orig; } }, 5000);
+          return;
+        }
+        btn.dataset.armed = ''; run();
+      });
+      btn.dataset.orig = btn.textContent;
+    }
+    arm(postBtn, 'Tap again to post to ' + r.CaseNumber, function () {
+      if (!text.value.trim()) { msg.className = 'wbmsg bad'; msg.textContent = 'Write the response first.'; return; }
+      doWork(r, cid, { comment: text.value.trim(), pub: pub.checked, close: false }, slot, msg,
+        [postBtn, closeBtn]);
+    });
+    arm(closeBtn, 'Tap again to close ' + r.CaseNumber + ' (' + (reason.value || '') + ')', function () {
+      doWork(r, cid, { comment: text.value.trim(), pub: pub.checked, close: true,
+        reason: reason.value, type: typeEl ? typeEl.value : '' }, slot, msg, [postBtn, closeBtn]);
+    });
+  }
+
+  function wbFail(msg, err, extraNote) {
+    msg.className = 'wbmsg bad';
+    var base = err && err.code === 'tool_error'
+      ? 'Salesforce said no: ' + (err.message || 'validation failed') + '.'
+      : fixCopy(err, 'Salesforce');
+    msg.textContent = base + (extraNote ? ' ' + extraNote : '');
+  }
+
+  function doWork(r, cid, opts, slot, msg, btns) {
+    var mcp = live.mcp, sf = live.sf;
+    if (!mcp) { msg.className = 'wbmsg bad'; msg.textContent = 'Live connection lost — reload the page.'; return; }
+    btns.forEach(function (b) { b.disabled = true; });
+    msg.className = 'wbmsg'; msg.textContent = 'Working…';
+
+    var step = opts.comment
+      ? mcp.callTool(sf, 'createSobjectRecord', { 'sobject-name': 'CaseComment',
+          body: { ParentId: cid, CommentBody: opts.comment, IsPublished: !!opts.pub } })
+      : Promise.resolve(null);
+
+    step.then(function () {
+      if (!opts.close) return { closed: false };
+      var body = { Status: 'Closed', Case_Closed_Reason__c: opts.reason };
+      if (opts.type) body.Type = opts.type;
+      msg.textContent = 'Response posted. Closing the case…';
+      return mcp.callTool(sf, 'updateSobjectRecord', { 'sobject-name': 'Case', id: cid, body: body })
+        .then(function () {
+          // audit trail per the operating rules — best-effort, never blocks the outcome
+          return mcp.callTool(sf, 'createSobjectRecord', { 'sobject-name': 'CaseComment',
+            body: { ParentId: cid, CommentBody: 'Closed via BirdLife ICT Console (reason: ' + opts.reason + ').', IsPublished: false } })
+            .catch(function () {})
+            .then(function () { return { closed: true }; });
+        });
+    }).then(function (res) {
+      // trust, but verify: re-read the case fresh before declaring success
+      return mcp.callTool(sf, 'soqlQuery',
+        { q: "SELECT Status, IsClosed FROM Case WHERE Id = '" + cid + "'" }, { cache: { refresh: true } })
+        .then(function (v) {
+          var p = v.payload; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+          var rec = p && p.records && p.records[0];
+          if (res.closed && rec && rec.IsClosed) {
+            msg.className = 'wbmsg ok';
+            msg.textContent = '✓ Done — response on the case and ' + r.CaseNumber + ' is Closed (' + opts.reason + ').';
+          } else if (res.closed) {
+            msg.className = 'wbmsg bad';
+            msg.textContent = 'The close didn’t stick — Salesforce shows the case still open. Check it in Salesforce.';
+          } else {
+            msg.className = 'wbmsg ok';
+            msg.textContent = '✓ Response posted on ' + r.CaseNumber + (opts.pub ? ' (visible to the requester).' : ' (internal note).');
+          }
+          wbOpen = false;
+          try { mcp.invalidate(sf, 'soqlQuery'); } catch (e) {}
+        }, function () {
+          msg.className = 'wbmsg ok';
+          msg.textContent = '✓ Written — but couldn’t re-check just now. Verify in Salesforce.';
+          wbOpen = false;
+        });
+    }).catch(function (err) {
+      // A failed write is AMBIGUOUS for server_unavailable/upstream_error — check reality
+      if (err && (err.code === 'server_unavailable' || err.code === 'upstream_error')) {
+        mcp.callTool(sf, 'soqlQuery', { q: "SELECT Status, IsClosed FROM Case WHERE Id = '" + cid + "'" }, { cache: { refresh: true } })
+          .then(function (v) {
+            var p = v.payload; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+            var rec = p && p.records && p.records[0];
+            wbFail(msg, err, rec ? ('Right now the case shows as ' + (rec.IsClosed ? 'Closed — it may have worked.' : 'still open — it likely did not go through.')) : '');
+          }, function () { wbFail(msg, err, 'Couldn’t check the case state either — verify in Salesforce before retrying.'); });
+      } else { wbFail(msg, err); }
+      btns.forEach(function (b) { b.disabled = false; });
+    });
   }
 
   function offline(msg) {
@@ -657,6 +815,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   })();
 
   function startWatches(mcp, sfServer, asanaServer) {
+      live.mcp = mcp; live.sf = sfServer;
       mcp.watchTool(sfServer, 'soqlQuery', { q: SOQL }, function (ev) {
         if (ev.type === 'data') {
           var p = ev.result.payload;

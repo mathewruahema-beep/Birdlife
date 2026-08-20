@@ -10,11 +10,13 @@ prompt to preview without writing.
 ## The online console
 
 **https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e** — bookmark
-this on your phone. It's an interactive cockpit: pick an action, fill in the case
-number or leaver's name, and it composes the exact prompt to paste into a Claude
-session; the Runbooks tab generates the full offboarding PowerShell sequence from
-a name and UPN; the Reference tab carries close reasons, Asana section gids, and
-the scoped SOQL. Source lives at `console/index.html` in this repo — tell any
+this on your phone. The Today tab shows the live Ask Zeus queue and Asana board
+(via your claude.ai connectors) with a prioritised "What to do next" list, and each
+case opens a workbench that can post a response on the case and close it (reason +
+type handled, two-tap confirm, internal audit comment, verified by re-query). The
+Ask tab composes exact prompts for a Claude session; Runbooks generates the full
+offboarding PowerShell sequence from a name and UPN; Reference carries close
+reasons, Asana section gids, and the scoped SOQL. Source lives at `console/index.html` in this repo — tell any
 assistant session "update the console" to change it. (Don't enable GitHub Pages
 for it on a free plan: Pages would make the page public, and it names internal
 systems. The artifact URL is private to you.)
