@@ -1,18 +1,18 @@
 # Site Audit — https://afo.birdlife.org.au/afo/index.php/afo
 
-Harvested 2026-08-20 09:58 UTC
+Harvested 2026-08-20 14:43 UTC
 
 | Metric | Value |
 |---|---|
 | Platform (best guess) | Open Journal Systems 2.4.6.0 |
-| Pages captured | 6402 |
-| Assets captured | 1598 (3082 MB) |
-| Internal links mapped | 86311 |
-| Fetch errors | 0 |
+| Pages captured | 7184 |
+| Assets captured | 2374 (4803 MB) |
+| Internal links mapped | 95639 |
+| Fetch errors | 2 |
 
 ## Asset types
 
-- application/pdf: 1540
+- application/pdf: 2316
 - text/javascript: 27
 - image/jpeg: 14
 - text/css: 10
@@ -37,6 +37,11 @@ Harvested 2026-08-20 09:58 UTC
 -   1814 words — [The avifauna of Bungalbin, Western Australia &ndash; an arid region   with minimal human impact   | Craig | Australian Field Ornithology](https://afo.birdlife.org.au/afo/index.php/afo/article/view/2174)
 -   1814 words — [The avifauna of Bungalbin, Western Australia &ndash; an arid region   with minimal human impact   | Craig | Australian Field Ornithology](https://afo.birdlife.org.au/afo/index.php/afo/article/view/2174/0)
 -   1783 words — [Birds of French Island forest, woodland, heath and grassland  | Oâ€™Brien | Australian Field Ornithology](https://afo.birdlife.org.au/afo/index.php/afo/article/view/2110)
+
+## Errors
+
+- https://afo.birdlife.org.au/afo/index.php/afo/article/download/2020/2007 — ('Connection broken: IncompleteRead(7602176 bytes read, 62023 more expected)', IncompleteRead(7602176 bytes read, 62023 more expected))
+- https://afo.birdlife.org.au/afo/index.php/afo/article/download/334/321 — ('Connection broken: IncompleteRead(385024 bytes read, 2065460 more expected)', IncompleteRead(385024 bytes read, 2065460 more expected))
 
 ## Next steps
 

@@ -4,7 +4,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
 		http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-	<responseDate>2026-08-20T06:59:49Z</responseDate>
+	<responseDate>2026-08-20T10:41:21Z</responseDate>
 	<request verb="Identify">https://afo.birdlife.org.au/afo/index.php/afo/oai</request>
 	<Identify>
 		<repositoryName>Australian Field Ornithology</repositoryName>
