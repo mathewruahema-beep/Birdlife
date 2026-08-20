@@ -1,0 +1,49 @@
+<view class="screen" wx:if="{{course}}">
+  <view class="card">
+    <view class="title">{{course.cover}} {{course.title}}</view>
+    <view class="muted" style="margin-top: 8rpx">{{course.blurb}}</view>
+    <view style="margin-top: 12rpx">
+      <text class="price">{{course.priceLabel}}</text>
+      <text wx:if="{{course.enrolled}}" class="tag" style="margin-left: 16rpx">
+        Enrolled · {{course.done}}/{{course.lessons.length}} lessons done
+      </text>
+    </view>
+
+    <button
+      wx:if="{{!course.enrolled}}"
+      class="btn"
+      bindtap="enrol"
+      disabled="{{paying}}"
+    >
+      {{paying ? "Processing…" : course.price === 0 ? "Enrol free" : "Buy " + course.priceLabel}}
+    </button>
+  </view>
+
+  <view class="card">
+    <view class="title" style="font-size: 30rpx">Lessons</view>
+    <view
+      wx:for="{{course.lessons}}"
+      wx:key="id"
+      style="display: flex; justify-content: space-between; align-items: center; padding: 16rpx 0"
+    >
+      <text>{{item.done ? "✅" : "▫️"}} {{item.title}}</text>
+      <button
+        wx:if="{{course.enrolled}}"
+        size="mini"
+        class="btn btn-quiet"
+        style="margin: 0"
+        data-lesson-id="{{item.id}}"
+        data-done="{{item.done}}"
+        bindtap="toggleLesson"
+      >
+        {{item.done ? "Undo" : "Done"}}
+      </button>
+    </view>
+    <view wx:if="{{!course.enrolled}}" class="muted">Enrol to track progress.</view>
+  </view>
+</view>
+
+<view class="screen" wx:if="{{error}}">
+  <view class="error-box">{{error}}</view>
+  <button class="btn" bindtap="fetch">Retry</button>
+</view>

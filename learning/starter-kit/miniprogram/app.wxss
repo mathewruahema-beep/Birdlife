@@ -1,0 +1,41 @@
+/* Global styles. Note the unit: rpx (responsive px) — 750rpx = screen width. */
+page {
+  background: #f6f7f4;
+  color: #1b2420;
+  font-size: 28rpx;
+}
+.screen { padding: 24rpx; }
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(27, 36, 32, 0.06);
+}
+.title { font-size: 34rpx; font-weight: 700; }
+.muted { color: #7a857f; font-size: 24rpx; }
+.price { color: #0a8a4a; font-weight: 700; }
+.btn {
+  background: #07c160;
+  color: #ffffff;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  margin-top: 20rpx;
+}
+.btn[disabled] { background: #a9d9bd; color: #ffffff; }
+.btn-quiet { background: #edf0eb; color: #1b2420; }
+.tag {
+  display: inline-block;
+  font-size: 22rpx;
+  color: #0a8a4a;
+  background: #e4f3ea;
+  border-radius: 8rpx;
+  padding: 4rpx 12rpx;
+}
+.error-box {
+  background: #f7e9e6;
+  color: #b3402f;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}

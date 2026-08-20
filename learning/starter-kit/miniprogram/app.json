@@ -1,0 +1,21 @@
+{
+  "pages": [
+    "pages/courses/courses",
+    "pages/course/course",
+    "pages/me/me"
+  ],
+  "window": {
+    "navigationBarTitleText": "ANWA Practice",
+    "navigationBarBackgroundColor": "#0A8A4A",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F6F7F4"
+  },
+  "tabBar": {
+    "color": "#7A857F",
+    "selectedColor": "#0A8A4A",
+    "list": [
+      { "pagePath": "pages/courses/courses", "text": "Courses" },
+      { "pagePath": "pages/me/me", "text": "Me" }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "appid": "touristappid",
+  "projectname": "anwa-practice-kit",
+  "compileType": "miniprogram",
+  "miniprogramRoot": "./",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "postcss": true,
+    "minified": true,
+    "coverView": true
+  },
+  "libVersion": "latest",
+  "description": "Practice replica of the ANWA Mini Program architecture. urlCheck:false lets the simulator call 127.0.0.1 — a real build needs whitelisted HTTPS domains (Runbook Phase 4.2)."
+}

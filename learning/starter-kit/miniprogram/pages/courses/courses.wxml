@@ -1,0 +1,24 @@
+<!-- WXML = layout with data bindings. {{ }} interpolates page data;
+     wx:for repeats a node; bindtap wires a tap to a page method. -->
+<view class="screen">
+  <view wx:if="{{error}}" class="error-box">
+    {{error}}
+    <button class="btn btn-quiet" size="mini" bindtap="fetch">Retry</button>
+  </view>
+
+  <view wx:if="{{loading && !courses.length}}" class="muted">Loading…</view>
+
+  <view
+    wx:for="{{courses}}"
+    wx:key="id"
+    class="card"
+    data-id="{{item.id}}"
+    bindtap="openCourse"
+  >
+    <view class="title">{{item.cover}} {{item.title}}</view>
+    <view style="margin-top: 8rpx">
+      <text class="price">{{item.priceLabel}}</text>
+      <text wx:if="{{item.enrolled}}" class="tag" style="margin-left: 16rpx">Enrolled</text>
+    </view>
+  </view>
+</view>

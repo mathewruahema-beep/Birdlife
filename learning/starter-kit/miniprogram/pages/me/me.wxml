@@ -1,0 +1,29 @@
+<view class="screen">
+  <view wx:if="{{error}}" class="error-box">{{error}}</view>
+
+  <view class="card" wx:if="{{me}}">
+    <view class="title">{{me.name}}</view>
+    <view class="muted">openid: {{me.openid}}</view>
+    <view class="muted" style="margin-top: 8rpx">
+      In the real app this account would be linked to a website student via
+      UnionID (Runbook Phase 6.2).
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{me}}">
+    <view class="title" style="font-size: 30rpx">My courses</view>
+    <view wx:if="{{!me.enrolments.length}}" class="muted">Nothing yet — enrol from the Courses tab.</view>
+    <view
+      wx:for="{{me.enrolments}}"
+      wx:key="courseId"
+      data-id="{{item.courseId}}"
+      bindtap="openCourse"
+      style="padding: 16rpx 0"
+    >
+      <text>{{item.cover}} {{item.title}}</text>
+      <text class="muted" style="margin-left: 12rpx">{{item.lessonsDone}}/{{item.lessonCount}} done</text>
+    </view>
+  </view>
+
+  <button class="btn btn-quiet" bindtap="logout">Log out (clear token)</button>
+</view>
