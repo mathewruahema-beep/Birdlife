@@ -1,0 +1,936 @@
+<title>Stake Presidency Assistant</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600;700&display=swap">
+
+<style>
+:root {
+  --paper: #F7F6F3;
+  --surface: #FFFFFF;
+  --surface-2: #EFEDE8;
+  --ink: #1E2833;
+  --ink-soft: #55606B;
+  --line: #DCD9D2;
+  --accent: #2E5375;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E4EBF2;
+  --gold: #A9822F;
+  --gold-soft: #F3EBD9;
+  --good: #2F7A4D;
+  --good-soft: #E2F0E7;
+  --warn: #A96A1C;
+  --warn-soft: #F6ECDC;
+  --bad: #AE3B2A;
+  --bad-soft: #F6E4E0;
+  --focus: #2E5375;
+  --shadow: 0 1px 2px rgba(30, 40, 51, 0.06), 0 4px 14px rgba(30, 40, 51, 0.05);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #151A20;
+    --surface: #1D242C;
+    --surface-2: #242C36;
+    --ink: #E7E5DF;
+    --ink-soft: #9AA4AE;
+    --line: #333D48;
+    --accent: #7EA6C9;
+    --accent-ink: #10202E;
+    --accent-soft: #24354426;
+    --gold: #D0A957;
+    --gold-soft: #3A32204d;
+    --good: #6FBB8D;
+    --good-soft: #1F3A2B66;
+    --warn: #D69A4E;
+    --warn-soft: #40311b66;
+    --bad: #D97B6C;
+    --bad-soft: #45231e66;
+    --focus: #7EA6C9;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.25);
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #151A20;
+  --surface: #1D242C;
+  --surface-2: #242C36;
+  --ink: #E7E5DF;
+  --ink-soft: #9AA4AE;
+  --line: #333D48;
+  --accent: #7EA6C9;
+  --accent-ink: #10202E;
+  --accent-soft: #24354426;
+  --gold: #D0A957;
+  --gold-soft: #3A32204d;
+  --good: #6FBB8D;
+  --good-soft: #1F3A2B66;
+  --warn: #D69A4E;
+  --warn-soft: #40311b66;
+  --bad: #D97B6C;
+  --bad-soft: #45231e66;
+  --focus: #7EA6C9;
+  --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.25);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+h1, h2, h3 { font-family: "Source Serif 4", Georgia, "Times New Roman", serif; text-wrap: balance; margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.masthead {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.masthead-inner {
+  max-width: 1100px; margin: 0 auto; padding: 20px 20px 0;
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px;
+}
+.masthead h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: 0.01em; }
+.masthead .stake-name { color: var(--ink-soft); font-size: 0.95rem; }
+.masthead .spacer { flex: 1; }
+.masthead .settings-btn {
+  background: none; border: 1px solid var(--line); border-radius: 6px;
+  padding: 5px 12px; cursor: pointer; color: var(--ink-soft); font-size: 0.85rem;
+}
+.masthead .settings-btn:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+nav.tabs {
+  max-width: 1100px; margin: 0 auto; padding: 10px 20px 0;
+  display: flex; gap: 2px; overflow-x: auto;
+}
+nav.tabs button {
+  background: none; border: none; border-bottom: 3px solid transparent;
+  padding: 8px 14px 10px; cursor: pointer; color: var(--ink-soft);
+  font-weight: 600; font-size: 0.9rem; white-space: nowrap;
+}
+nav.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+nav.tabs button:hover { color: var(--ink); }
+
+main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+.privacy-note {
+  margin: 0 0 20px; padding: 10px 14px; border: 1px dashed var(--line); border-radius: 8px;
+  color: var(--ink-soft); font-size: 0.82rem; background: var(--surface);
+}
+
+/* Dashboard */
+.dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: var(--shadow); padding: 18px 18px 14px; min-width: 0;
+}
+.card h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+.card .card-sub { color: var(--ink-soft); font-size: 0.82rem; margin: 0 0 12px; }
+.card ul { list-style: none; margin: 0; padding: 0; }
+.card li { padding: 8px 0; border-top: 1px solid var(--line); display: flex; gap: 10px; align-items: baseline; }
+.card li:first-child { border-top: none; }
+.empty { color: var(--ink-soft); font-style: italic; padding: 8px 0; }
+.date-chip {
+  font-variant-numeric: tabular-nums; font-weight: 600; font-size: 0.82rem;
+  color: var(--accent); min-width: 74px; flex-shrink: 0;
+}
+.sunday-block { border-top: 1px solid var(--line); padding: 10px 0; }
+.sunday-block:first-child { border-top: none; }
+.sunday-block .s-date { font-weight: 700; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.sunday-block .s-rows { margin: 4px 0 0; padding-left: 0; list-style: none; }
+.sunday-block .s-rows li { border: none; padding: 3px 0; font-size: 0.9rem; }
+.uncovered { color: var(--ink-soft); font-style: italic; }
+
+.pill {
+  display: inline-block; padding: 1px 9px; border-radius: 999px;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; white-space: nowrap;
+}
+.pill.stage-0 { background: var(--surface-2); color: var(--ink-soft); }
+.pill.stage-1 { background: var(--accent-soft); color: var(--accent); }
+.pill.stage-2 { background: var(--warn-soft); color: var(--warn); }
+.pill.stage-3 { background: var(--gold-soft); color: var(--gold); }
+.pill.stage-4 { background: var(--gold-soft); color: var(--gold); }
+.pill.stage-5 { background: var(--good-soft); color: var(--good); }
+.pill.p-good { background: var(--good-soft); color: var(--good); }
+.pill.p-warn { background: var(--warn-soft); color: var(--warn); }
+.pill.p-bad { background: var(--bad-soft); color: var(--bad); }
+.pill.p-neutral { background: var(--surface-2); color: var(--ink-soft); }
+
+/* Forms */
+form.entry {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 16px 18px; margin: 0 0 22px; box-shadow: var(--shadow);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px;
+  align-items: end;
+}
+form.entry .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+form.entry .field.wide { grid-column: 1 / -1; }
+form.entry label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); }
+form.entry input, form.entry select, form.entry textarea {
+  background: var(--paper); border: 1px solid var(--line); border-radius: 6px;
+  padding: 7px 10px; width: 100%; color: var(--ink);
+}
+form.entry textarea { resize: vertical; min-height: 38px; }
+.btn {
+  background: var(--accent); color: var(--accent-ink); border: none; border-radius: 6px;
+  padding: 8px 18px; font-weight: 700; cursor: pointer;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn.secondary { background: none; color: var(--ink-soft); border: 1px solid var(--line); font-weight: 600; }
+.btn.secondary:hover { color: var(--ink); border-color: var(--ink-soft); }
+.btn.danger { background: none; border: 1px solid var(--line); color: var(--bad); font-weight: 600; }
+.btn.small { padding: 4px 10px; font-size: 0.8rem; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th {
+  text-align: left; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--ink-soft); padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap;
+}
+td { padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+td .note { color: var(--ink-soft); font-size: 0.82rem; display: block; }
+.row-done td { opacity: 0.55; }
+.row-done .strike { text-decoration: line-through; }
+td.actions-cell { white-space: nowrap; text-align: right; }
+td.actions-cell button { margin-left: 6px; }
+.icon-btn { background: none; border: none; cursor: pointer; color: var(--ink-soft); font-size: 0.85rem; padding: 2px 5px; border-radius: 4px; }
+.icon-btn:hover { color: var(--ink); background: var(--surface-2); }
+.icon-btn.danger:hover { color: var(--bad); background: var(--bad-soft); }
+
+.section-head { display: flex; align-items: baseline; gap: 12px; margin: 0 0 12px; flex-wrap: wrap; }
+.section-head h2 { font-size: 1.25rem; font-weight: 600; }
+.section-head .hint { color: var(--ink-soft); font-size: 0.83rem; }
+.stage-group-title {
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--ink-soft); margin: 22px 0 8px;
+}
+.stage-group-title:first-of-type { margin-top: 0; }
+
+/* Dialog */
+dialog {
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink);
+  max-width: 560px; width: calc(100vw - 40px); padding: 22px; box-shadow: var(--shadow);
+}
+dialog::backdrop { background: rgba(15, 20, 26, 0.5); }
+dialog h2 { font-size: 1.2rem; margin-bottom: 12px; }
+dialog .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+dialog label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); }
+dialog input, dialog textarea {
+  background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; width: 100%;
+}
+dialog textarea { resize: vertical; }
+dialog .dialog-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+dialog .dialog-actions .spacer { flex: 1; }
+dialog .field-hint { font-size: 0.78rem; color: var(--ink-soft); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+@media (max-width: 640px) {
+  form.entry { grid-template-columns: 1fr 1fr; }
+  form.entry .field.wide { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  nav.tabs button { transition: color 0.15s, border-color 0.15s; }
+  .btn, .icon-btn { transition: filter 0.15s, color 0.15s, background 0.15s; }
+}
+</style>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <h1>Stake Presidency Assistant</h1>
+    <span class="stake-name" id="stakeNameDisplay"></span>
+    <span class="spacer"></span>
+    <button class="settings-btn" id="openSettings">Settings &amp; backup</button>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" aria-selected="true" data-tab="dashboard">Dashboard</button>
+    <button role="tab" aria-selected="false" data-tab="sundays">Sundays</button>
+    <button role="tab" aria-selected="false" data-tab="callings">Callings</button>
+    <button role="tab" aria-selected="false" data-tab="interviews">Interviews</button>
+    <button role="tab" aria-selected="false" data-tab="actions">Action items</button>
+    <button role="tab" aria-selected="false" data-tab="units">Units</button>
+  </nav>
+</header>
+
+<main>
+  <p class="privacy-note">All information stays in this browser's local storage — nothing is sent anywhere.
+  Use <strong>Settings &amp; backup</strong> to copy a backup or move your data to another device.</p>
+
+  <!-- DASHBOARD -->
+  <section class="panel active" id="panel-dashboard">
+    <div class="dash-grid">
+      <div class="card" style="grid-column: 1 / -1;">
+        <h2>The next four Sundays</h2>
+        <p class="card-sub">Visits, speaking assignments and ward conferences. A Sunday with no assignment is flagged so nothing slips.</p>
+        <div id="dashSundays"></div>
+      </div>
+      <div class="card">
+        <h2>Callings in motion</h2>
+        <p class="card-sub">Everything not yet recorded, oldest first.</p>
+        <ul id="dashCallings"></ul>
+      </div>
+      <div class="card">
+        <h2>Interviews — next 14 days</h2>
+        <p class="card-sub">Recommend, calling and other interviews on the books.</p>
+        <ul id="dashInterviews"></ul>
+      </div>
+      <div class="card">
+        <h2>Open action items</h2>
+        <p class="card-sub">From presidency meetings. Overdue items are flagged.</p>
+        <ul id="dashActions"></ul>
+      </div>
+      <div class="card">
+        <h2>Ward conferences</h2>
+        <p class="card-sub">As scheduled on each unit's record.</p>
+        <ul id="dashConferences"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUNDAYS -->
+  <section class="panel" id="panel-sundays">
+    <div class="section-head">
+      <h2>Sunday assignments</h2>
+      <span class="hint">Who is visiting or speaking where, each week.</span>
+    </div>
+    <form class="entry" id="formSunday">
+      <div class="field"><label for="su-date">Date</label><input type="date" id="su-date" required></div>
+      <div class="field"><label for="su-unit">Unit</label><select id="su-unit" required></select></div>
+      <div class="field"><label for="su-who">Assigned to</label><input id="su-who" list="peopleList" placeholder="e.g. President Hema" required></div>
+      <div class="field"><label for="su-purpose">Purpose</label>
+        <select id="su-purpose">
+          <option>Presiding visit</option><option>Speaking</option><option>Ward conference</option>
+          <option>Sacrament meeting visit</option><option>High council Sunday</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field wide"><label for="su-notes">Notes</label><input id="su-notes" placeholder="Topic, travel, who else is coming…"></div>
+      <div class="field"><button class="btn" type="submit" id="su-submit">Add assignment</button></div>
+      <div class="field" id="su-cancel-wrap" hidden><button class="btn secondary" type="button" id="su-cancel">Cancel edit</button></div>
+    </form>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Unit</th><th>Assigned to</th><th>Purpose</th><th></th></tr></thead>
+        <tbody id="sundayRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CALLINGS -->
+  <section class="panel" id="panel-callings">
+    <div class="section-head">
+      <h2>Callings pipeline</h2>
+      <span class="hint">Track each calling from recommendation to recorded. Use “Advance” to move it to the next step.</span>
+    </div>
+    <form class="entry" id="formCalling">
+      <div class="field"><label for="ca-person">Person</label><input id="ca-person" required placeholder="Full name"></div>
+      <div class="field"><label for="ca-calling">Calling</label><input id="ca-calling" required placeholder="e.g. Elders Quorum President"></div>
+      <div class="field"><label for="ca-unit">Unit</label><select id="ca-unit"></select></div>
+      <div class="field"><label for="ca-stage">Stage</label><select id="ca-stage"></select></div>
+      <div class="field wide"><label for="ca-notes">Notes</label><input id="ca-notes" placeholder="Releases needed, who extends the call, spouse present…"></div>
+      <div class="field"><button class="btn" type="submit" id="ca-submit">Add calling</button></div>
+      <div class="field" id="ca-cancel-wrap" hidden><button class="btn secondary" type="button" id="ca-cancel">Cancel edit</button></div>
+    </form>
+    <div id="callingGroups"></div>
+  </section>
+
+  <!-- INTERVIEWS -->
+  <section class="panel" id="panel-interviews">
+    <div class="section-head">
+      <h2>Interviews</h2>
+      <span class="hint">Recommend, calling, missionary and other interviews.</span>
+    </div>
+    <form class="entry" id="formInterview">
+      <div class="field"><label for="in-person">Person</label><input id="in-person" required placeholder="Full name"></div>
+      <div class="field"><label for="in-type">Type</label>
+        <select id="in-type">
+          <option>Temple recommend</option><option>Calling</option><option>Missionary</option>
+          <option>Patriarchal blessing</option><option>Youth</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label for="in-when">Date &amp; time</label><input type="datetime-local" id="in-when" required></div>
+      <div class="field"><label for="in-with">With</label><input id="in-with" list="peopleList" placeholder="Presidency member"></div>
+      <div class="field"><label for="in-unit">Unit</label><select id="in-unit"></select></div>
+      <div class="field wide"><label for="in-notes">Notes</label><input id="in-notes" placeholder="Context, follow-up needed…"></div>
+      <div class="field"><button class="btn" type="submit" id="in-submit">Add interview</button></div>
+      <div class="field" id="in-cancel-wrap" hidden><button class="btn secondary" type="button" id="in-cancel">Cancel edit</button></div>
+    </form>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>When</th><th>Person</th><th>Type</th><th>With</th><th>Unit</th><th>Status</th><th></th></tr></thead>
+        <tbody id="interviewRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ACTION ITEMS -->
+  <section class="panel" id="panel-actions">
+    <div class="section-head">
+      <h2>Action items</h2>
+      <span class="hint">Assignments out of presidency meeting, with owners and due dates.</span>
+    </div>
+    <form class="entry" id="formAction">
+      <div class="field wide"><label for="ac-text">Action</label><input id="ac-text" required placeholder="What needs to happen"></div>
+      <div class="field"><label for="ac-owner">Owner</label><input id="ac-owner" list="peopleList" placeholder="Who carries it"></div>
+      <div class="field"><label for="ac-due">Due</label><input type="date" id="ac-due"></div>
+      <div class="field"><button class="btn" type="submit" id="ac-submit">Add item</button></div>
+      <div class="field" id="ac-cancel-wrap" hidden><button class="btn secondary" type="button" id="ac-cancel">Cancel edit</button></div>
+    </form>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th>Action</th><th>Owner</th><th>Due</th><th></th></tr></thead>
+        <tbody id="actionRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- UNITS -->
+  <section class="panel" id="panel-units">
+    <div class="section-head">
+      <h2>Wards &amp; branches</h2>
+      <span class="hint">The units of the stake, their leaders, and ward conference dates.</span>
+    </div>
+    <form class="entry" id="formUnit">
+      <div class="field"><label for="un-name">Unit name</label><input id="un-name" required placeholder="e.g. Riverton Ward"></div>
+      <div class="field"><label for="un-type">Type</label><select id="un-type"><option>Ward</option><option>Branch</option></select></div>
+      <div class="field"><label for="un-leader">Bishop / Branch President</label><input id="un-leader" placeholder="Name"></div>
+      <div class="field"><label for="un-conf">Ward conference</label><input type="date" id="un-conf"></div>
+      <div class="field wide"><label for="un-notes">Notes</label><input id="un-notes" placeholder="Meeting time, building, current focus…"></div>
+      <div class="field"><button class="btn" type="submit" id="un-submit">Add unit</button></div>
+      <div class="field" id="un-cancel-wrap" hidden><button class="btn secondary" type="button" id="un-cancel">Cancel edit</button></div>
+    </form>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Unit</th><th>Type</th><th>Leader</th><th>Ward conference</th><th></th></tr></thead>
+        <tbody id="unitRows"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<datalist id="peopleList"></datalist>
+
+<dialog id="settingsDialog">
+  <h2>Settings &amp; backup</h2>
+  <div class="field">
+    <label for="set-stake">Stake name</label>
+    <input id="set-stake" placeholder="e.g. Melbourne Australia Stake">
+  </div>
+  <div class="field">
+    <label for="set-people">Presidency &amp; high council <span class="field-hint">(one name per line — used for the “assigned to / with” suggestions)</span></label>
+    <textarea id="set-people" rows="6" placeholder="President …&#10;President …&#10;President …&#10;Executive Secretary …&#10;Clerk …"></textarea>
+  </div>
+  <div class="field">
+    <label for="set-backup">Backup <span class="field-hint">(copy this text somewhere safe; paste a saved backup here and press Restore to load it)</span></label>
+    <textarea id="set-backup" rows="4" spellcheck="false"></textarea>
+  </div>
+  <div class="dialog-actions">
+    <button class="btn" id="saveSettings">Save</button>
+    <button class="btn secondary" id="copyBackup">Copy backup</button>
+    <button class="btn secondary" id="restoreBackup">Restore from pasted text</button>
+    <span class="spacer"></span>
+    <button class="btn danger" id="wipeData">Erase all data</button>
+    <button class="btn secondary" id="closeSettings">Close</button>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORE_KEY = "stakePresidencyAssistant.v1";
+  var STAGES = ["Recommended", "Approved", "Call extended", "Sustained", "Set apart", "Recorded"];
+
+  function uid() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
+
+  function blank() {
+    return {
+      settings: { stakeName: "", people: [] },
+      units: [], sundays: [], callings: [], interviews: [], actions: []
+    };
+  }
+
+  var data = blank();
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      data = Object.assign(blank(), parsed);
+      data.settings = Object.assign({ stakeName: "", people: [] }, parsed.settings || {});
+    }
+  } catch (e) { /* corrupted store — start fresh, don't crash */ }
+
+  function save() { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function unitName(id) {
+    var u = data.units.find(function (u) { return u.id === id; });
+    return u ? u.name : "";
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return "";
+    var d = new Date(iso + (iso.length === 10 ? "T00:00" : ""));
+    if (isNaN(d)) return iso;
+    return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  }
+  function fmtDateTime(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d)) return iso;
+    return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) +
+      " · " + d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  }
+  function todayISO() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function nextSundays(n) {
+    var out = [], d = new Date();
+    d.setHours(12, 0, 0, 0);
+    d.setDate(d.getDate() + ((7 - d.getDay()) % 7)); // today if Sunday
+    for (var i = 0; i < n; i++) {
+      out.push(d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"));
+      d.setDate(d.getDate() + 7);
+    }
+    return out;
+  }
+
+  /* ---------- Tabs ---------- */
+  var tabs = document.querySelectorAll("nav.tabs button");
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function () {
+      tabs.forEach(function (x) { x.setAttribute("aria-selected", x === t ? "true" : "false"); });
+      document.querySelectorAll(".panel").forEach(function (p) { p.classList.remove("active"); });
+      document.getElementById("panel-" + t.dataset.tab).classList.add("active");
+    });
+  });
+
+  /* ---------- Shared render helpers ---------- */
+  function fillUnitSelects() {
+    ["su-unit", "ca-unit", "in-unit"].forEach(function (id) {
+      var sel = document.getElementById(id);
+      var current = sel.value;
+      var opts = id === "su-unit" ? "" : '<option value="">—</option>';
+      data.units.forEach(function (u) {
+        opts += '<option value="' + esc(u.id) + '">' + esc(u.name) + "</option>";
+      });
+      sel.innerHTML = opts || '<option value="">Add units first</option>';
+      if (current) sel.value = current;
+    });
+    var dl = document.getElementById("peopleList");
+    dl.innerHTML = data.settings.people.map(function (p) { return '<option value="' + esc(p) + '">'; }).join("");
+  }
+
+  /* ---------- Dashboard ---------- */
+  function renderDashboard() {
+    var today = todayISO();
+
+    // Sundays
+    var host = document.getElementById("dashSundays");
+    host.innerHTML = nextSundays(4).map(function (iso) {
+      var rows = data.sundays.filter(function (s) { return s.date === iso; });
+      var confs = data.units.filter(function (u) { return u.confDate === iso; });
+      var inner = "";
+      confs.forEach(function (u) {
+        inner += '<li><span class="pill stage-3">Ward conference</span> ' + esc(u.name) + "</li>";
+      });
+      rows.forEach(function (s) {
+        inner += "<li><strong>" + esc(s.who) + "</strong> — " + esc(unitName(s.unitId)) +
+          ' <span class="pill p-neutral">' + esc(s.purpose) + "</span>" +
+          (s.notes ? ' <span class="note">' + esc(s.notes) + "</span>" : "") + "</li>";
+      });
+      if (!inner) inner = '<li class="uncovered">No assignment yet</li>';
+      return '<div class="sunday-block"><div class="s-date">' + esc(fmtDate(iso)) + '</div><ul class="s-rows">' + inner + "</ul></div>";
+    }).join("");
+
+    // Callings
+    var cHost = document.getElementById("dashCallings");
+    var open = data.callings.filter(function (c) { return c.stage < STAGES.length - 1; });
+    cHost.innerHTML = open.length ? open.slice(0, 8).map(function (c) {
+      return '<li><span class="pill stage-' + c.stage + '">' + esc(STAGES[c.stage]) + "</span>" +
+        "<span><strong>" + esc(c.person) + "</strong> — " + esc(c.calling) +
+        (c.unitId ? " (" + esc(unitName(c.unitId)) + ")" : "") + "</span></li>";
+    }).join("") : '<li class="empty">Nothing in the pipeline.</li>';
+
+    // Interviews next 14 days
+    var iHost = document.getElementById("dashInterviews");
+    var horizon = new Date(); horizon.setDate(horizon.getDate() + 14);
+    var upcoming = data.interviews.filter(function (i) {
+      if (i.done) return false;
+      var d = new Date(i.when);
+      return !isNaN(d) && d <= horizon && d >= new Date(Date.now() - 6 * 3600 * 1000);
+    }).sort(function (a, b) { return a.when < b.when ? -1 : 1; });
+    iHost.innerHTML = upcoming.length ? upcoming.map(function (i) {
+      return '<li><span class="date-chip">' + esc(fmtDateTime(i.when)) + "</span>" +
+        "<span><strong>" + esc(i.person) + "</strong> — " + esc(i.type) +
+        (i.withWhom ? " with " + esc(i.withWhom) : "") + "</span></li>";
+    }).join("") : '<li class="empty">Nothing scheduled in the next two weeks.</li>';
+
+    // Actions
+    var aHost = document.getElementById("dashActions");
+    var openActs = data.actions.filter(function (a) { return !a.done; })
+      .sort(function (a, b) { return (a.due || "9999") < (b.due || "9999") ? -1 : 1; });
+    aHost.innerHTML = openActs.length ? openActs.slice(0, 8).map(function (a) {
+      var overdue = a.due && a.due < today;
+      return "<li>" + (a.due ? '<span class="date-chip">' + esc(fmtDate(a.due)) + "</span>" : '<span class="date-chip">—</span>') +
+        "<span>" + esc(a.text) + (a.owner ? " <strong>· " + esc(a.owner) + "</strong>" : "") +
+        (overdue ? ' <span class="pill p-bad">Overdue</span>' : "") + "</span></li>";
+    }).join("") : '<li class="empty">All caught up.</li>';
+
+    // Conferences
+    var cfHost = document.getElementById("dashConferences");
+    var confs = data.units.filter(function (u) { return u.confDate && u.confDate >= today; })
+      .sort(function (a, b) { return a.confDate < b.confDate ? -1 : 1; });
+    cfHost.innerHTML = confs.length ? confs.map(function (u) {
+      return '<li><span class="date-chip">' + esc(fmtDate(u.confDate)) + "</span><span>" + esc(u.name) + "</span></li>";
+    }).join("") : '<li class="empty">No upcoming ward conferences on record.</li>';
+  }
+
+  /* ---------- Generic CRUD wiring ---------- */
+  function wireForm(opts) {
+    var form = document.getElementById(opts.form);
+    var editId = null;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var item = opts.read();
+      if (!item) return;
+      if (editId) {
+        var idx = data[opts.list].findIndex(function (x) { return x.id === editId; });
+        if (idx >= 0) data[opts.list][idx] = Object.assign({}, data[opts.list][idx], item);
+        stopEdit();
+      } else {
+        item.id = uid();
+        data[opts.list].push(item);
+      }
+      save(); renderAll(); form.reset();
+      if (opts.afterReset) opts.afterReset();
+    });
+    document.getElementById(opts.cancelBtn).addEventListener("click", function () {
+      stopEdit(); form.reset();
+    });
+    function stopEdit() {
+      editId = null;
+      document.getElementById(opts.submitBtn).textContent = opts.addLabel;
+      document.getElementById(opts.cancelWrap).hidden = true;
+    }
+    return {
+      startEdit: function (item) {
+        editId = item.id;
+        opts.write(item);
+        document.getElementById(opts.submitBtn).textContent = "Save changes";
+        document.getElementById(opts.cancelWrap).hidden = false;
+        form.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    };
+  }
+
+  function bindRowActions(tbody, list, editor, extra) {
+    tbody.addEventListener("click", function (e) {
+      var btn = e.target.closest("button");
+      if (!btn) return;
+      var id = btn.dataset.id;
+      var item = data[list].find(function (x) { return x.id === id; });
+      if (!item) return;
+      if (btn.dataset.act === "edit") { editor.startEdit(item); }
+      else if (btn.dataset.act === "del") {
+        if (confirm("Delete this entry?")) {
+          data[list] = data[list].filter(function (x) { return x.id !== id; });
+          save(); renderAll();
+        }
+      } else if (extra) { extra(btn.dataset.act, item); }
+    });
+  }
+
+  /* ---------- Sundays ---------- */
+  var sundayEditor = wireForm({
+    form: "formSunday", list: "sundays", addLabel: "Add assignment",
+    submitBtn: "su-submit", cancelBtn: "su-cancel", cancelWrap: "su-cancel-wrap",
+    read: function () {
+      var unitId = document.getElementById("su-unit").value;
+      if (!unitId) { alert("Add your wards and branches under the Units tab first."); return null; }
+      return {
+        date: document.getElementById("su-date").value,
+        unitId: unitId,
+        who: document.getElementById("su-who").value.trim(),
+        purpose: document.getElementById("su-purpose").value,
+        notes: document.getElementById("su-notes").value.trim()
+      };
+    },
+    write: function (s) {
+      document.getElementById("su-date").value = s.date;
+      document.getElementById("su-unit").value = s.unitId;
+      document.getElementById("su-who").value = s.who;
+      document.getElementById("su-purpose").value = s.purpose;
+      document.getElementById("su-notes").value = s.notes || "";
+    }
+  });
+
+  function renderSundays() {
+    var tbody = document.getElementById("sundayRows");
+    var rows = data.sundays.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+    var today = todayISO();
+    tbody.innerHTML = rows.length ? rows.map(function (s) {
+      var past = s.date < today;
+      return "<tr" + (past ? ' class="row-done"' : "") + '><td class="num">' + esc(fmtDate(s.date)) + "</td>" +
+        "<td>" + esc(unitName(s.unitId)) + "</td>" +
+        "<td><strong>" + esc(s.who) + "</strong></td>" +
+        '<td><span class="pill p-neutral">' + esc(s.purpose) + "</span>" +
+        (s.notes ? '<span class="note">' + esc(s.notes) + "</span>" : "") + "</td>" +
+        '<td class="actions-cell">' +
+        '<button class="icon-btn" data-act="edit" data-id="' + s.id + '">Edit</button>' +
+        '<button class="icon-btn danger" data-act="del" data-id="' + s.id + '">Delete</button></td></tr>';
+    }).join("") : '<tr><td colspan="5" class="empty">No assignments yet — add the first one above.</td></tr>';
+  }
+  bindRowActions(document.getElementById("sundayRows"), "sundays", sundayEditor);
+
+  /* ---------- Callings ---------- */
+  (function () {
+    var sel = document.getElementById("ca-stage");
+    sel.innerHTML = STAGES.map(function (s, i) { return '<option value="' + i + '">' + s + "</option>"; }).join("");
+  })();
+
+  var callingEditor = wireForm({
+    form: "formCalling", list: "callings", addLabel: "Add calling",
+    submitBtn: "ca-submit", cancelBtn: "ca-cancel", cancelWrap: "ca-cancel-wrap",
+    read: function () {
+      return {
+        person: document.getElementById("ca-person").value.trim(),
+        calling: document.getElementById("ca-calling").value.trim(),
+        unitId: document.getElementById("ca-unit").value,
+        stage: parseInt(document.getElementById("ca-stage").value, 10) || 0,
+        notes: document.getElementById("ca-notes").value.trim(),
+        updated: todayISO()
+      };
+    },
+    write: function (c) {
+      document.getElementById("ca-person").value = c.person;
+      document.getElementById("ca-calling").value = c.calling;
+      document.getElementById("ca-unit").value = c.unitId || "";
+      document.getElementById("ca-stage").value = c.stage;
+      document.getElementById("ca-notes").value = c.notes || "";
+    }
+  });
+
+  function renderCallings() {
+    var host = document.getElementById("callingGroups");
+    var html = "";
+    for (var st = 0; st < STAGES.length; st++) {
+      var rows = data.callings.filter(function (c) { return c.stage === st; });
+      if (!rows.length) continue;
+      html += '<div class="stage-group-title">' + STAGES[st] + " · " + rows.length + "</div>";
+      html += '<div class="table-wrap" style="margin-bottom:6px;"><table><tbody>';
+      html += rows.map(function (c) {
+        var canAdvance = c.stage < STAGES.length - 1;
+        return "<tr><td><strong>" + esc(c.person) + "</strong> — " + esc(c.calling) +
+          (c.unitId ? " (" + esc(unitName(c.unitId)) + ")" : "") +
+          (c.notes ? '<span class="note">' + esc(c.notes) + "</span>" : "") + "</td>" +
+          '<td class="num" style="color:var(--ink-soft);font-size:0.8rem;">updated ' + esc(fmtDate(c.updated)) + "</td>" +
+          '<td class="actions-cell">' +
+          (canAdvance ? '<button class="btn small" data-act="advance" data-id="' + c.id + '">Advance → ' + STAGES[c.stage + 1] + "</button>" : "") +
+          '<button class="icon-btn" data-act="edit" data-id="' + c.id + '">Edit</button>' +
+          '<button class="icon-btn danger" data-act="del" data-id="' + c.id + '">Delete</button></td></tr>';
+      }).join("");
+      html += "</tbody></table></div>";
+    }
+    host.innerHTML = html || '<p class="empty">No callings tracked yet — add the first one above.</p>';
+  }
+  bindRowActions(document.getElementById("callingGroups"), "callings", callingEditor, function (act, item) {
+    if (act === "advance" && item.stage < STAGES.length - 1) {
+      item.stage += 1; item.updated = todayISO(); save(); renderAll();
+    }
+  });
+
+  /* ---------- Interviews ---------- */
+  var interviewEditor = wireForm({
+    form: "formInterview", list: "interviews", addLabel: "Add interview",
+    submitBtn: "in-submit", cancelBtn: "in-cancel", cancelWrap: "in-cancel-wrap",
+    read: function () {
+      return {
+        person: document.getElementById("in-person").value.trim(),
+        type: document.getElementById("in-type").value,
+        when: document.getElementById("in-when").value,
+        withWhom: document.getElementById("in-with").value.trim(),
+        unitId: document.getElementById("in-unit").value,
+        notes: document.getElementById("in-notes").value.trim(),
+        done: false
+      };
+    },
+    write: function (i) {
+      document.getElementById("in-person").value = i.person;
+      document.getElementById("in-type").value = i.type;
+      document.getElementById("in-when").value = i.when;
+      document.getElementById("in-with").value = i.withWhom || "";
+      document.getElementById("in-unit").value = i.unitId || "";
+      document.getElementById("in-notes").value = i.notes || "";
+    }
+  });
+
+  function renderInterviews() {
+    var tbody = document.getElementById("interviewRows");
+    var rows = data.interviews.slice().sort(function (a, b) { return a.when < b.when ? -1 : 1; });
+    tbody.innerHTML = rows.length ? rows.map(function (i) {
+      return "<tr" + (i.done ? ' class="row-done"' : "") + '><td class="num">' + esc(fmtDateTime(i.when)) + "</td>" +
+        '<td class="' + (i.done ? "strike" : "") + '"><strong>' + esc(i.person) + "</strong>" +
+        (i.notes ? '<span class="note">' + esc(i.notes) + "</span>" : "") + "</td>" +
+        "<td>" + esc(i.type) + "</td>" +
+        "<td>" + esc(i.withWhom || "") + "</td>" +
+        "<td>" + esc(unitName(i.unitId)) + "</td>" +
+        "<td>" + (i.done ? '<span class="pill p-good">Held</span>' : '<span class="pill p-warn">Scheduled</span>') + "</td>" +
+        '<td class="actions-cell">' +
+        '<button class="icon-btn" data-act="toggle" data-id="' + i.id + '">' + (i.done ? "Reopen" : "Mark held") + "</button>" +
+        '<button class="icon-btn" data-act="edit" data-id="' + i.id + '">Edit</button>' +
+        '<button class="icon-btn danger" data-act="del" data-id="' + i.id + '">Delete</button></td></tr>';
+    }).join("") : '<tr><td colspan="7" class="empty">No interviews yet — add the first one above.</td></tr>';
+  }
+  bindRowActions(document.getElementById("interviewRows"), "interviews", interviewEditor, function (act, item) {
+    if (act === "toggle") { item.done = !item.done; save(); renderAll(); }
+  });
+
+  /* ---------- Actions ---------- */
+  var actionEditor = wireForm({
+    form: "formAction", list: "actions", addLabel: "Add item",
+    submitBtn: "ac-submit", cancelBtn: "ac-cancel", cancelWrap: "ac-cancel-wrap",
+    read: function () {
+      return {
+        text: document.getElementById("ac-text").value.trim(),
+        owner: document.getElementById("ac-owner").value.trim(),
+        due: document.getElementById("ac-due").value,
+        done: false
+      };
+    },
+    write: function (a) {
+      document.getElementById("ac-text").value = a.text;
+      document.getElementById("ac-owner").value = a.owner || "";
+      document.getElementById("ac-due").value = a.due || "";
+    }
+  });
+
+  function renderActions() {
+    var tbody = document.getElementById("actionRows");
+    var today = todayISO();
+    var rows = data.actions.slice().sort(function (a, b) {
+      if (a.done !== b.done) return a.done ? 1 : -1;
+      return (a.due || "9999") < (b.due || "9999") ? -1 : 1;
+    });
+    tbody.innerHTML = rows.length ? rows.map(function (a) {
+      var overdue = !a.done && a.due && a.due < today;
+      return "<tr" + (a.done ? ' class="row-done"' : "") + ">" +
+        '<td><input type="checkbox" data-act="toggle" data-id="' + a.id + '" aria-label="Done"' + (a.done ? " checked" : "") + "></td>" +
+        '<td class="' + (a.done ? "strike" : "") + '">' + esc(a.text) + "</td>" +
+        "<td>" + esc(a.owner || "") + "</td>" +
+        '<td class="num">' + esc(fmtDate(a.due)) + (overdue ? ' <span class="pill p-bad">Overdue</span>' : "") + "</td>" +
+        '<td class="actions-cell">' +
+        '<button class="icon-btn" data-act="edit" data-id="' + a.id + '">Edit</button>' +
+        '<button class="icon-btn danger" data-act="del" data-id="' + a.id + '">Delete</button></td></tr>';
+    }).join("") : '<tr><td colspan="5" class="empty">No action items yet — add the first one above.</td></tr>';
+  }
+  bindRowActions(document.getElementById("actionRows"), "actions", actionEditor);
+  document.getElementById("actionRows").addEventListener("change", function (e) {
+    var cb = e.target.closest('input[type="checkbox"][data-act="toggle"]');
+    if (!cb) return;
+    var item = data.actions.find(function (x) { return x.id === cb.dataset.id; });
+    if (item) { item.done = cb.checked; save(); renderAll(); }
+  });
+
+  /* ---------- Units ---------- */
+  var unitEditor = wireForm({
+    form: "formUnit", list: "units", addLabel: "Add unit",
+    submitBtn: "un-submit", cancelBtn: "un-cancel", cancelWrap: "un-cancel-wrap",
+    read: function () {
+      return {
+        name: document.getElementById("un-name").value.trim(),
+        type: document.getElementById("un-type").value,
+        leader: document.getElementById("un-leader").value.trim(),
+        confDate: document.getElementById("un-conf").value,
+        notes: document.getElementById("un-notes").value.trim()
+      };
+    },
+    write: function (u) {
+      document.getElementById("un-name").value = u.name;
+      document.getElementById("un-type").value = u.type;
+      document.getElementById("un-leader").value = u.leader || "";
+      document.getElementById("un-conf").value = u.confDate || "";
+      document.getElementById("un-notes").value = u.notes || "";
+    }
+  });
+
+  function renderUnits() {
+    var tbody = document.getElementById("unitRows");
+    var rows = data.units.slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
+    tbody.innerHTML = rows.length ? rows.map(function (u) {
+      return "<tr><td><strong>" + esc(u.name) + "</strong>" +
+        (u.notes ? '<span class="note">' + esc(u.notes) + "</span>" : "") + "</td>" +
+        "<td>" + esc(u.type) + "</td>" +
+        "<td>" + esc(u.leader || "") + "</td>" +
+        '<td class="num">' + esc(fmtDate(u.confDate)) + "</td>" +
+        '<td class="actions-cell">' +
+        '<button class="icon-btn" data-act="edit" data-id="' + u.id + '">Edit</button>' +
+        '<button class="icon-btn danger" data-act="del" data-id="' + u.id + '">Delete</button></td></tr>';
+    }).join("") : '<tr><td colspan="5" class="empty">Start here: add each ward and branch in the stake.</td></tr>';
+  }
+  bindRowActions(document.getElementById("unitRows"), "units", unitEditor);
+
+  /* ---------- Settings & backup ---------- */
+  var dlg = document.getElementById("settingsDialog");
+  document.getElementById("openSettings").addEventListener("click", function () {
+    document.getElementById("set-stake").value = data.settings.stakeName || "";
+    document.getElementById("set-people").value = (data.settings.people || []).join("\n");
+    document.getElementById("set-backup").value = JSON.stringify(data);
+    dlg.showModal();
+  });
+  document.getElementById("closeSettings").addEventListener("click", function () { dlg.close(); });
+  document.getElementById("saveSettings").addEventListener("click", function () {
+    data.settings.stakeName = document.getElementById("set-stake").value.trim();
+    data.settings.people = document.getElementById("set-people").value.split("\n")
+      .map(function (s) { return s.trim(); }).filter(Boolean);
+    save(); renderAll(); dlg.close();
+  });
+  document.getElementById("copyBackup").addEventListener("click", function () {
+    var ta = document.getElementById("set-backup");
+    ta.value = JSON.stringify(data);
+    ta.select();
+    var btn = this;
+    function ok() { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy backup"; }, 1500); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(ta.value).then(ok, function () { document.execCommand("copy"); ok(); });
+    } else { document.execCommand("copy"); ok(); }
+  });
+  document.getElementById("restoreBackup").addEventListener("click", function () {
+    try {
+      var parsed = JSON.parse(document.getElementById("set-backup").value);
+      if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.units)) throw new Error("bad shape");
+      data = Object.assign(blank(), parsed);
+      data.settings = Object.assign({ stakeName: "", people: [] }, parsed.settings || {});
+      save(); renderAll(); dlg.close();
+    } catch (e) {
+      alert("That text doesn't look like a Stake Presidency Assistant backup. Paste the exact text you copied earlier.");
+    }
+  });
+  document.getElementById("wipeData").addEventListener("click", function () {
+    if (confirm("Erase everything stored in this browser? Download a backup first if you might need it.")) {
+      data = blank(); save(); renderAll(); dlg.close();
+    }
+  });
+
+  /* ---------- Render everything ---------- */
+  function renderAll() {
+    document.getElementById("stakeNameDisplay").textContent = data.settings.stakeName || "";
+    fillUnitSelects();
+    renderDashboard();
+    renderSundays();
+    renderCallings();
+    renderInterviews();
+    renderActions();
+    renderUnits();
+  }
+  renderAll();
+})();
+</script>
