@@ -32,6 +32,10 @@ on:
         description: "Also produce a WordPress import file"
         type: boolean
         default: false
+      ignore_robots:
+        description: "Ignore robots.txt (only for sites we own)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -58,12 +62,13 @@ jobs:
 
       - name: Full site crawl
         run: |
-          WXR_FLAG=""
-          if [ "${{ inputs.wxr }}" = "true" ]; then WXR_FLAG="--wxr"; fi
+          EXTRA_FLAGS=""
+          if [ "${{ inputs.wxr }}" = "true" ]; then EXTRA_FLAGS="$EXTRA_FLAGS --wxr"; fi
+          if [ "${{ inputs.ignore_robots }}" = "true" ]; then EXTRA_FLAGS="$EXTRA_FLAGS --ignore-robots"; fi
           python3 site-harvester/harvest.py "${{ inputs.url }}" \
             --out "harvest/${{ inputs.name }}" \
             --max-pages "${{ inputs.max_pages }}" \
-            --delay "${{ inputs.delay }}" $WXR_FLAG
+            --delay "${{ inputs.delay }}" $EXTRA_FLAGS
 
       - name: Show audit in run summary
         if: always()

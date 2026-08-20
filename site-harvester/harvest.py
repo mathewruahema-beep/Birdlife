@@ -261,15 +261,21 @@ def run(args):
     session = requests.Session()
     session.headers["User-Agent"] = UA
 
+    # Fetch robots.txt with our own UA via requests: urllib's default UA gets
+    # 403'd by many servers/CDNs, and RobotFileParser treats a 403 as
+    # "disallow everything", silently killing the whole crawl.
     robots = None
     if not args.ignore_robots:
-        robots = urllib.robotparser.RobotFileParser()
         try:
             base = urlparse(start_url)
-            robots.set_url(f"{base.scheme}://{base.netloc}/robots.txt")
-            robots.read()
-        except Exception:
-            robots = None
+            r = session.get(f"{base.scheme}://{base.netloc}/robots.txt", timeout=15)
+            if r.status_code == 200 and r.text.strip():
+                robots = urllib.robotparser.RobotFileParser()
+                robots.parse(r.text.splitlines())
+            else:
+                print(f"note: robots.txt returned {r.status_code}; proceeding", file=sys.stderr)
+        except Exception as e:
+            print(f"note: robots.txt unreadable ({e}); proceeding", file=sys.stderr)
 
     queue = deque([start_url])
     seen = {start_url}
