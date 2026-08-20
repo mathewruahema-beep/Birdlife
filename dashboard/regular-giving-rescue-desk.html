@@ -1,0 +1,560 @@
+<title>Regular Giving Rescue Desk</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #F7F6F2;
+    --card: #FFFFFF;
+    --card-edge: #E4E2DA;
+    --ink: #232B26;
+    --ink-2: #5A6660;
+    --ink-3: #8B948E;
+    --accent: #1E6B5C;
+    --accent-soft: #E3EFEB;
+    --accent-ink: #14503F;
+    --bar: #2E8873;
+    --bar-track: #ECEAE3;
+    --critical: #B3261E;
+    --critical-soft: #F9E9E7;
+    --warning: #9A5B00;
+    --warning-soft: #F7EEDD;
+    --good: #1E7B34;
+    --good-soft: #E5F1E6;
+    --row-hover: #F2F1EB;
+    --focus: #1E6B5C;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141F1A;
+      --card: #1B2A23;
+      --card-edge: #2B3B33;
+      --ink: #E6EEE8;
+      --ink-2: #A9B8AF;
+      --ink-3: #74857C;
+      --accent: #5BC4A8;
+      --accent-soft: #21382F;
+      --accent-ink: #8FDCC6;
+      --bar: #4BB094;
+      --bar-track: #24332B;
+      --critical: #F2988F;
+      --critical-soft: #3C2320;
+      --warning: #E4B36A;
+      --warning-soft: #3A2E18;
+      --good: #8ACB95;
+      --good-soft: #1F3524;
+      --row-hover: #22332B;
+      --focus: #5BC4A8;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141F1A;
+    --card: #1B2A23;
+    --card-edge: #2B3B33;
+    --ink: #E6EEE8;
+    --ink-2: #A9B8AF;
+    --ink-3: #74857C;
+    --accent: #5BC4A8;
+    --accent-soft: #21382F;
+    --accent-ink: #8FDCC6;
+    --bar: #4BB094;
+    --bar-track: #24332B;
+    --critical: #F2988F;
+    --critical-soft: #3C2320;
+    --warning: #E4B36A;
+    --warning-soft: #3A2E18;
+    --good: #8ACB95;
+    --good-soft: #1F3524;
+    --row-hover: #22332B;
+    --focus: #5BC4A8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  a { color: var(--accent-ink); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  button { font: inherit; cursor: pointer; }
+  :is(button, a, [tabindex]):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 24px 56px; }
+
+  header.mast { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 18px; margin-bottom: 6px; }
+  .mast h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600; font-size: 30px; letter-spacing: -0.01em;
+    margin: 0; text-wrap: balance;
+  }
+  .mast .org { font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); font-weight: 600; }
+  .mast-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .sub { color: var(--ink-2); margin: 0 0 22px; max-width: 68ch; }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  }
+  .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .pill.live { background: var(--good-soft); color: var(--good); }
+  .pill.snapshot { background: var(--warning-soft); color: var(--warning); }
+  .pill.err { background: var(--critical-soft); color: var(--critical); }
+
+  .btn {
+    border: 1px solid var(--card-edge); background: var(--card); color: var(--ink);
+    border-radius: 8px; padding: 6px 14px; font-weight: 600; font-size: 13px;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .btn[disabled] { opacity: 0.5; cursor: default; }
+
+  .banner {
+    border: 1px solid var(--card-edge); border-left: 4px solid var(--warning);
+    background: var(--card); border-radius: 10px;
+    padding: 12px 16px; margin: 0 0 20px; color: var(--ink-2);
+  }
+  .banner.critical { border-left-color: var(--critical); }
+  .banner strong { color: var(--ink); }
+  .banner:empty { display: none; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+  @media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi {
+    background: var(--card); border: 1px solid var(--card-edge); border-radius: 12px;
+    padding: 16px 18px 14px;
+  }
+  .kpi .label { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-3); }
+  .kpi .value {
+    font-family: "Fraunces", Georgia, serif; font-weight: 600;
+    font-size: 34px; line-height: 1.15; margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi .value.crit { color: var(--critical); }
+  .kpi .value.warn { color: var(--warning); }
+  .kpi .value.ok { color: var(--good); }
+  .kpi .note { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 18px; align-items: start; }
+  @media (max-width: 980px) { .cols { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--card); border: 1px solid var(--card-edge); border-radius: 12px;
+    padding: 18px 18px 14px; margin-bottom: 18px;
+  }
+  .card h2 {
+    margin: 0; font-size: 15px; font-weight: 700; letter-spacing: 0.01em;
+  }
+  .card .h-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .card .h-row .count { color: var(--ink-3); font-size: 13px; font-variant-numeric: tabular-nums; }
+
+  .chips { display: flex; gap: 6px; margin-left: auto; }
+  .chip {
+    border: 1px solid var(--card-edge); background: transparent; color: var(--ink-2);
+    border-radius: 999px; padding: 3px 11px; font-size: 12.5px; font-weight: 600;
+  }
+  .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+
+  .tbl-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; }
+  th {
+    text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.09em; color: var(--ink-3); padding: 6px 10px;
+    border-bottom: 1px solid var(--card-edge); white-space: nowrap;
+  }
+  td {
+    padding: 8px 10px; border-bottom: 1px solid var(--card-edge);
+    vertical-align: top; font-size: 13.5px;
+  }
+  tbody tr:hover { background: var(--row-hover); }
+  td.num, th.num { text-align: right; font-family: "Spline Sans Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td .who { font-weight: 600; }
+  td .mail { color: var(--ink-2); font-size: 12.5px; word-break: break-all; }
+  td .rpno { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 12px; color: var(--ink-3); }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600; }
+  .tag.mem { background: var(--accent-soft); color: var(--accent-ink); }
+  .tag.don { background: var(--warning-soft); color: var(--warning); }
+  .noemail { color: var(--critical); font-size: 12px; font-weight: 600; }
+  .empty { color: var(--ink-2); padding: 18px 4px; }
+
+  .barlist { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  .barrow .toplabels { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; }
+  .barrow .toplabels .n { font-family: "Spline Sans Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .barrow .track { height: 10px; background: var(--bar-track); border-radius: 4px; margin-top: 3px; overflow: hidden; }
+  .barrow .fill { height: 100%; background: var(--bar); border-radius: 0 4px 4px 0; min-width: 3px; }
+
+  .watch { display: flex; flex-direction: column; gap: 0; }
+  .watch-row { display: flex; justify-content: space-between; gap: 10px; padding: 7px 2px; border-bottom: 1px solid var(--card-edge); }
+  .watch-row:last-child { border-bottom: none; }
+  .watch-row .d { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 12px; color: var(--warning); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .watch-row .w { min-width: 0; }
+  .watch-row .w .nm { font-weight: 600; font-size: 13px; }
+  .watch-row .w .amt { color: var(--ink-2); font-size: 12px; }
+
+  .foot { margin-top: 8px; color: var(--ink-3); font-size: 12.5px; max-width: 78ch; }
+  .foot code { font-family: "Spline Sans Mono", ui-monospace, monospace; font-size: 11.5px; }
+  .asof { font-size: 12px; color: var(--ink-3); }
+  @media (prefers-reduced-motion: no-preference) {
+    .barrow .fill { transition: width 400ms ease; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <div class="org">BirdLife Australia · Zeus</div>
+      <h1>Regular Giving Rescue Desk</h1>
+    </div>
+    <div class="mast-right">
+      <span id="mode" class="pill snapshot"><span class="dot"></span><span id="modeText">Loading…</span></span>
+      <button id="refresh" class="btn" hidden>Refresh</button>
+    </div>
+  </header>
+  <p class="sub">Recurring payments that have stopped charging (<em>Suspended – Max retries exceeded</em>) and cards about to expire — the queue behind the Regular Giving Recovery flows. Work top-down: newest declines are the most recoverable.</p>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <section class="kpis" aria-label="Key numbers">
+    <div class="kpi"><div class="label">Suspended payments</div><div id="kSusp" class="value crit">—</div><div id="kSuspNote" class="note"></div></div>
+    <div class="kpi"><div class="label">Declined in last 90 days</div><div id="kNew" class="value warn">—</div><div id="kNewNote" class="note">most recoverable cohort</div></div>
+    <div class="kpi"><div class="label">Cards expiring ≤ 60 days</div><div id="kExp" class="value warn">—</div><div id="kExpNote" class="note">on active payments</div></div>
+    <div class="kpi"><div class="label">Open rescue tasks</div><div id="kTask" class="value">—</div><div id="kTaskNote" class="note">tasks on recurring payments</div></div>
+  </section>
+
+  <div class="cols">
+    <main>
+      <div class="card">
+        <div class="h-row">
+          <h2>Suspended queue</h2>
+          <span id="queueCount" class="count"></span>
+          <div class="chips" role="group" aria-label="Filter queue">
+            <button class="chip" data-seg="all" aria-pressed="true">All</button>
+            <button class="chip" data-seg="mem" aria-pressed="false">Memberships</button>
+            <button class="chip" data-seg="don" aria-pressed="false">Donations</button>
+          </div>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr>
+              <th>Donor</th><th>Type</th><th class="num">Amount</th><th class="num">Monthly</th><th class="num">Last declined</th><th>Record</th>
+            </tr></thead>
+            <tbody id="queueBody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+          </table>
+        </div>
+        <p id="queueAsOf" class="asof"></p>
+      </div>
+    </main>
+
+    <aside>
+      <div class="card">
+        <div class="h-row"><h2>Suspended by payment form</h2></div>
+        <div id="bars" class="barlist"></div>
+      </div>
+      <div class="card">
+        <div class="h-row"><h2>Card expiry watchlist</h2><span id="expCount" class="count"></span></div>
+        <div id="watch" class="watch"><div class="empty">Loading…</div></div>
+        <p id="expAsOf" class="asof"></p>
+      </div>
+      <p class="foot">Companion to the draft flows <code>RP aCU – Suspended Regular Giving Rescue</code> and <code>RP aCU – Card Expiry Reminder</code> (see <code>docs/fundraising/</code> on the build branch). This desk reads Salesforce only — it never changes records.</p>
+    </aside>
+  </div>
+</div>
+
+<script>
+(async function () {
+  "use strict";
+
+  var ORG_URL = "https://birdlifeaustralia.lightning.force.com/lightning/r/AAkPay__Recurring_Payment__c/";
+  var SUSPENDED = "Suspended - Max retries exceeded";
+  var TOOL = "soqlQuery";
+
+  var Q_QUEUE = "SELECT Id, Name, AAkPay__Recurring_Payment_No__c, AAkPay__Contact__r.Name, AAkPay__Contact__r.Email, AAkPay__Payment_Type__r.Name, AAkPay__Payment_Amount__c, AAkPay__Frequency__c, AAkPay__Monthly_Amount__c, AAkPay__Last_Declined_Date__c FROM AAkPay__Recurring_Payment__c WHERE AAkPay__Recurring_Payment_Status__c = '" + SUSPENDED + "' ORDER BY AAkPay__Last_Declined_Date__c DESC NULLS LAST LIMIT 200";
+  var Q_EXPIRY = "SELECT Id, Name, AAkPay__Contact__r.Name, AAkPay__Payment_Amount__c, AAkPay__Frequency__c, AAkPay__Card_Expiry_Date__c FROM AAkPay__Recurring_Payment__c WHERE AAkPay__Recurring_Payment_Status__c = 'Active' AND AAkPay__Card_Expiry_Date__c = NEXT_N_DAYS:60 ORDER BY AAkPay__Card_Expiry_Date__c LIMIT 200";
+  var Q_TASKS = "SELECT COUNT() FROM Task WHERE What.Type = 'AAkPay__Recurring_Payment__c' AND Status != 'Completed'";
+
+  // Verified production snapshot, 20 Aug 2026 (read-only discovery).
+  var SNAP = {
+    date: "20 Aug 2026",
+    suspended: 542, suspendedMonthly: 4081.69,
+    recent: 43, recentMonthly: 352.72,
+    expiring: 133, expiringMonthly: 785.83,
+    tasks: 0,
+    forms: [
+      ["BirdLife Membership", 444, 2677.78],
+      ["Direct Debit Donation", 43, 1309.68],
+      ["Photography Membership", 38, 47.50],
+      ["Wader Studies Membership", 9, 26.64],
+      ["Raptor Group Membership", 5, 14.60],
+      ["Seabird Group Membership", 3, 5.49]
+    ]
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var aud = new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 });
+  var aud2 = new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" });
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function fmtDate(iso) {
+    if (!iso) return "—";
+    var d = new Date(iso + "T00:00:00");
+    return isNaN(d) ? esc(iso) : d.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
+  }
+
+  function setMode(cls, text) {
+    var el = $("mode");
+    el.className = "pill " + cls;
+    $("modeText").textContent = text;
+  }
+  function banner(html, critical) {
+    var b = $("banner");
+    if (!html) { b.hidden = true; b.innerHTML = ""; return; }
+    b.hidden = false;
+    b.className = "banner" + (critical ? " critical" : "");
+    b.innerHTML = html;
+  }
+
+  function isMembership(formName) { return /membership/i.test(formName || ""); }
+
+  // ---------- rendering ----------
+  var state = { rows: null, seg: "all", expiry: null, tasks: null, queueStoredAt: null, expStoredAt: null };
+
+  function renderKpis() {
+    if (state.rows) {
+      var monthly = 0, recent = 0, recentMonthly = 0;
+      var cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 90);
+      state.rows.forEach(function (r) {
+        monthly += r.monthly || 0;
+        if (r.declined && new Date(r.declined + "T00:00:00") >= cutoff) { recent++; recentMonthly += r.monthly || 0; }
+      });
+      $("kSusp").textContent = state.rows.length + (state.rows.length === 200 ? "+" : "");
+      $("kSuspNote").textContent = aud.format(monthly) + "/month committed";
+      $("kNew").textContent = String(recent);
+      $("kNewNote").textContent = aud.format(recentMonthly) + "/month · most recoverable";
+    } else {
+      $("kSusp").textContent = String(SNAP.suspended);
+      $("kSuspNote").textContent = aud.format(SNAP.suspendedMonthly) + "/month committed";
+      $("kNew").textContent = String(SNAP.recent);
+      $("kNewNote").textContent = aud.format(SNAP.recentMonthly) + "/month · most recoverable";
+    }
+    if (state.expiry) {
+      $("kExp").textContent = state.expiry.length + (state.expiry.length === 200 ? "+" : "");
+      $("kExpNote").textContent = "on active payments";
+    } else {
+      $("kExp").textContent = String(SNAP.expiring);
+      $("kExpNote").textContent = aud.format(SNAP.expiringMonthly) + "/month at risk";
+    }
+    var t = state.tasks == null ? SNAP.tasks : state.tasks;
+    $("kTask").textContent = String(t);
+    $("kTask").className = "value " + (t > 0 ? "ok" : "crit");
+    $("kTaskNote").textContent = t === 0 ? "no follow-up is happening" : "tasks on recurring payments";
+  }
+
+  function renderBars() {
+    var data;
+    if (state.rows) {
+      var byForm = {};
+      state.rows.forEach(function (r) {
+        var k = (r.form || "Unknown form").replace(/^BirdLife (Australasian |Australia )?/, "");
+        (byForm[k] = byForm[k] || [0, 0])[0]++; byForm[k][1] += r.monthly || 0;
+      });
+      data = Object.keys(byForm).map(function (k) { return [k, byForm[k][0], byForm[k][1]]; })
+        .sort(function (a, b) { return b[1] - a[1]; }).slice(0, 8);
+    } else {
+      data = SNAP.forms;
+    }
+    var max = Math.max.apply(null, data.map(function (d) { return d[1]; }).concat([1]));
+    $("bars").innerHTML = data.map(function (d) {
+      return '<div class="barrow"><div class="toplabels"><span>' + esc(d[0]) + '</span><span class="n">' + d[1] + " · " + aud.format(d[2]) + "/mo</span></div>" +
+        '<div class="track"><div class="fill" style="width:' + Math.max(2, Math.round(d[1] / max * 100)) + '%"></div></div></div>';
+    }).join("");
+  }
+
+  function renderQueue() {
+    var body = $("queueBody");
+    if (!state.rows) {
+      body.innerHTML = '<tr><td colspan="6" class="empty">The row-level queue needs a live Salesforce Production connection — the snapshot above still shows the shape of the problem. Connect Salesforce Production in claude.ai Settings → Connectors, then reopen this page.</td></tr>';
+      $("queueCount").textContent = "";
+      return;
+    }
+    var rows = state.rows.filter(function (r) {
+      if (state.seg === "mem") return isMembership(r.form);
+      if (state.seg === "don") return !isMembership(r.form);
+      return true;
+    });
+    $("queueCount").textContent = rows.length + " of " + state.rows.length;
+    if (!rows.length) { body.innerHTML = '<tr><td colspan="6" class="empty">Nothing in this segment.</td></tr>'; return; }
+    body.innerHTML = rows.map(function (r) {
+      var tag = isMembership(r.form)
+        ? '<span class="tag mem">Membership</span>'
+        : '<span class="tag don">Donation</span>';
+      var mail = r.email ? '<div class="mail">' + esc(r.email) + "</div>" : '<div class="noemail">no email — phone/mail</div>';
+      return "<tr><td><div class=\"who\">" + esc(r.donor || "(no contact)") + "</div>" + mail + "</td>" +
+        "<td>" + tag + '<div class="rpno">' + esc(r.form || "") + "</div></td>" +
+        '<td class="num">' + (r.amount != null ? aud2.format(r.amount) : "—") + "<br><span class=\"rpno\">" + esc(r.freq || "") + "</span></td>" +
+        '<td class="num">' + (r.monthly != null ? aud2.format(r.monthly) : "—") + "</td>" +
+        '<td class="num">' + fmtDate(r.declined) + "</td>" +
+        '<td><a href="' + ORG_URL + esc(r.id) + '/view" target="_blank" rel="noopener">' + esc(r.rpNo || "open") + "</a></td></tr>";
+    }).join("");
+  }
+
+  function renderWatch() {
+    var el = $("watch");
+    if (!state.expiry) {
+      el.innerHTML = '<div class="empty">Needs a live connection — ' + SNAP.expiring + " cards were expiring within 60 days at the " + SNAP.date + " snapshot (" + aud.format(SNAP.expiringMonthly) + "/mo).</div>";
+      $("expCount").textContent = "";
+      return;
+    }
+    $("expCount").textContent = String(state.expiry.length);
+    if (!state.expiry.length) { el.innerHTML = '<div class="empty">No cards expiring in the next 60 days.</div>'; return; }
+    el.innerHTML = state.expiry.slice(0, 25).map(function (r) {
+      return '<div class="watch-row"><div class="w"><div class="nm"><a href="' + ORG_URL + esc(r.id) + '/view" target="_blank" rel="noopener">' + esc(r.donor || "(no contact)") + '</a></div><div class="amt">' + (r.amount != null ? aud2.format(r.amount) : "—") + " · " + esc(r.freq || "") + '</div></div><div class="d">' + fmtDate(r.expiry) + "</div></div>";
+    }).join("") + (state.expiry.length > 25 ? '<div class="empty">+ ' + (state.expiry.length - 25) + " more in Salesforce</div>" : "");
+  }
+
+  function renderAsOf() {
+    $("queueAsOf").textContent = state.queueStoredAt ? "Data as of " + new Date(state.queueStoredAt).toLocaleString("en-AU") : (state.rows ? "" : "Snapshot: production discovery, " + SNAP.date + ".");
+    $("expAsOf").textContent = state.expStoredAt ? "Data as of " + new Date(state.expStoredAt).toLocaleString("en-AU") : "";
+  }
+
+  function renderAll() { renderKpis(); renderBars(); renderQueue(); renderWatch(); renderAsOf(); }
+
+  // segment chips
+  Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (btn) {
+    btn.addEventListener("click", function () {
+      state.seg = btn.getAttribute("data-seg");
+      Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (b) {
+        b.setAttribute("aria-pressed", String(b === btn));
+      });
+      renderQueue();
+    });
+  });
+
+  // ---------- data layer ----------
+  function parsePayload(result) {
+    var p = result && result.payload;
+    if (typeof p === "string") { try { p = JSON.parse(p); } catch (e) { /* leave */ } }
+    if (!p && result && result.content && result.content[0] && result.content[0].text) {
+      try { p = JSON.parse(result.content[0].text); } catch (e) { p = null; }
+    }
+    return p;
+  }
+  function rel(row, path) {
+    // safe getter for "A.B" relationship fields
+    var parts = path.split("."); var v = row;
+    for (var i = 0; i < parts.length; i++) { if (v == null) return null; v = v[parts[i]]; }
+    return v;
+  }
+
+  function snapshotMode(reasonHtml) {
+    setMode("snapshot", "Snapshot · " + SNAP.date);
+    if (reasonHtml) banner(reasonHtml);
+    renderAll();
+  }
+
+  function errCopy(server, e) {
+    var code = e && e.code;
+    if (code === "needs_reauth") return "<strong>Salesforce needs reconnecting.</strong> Reconnect “" + esc(server) + "” in claude.ai Settings → Connectors, then refresh this page.";
+    if (code === "server_not_connected") return "<strong>Salesforce Production isn’t connected for you.</strong> Add it in claude.ai Settings → Connectors to see live data.";
+    if (code === "selection_required") return "You have more than one connector named “" + esc(server) + "” — choose one when prompted, then refresh.";
+    if (code === "blocked_by_policy" || code === "approval_required") return "Your organisation’s policy blocks this query from running here — showing the " + SNAP.date + " snapshot instead.";
+    if (code === "tool_error") return "<strong>Salesforce rejected a query.</strong> " + esc((e && e.message) || "") + " Showing last good data where available.";
+    if (code === "server_unavailable") return "Salesforce is briefly unreachable — will keep trying. Showing last good data.";
+    return "Live refresh hit a problem (" + esc(code || "unknown") + "). Showing last good data where available.";
+  }
+
+  var mcp = await (window.claude && claude.use ? claude.use("mcp") : Promise.resolve(null));
+  if (!mcp) {
+    snapshotMode("This view can’t reach connectors, so you’re seeing the verified <strong>" + SNAP.date + " production snapshot</strong>. Open the artifact on claude.ai with the Salesforce Production connector added to go live.");
+    return;
+  }
+
+  var server = null;
+  try {
+    var lt = await mcp.listTools();
+    var servers = (lt && lt.servers) || [];
+    var match = servers.find(function (s) { return /salesforce[ _-]?production/i.test(s.server) && s.tools && s.tools.length; }) ||
+                servers.find(function (s) { return /salesforce/i.test(s.server) && s.tools && s.tools.length; });
+    if (match) server = match.server;
+    if (match && match.authStatus === "needs_reauth") {
+      snapshotMode(errCopy(server, { code: "needs_reauth" }));
+      return;
+    }
+  } catch (e) { /* fall through to snapshot */ }
+
+  if (!server) {
+    snapshotMode("<strong>Salesforce Production isn’t connected for you.</strong> Add it in claude.ai Settings → Connectors and reopen this page for the live queue. Until then this is the verified " + SNAP.date + " snapshot.");
+    return;
+  }
+
+  setMode("live", "Live · " + server);
+  banner(null);
+  var cacheOpts = { cache: { staleTime: 300000, gcTime: 86400000 } };
+  var hadAuthzFailure = false;
+
+  function authz(code) { return code === "needs_reauth" || code === "server_not_connected" || code === "blocked_by_policy" || code === "approval_required" || code === "not_granted"; }
+
+  mcp.watchTool(server, TOOL, { q: Q_QUEUE }, function (ev) {
+    if (ev.type === "data") {
+      var p = parsePayload(ev.result);
+      if (p && p.records) {
+        state.rows = p.records.map(function (r) {
+          return {
+            id: r.Id, name: r.Name,
+            rpNo: r.AAkPay__Recurring_Payment_No__c,
+            donor: rel(r, "AAkPay__Contact__r.Name"),
+            email: rel(r, "AAkPay__Contact__r.Email"),
+            form: rel(r, "AAkPay__Payment_Type__r.Name"),
+            amount: r.AAkPay__Payment_Amount__c,
+            freq: r.AAkPay__Frequency__c,
+            monthly: r.AAkPay__Monthly_Amount__c,
+            declined: r.AAkPay__Last_Declined_Date__c
+          };
+        });
+        state.queueStoredAt = ev.result.cache ? ev.result.cache.storedAt : Date.now();
+        if (!hadAuthzFailure) banner(null);
+        renderAll();
+      }
+    } else if (ev.type === "error") {
+      var code = ev.error && ev.error.code;
+      if (authz(code)) { hadAuthzFailure = true; state.rows = null; state.queueStoredAt = null; setMode("err", "Disconnected"); banner(errCopy(server, ev.error), true); renderAll(); }
+      else banner(errCopy(server, ev.error));
+    }
+  }, cacheOpts);
+
+  mcp.watchTool(server, TOOL, { q: Q_EXPIRY }, function (ev) {
+    if (ev.type === "data") {
+      var p = parsePayload(ev.result);
+      if (p && p.records) {
+        state.expiry = p.records.map(function (r) {
+          return {
+            id: r.Id,
+            donor: rel(r, "AAkPay__Contact__r.Name"),
+            amount: r.AAkPay__Payment_Amount__c,
+            freq: r.AAkPay__Frequency__c,
+            expiry: r.AAkPay__Card_Expiry_Date__c
+          };
+        });
+        state.expStoredAt = ev.result.cache ? ev.result.cache.storedAt : Date.now();
+        renderKpis(); renderWatch(); renderAsOf();
+      }
+    } else if (ev.type === "error" && authz(ev.error && ev.error.code)) { state.expiry = null; renderWatch(); }
+  }, cacheOpts);
+
+  mcp.watchTool(server, TOOL, { q: Q_TASKS }, function (ev) {
+    if (ev.type === "data") {
+      var p = parsePayload(ev.result);
+      if (p && typeof p.totalSize === "number") { state.tasks = p.totalSize; renderKpis(); }
+    }
+  }, cacheOpts);
+
+  var refreshBtn = $("refresh");
+  refreshBtn.hidden = false;
+  refreshBtn.addEventListener("click", function () {
+    refreshBtn.disabled = true;
+    mcp.invalidate(server, TOOL).catch(function () {}).then(function () {
+      setTimeout(function () { refreshBtn.disabled = false; }, 1500);
+    });
+  });
+
+  renderAll();
+})();
+</script>
