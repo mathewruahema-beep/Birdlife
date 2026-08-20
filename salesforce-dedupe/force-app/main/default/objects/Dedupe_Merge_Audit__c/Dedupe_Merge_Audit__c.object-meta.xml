@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Dedupe Merge Audit</label>
+    <pluralLabel>Dedupe Merge Audits</pluralLabel>
+    <nameField>
+        <label>Audit No.</label>
+        <type>AutoNumber</type>
+        <displayFormat>DMA-{0000000}</displayFormat>
+    </nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <sharingModel>ReadWrite</sharingModel>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <description>One row per duplicate group evaluated by the dedupe automation: the scorecard, the outcome, and the merge trail. See salesforce-dedupe/docs/SCORECARD.md.</description>
+</CustomObject>

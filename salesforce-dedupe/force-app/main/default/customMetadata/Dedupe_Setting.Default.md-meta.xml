@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <label>Default</label>
+    <protected>false</protected>
+    <values>
+        <field>Dry_Run__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Auto_Merge_Enabled__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Fill_Master_Blanks__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Max_Merges_Per_Run__c</field>
+        <value xsi:type="xsd:double">200</value>
+    </values>
+    <values>
+        <field>Max_Group_Size__c</field>
+        <value xsi:type="xsd:double">6</value>
+    </values>
+    <values>
+        <field>Batch_Size__c</field>
+        <value xsi:type="xsd:double">25</value>
+    </values>
+    <values>
+        <field>Contact_Id_Points_Required__c</field>
+        <value xsi:type="xsd:double">2.5</value>
+    </values>
+    <values>
+        <field>Account_Id_Points_Required__c</field>
+        <value xsi:type="xsd:double">3.0</value>
+    </values>
+</CustomMetadata>

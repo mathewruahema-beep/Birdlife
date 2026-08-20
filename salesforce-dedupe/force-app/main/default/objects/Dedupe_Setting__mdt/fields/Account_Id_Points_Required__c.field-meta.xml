@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Account_Id_Points_Required__c</fullName>
+    <label>Account ID Points Required</label>
+    <type>Number</type>
+    <precision>6</precision>
+    <scale>2</scale>
+    <required>false</required>
+    <unique>false</unique>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+</CustomField>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Dedupe Setting</label>
+    <pluralLabel>Dedupe Settings</pluralLabel>
+    <visibility>Public</visibility>
+    <description>Runtime switches for the dedupe automation. The batch reads the record named "Default". Ships with Dry Run ON and Auto Merge OFF.</description>
+</CustomObject>

@@ -1,0 +1,129 @@
+{
+  "description": "Machine-readable mirror of the Dedupe_Rule__mdt / Dedupe_Setting__mdt records. Source of truth is the custom metadata deployed to the org; this file exists so scripts and the ops dashboard can read the same rule set. Scenarios were read from the live Plauti Duplicate Check configuration in production on 2026-08-20.",
+  "settings": {
+    "dryRun": true,
+    "autoMergeEnabled": false,
+    "fillMasterBlanks": true,
+    "maxMergesPerRun": 200,
+    "maxGroupSize": 6,
+    "batchSize": 25,
+    "contactIdPointsRequired": 2.5,
+    "accountIdPointsRequired": 3.0
+  },
+  "autoMergeGate": [
+    "an auto-eligible scenario reaches its autoMergeScore (Name and Email - Exact at 100)",
+    "group ID points >= 2.5 for Contacts (3.0 for Accounts)",
+    "no guardrail blocks: single/zero active portal user, at most one holder of active recurring giving, no deceased conflict",
+    "group size <= maxGroupSize and run merge cap not exhausted"
+  ],
+  "scenarios": [
+    {
+      "key": "NAME_EMAIL_EXACT",
+      "label": "Name and Email - Exact",
+      "object": "Contact",
+      "plautiScenarioId": "a4pI80000008zqjIAA",
+      "plautiJob": "Clone: Daily Contact Merge",
+      "scoreMethod": "DEDUP",
+      "threshold": 75,
+      "autoMergeScore": 100,
+      "fields": [
+        { "field": "FirstName", "match": "EQUAL", "weight": 100, "idPoints": 0.5 },
+        { "field": "LastName", "match": "EQUAL", "weight": 100, "idPoints": 0.5 },
+        { "field": "Email", "match": "EQUAL", "weight": 100, "idPoints": 1.5 }
+      ]
+    },
+    {
+      "key": "CONTACT_FUZZY",
+      "label": "Contact Fuzzy",
+      "object": "Contact",
+      "plautiScenarioId": "a4pI80000008yrnIAA",
+      "scoreMethod": "DEDUP50",
+      "threshold": 75,
+      "autoMergeScore": null,
+      "fields": [
+        { "field": "LastName", "match": "PERSON_NAME", "weight": 100, "idPoints": 0.5 },
+        { "field": "FirstName", "match": "PERSON_NAME", "weight": 90, "idPoints": 0.5 },
+        { "field": "AllEmail__c", "match": "COMPANY", "weight": 80, "idPoints": 1.5 },
+        { "field": "AllPhone__c", "match": "COMPANY", "weight": 60, "idPoints": 1.0 }
+      ]
+    },
+    {
+      "key": "FIRST_EMAIL_PHONE",
+      "label": "First Name and Email and Phone",
+      "object": "Contact",
+      "plautiScenarioId": "a4pI8000000BlplIAC",
+      "scoreMethod": "DEDUP50",
+      "threshold": 75,
+      "autoMergeScore": null,
+      "fields": [
+        { "field": "FirstName", "match": "FUZZY_PERSON", "weight": 50, "idPoints": 0.5 },
+        { "field": "AllEmail__c", "match": "COMPANY", "weight": 100, "idPoints": 1.5 },
+        { "field": "AllPhone__c", "match": "COMPANY", "weight": 100, "idPoints": 1.0 }
+      ]
+    },
+    {
+      "key": "ALL_EMAIL",
+      "label": "All Email",
+      "object": "Contact",
+      "plautiScenarioId": "a4pRF0000000CsPYAU",
+      "scoreMethod": "SEARCH",
+      "threshold": 75,
+      "autoMergeScore": null,
+      "fields": [
+        { "field": "AllEmail__c", "match": "EMAIL_EXACT", "weight": 90, "idPoints": 1.5 }
+      ]
+    },
+    {
+      "key": "EMAIL_EXACT",
+      "label": "Email Exact",
+      "object": "Contact",
+      "plautiScenarioId": "a4pI80000009lj1IAA",
+      "scoreMethod": "SEARCH",
+      "threshold": 100,
+      "autoMergeScore": null,
+      "fields": [
+        { "field": "Email", "match": "EQUAL", "weight": 100, "idPoints": 1.5 }
+      ]
+    },
+    {
+      "key": "MOBILE_MATCH",
+      "label": "Mobile Match",
+      "object": "Contact",
+      "plautiScenarioId": "a4pI80000009s3lIAA",
+      "scoreMethod": "SEARCH",
+      "threshold": 75,
+      "autoMergeScore": null,
+      "fields": [
+        { "field": "AllPhone__c", "match": "PHONE", "weight": 100, "idPoints": 1.0 }
+      ]
+    },
+    {
+      "key": "SAME_ADDR_DIFF_HH",
+      "label": "Same Address Different Household",
+      "object": "Contact",
+      "plautiScenarioId": "a4pRF0000000ECfYAM",
+      "scoreMethod": "DEDUP",
+      "threshold": 75,
+      "autoMergeScore": null,
+      "fields": [
+        { "field": "MailingStreet", "match": "EQUAL", "weight": 85, "idPoints": 0.75 },
+        { "field": "MailingState", "match": "POSTAL_CODE", "weight": 60, "idPoints": 0.25 },
+        { "field": "AccountId", "match": "NOT_EQUAL", "weight": 100, "idPoints": 0 }
+      ]
+    },
+    {
+      "key": "ACCOUNT_NAME_MATCH",
+      "label": "Account Name Match",
+      "object": "Account",
+      "plautiScenarioId": "a4pI8000000AeVFIA0",
+      "plautiJob": "Weekly Account Merge",
+      "scoreMethod": "SEARCH",
+      "threshold": 75,
+      "autoMergeScore": null,
+      "fields": [
+        { "field": "Name", "match": "EQUAL", "weight": 90, "idPoints": 2.0 },
+        { "field": "BillingPostalCode", "match": "EQUAL", "weight": 75, "idPoints": 1.0 }
+      ]
+    }
+  ]
+}
