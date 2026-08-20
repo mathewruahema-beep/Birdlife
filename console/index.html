@@ -428,6 +428,8 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   var mailState = { data: null, storedAt: null, error: null };
   var teamsState = { data: null, storedAt: null, error: null };
   var wbOpen = false;
+  var boardFilter = 'all';
+  var mailFilter = 'all';
   var PROJECT_GID = '1211042432693678';
   var SECTION_GIDS = {};   // name -> gid
   Object.keys(SECTION_NAMES).forEach(function (g) { SECTION_GIDS[SECTION_NAMES[g]] = g; });
@@ -468,6 +470,27 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     return 's-Other';
   }
   function daysAgo(iso, now) { return Math.floor((now - Date.parse(iso)) / 864e5); }
+  function goTo(id) { var el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+  // Shared views over the mail/teams data, used by both the tiles and the sections.
+  function peopleMail() {
+    return (mailState.data || []).filter(function (m) {
+      return m.sender && !AUTOMATED_SENDER.test(m.sender) && m.sender.toLowerCase() !== MY_ADDR;
+    }).sort(function (a, b) {
+      if (!!a.isRead !== !!b.isRead) return a.isRead ? 1 : -1;
+      return (b.receivedDateTime || '').localeCompare(a.receivedDateTime || '');
+    });
+  }
+  function teamsChats() {
+    var latestPerChat = {};
+    (teamsState.data || []).forEach(function (t) {
+      if (!t.chatId || (t.from && t.from.displayName === MY_NAME)) return;
+      var cur = latestPerChat[t.chatId];
+      if (!cur || (t.createdDateTime || '') > (cur.createdDateTime || '')) latestPerChat[t.chatId] = t;
+    });
+    return Object.keys(latestPerChat).map(function (k) { return latestPerChat[k]; })
+      .sort(function (a, b) { return (b.createdDateTime || '').localeCompare(a.createdDateTime || ''); });
+  }
 
   // The advice engine: one plain-English recommendation per case.
   function adviceFor(r, now) {
@@ -618,33 +641,50 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     var recs = sfState.data ? (sfState.data.records || []) : null;
     var tasks = asState.data;
 
-    // ---- tiles (tap to filter the case list) ----
+    // ---- tiles: every number is a door — tap it to jump to (and filter) its section ----
     var t = [];
     if (recs) {
       var neu = recs.filter(function (r) { return r.Status === 'New'; }).length;
       var zeus = recs.filter(function (r) { return r.Owner && r.Owner.Name === 'Zeus'; }).length;
       var old = recs.filter(function (r) { return daysAgo(r.CreatedDate, now) > 30; }).length;
-      t.push({ n: recs.length, l: 'Open cases', f: 'all' },
-             { n: neu, l: 'Just arrived', f: 'neu' },
-             { n: zeus, l: 'No owner yet', f: 'unassigned', warn: zeus > 0 },
-             { n: old, l: 'Over a month', f: 'old', warn: old > 0 });
+      t.push({ n: recs.length, l: 'Open cases', k: 'case', f: 'all' },
+             { n: neu, l: 'Just arrived', k: 'case', f: 'neu' },
+             { n: zeus, l: 'No owner yet', k: 'case', f: 'unassigned', warn: zeus > 0 },
+             { n: old, l: 'Over a month', k: 'case', f: 'old', warn: old > 0 });
     }
     if (tasks) {
       var boardTasks = tasks.filter(function (x) { return x.section !== 'Backlog/Requests'; });
       var blocked = boardTasks.filter(function (x) { return x.section === 'Blocked'; }).length;
       var overdue = boardTasks.filter(function (x) { return x.due_on && x.due_on < new Date(now).toISOString().slice(0, 10); }).length;
-      t.push({ n: blocked, l: 'Stuck', warn: blocked > 0 }, { n: overdue, l: 'Past due', warn: overdue > 0 });
+      t.push({ n: blocked, l: 'Stuck', k: 'board', f: 'blocked', warn: blocked > 0 },
+             { n: overdue, l: 'Past due', k: 'board', f: 'overdue', warn: overdue > 0 });
     }
+    if (mailState.data) {
+      var unreadN = peopleMail().filter(function (m) { return !m.isRead; }).length;
+      t.push({ n: unreadN, l: 'Unread mail', k: 'mail', f: 'unread', warn: unreadN > 0 });
+    }
+    if (teamsState.data) t.push({ n: teamsChats().length, l: 'Teams chats', k: 'teams', f: 'go' });
     tilesEl.innerHTML = t.map(function (x) {
-      var press = x.f ? ' aria-pressed="' + (caseFilter === x.f && x.f !== 'all' ? 'true' : 'false') + '" data-filter="' + x.f + '"' : '';
-      return '<button class="tile' + (x.warn ? ' warn' : '') + (x.f ? '' : ' still') + '"' + press + '>' +
+      var pressed = (x.k === 'case' && x.f !== 'all' && caseFilter === x.f) ||
+                    (x.k === 'board' && boardFilter === x.f) ||
+                    (x.k === 'mail' && mailFilter === 'unread');
+      return '<button class="tile' + (x.warn ? ' warn' : '') + '" aria-pressed="' + (pressed ? 'true' : 'false') +
+        '" data-k="' + x.k + '" data-f="' + x.f + '">' +
         '<div class="n">' + x.n + '</div><div class="l">' + esc(x.l) + '</div></button>';
     }).join('');
-    tilesEl.querySelectorAll('[data-filter]').forEach(function (b) {
+    tilesEl.querySelectorAll('[data-k]').forEach(function (b) {
       b.addEventListener('click', function () {
-        caseFilter = (caseFilter === b.dataset.filter) ? 'all' : b.dataset.filter;
-        renderQueue();
-        if (caseFilter !== 'all') sfArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        var k = b.dataset.k, f = b.dataset.f;
+        if (k === 'case') {
+          caseFilter = (caseFilter === f) ? 'all' : f;
+          renderQueue(); goTo('sf-area');
+        } else if (k === 'board') {
+          boardFilter = (boardFilter === f) ? 'all' : f;
+          renderQueue(); goTo('asana-area');
+        } else if (k === 'mail') {
+          mailFilter = (mailFilter === 'unread') ? 'all' : 'unread';
+          renderQueue(); goTo('mail-area');
+        } else { goTo('teams-area'); }
       });
     });
     if (caseFilter !== 'all') {
@@ -737,7 +777,22 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         (bySec[x.section] = bySec[x.section] || []).push(x);
       });
       var todayStr = new Date(now).toISOString().slice(0, 10);
-      asanaArea.innerHTML = SECTION_ORDER.filter(function (s) { return bySec[s]; }).map(function (s) {
+      var boardBar = '';
+      if (boardFilter === 'blocked') {
+        bySec = bySec['Blocked'] ? { 'Blocked': bySec['Blocked'] } : {};
+        boardBar = '<p class="filterbar" style="margin:0 0 10px">Showing only <b>stuck</b> tasks — <button id="boardclear">show the whole board</button></p>';
+      } else if (boardFilter === 'overdue') {
+        var lateTasks = [];
+        Object.keys(bySec).forEach(function (s) {
+          bySec[s].forEach(function (x) { if (x.due_on && x.due_on < todayStr) lateTasks.push(x); });
+        });
+        bySec = lateTasks.length ? { 'Past due': lateTasks } : {};
+        SECTION_PLAIN['Past due'] = 'Past their due date';
+        if (SECTION_ORDER.indexOf('Past due') < 0) SECTION_ORDER.unshift('Past due');
+        boardBar = '<p class="filterbar" style="margin:0 0 10px">Showing only <b>past-due</b> tasks — <button id="boardclear">show the whole board</button></p>';
+      }
+      asanaArea.innerHTML = boardBar;
+      asanaArea.innerHTML += SECTION_ORDER.filter(function (s) { return bySec[s]; }).map(function (s) {
         var rows = bySec[s].map(function (x) {
           var a = adviceForTask(x, todayStr);
           var dueBadge = x.due_on
@@ -750,13 +805,15 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
               null, x.gid) + '</details>';
         }).join('');
         return '<div class="grp"><h3>' + esc(SECTION_PLAIN[s] || s) + ' (' + bySec[s].length + ')</h3>' + rows + '</div>';
-      }).join('') || '<div class="secterr">Nothing on the board outside the backlog.</div>';
+      }).join('') || '<div class="secterr">' + (boardFilter !== 'all' ? 'Nothing matches this filter.' : 'Nothing on the board outside the backlog.') + '</div>';
       asanaArea.innerHTML += '<p class="hint">Backlog is tucked away here — ' + backlogN + ' task' + (backlogN === 1 ? '' : 's') +
         (asState.truncated ? ' · first 100 tasks shown' : '') +
         '. <a target="_blank" rel="noopener" href="https://app.asana.com/1/443963187362944/project/1211042432693678">See the full board in Asana ↗</a></p>';
       if (asState.error) {
         asanaArea.innerHTML += '<div class="secterr">Couldn’t refresh just now — this is the last good data. ' + esc(fixCopy(asState.error, 'Asana')) + '</div>';
       }
+      var bc = document.getElementById('boardclear');
+      if (bc) bc.addEventListener('click', function () { boardFilter = 'all'; renderQueue(); });
       wireCopyPlans(asanaArea);
     } else {
       asanaArea.innerHTML = '<div class="secterr">Waiting for Asana…</div>';
@@ -785,14 +842,18 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       mailArea.innerHTML = '<div class="secterr">' + esc(fixCopy(mailState.error, 'Microsoft 365')) + '</div>'; return;
     }
     if (!mailState.data) { mailArea.innerHTML = '<div class="secterr">Waiting for Outlook…</div>'; return; }
-    var people = mailState.data.filter(function (m) {
-      return m.sender && !AUTOMATED_SENDER.test(m.sender) && m.sender.toLowerCase() !== MY_ADDR;
-    }).sort(function (a, b) {
-      if (!!a.isRead !== !!b.isRead) return a.isRead ? 1 : -1;
-      return (b.receivedDateTime || '').localeCompare(a.receivedDateTime || '');
-    }).slice(0, 8);
-    if (!people.length) { mailArea.innerHTML = '<div class="secterr">Nothing from real people in the last three days.</div>'; return; }
-    mailArea.innerHTML = people.map(function (m) {
+    var people = peopleMail();
+    if (mailFilter === 'unread') people = people.filter(function (m) { return !m.isRead; });
+    people = people.slice(0, 8);
+    var mailBar = mailFilter === 'unread'
+      ? '<p class="filterbar" style="margin:0 0 10px">Showing only <b>unread</b> — <button id="mailclear">show all</button></p>' : '';
+    if (!people.length) {
+      mailArea.innerHTML = mailBar + '<div class="secterr">' + (mailFilter === 'unread' ? 'No unread mail from real people.' : 'Nothing from real people in the last three days.') + '</div>';
+      var mc0 = document.getElementById('mailclear');
+      if (mc0) mc0.addEventListener('click', function () { mailFilter = 'all'; renderQueue(); });
+      return;
+    }
+    mailArea.innerHTML = mailBar + people.map(function (m) {
       mailIndex[m.id] = m;
       var first = firstNameOf(m.sender);
       var when = m.receivedDateTime ? new Date(m.receivedDateTime).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '';
@@ -810,6 +871,8 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         '</div><div class="wbslot"></div></div></details>';
     }).join('');
     if (mailState.error) mailArea.innerHTML += '<div class="secterr">Couldn’t refresh just now — this is the last good data. ' + esc(fixCopy(mailState.error, 'Microsoft 365')) + '</div>';
+    var mc = document.getElementById('mailclear');
+    if (mc) mc.addEventListener('click', function () { mailFilter = 'all'; renderQueue(); });
     wireCopyPlans(mailArea);
   }
 
@@ -892,14 +955,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       teamsArea.innerHTML = '<div class="secterr">' + esc(fixCopy(teamsState.error, 'Microsoft 365')) + '</div>'; return;
     }
     if (!teamsState.data) { teamsArea.innerHTML = '<div class="secterr">Waiting for Teams…</div>'; return; }
-    var latestPerChat = {};
-    teamsState.data.forEach(function (t) {
-      if (!t.chatId || (t.from && t.from.displayName === MY_NAME)) return;
-      var cur = latestPerChat[t.chatId];
-      if (!cur || (t.createdDateTime || '') > (cur.createdDateTime || '')) latestPerChat[t.chatId] = t;
-    });
-    var msgs = Object.keys(latestPerChat).map(function (k) { return latestPerChat[k]; })
-      .sort(function (a, b) { return (b.createdDateTime || '').localeCompare(a.createdDateTime || ''); }).slice(0, 6);
+    var msgs = teamsChats().slice(0, 6);
     if (!msgs.length) { teamsArea.innerHTML = '<div class="secterr">No recent Teams messages from others.</div>'; return; }
     teamsArea.innerHTML = msgs.map(function (t) {
       teamsIndex[t.id] = t;
