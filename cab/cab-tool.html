@@ -1,0 +1,903 @@
+<title>Flightpath Change Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<script type="application/json" id="cab-state">{"nextId":1,"changes":[],"freezes":[{"label":"EOFY receipting","from":"06-15","to":"07-15"},{"label":"Bird Week / Backyard Bird Count","from":"10-12","to":"10-25"},{"label":"Year-end giving","from":"12-01","to":"01-05"}]}</script>
+
+<style>
+:root {
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --surface-2: #eef1ec;
+  --ink: #1c2b2d;
+  --muted: #5b6b6d;
+  --line: #dde3dd;
+  --accent: #0e7c86;
+  --accent-ink: #0a5a62;
+  --accent-soft: #e2f0f1;
+  --ok: #2e7d4f;       --ok-soft: #e3f0e8;
+  --warn: #a06c0a;     --warn-soft: #f5ecd7;
+  --crit: #b3372f;     --crit-soft: #f7e4e2;
+  --shadow: 0 1px 3px rgba(28,43,45,.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131a1b;
+    --surface: #1b2425;
+    --surface-2: #212c2d;
+    --ink: #e8eceb;
+    --muted: #93a3a3;
+    --line: #2b3738;
+    --accent: #3fb2bc;
+    --accent-ink: #7fd0d7;
+    --accent-soft: #14393c;
+    --ok: #57b380;     --ok-soft: #1a352a;
+    --warn: #d9a13f;   --warn-soft: #3a3012;
+    --crit: #e06a5f;   --crit-soft: #402020;
+    --shadow: 0 1px 3px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131a1b;
+  --surface: #1b2425;
+  --surface-2: #212c2d;
+  --ink: #e8eceb;
+  --muted: #93a3a3;
+  --line: #2b3738;
+  --accent: #3fb2bc;
+  --accent-ink: #7fd0d7;
+  --accent-soft: #14393c;
+  --ok: #57b380;     --ok-soft: #1a352a;
+  --warn: #d9a13f;   --warn-soft: #3a3012;
+  --crit: #e06a5f;   --crit-soft: #402020;
+  --shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+h1, h2, h3 { font-family: Archivo, "Segoe UI", system-ui, sans-serif; text-wrap: balance; margin: 0; }
+.mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; }
+a { color: var(--accent-ink); }
+
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px 64px; }
+
+/* ---------- header ---------- */
+header.site {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.site-inner {
+  max-width: 1060px; margin: 0 auto; padding: 18px 20px 0;
+  display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;
+}
+.wordmark { font-size: 1.5rem; font-weight: 700; letter-spacing: -.01em; }
+.wordmark .tail { color: var(--accent); }
+.org { color: var(--muted); font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; }
+.identity { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: .875rem; color: var(--muted); }
+.identity input {
+  width: 11em; padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--bg); color: var(--ink); font: inherit;
+}
+nav.tabs { max-width: 1060px; margin: 10px auto 0; padding: 0 20px; display: flex; gap: 2px; }
+nav.tabs button {
+  appearance: none; border: 0; background: none; color: var(--muted);
+  font: 600 .95rem Archivo, system-ui, sans-serif; padding: 10px 14px; cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav.tabs button:hover { color: var(--ink); }
+
+/* ---------- notices ---------- */
+.notice {
+  margin: 16px 0 0; padding: 10px 14px; border-radius: 8px; font-size: .9rem;
+  border: 1px solid var(--line); background: var(--surface);
+}
+.notice.warn { background: var(--warn-soft); border-color: var(--warn); }
+.notice.info { background: var(--accent-soft); border-color: var(--accent); }
+[hidden] { display: none !important; }
+
+/* ---------- stats ---------- */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+.stat {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 12px 16px; box-shadow: var(--shadow);
+}
+.stat .n { font: 700 1.6rem Archivo, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; }
+
+/* ---------- pills ---------- */
+.pill {
+  display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: .75rem;
+  font-weight: 600; letter-spacing: .02em; white-space: nowrap;
+  background: var(--surface-2); color: var(--muted); border: 1px solid var(--line);
+}
+.pill.risk-low  { background: var(--ok-soft);   color: var(--ok);   border-color: transparent; }
+.pill.risk-med  { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.pill.risk-high { background: var(--crit-soft); color: var(--crit); border-color: transparent; }
+.pill.st-review, .pill.st-scheduled { background: var(--accent-soft); color: var(--accent-ink); border-color: transparent; }
+.pill.st-approved { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.pill.st-implemented { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.pill.st-rejected { background: var(--crit-soft); color: var(--crit); border-color: transparent; }
+.pill.type-emergency { background: var(--crit-soft); color: var(--crit); border-color: transparent; }
+
+/* ---------- register table ---------- */
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
+table.register { width: 100%; border-collapse: collapse; font-size: .9rem; min-width: 760px; }
+table.register th {
+  text-align: left; padding: 10px 12px; color: var(--muted); font-size: .75rem;
+  text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--line);
+}
+table.register td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.register tr.row { cursor: pointer; }
+table.register tr.row:hover td { background: var(--surface-2); }
+table.register tr:last-child td { border-bottom: 0; }
+td.date, td.id { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .8rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+tr.detail td { background: var(--surface-2); padding: 16px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; }
+.detail-grid .full { grid-column: 1 / -1; }
+.detail-grid h4 { margin: 0 0 2px; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.detail-grid p { margin: 0; white-space: pre-wrap; }
+.log { list-style: none; margin: 4px 0 0; padding: 0; font-size: .85rem; }
+.log li { padding: 3px 0; border-top: 1px dashed var(--line); }
+.log .when { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .75rem; color: var(--muted); margin-right: 8px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+.actions input[type=text] {
+  flex: 1 1 200px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--surface); color: var(--ink); font: inherit; font-size: .875rem;
+}
+.filterbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; align-items: center; }
+.filterbar select, .filterbar input {
+  padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--surface); color: var(--ink); font: inherit; font-size: .875rem;
+}
+.filterbar .spacer { flex: 1; }
+.empty { padding: 36px 20px; text-align: center; color: var(--muted); }
+
+/* ---------- buttons ---------- */
+button.btn {
+  appearance: none; font: 600 .875rem "Source Sans 3", system-ui, sans-serif;
+  padding: 7px 14px; border-radius: 7px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+}
+button.btn:hover { background: var(--surface-2); }
+button.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.btn.primary:hover { background: var(--accent-ink); }
+button.btn.danger { color: var(--crit); border-color: var(--crit); background: none; }
+button.btn.small { padding: 4px 10px; font-size: .8rem; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+button.btn[disabled] { opacity: .5; cursor: default; }
+
+/* ---------- form ---------- */
+form.change { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 24px; box-shadow: var(--shadow); max-width: 760px; }
+form.change .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+form.change .full { grid-column: 1 / -1; }
+form.change label { display: block; font-weight: 600; font-size: .875rem; margin-bottom: 4px; }
+form.change label .req { color: var(--crit); }
+form.change input[type=text], form.change input[type=date], form.change select, form.change textarea {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px;
+  background: var(--bg); color: var(--ink); font: inherit; font-size: .95rem;
+}
+form.change textarea { min-height: 72px; resize: vertical; }
+form.change .hint { color: var(--muted); font-size: .8rem; margin-top: 3px; }
+fieldset.systems { border: 1px solid var(--line); border-radius: 7px; padding: 10px 12px; margin: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+fieldset.systems legend { font-weight: 600; font-size: .875rem; padding: 0 4px; }
+fieldset.systems label { font-weight: 400; font-size: .9rem; display: inline-flex; align-items: center; gap: 6px; margin: 0; }
+.riskbox { border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; background: var(--surface-2); }
+.riskbox .score { font: 700 1.1rem Archivo, system-ui, sans-serif; }
+.riskbox .route { font-size: .875rem; color: var(--muted); margin-top: 2px; }
+.freeze-warn { margin-top: 8px; }
+
+/* ---------- agenda & process ---------- */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
+.panel h2 { font-size: 1.05rem; margin-bottom: 8px; }
+.panel h2 .count { color: var(--muted); font-weight: 500; }
+.agenda-item { padding: 8px 0; border-top: 1px dashed var(--line); display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.agenda-item:first-of-type { border-top: 0; }
+.agenda-item .id { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .8rem; color: var(--muted); }
+.prose { max-width: 68ch; }
+.prose table { border-collapse: collapse; font-size: .875rem; margin: 8px 0 16px; }
+.prose th, .prose td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }
+.prose th { background: var(--surface-2); font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.prose h3 { font-size: 1rem; margin: 18px 0 6px; }
+.prose ul { margin: 6px 0; padding-left: 20px; }
+
+/* ---------- toast ---------- */
+#toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 8px;
+  font-size: .9rem; box-shadow: 0 4px 16px rgba(0,0,0,.25); z-index: 10;
+  transition: opacity .3s;
+}
+@media (prefers-reduced-motion: reduce) { #toast { transition: none; } }
+@media (max-width: 640px) {
+  form.change .grid, .detail-grid { grid-template-columns: 1fr; }
+  .identity { margin-left: 0; }
+}
+</style>
+
+<header class="site">
+  <div class="site-inner">
+    <div class="wordmark">Flightpath<span class="tail">.</span></div>
+    <div class="org">BirdLife Australia · Change Advisory Board</div>
+    <div class="identity">
+      <label for="me">You are</label>
+      <input id="me" type="text" placeholder="Your name" autocomplete="name">
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="register">Register</button>
+    <button role="tab" aria-selected="false" data-tab="new">New change</button>
+    <button role="tab" aria-selected="false" data-tab="agenda">CAB agenda</button>
+    <button role="tab" aria-selected="false" data-tab="process">Process</button>
+  </nav>
+</header>
+
+<div class="wrap">
+  <div id="mode-banner" class="notice warn" hidden></div>
+
+  <!-- ================= REGISTER ================= -->
+  <section id="tab-register">
+    <div class="stats" data-dyn id="stats"></div>
+    <div class="filterbar">
+      <select id="f-status">
+        <option value="">All statuses</option>
+        <option value="open">Open (not closed/rejected)</option>
+        <option value="awaiting">Awaiting decision</option>
+        <option value="submitted">Submitted</option>
+        <option value="review">In review</option>
+        <option value="approved">Approved</option>
+        <option value="scheduled">Scheduled</option>
+        <option value="implemented">Implemented</option>
+        <option value="closed">Closed</option>
+        <option value="rejected">Rejected</option>
+        <option value="deferred">Deferred</option>
+      </select>
+      <select id="f-risk">
+        <option value="">All risk</option>
+        <option value="high">High</option>
+        <option value="med">Medium</option>
+        <option value="low">Low</option>
+      </select>
+      <input id="f-q" type="search" placeholder="Search title, system, requester…">
+      <div class="spacer"></div>
+      <button class="btn small" id="export-csv" hidden>Export CSV</button>
+    </div>
+    <div class="tablewrap">
+      <table class="register">
+        <thead>
+          <tr><th>ID</th><th>Change</th><th>System</th><th>Type</th><th>Risk</th><th>Status</th><th>Planned</th><th>Owner</th></tr>
+        </thead>
+        <tbody data-dyn id="register-body"></tbody>
+      </table>
+      <div class="empty" id="register-empty" hidden>No changes recorded yet. Raise the first one under <b>New change</b>.</div>
+    </div>
+  </section>
+
+  <!-- ================= NEW CHANGE ================= -->
+  <section id="tab-new" hidden>
+    <form class="change" id="change-form">
+      <div class="grid">
+        <div class="full">
+          <label for="c-title">Change title <span class="req">*</span></label>
+          <input type="text" id="c-title" required placeholder="e.g. Update WooCommerce Stripe gateway plugin 8.1 → 8.2 (production)">
+        </div>
+        <div>
+          <label for="c-requester">Requested by <span class="req">*</span></label>
+          <input type="text" id="c-requester" required>
+        </div>
+        <div>
+          <label for="c-type">Change type</label>
+          <select id="c-type">
+            <option value="normal">Normal — assessed by risk</option>
+            <option value="standard">Standard — pre-approved procedure</option>
+            <option value="emergency">Emergency — done/doing now, retro review</option>
+          </select>
+        </div>
+        <div class="full">
+          <fieldset class="systems" id="c-systems">
+            <legend>Systems affected</legend>
+            <label><input type="checkbox" value="Salesforce (Zeus)">Salesforce (Zeus)</label>
+            <label><input type="checkbox" value="Website / WooCommerce">Website / WooCommerce</label>
+            <label><input type="checkbox" value="NetSuite">NetSuite</label>
+            <label><input type="checkbox" value="M365 / Entra">M365 / Entra</label>
+            <label><input type="checkbox" value="Cloudflare / DNS">Cloudflare / DNS</label>
+            <label><input type="checkbox" value="Stripe / Payments">Stripe / Payments</label>
+            <label><input type="checkbox" value="Integrations / Zapier">Integrations / Zapier</label>
+            <label><input type="checkbox" value="Other">Other</label>
+          </fieldset>
+        </div>
+        <div class="full">
+          <label for="c-desc">What is changing <span class="req">*</span></label>
+          <textarea id="c-desc" required placeholder="What exactly will be done, where, and how."></textarea>
+        </div>
+        <div class="full">
+          <label for="c-reason">Why</label>
+          <textarea id="c-reason" placeholder="The problem this solves or the request behind it. Zeus case number if there is one."></textarea>
+        </div>
+        <div id="score-block" class="full">
+          <div class="grid" style="margin-bottom:12px">
+            <div>
+              <label for="c-impact">Impact if it goes wrong</label>
+              <select id="c-impact">
+                <option value="1">1 — Low: single user / cosmetic, trivially reversed</option>
+                <option value="2" selected>2 — Medium: one team degraded, workaround exists</option>
+                <option value="3">3 — High: payments, sign-in, DNS/mail, financial data, public site</option>
+              </select>
+            </div>
+            <div>
+              <label for="c-likelihood">Likelihood of going wrong</label>
+              <select id="c-likelihood">
+                <option value="1">1 — Low: well understood, tested, rollback rehearsed</option>
+                <option value="2" selected>2 — Medium: some complexity, partially tested</option>
+                <option value="3">3 — High: novel, no test env, vendor-dependent</option>
+              </select>
+            </div>
+          </div>
+          <div class="riskbox">
+            <div class="score" id="risk-readout"></div>
+            <div class="route" id="risk-route"></div>
+          </div>
+        </div>
+        <div class="full">
+          <label for="c-rollback">Rollback plan <span class="req">*</span></label>
+          <textarea id="c-rollback" required placeholder="How this gets undone if it fails. A change with no rollback plan is not approvable."></textarea>
+        </div>
+        <div>
+          <label for="c-date">Planned date</label>
+          <input type="date" id="c-date">
+          <div class="notice warn freeze-warn" id="freeze-warn" hidden></div>
+        </div>
+        <div>
+          <label for="c-links">Links</label>
+          <input type="text" id="c-links" placeholder="Zeus case, Asana task URL…">
+        </div>
+        <div class="full">
+          <button type="submit" class="btn primary" id="submit-btn">Submit change request</button>
+          <span class="hint" id="submit-hint"></span>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <!-- ================= AGENDA ================= -->
+  <section id="tab-agenda" hidden>
+    <div class="filterbar">
+      <div class="spacer"></div>
+      <button class="btn small" id="copy-agenda">Copy agenda as Markdown</button>
+    </div>
+    <div data-dyn id="agenda-panels"></div>
+  </section>
+
+  <!-- ================= PROCESS ================= -->
+  <section id="tab-process" hidden>
+    <div class="panel prose">
+      <h2>The process, on one page</h2>
+      <p>Every production change gets a record here before it happens — or, for
+      emergencies, the same day. Risk decides scrutiny: most changes should pass
+      with an async thumbs-up, not a meeting. The full process lives in the
+      repository at <span class="mono">cab/CAB-PROCESS.md</span>.</p>
+
+      <h3>Change types</h3>
+      <table>
+        <tr><th>Type</th><th>Approval</th></tr>
+        <tr><td><b>Standard</b> — pre-approved catalogue procedure</td><td>None. Log it and go.</td></tr>
+        <tr><td><b>Normal</b> — everything else</td><td>By risk score, below</td></tr>
+        <tr><td><b>Emergency</b> — restore service / close a security hole now</td><td>Verbal OK from CAB Chair, log same day, retro review at next CAB</td></tr>
+      </table>
+
+      <h3>Risk = Impact × Likelihood</h3>
+      <table>
+        <tr><th>Score</th><th>Risk</th><th>Who approves</th></tr>
+        <tr><td>1–2</td><td>Low</td><td>Any one other CAB member, async</td></tr>
+        <tr><td>3–4</td><td>Medium</td><td>CAB Chair + one member, async or next meeting</td></tr>
+        <tr><td>6–9</td><td>High</td><td>CAB meeting, quorum of 3 incl. Chair, business stakeholder invited</td></tr>
+      </table>
+      <ul>
+        <li>Anything touching <b>payments, donations or member joins</b> in production is minimum Medium.</li>
+        <li>A change with <b>no rollback plan</b> is not approvable.</li>
+      </ul>
+
+      <h3>Roles</h3>
+      <ul>
+        <li><b>CAB Chair:</b> Mathew Hema — runs meetings, tie-breaks, approves emergencies.</li>
+        <li><b>CAB members:</b> Andrew Dunn, Keith Tsui, Nina Lewis.</li>
+        <li><b>Business stakeholders</b> join for High-risk changes to their domain.</li>
+      </ul>
+
+      <h3>Freeze windows</h3>
+      <p>No Medium/High changes to the affected domain during these windows
+      without CAB-meeting approval. The form warns automatically.</p>
+      <div data-dyn id="freeze-list"></div>
+
+      <h3>Cadence</h3>
+      <p>CAB meets fortnightly for 30 minutes, appended to an existing ICT
+      catch-up. Between meetings, Low and Medium changes move by async approval
+      here. In Asana, <i>Ready for Deployment</i> = approved &amp; scheduled;
+      <i>Hypercare</i> = implemented, in verification before Close.</p>
+    </div>
+  </section>
+</div>
+
+<script data-app>
+(() => {
+"use strict";
+
+/* ---------- state ---------- */
+const STATE_EL = document.getElementById("cab-state");
+let state = JSON.parse(STATE_EL.textContent);
+let artifactApi = null;          // resolved claude.use("artifact") or null
+let downloadsApi = null;
+let mode = "detecting";          // "shared" | "local" | "readonly"
+const LS_STATE = "flightpath-state";
+const LS_NAME  = "flightpath-name";
+
+const SYSTEMS_ABBR = { "Salesforce (Zeus)":"Zeus", "Website / WooCommerce":"Web/Woo",
+  "NetSuite":"NetSuite", "M365 / Entra":"M365", "Cloudflare / DNS":"DNS",
+  "Stripe / Payments":"Stripe", "Integrations / Zapier":"Zapier", "Other":"Other" };
+
+const STATUS_LABEL = { submitted:"Submitted", review:"In review", approved:"Approved",
+  scheduled:"Scheduled", implemented:"Implemented", closed:"Closed",
+  rejected:"Rejected", deferred:"Deferred" };
+
+const OUTCOME_LABEL = { success:"Successful", issues:"Successful with issues",
+  rolledback:"Rolled back", failed:"Failed" };
+
+const TRANSITIONS = {
+  submitted:   [["review","Start review"],["approved","Approve"],["rejected","Reject"],["deferred","Defer"]],
+  review:      [["approved","Approve"],["rejected","Reject"],["deferred","Defer"]],
+  approved:    [["scheduled","Schedule"],["deferred","Defer"]],
+  scheduled:   [["implemented","Mark implemented"],["deferred","Defer"]],
+  implemented: [["closed:success","Close — successful"],["closed:issues","Close — with issues"],
+                ["closed:rolledback","Close — rolled back"],["closed:failed","Close — failed"]],
+  deferred:    [["submitted","Reopen"]],
+  rejected:    [["submitted","Reopen"]],
+  closed:      []
+};
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const todayISO = () => new Date().toISOString().slice(0,10);
+const meName = () => ($("#me").value || "").trim() || "Unknown";
+
+function riskOf(impact, likelihood) {
+  const s = impact * likelihood;
+  return s >= 6 ? "high" : s >= 3 ? "med" : "low";
+}
+const RISK_LABEL = { low:"Low", med:"Medium", high:"High" };
+const RISK_ROUTE = {
+  low:  "Approval: any one other CAB member, async — no meeting needed.",
+  med:  "Approval: CAB Chair + one member, async or next CAB meeting.",
+  high: "Approval: CAB meeting (quorum 3 incl. Chair). Invite the affected business stakeholder. Tested rollback mandatory."
+};
+
+function inFreeze(dateStr) {
+  if (!dateStr) return null;
+  const md = dateStr.slice(5); // MM-DD
+  for (const f of state.freezes) {
+    if (f.from <= f.to ? (md >= f.from && md <= f.to)
+                       : (md >= f.from || md <= f.to)) return f;
+  }
+  return null;
+}
+
+function toast(msg, ms = 3200) {
+  document.querySelectorAll("#toast").forEach(t => t.remove());
+  const t = document.createElement("div");
+  t.id = "toast"; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 400); }, ms);
+}
+
+/* ---------- persistence ---------- */
+function stateJSON() {
+  return JSON.stringify(state).replace(/</g, "\\u003c");
+}
+
+async function fetchOwnSource() {
+  const res = await fetch(location.href, { cache: "no-store" });
+  if (!res.ok) throw new Error("fetch " + res.status);
+  return await res.text();
+}
+
+function spliceState(html, json) {
+  const m = html.match(/<script[^>]*id="cab-state"[^>]*>/);
+  if (!m) throw new Error("state marker not found");
+  const start = m.index + m[0].length;
+  const end = html.indexOf("</scr" + "ipt>", start);
+  if (end < 0) throw new Error("state end not found");
+  return html.slice(0, start) + json + html.slice(end);
+}
+
+function serializeFromDOM(json) {
+  const clone = document.documentElement.cloneNode(true);
+  clone.querySelectorAll("script:not([data-app]):not(#cab-state)").forEach(s => s.remove());
+  clone.querySelectorAll("[data-dyn]").forEach(el => { el.innerHTML = ""; });
+  clone.querySelectorAll("#toast, tr.detail").forEach(el => el.remove());
+  clone.querySelectorAll("[data-id]").forEach(el => el.removeAttribute("data-id"));
+  ["artifact-sync", "artifact-sync-state"].forEach(a => {
+    clone.querySelectorAll("[" + a + "]").forEach(el => el.removeAttribute(a));
+  });
+  const st = clone.querySelector("#cab-state");
+  if (st) st.textContent = json;
+  return "<!doctype html>\n" + clone.outerHTML;
+}
+
+let saving = false;
+async function persist(flashMsg) {
+  if (saving) return;
+  const json = stateJSON();
+
+  if (mode !== "shared") {
+    try { localStorage.setItem(LS_STATE, json); } catch (e) {}
+    renderAll();
+    if (flashMsg) toast(flashMsg + " (saved to this browser only)");
+    return;
+  }
+
+  saving = true;
+  $("#submit-btn") && ($("#submit-btn").disabled = true);
+  toast("Saving to the shared register…", 8000);
+  let html;
+  try {
+    html = spliceState(await fetchOwnSource(), json);
+  } catch (e) {
+    html = serializeFromDOM(json);
+  }
+  if (!/^\s*<!doctype/i.test(html)) html = "<!doctype html>\n" + html;
+
+  try {
+    if (flashMsg) sessionStorage.setItem("flightpath-flash", flashMsg);
+    await artifactApi.publish(html);
+    // success: the shell reloads this view to the new version.
+  } catch (err) {
+    sessionStorage.removeItem("flightpath-flash");
+    saving = false;
+    $("#submit-btn") && ($("#submit-btn").disabled = false);
+    const code = err && err.code;
+    if (code === "conflict") {
+      toast("Someone else just saved — reloading to the latest version.");
+    } else if (code === "not_writer" || code === "not_granted" ||
+               code === "consent_required" || code === "capability_disabled" ||
+               code === "capability_removed" || code === "not_declared") {
+      enterReadOnly();
+    } else if (code === "rate_limited") {
+      toast("Saving too fast — wait a moment and try again.");
+    } else {
+      toast("Save failed (" + (code || "error") + "). Your entry is still on screen — try again.");
+    }
+  }
+}
+
+function enterReadOnly() {
+  mode = "readonly";
+  const b = $("#mode-banner");
+  b.hidden = false;
+  b.className = "notice info";
+  b.textContent = "Read-only view — you can browse the register but this account can't record changes. Ask Mathew for write access to the artifact.";
+  renderAll();
+}
+
+/* ---------- rendering ---------- */
+function statPill(n, label) {
+  return '<div class="stat"><div class="n">' + n + '</div><div class="l">' + label + "</div></div>";
+}
+
+function renderStats() {
+  const cs = state.changes;
+  const open = cs.filter(c => !["closed","rejected"].includes(c.status)).length;
+  const awaiting = cs.filter(c => ["submitted","review"].includes(c.status) ||
+                                  (c.retro && c.status === "implemented")).length;
+  const closed = cs.filter(c => c.status === "closed");
+  const okRate = closed.length
+    ? Math.round(100 * closed.filter(c => c.outcome === "success").length / closed.length) + "%"
+    : "—";
+  const emRatio = cs.length
+    ? Math.round(100 * cs.filter(c => c.type === "emergency").length / cs.length) + "%"
+    : "—";
+  $("#stats").innerHTML =
+    statPill(open, "Open changes") +
+    statPill(awaiting, "Awaiting decision") +
+    statPill(okRate, "Success rate") +
+    statPill(emRatio, "Emergency ratio");
+}
+
+function riskPill(c)   { return '<span class="pill risk-' + c.risk + '">' + RISK_LABEL[c.risk] + "</span>"; }
+function statusPill(c) {
+  let txt = STATUS_LABEL[c.status];
+  if (c.status === "closed" && c.outcome) txt += " · " + OUTCOME_LABEL[c.outcome];
+  if (c.status === "implemented" && c.retro) txt += " · retro pending";
+  return '<span class="pill st-' + c.status + '">' + esc(txt) + "</span>";
+}
+function typePill(c) {
+  return '<span class="pill type-' + c.type + '">' + c.type.charAt(0).toUpperCase() + c.type.slice(1) + "</span>";
+}
+
+let expanded = null;
+function renderRegister() {
+  const tbody = $("#register-body");
+  const fs = $("#f-status").value, fr = $("#f-risk").value, q = $("#f-q").value.trim().toLowerCase();
+  let list = state.changes.slice().reverse();
+  if (fs === "open") list = list.filter(c => !["closed","rejected"].includes(c.status));
+  else if (fs === "awaiting") list = list.filter(c => ["submitted","review"].includes(c.status) || (c.retro && c.status === "implemented"));
+  else if (fs) list = list.filter(c => c.status === fs);
+  if (fr) list = list.filter(c => c.risk === fr);
+  if (q) list = list.filter(c => (c.id + " " + c.title + " " + c.systems.join(" ") + " " + c.requester + " " + (c.owner||"")).toLowerCase().includes(q));
+
+  $("#register-empty").hidden = state.changes.length > 0;
+  tbody.innerHTML = list.map(c => {
+    const sys = c.systems.map(s => SYSTEMS_ABBR[s] || s).join(", ");
+    let rows = '<tr class="row" data-cid="' + c.id + '" tabindex="0">' +
+      '<td class="id">' + c.id + "</td>" +
+      "<td>" + esc(c.title) + "</td>" +
+      "<td>" + esc(sys) + "</td>" +
+      "<td>" + typePill(c) + "</td>" +
+      "<td>" + riskPill(c) + "</td>" +
+      "<td>" + statusPill(c) + "</td>" +
+      '<td class="date">' + (c.planned || "—") + "</td>" +
+      "<td>" + esc(c.owner || c.requester) + "</td></tr>";
+    if (expanded === c.id) rows += renderDetail(c);
+    return rows;
+  }).join("");
+}
+
+function renderDetail(c) {
+  const canAct = mode !== "readonly";
+  const acts = TRANSITIONS[c.status] || [];
+  const freeze = inFreeze(c.planned);
+  const logHtml = (c.log || []).slice().reverse().map(l =>
+    '<li><span class="when">' + esc(l.t) + "</span><b>" + esc(l.who) + "</b> — " +
+    esc(l.action) + (l.note ? ": " + esc(l.note) : "") + "</li>").join("");
+  return '<tr class="detail"><td colspan="8"><div class="detail-grid">' +
+    '<div class="full"><h4>What is changing</h4><p>' + esc(c.description) + "</p></div>" +
+    (c.reason ? '<div class="full"><h4>Why</h4><p>' + esc(c.reason) + "</p></div>" : "") +
+    '<div><h4>Rollback plan</h4><p>' + esc(c.rollback) + "</p></div>" +
+    "<div><h4>Details</h4><p>Requested by " + esc(c.requester) + " on " + esc(c.created) +
+      "<br>Impact " + c.impact + " × Likelihood " + c.likelihood + " = <b>" + RISK_LABEL[c.risk] + "</b>" +
+      (c.planned ? "<br>Planned: " + esc(c.planned) : "") +
+      (freeze ? '<br><span class="pill risk-med">Freeze: ' + esc(freeze.label) + "</span>" : "") +
+      (c.links ? "<br>Links: " + esc(c.links) : "") + "</p></div>" +
+    '<div class="full"><h4>Log</h4><ul class="log">' + logHtml + "</ul></div>" +
+    (canAct && acts.length ?
+      '<div class="full"><h4>Actions — recorded as ' + esc(meName()) + '</h4>' +
+      '<div class="actions"><input type="text" id="act-note" placeholder="Decision note (optional)">' +
+      acts.map(([to, label]) =>
+        '<button class="btn small' + (to.startsWith("closed:failed") || to === "rejected" ? " danger" : "") +
+        '" data-act="' + to + '" data-cid="' + c.id + '">' + label + "</button>").join("") +
+      "</div></div>" : "") +
+    "</div></td></tr>";
+}
+
+function renderFreezes() {
+  $("#freeze-list").innerHTML = "<ul>" + state.freezes.map(f =>
+    "<li><b>" + esc(f.label) + "</b> — " + esc(f.from) + " to " + esc(f.to) + " (annual, month-day)</li>"
+  ).join("") + "</ul>";
+}
+
+function agendaLine(c) {
+  return '<div class="agenda-item"><span class="id">' + c.id + "</span> " +
+    esc(c.title) + " " + riskPill(c) + " " + statusPill(c) +
+    ' <span class="id">' + esc(c.owner || c.requester) + "</span></div>";
+}
+
+function agendaData() {
+  const cs = state.changes;
+  const soon = d => {
+    if (!d) return false;
+    const diff = (new Date(d) - new Date(todayISO())) / 864e5;
+    return diff >= 0 && diff <= 14;
+  };
+  return [
+    ["Emergency changes — retrospective review", cs.filter(c => c.type === "emergency" && c.status === "implemented")],
+    ["High-risk requests for decision", cs.filter(c => c.risk === "high" && ["submitted","review"].includes(c.status))],
+    ["Medium requests awaiting decision", cs.filter(c => c.risk === "med" && ["submitted","review"].includes(c.status))],
+    ["Low-risk awaiting async approval (should not need the meeting)", cs.filter(c => c.risk === "low" && ["submitted","review"].includes(c.status))],
+    ["Failed / rolled back since last meeting — lessons", cs.filter(c => c.status === "closed" && ["failed","rolledback"].includes(c.outcome))],
+    ["Scheduled in the next 14 days", cs.filter(c => c.status === "scheduled" && soon(c.planned))]
+  ];
+}
+
+function renderAgenda() {
+  $("#agenda-panels").innerHTML = agendaData().map(([title, items]) =>
+    '<div class="panel"><h2>' + esc(title) + ' <span class="count">(' + items.length + ")</span></h2>" +
+    (items.length ? items.map(agendaLine).join("") : '<p class="hint" style="color:var(--muted);margin:0">Nothing in this section.</p>') +
+    "</div>").join("");
+}
+
+function agendaMarkdown() {
+  let md = "# CAB agenda — " + todayISO() + "\n";
+  for (const [title, items] of agendaData()) {
+    md += "\n## " + title + " (" + items.length + ")\n";
+    for (const c of items) {
+      md += "- **" + c.id + "** " + c.title + " — " + RISK_LABEL[c.risk] + " risk, " +
+            STATUS_LABEL[c.status] + (c.planned ? ", planned " + c.planned : "") +
+            " (" + (c.owner || c.requester) + ")\n";
+    }
+    if (!items.length) md += "- none\n";
+  }
+  md += "\n## Freeze lookahead\n";
+  for (const f of state.freezes) md += "- " + f.label + ": " + f.from + " to " + f.to + "\n";
+  return md;
+}
+
+function renderForm() {
+  const type = $("#c-type").value;
+  $("#score-block").style.display = type === "standard" ? "none" : "";
+  let risk, score;
+  if (type === "standard") { risk = "low"; score = "—"; }
+  else {
+    const i = +$("#c-impact").value, l = +$("#c-likelihood").value;
+    risk = riskOf(i, l); score = i * l;
+  }
+  $("#risk-readout").innerHTML = "Risk: " + riskPill({risk}) +
+    (score !== "—" ? ' <span class="mono" style="font-size:.85rem;color:var(--muted)">score ' + score + "</span>" : "");
+  $("#risk-route").textContent = type === "standard"
+    ? "Pre-approved. Logged for the record; no approval needed."
+    : type === "emergency"
+      ? "Emergency: verbal OK from the CAB Chair, log now, retrospective review at the next CAB."
+      : RISK_ROUTE[risk];
+
+  const f = inFreeze($("#c-date").value);
+  const fw = $("#freeze-warn");
+  if (f && type !== "standard") {
+    fw.hidden = false;
+    fw.textContent = "⚠ This date falls in the “" + f.label + "” freeze window. Medium/High changes need CAB-meeting approval to proceed in a freeze.";
+  } else fw.hidden = true;
+
+  $("#submit-hint").textContent = mode === "readonly" ? "Read-only view — submissions disabled." : "";
+  $("#submit-btn").disabled = mode === "readonly";
+}
+
+function renderAll() {
+  renderStats();
+  renderRegister();
+  renderAgenda();
+  renderFreezes();
+  renderForm();
+}
+
+/* ---------- events ---------- */
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", x === b ? "true" : "false"));
+  ["register","new","agenda","process"].forEach(t => { $("#tab-" + t).hidden = t !== b.dataset.tab; });
+}));
+
+$("#me").addEventListener("change", () => {
+  try { localStorage.setItem(LS_NAME, $("#me").value.trim()); } catch (e) {}
+});
+
+["#f-status","#f-risk"].forEach(s => $(s).addEventListener("change", renderRegister));
+$("#f-q").addEventListener("input", renderRegister);
+["#c-type","#c-impact","#c-likelihood","#c-date"].forEach(s => $(s).addEventListener("change", renderForm));
+
+$("#register-body").addEventListener("click", e => {
+  const actBtn = e.target.closest("button[data-act]");
+  if (actBtn) { doAction(actBtn.dataset.cid, actBtn.dataset.act); return; }
+  const row = e.target.closest("tr.row");
+  if (row) { expanded = expanded === row.dataset.cid ? null : row.dataset.cid; renderRegister(); }
+});
+$("#register-body").addEventListener("keydown", e => {
+  if (e.key === "Enter" || e.key === " ") {
+    const row = e.target.closest("tr.row");
+    if (row) { e.preventDefault(); expanded = expanded === row.dataset.cid ? null : row.dataset.cid; renderRegister(); }
+  }
+});
+
+function doAction(cid, act) {
+  const c = state.changes.find(x => x.id === cid);
+  if (!c) return;
+  const note = ($("#act-note") && $("#act-note").value.trim()) || "";
+  let to = act, outcome = null;
+  if (act.startsWith("closed:")) { to = "closed"; outcome = act.split(":")[1]; }
+  const label = (TRANSITIONS[c.status].find(([t]) => t === act) || [null, act])[1];
+  c.status = to;
+  if (outcome) c.outcome = outcome;
+  if (to === "approved" && !c.owner) c.owner = c.requester;
+  if (to === "closed" && c.retro) c.retro = false;
+  (c.log = c.log || []).push({ t: todayISO(), who: meName(), action: label, note });
+  persist(c.id + " → " + STATUS_LABEL[to] + (outcome ? " (" + OUTCOME_LABEL[outcome] + ")" : ""));
+}
+
+$("#change-form").addEventListener("submit", e => {
+  e.preventDefault();
+  if (mode === "readonly") return;
+  const type = $("#c-type").value;
+  const systems = [...document.querySelectorAll("#c-systems input:checked")].map(x => x.value);
+  if (!systems.length) { toast("Tick at least one affected system."); return; }
+  let impact = 1, likelihood = 1;
+  if (type !== "standard") { impact = +$("#c-impact").value; likelihood = +$("#c-likelihood").value; }
+  const id = "CHG-" + String(state.nextId).padStart(3, "0");
+  state.nextId++;
+  const requester = $("#c-requester").value.trim();
+  const c = {
+    id, title: $("#c-title").value.trim(), requester, owner: "",
+    systems, type,
+    description: $("#c-desc").value.trim(), reason: $("#c-reason").value.trim(),
+    impact, likelihood, risk: type === "standard" ? "low" : riskOf(impact, likelihood),
+    rollback: $("#c-rollback").value.trim(),
+    planned: $("#c-date").value, links: $("#c-links").value.trim(),
+    status: type === "standard" ? "approved" : type === "emergency" ? "implemented" : "submitted",
+    retro: type === "emergency", outcome: null, created: todayISO(),
+    log: [{ t: todayISO(), who: requester || meName(), action:
+      type === "standard" ? "Logged as Standard change (pre-approved)" :
+      type === "emergency" ? "Logged as Emergency change — retrospective review pending" :
+      "Submitted", note: "" }]
+  };
+  if (type === "emergency") c.owner = requester;
+  state.changes.push(c);
+  if (!$("#me").value.trim() && requester) {
+    $("#me").value = requester;
+    try { localStorage.setItem(LS_NAME, requester); } catch (err) {}
+  }
+  persist(id + " submitted");
+  e.target.reset();
+  $("#c-requester").value = $("#me").value;
+  renderForm();
+});
+
+$("#copy-agenda").addEventListener("click", async () => {
+  const md = agendaMarkdown();
+  try { await navigator.clipboard.writeText(md); toast("Agenda copied as Markdown."); }
+  catch (e) { toast("Couldn't access the clipboard in this view."); }
+});
+
+$("#export-csv").addEventListener("click", async () => {
+  if (!downloadsApi) return;
+  const cols = ["id","title","systems","type","risk","status","outcome","requester","owner","planned","created","links"];
+  const cell = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
+  const csv = cols.join(",") + "\n" + state.changes.map(c =>
+    cols.map(k => cell(k === "systems" ? c.systems.join("; ") : c[k])).join(",")).join("\n");
+  try {
+    await downloadsApi.save({ filename: "flightpath-register.csv", data: csv });
+    toast("Register exported.");
+  } catch (err) {
+    if (err && err.code === "extension_not_enabled") {
+      try { await downloadsApi.save({ filename: "flightpath-register.txt", data: csv }); toast("Exported as .txt (CSV inside)."); }
+      catch (e2) { if (e2 && e2.code !== "declined") toast("Export failed."); }
+    } else if (err && err.code !== "declined") toast("Export unavailable in this view.");
+  }
+});
+
+/* ---------- boot ---------- */
+(async function boot() {
+  try { $("#me").value = localStorage.getItem(LS_NAME) || ""; } catch (e) {}
+  $("#c-requester").value = $("#me").value;
+
+  const hasClaude = typeof window.claude !== "undefined" && window.claude && typeof window.claude.use === "function";
+  if (hasClaude) {
+    artifactApi = await window.claude.use("artifact");
+    downloadsApi = await window.claude.use("downloads");
+  }
+  if (downloadsApi) $("#export-csv").hidden = false;
+
+  if (artifactApi) {
+    mode = "shared";
+  } else {
+    mode = "local";
+    const b = $("#mode-banner");
+    b.hidden = false;
+    b.className = "notice warn";
+    b.textContent = "Detached view — the shared register isn't reachable here, so anything you record saves to this browser only.";
+    try {
+      const local = localStorage.getItem(LS_STATE);
+      if (local) state = JSON.parse(local);
+    } catch (e) {}
+  }
+
+  const flash = sessionStorage.getItem("flightpath-flash");
+  if (flash) { sessionStorage.removeItem("flightpath-flash"); toast(flash); }
+
+  renderAll();
+})();
+
+})();
+</script>

@@ -273,10 +273,42 @@ They have been redacted from the backup in this repo, but:
 2. Re-add the WooCommerce order-sync check using an environment variable, not an
    inline credential. The check is currently marked PARKED in the consolidated routine.
 
+## Change Advisory Board — added 20 Aug 2026
+
+The Asana data above showed it plainly: *Ready for Deployment* and *Hypercare*
+have been empty throughout — changes reach production with no gate, no shared
+record, and no agreed rollback. The CAB fixes that with the minimum ceremony a
+four-person team can sustain.
+
+| | |
+|---|---|
+| Process | [`cab/CAB-PROCESS.md`](cab/CAB-PROCESS.md) — types, risk matrix, roles, cadence, freeze windows |
+| Tool | **Flightpath** — https://claude.ai/code/artifact/167683db-66be-42b6-b658-4f1eef2aa75e |
+| Tool source | [`cab/cab-tool.html`](cab/cab-tool.html) |
+
+**The short version:** every production change gets a register entry. Risk =
+Impact × Likelihood routes the approval — Low passes on one peer's async OK,
+Medium needs the Chair plus one, High goes to the fortnightly 30-minute CAB
+meeting with the affected business stakeholder invited. Standard changes are
+pre-approved and just logged; emergencies are done first, logged same day, and
+reviewed retrospectively. Payments/donations changes are minimum Medium, and
+nothing is approvable without a rollback plan.
+
+**The tool** is a self-contained shared artifact: the page itself is the
+register. Submissions and CAB decisions publish new versions attributed to
+whoever made them, it scores risk live, warns when a planned date lands in a
+freeze window (EOFY receipting, Bird Week, year-end giving), generates the
+CAB meeting agenda as copyable Markdown, and exports the register as CSV.
+Share the artifact with Andrew, Keith and Nina (write access) to make it the
+team register. Asana keeps implementation tasks: *Ready for Deployment* now
+means approved & scheduled; *Hypercare* means implemented, in verification.
+
 ## Repository layout
 
 ```
 README.md                            findings, admin runbook, routine consolidation
+cab/CAB-PROCESS.md                   Change Advisory Board process (v1.0)
+cab/cab-tool.html                    Flightpath CAB tool source as published
 dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
 ```
