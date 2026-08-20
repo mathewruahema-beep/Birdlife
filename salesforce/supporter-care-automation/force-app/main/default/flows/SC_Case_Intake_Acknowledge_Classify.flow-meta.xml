@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Send_Acknowledgement</name>
+        <label>Send Acknowledgement</label>
+        <locationX>176</locationX>
+        <locationY>950</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>$Record.SuppliedEmail</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>fAckSubject</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>ackBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>logEmailOnSend</name>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <apiVersion>61.0</apiVersion>
+    <assignments>
+        <name>Assign_Receipt</name>
+        <label>Propose: Receipt</label>
+        <locationX>314</locationX>
+        <locationY>650</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Type</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Donation</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.SC_Additional_Enquiry_Type__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Receipt</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Stamp_Classification</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Unsubscribe</name>
+        <label>Propose: Unsubscribe</label>
+        <locationX>446</locationX>
+        <locationY>650</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Type</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Supporter Comms</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.SC_Additional_Enquiry_Type__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Unsubscribe</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Stamp_Classification</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Update_Details</name>
+        <label>Propose: Update Contact Details</label>
+        <locationX>182</locationX>
+        <locationY>650</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Type</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Supporter Information</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.SC_Additional_Enquiry_Type__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Update Contact Details</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Stamp_Classification</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <name>Check_Eligibility</name>
+        <label>Eligible for acknowledgement?</label>
+        <locationX>176</locationX>
+        <locationY>350</locationY>
+        <defaultConnectorLabel>Not eligible</defaultConnectorLabel>
+        <rules>
+            <name>Eligible</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RecordTypeId</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Get_GE_RecordType.Id</elementReference>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>fEligibleOrigin</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.SuppliedEmail</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Do_Not_Email__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.IsEmailBounce__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Classify</targetReference>
+            </connector>
+            <label>Eligible</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Classify</name>
+        <label>Classify enquiry</label>
+        <locationX>176</locationX>
+        <locationY>500</locationY>
+        <defaultConnector>
+            <targetReference>Send_Acknowledgement</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No confident match</defaultConnectorLabel>
+        <rules>
+            <name>R_Update_Details</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>fIsUpdateDetails</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Update_Details</targetReference>
+            </connector>
+            <label>Update contact details</label>
+        </rules>
+        <rules>
+            <name>R_Receipt</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>fIsReceipt</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Receipt</targetReference>
+            </connector>
+            <label>Receipt enquiry</label>
+        </rules>
+        <rules>
+            <name>R_Unsubscribe</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>fIsUnsubscribe</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Unsubscribe</targetReference>
+            </connector>
+            <label>Unsubscribe</label>
+        </rules>
+    </decisions>
+    <description>Intake automation for General Enquiry (Supporter Care) cases created by email or web: sends an instant acknowledgement with the case number and proposes Type / Sub Type from subject and body keywords. Suppressed for bounce, Do Not Email, and cases with no supplied email. DESIGN BUILD - deployed as Draft, do not activate without UAT.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>fAckSubject</name>
+        <dataType>String</dataType>
+        <expression>"We have received your enquiry (Case " &amp; {!$Record.CaseNumber} &amp; ")"</expression>
+    </formulas>
+    <formulas>
+        <name>fEligibleOrigin</name>
+        <dataType>Boolean</dataType>
+        <expression>OR(TEXT({!$Record.Origin}) = "Email", TEXT({!$Record.Origin}) = "Web")</expression>
+    </formulas>
+    <formulas>
+        <name>fIsReceipt</name>
+        <dataType>Boolean</dataType>
+        <expression>OR(
+  CONTAINS(LOWER({!$Record.Subject} &amp; " " &amp; {!$Record.Description}), "receipt"),
+  CONTAINS(LOWER({!$Record.Subject} &amp; " " &amp; {!$Record.Description}), "tax statement")
+)</expression>
+    </formulas>
+    <formulas>
+        <name>fIsUnsubscribe</name>
+        <dataType>Boolean</dataType>
+        <expression>OR(
+  CONTAINS(LOWER({!$Record.Subject} &amp; " " &amp; {!$Record.Description}), "unsubscribe"),
+  CONTAINS(LOWER({!$Record.Subject} &amp; " " &amp; {!$Record.Description}), "remove me from"),
+  CONTAINS(LOWER({!$Record.Subject} &amp; " " &amp; {!$Record.Description}), "stop sending")
+)</expression>
+    </formulas>
+    <formulas>
+        <name>fIsUpdateDetails</name>
+        <dataType>Boolean</dataType>
+        <expression>OR(
+  CONTAINS(LOWER({!$Record.Subject} &amp; " " &amp; {!$Record.Description}), "change of address"),
+  CONTAINS(LOWER({!$Record.Subject} &amp; " " &amp; {!$Record.Description}), "change my address"),
+  CONTAINS(LOWER({!$Record.Subject} &amp; " " &amp; {!$Record.Description}), "update my address"),
+  CONTAINS(LOWER({!$Record.Subject} &amp; " " &amp; {!$Record.Description}), "new address"),
+  CONTAINS(LOWER({!$Record.Subject} &amp; " " &amp; {!$Record.Description}), "update my details"),
+  CONTAINS(LOWER({!$Record.Subject} &amp; " " &amp; {!$Record.Description}), "update my contact details")
+)</expression>
+    </formulas>
+    <interviewLabel>SC Case Intake {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SC Case Intake - Acknowledge and Classify</label>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_GE_RecordType</name>
+        <label>Get General Enquiry Record Type</label>
+        <locationX>176</locationX>
+        <locationY>200</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_Eligibility</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>General_Enquiry_Case</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Case</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <name>Stamp_Classification</name>
+        <label>Stamp proposed classification</label>
+        <locationX>314</locationX>
+        <locationY>800</locationY>
+        <connector>
+            <targetReference>Send_Acknowledgement</targetReference>
+        </connector>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_GE_RecordType</targetReference>
+        </connector>
+        <object>Case</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Draft</status>
+    <textTemplates>
+        <name>ackBody</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Hello,
+
+Thank you for contacting BirdLife Australia. Your enquiry has been received and logged as case {!$Record.CaseNumber}.
+
+Our Supporter Care team works through enquiries in the order they arrive and will be in touch as soon as possible. If you need to add anything, simply reply to this email and it will be attached to your case.
+
+Warm regards,
+BirdLife Australia Supporter Care</text>
+    </textTemplates>
+</Flow>
