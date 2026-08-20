@@ -1,4 +1,7 @@
 <title>BirdLife ICT Console</title>
+<meta name="theme-color" content="#2e6e5e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   :root {
@@ -12,6 +15,10 @@
     --euc-soft: #e7f0ec;
     --wattle: #8a6a10;
     --wattle-soft: #f6eed6;
+    --red: #a33b2e;
+    --red-soft: #f7e6e2;
+    --blue: #2d5a86;
+    --blue-soft: #e4edf5;
     --slate: #5a6570;
     --slate-soft: #e9ecef;
     --mono-bg: #f1f4f2;
@@ -21,14 +28,16 @@
     :root:not([data-theme="light"]) {
       --paper: #12201d; --surface: #1a2c28; --ink: #e6ede9; --muted: #9db3ab;
       --line: #2b403a; --euc: #6fc2ab; --euc-ink: #7fd0ba; --euc-soft: #21363080;
-      --wattle: #e0b54a; --wattle-soft: #3a301380; --slate: #a3b4bd;
+      --wattle: #e0b54a; --wattle-soft: #3a301380; --red: #e08a7c; --red-soft: #3c221d80;
+      --blue: #8ab4dd; --blue-soft: #1d2f4080; --slate: #a3b4bd;
       --slate-soft: #24343c; --mono-bg: #16261f; --btn-ink: #0e1a17;
     }
   }
   :root[data-theme="dark"] {
     --paper: #12201d; --surface: #1a2c28; --ink: #e6ede9; --muted: #9db3ab;
     --line: #2b403a; --euc: #6fc2ab; --euc-ink: #7fd0ba; --euc-soft: #21363080;
-    --wattle: #e0b54a; --wattle-soft: #3a301380; --slate: #a3b4bd;
+    --wattle: #e0b54a; --wattle-soft: #3a301380; --red: #e08a7c; --red-soft: #3c221d80;
+    --blue: #8ab4dd; --blue-soft: #1d2f4080; --slate: #a3b4bd;
     --slate-soft: #24343c; --mono-bg: #16261f; --btn-ink: #0e1a17;
   }
   * { box-sizing: border-box; }
@@ -37,24 +46,66 @@
     font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
     font-size: 16px; line-height: 1.55;
   }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 34px 18px 80px; }
-  header { margin-bottom: 22px; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 28px 16px 80px; }
+  header { margin-bottom: 16px; }
   .kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--euc); font-weight: 700; }
-  h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: clamp(28px, 6vw, 36px); margin: 6px 0 8px; line-height: 1.1; }
-  .lede { color: var(--muted); margin: 0; max-width: 60ch; font-size: 15.5px; }
-  nav { display: flex; gap: 6px; margin: 24px 0 26px; border-bottom: 1px solid var(--line); }
+  h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: clamp(26px, 6vw, 34px); margin: 4px 0 4px; line-height: 1.1; }
+  .lede { color: var(--muted); margin: 0; max-width: 60ch; font-size: 15px; }
+  nav { display: flex; gap: 2px; margin: 18px 0 22px; border-bottom: 1px solid var(--line); overflow-x: auto; }
   nav button {
     background: none; border: none; border-bottom: 2px solid transparent;
     font: 700 14px "Source Sans 3", sans-serif; letter-spacing: .04em;
-    color: var(--muted); padding: 8px 12px 10px; cursor: pointer;
+    color: var(--muted); padding: 8px 11px 10px; cursor: pointer; white-space: nowrap;
   }
   nav button[aria-selected="true"] { color: var(--euc-ink); border-bottom-color: var(--euc); }
   nav button:focus-visible { outline: 2px solid var(--euc); outline-offset: 2px; }
-  h2 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 30px 0 12px; }
+  h2 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 28px 0 12px; }
   .chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 1px 7px; border-radius: 99px; vertical-align: 1px; }
   .t1 { background: var(--euc-soft); color: var(--euc-ink); }
   .t2 { background: var(--wattle-soft); color: var(--wattle); }
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  a { color: var(--euc-ink); }
+
+  /* ---- queue tab ---- */
+  .livebar { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--slate); flex: none; }
+  .dot.live { background: var(--euc); }
+  .dot.err { background: var(--red); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .tile .n { font: 600 26px "Fraunces", Georgia, serif; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .tile .l { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .tile.warn .n { color: var(--red); }
+  .grp { margin-bottom: 4px; }
+  .grp h3 { font-size: 14px; margin: 14px 0 6px; font-weight: 700; }
+  .caserow {
+    display: flex; align-items: baseline; gap: 8px; padding: 8px 0;
+    border-bottom: 1px solid var(--line); font-size: 14.5px;
+  }
+  .caserow:last-child { border-bottom: none; }
+  .caserow .cn { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 13px; flex: none; }
+  .caserow .subj { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .caserow .age { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); flex: none; }
+  .caserow .age.old { color: var(--red); font-weight: 700; }
+  .badge { flex: none; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 99px; }
+  .s-New { background: var(--blue-soft); color: var(--blue); }
+  .s-InProgress { background: var(--euc-soft); color: var(--euc-ink); }
+  .s-Waiting { background: var(--wattle-soft); color: var(--wattle); }
+  .s-Response { background: var(--euc-soft); color: var(--euc-ink); }
+  .s-Other { background: var(--slate-soft); color: var(--slate); }
+  .askbtn {
+    flex: none; border: 1px solid var(--line); background: none; color: var(--muted);
+    border-radius: 6px; font: 600 11.5px "Source Sans 3", sans-serif; padding: 2px 8px; cursor: pointer;
+  }
+  .askbtn:hover { border-color: var(--euc); color: var(--euc-ink); }
+  .secterr { font-size: 13.5px; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
+  .taskrow { display: flex; gap: 8px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  .taskrow:last-child { border-bottom: none; }
+  .taskrow .who { color: var(--muted); font-size: 13px; flex: none; }
+  .install { margin-top: 24px; font-size: 13.5px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .install b { color: var(--ink); }
+
+  /* ---- builder / runbooks / reference (unchanged design) ---- */
   .actions { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
   .actions button {
     background: var(--surface); border: 1px solid var(--line); border-radius: 99px;
@@ -62,7 +113,6 @@
   }
   .actions button:hover { border-color: var(--euc); }
   .actions button[aria-pressed="true"] { background: var(--euc); border-color: var(--euc); color: var(--btn-ink); }
-  .actions button:focus-visible { outline: 2px solid var(--euc); outline-offset: 2px; }
   .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px; }
   .field label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
   .field input, .field select, .field textarea {
@@ -113,10 +163,9 @@
   th { text-align: left; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line); }
   td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
   td code, li code { font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace; font-size: 12.5px; background: var(--mono-bg); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
-  .safety { margin-top: 34px; padding: 13px 16px; border-left: 3px solid var(--euc); background: var(--surface); border-radius: 0 8px 8px 0; font-size: 14px; color: var(--muted); }
+  .safety { margin-top: 30px; padding: 13px 16px; border-left: 3px solid var(--euc); background: var(--surface); border-radius: 0 8px 8px 0; font-size: 14px; color: var(--muted); }
   .safety strong { color: var(--ink); }
-  footer { margin-top: 24px; font-size: 13px; color: var(--muted); }
-  a { color: var(--euc-ink); }
+  footer { margin-top: 22px; font-size: 13px; color: var(--muted); }
   ul.tight { margin: 8px 0; padding-left: 20px; font-size: 14.5px; }
   ul.tight li { margin-bottom: 4px; }
   .panel[hidden] { display: none; }
@@ -126,19 +175,30 @@
   <header>
     <div class="kicker">BirdLife Australia · ICT</div>
     <h1>BirdLife ICT Console</h1>
-    <p class="lede">The cockpit for the AI ICT Assistant. Compose an exact request,
-    copy it, and paste it into a Claude session — the assistant does the
-    investigating, proposes every change, and waits for your approval.</p>
+    <p class="lede">Live queue, prompt cockpit and runbooks for the AI ICT Assistant.</p>
   </header>
 
   <nav role="tablist" aria-label="Console sections">
-    <button role="tab" aria-selected="true" data-panel="launch">Launch</button>
+    <button role="tab" aria-selected="true" data-panel="queue">Queue</button>
+    <button role="tab" aria-selected="false" data-panel="launch">Launch</button>
     <button role="tab" aria-selected="false" data-panel="runbooks">Runbooks</button>
     <button role="tab" aria-selected="false" data-panel="reference">Reference</button>
   </nav>
 
+  <!-- ============ QUEUE (live) ============ -->
+  <section class="panel" id="panel-queue">
+    <div class="livebar"><span class="dot" id="live-dot"></span><span id="live-status">Connecting to live data…</span></div>
+    <div class="tiles" id="tiles"></div>
+    <div id="sf-area"></div>
+    <h2>Project board</h2>
+    <div id="asana-area"></div>
+    <div class="install"><b>Make it an app:</b> in Samsung Internet tap ≡ → <b>Add page to</b> →
+    <b>Home screen</b>; in Chrome tap ⋮ → <b>Add to Home screen</b>. It opens full-screen
+    from its own icon. Live data needs you signed in to claude.ai in that browser.</div>
+  </section>
+
   <!-- ============ LAUNCH ============ -->
-  <section class="panel" id="panel-launch">
+  <section class="panel" id="panel-launch" hidden>
     <div class="actions" id="action-list" role="group" aria-label="Choose an action"></div>
     <div class="card">
       <div class="fields" id="field-area"></div>
@@ -247,7 +307,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   <div class="safety"><strong>Standing rules:</strong> the assistant never sends email
   in your name without showing the draft, never bulk-updates or deletes, confirms the
   staff record before reassigning, and hands anything security-, finance- or
-  PII-sensitive to you with the action prepared.</div>
+  PII-sensitive to you with the action prepared. This page itself only reads.</div>
 
   <footer>Source of truth: <code>console/index.html</code> in the
   <a href="https://github.com/mathewruahema-beep/Birdlife" target="_blank" rel="noopener">Birdlife repo</a>.
@@ -266,7 +326,216 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     });
   });
 
-  // ---------- prompt builder ----------
+  function flash(btn, doneText) {
+    var t = btn.textContent; btn.textContent = doneText || 'Copied ✓';
+    setTimeout(function () { btn.textContent = t; }, 1500);
+  }
+  function copyText(text, btn, doneText) {
+    navigator.clipboard.writeText(text).then(function () { if (btn) flash(btn, doneText); });
+  }
+
+  // ============================================================
+  // QUEUE — live data via the artifact mcp capability
+  // ============================================================
+  var SF_SERVER = 'Salesforce_Production', ASANA_SERVER = 'Asana';
+  var SOQL = "SELECT CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE RecordType.DeveloperName = 'Zeus' AND IsClosed = false ORDER BY CreatedDate ASC LIMIT 200";
+  var ASANA_INPUT = { completed: false, projects_any: "1211042432693678", limit: 100,
+    opt_fields: "name,assignee.name,due_on,memberships.section.name,permalink_url" };
+  var SECTION_NAMES = {
+    "1216556543715194": "Backlog/Requests", "1216556543715193": "Scoping/Requirements Gathering",
+    "1216556543715191": "In Development/Progress", "1217146608838572": "Awaiting Response",
+    "1216556543715197": "Blocked", "1216556543715188": "Ready for Deployment",
+    "1211042432693693": "Hypercare", "1211051239943465": "Done"
+  };
+  var liveDot = document.getElementById('live-dot');
+  var liveStatus = document.getElementById('live-status');
+  var tilesEl = document.getElementById('tiles');
+  var sfArea = document.getElementById('sf-area');
+  var asanaArea = document.getElementById('asana-area');
+  var sfState = { data: null, storedAt: null, error: null };
+  var asState = { data: null, storedAt: null, error: null };
+
+  function fixCopy(err, server) {
+    if (!err) return '';
+    if (err.code === 'needs_reauth') return 'Reconnect ' + server + ' in claude.ai Settings → Connectors.';
+    if (err.code === 'server_not_connected') return 'Add ' + server + ' in claude.ai Settings → Connectors.';
+    if (err.code === 'selection_required') return 'Choose which ' + server + ' connector to use when claude.ai prompts you.';
+    if (err.code === 'approval_required') return server + ' needs org approval for this call.';
+    if (err.code === 'blocked_by_policy') return 'Org policy blocks this ' + server + ' call.';
+    return server + ': ' + (err.message || err.code) + '.';
+  }
+  var AUTHZ = { needs_reauth: 1, server_not_connected: 1, blocked_by_policy: 1, approval_required: 1 };
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function statusClass(s) {
+    if (s === 'New') return 's-New';
+    if (s === 'In Progress') return 's-InProgress';
+    if (s === 'Waiting Response-External' || s === 'Pending' || s === 'On Hold-Internal') return 's-Waiting';
+    if (s === 'Response Received') return 's-Response';
+    return 's-Other';
+  }
+  function shortStatus(s) {
+    return ({ 'Waiting Response-External': 'Waiting ext', 'Response Received': 'Response rcvd',
+      'On Hold-Internal': 'On hold', 'In Progress': 'In progress' })[s] || s;
+  }
+
+  function renderQueue() {
+    var now = Date.now();
+    // tiles
+    var t = [];
+    if (sfState.data) {
+      var recs = sfState.data.records || [];
+      var open = recs.length;
+      var neu = recs.filter(function (r) { return r.Status === 'New'; }).length;
+      var zeus = recs.filter(function (r) { return r.Owner && r.Owner.Name === 'Zeus'; }).length;
+      var old = recs.filter(function (r) { return (now - Date.parse(r.CreatedDate)) / 864e5 > 30; }).length;
+      t.push({ n: open, l: 'Open cases' }, { n: neu, l: 'New' }, { n: zeus, l: 'Unassigned' },
+             { n: old, l: '&gt;30 days', warn: old > 0 });
+    }
+    if (asState.data) {
+      var tasks = asState.data;
+      var blocked = tasks.filter(function (x) { return x.section === 'Blocked'; }).length;
+      var overdue = tasks.filter(function (x) { return x.due_on && x.due_on < new Date(now).toISOString().slice(0, 10); }).length;
+      t.push({ n: blocked, l: 'Blocked', warn: blocked > 0 }, { n: overdue, l: 'Overdue', warn: overdue > 0 });
+    }
+    tilesEl.innerHTML = t.map(function (x) {
+      return '<div class="tile' + (x.warn ? ' warn' : '') + '"><div class="n">' + x.n + '</div><div class="l">' + x.l + '</div></div>';
+    }).join('');
+
+    // salesforce list
+    if (sfState.error && !sfState.data) {
+      sfArea.innerHTML = '<div class="secterr">' + esc(fixCopy(sfState.error, 'Salesforce')) + '</div>';
+    } else if (sfState.data) {
+      var recs2 = sfState.data.records || [];
+      var groups = {};
+      recs2.forEach(function (r) {
+        var o = (r.Owner && r.Owner.Name) || 'Unknown';
+        (groups[o] = groups[o] || []).push(r);
+      });
+      var order = Object.keys(groups).sort(function (a, b) {
+        if (a === 'Zeus') return -1; if (b === 'Zeus') return 1; return a.localeCompare(b);
+      });
+      sfArea.innerHTML = order.map(function (o) {
+        var rows = groups[o].map(function (r) {
+          var id = (r.attributes && r.attributes.url || '').split('/').pop();
+          var age = Math.floor((now - Date.parse(r.CreatedDate)) / 864e5);
+          return '<div class="caserow">' +
+            '<a class="cn" target="_blank" rel="noopener" href="https://birdlifeaustralia.lightning.force.com/lightning/r/Case/' + esc(id) + '/view">' + esc(r.CaseNumber) + '</a>' +
+            '<span class="subj" title="' + esc(r.Subject) + '">' + esc(r.Subject) + (r.Type ? '' : ' <span style="color:var(--wattle)" title="No Type set">•</span>') + '</span>' +
+            '<span class="badge ' + statusClass(r.Status) + '">' + esc(shortStatus(r.Status)) + '</span>' +
+            '<span class="age' + (age > 30 ? ' old' : '') + '">' + age + 'd</span>' +
+            '<button class="askbtn" data-case="' + esc(r.CaseNumber) + '">ask</button>' +
+            '</div>';
+        }).join('');
+        var head = o === 'Zeus' ? 'Zeus queue — unassigned intake (' + groups[o].length + ')' : esc(o) + ' (' + groups[o].length + ')';
+        return '<div class="grp"><h3>' + head + '</h3>' + rows + '</div>';
+      }).join('');
+      if (sfState.error) {
+        sfArea.innerHTML += '<div class="secterr">Refresh failed — showing last data. ' + esc(fixCopy(sfState.error, 'Salesforce')) + '</div>';
+      }
+      sfArea.querySelectorAll('.askbtn').forEach(function (b) {
+        b.addEventListener('click', function () {
+          copyText('Summarise case ' + b.dataset.case + ' and how to resolve it', b, '✓');
+        });
+      });
+    } else {
+      sfArea.innerHTML = '<div class="secterr">Waiting for Salesforce…</div>';
+    }
+
+    // asana list
+    if (asState.error && !asState.data) {
+      asanaArea.innerHTML = '<div class="secterr">' + esc(fixCopy(asState.error, 'Asana')) + '</div>';
+    } else if (asState.data) {
+      var byS = {};
+      asState.data.forEach(function (x) { byS[x.section] = (byS[x.section] || 0) + 1; });
+      var summary = Object.keys(byS).sort().map(function (s) { return esc(s) + ' ' + byS[s]; }).join(' · ');
+      var blockedRows = asState.data.filter(function (x) { return x.section === 'Blocked'; }).map(function (x) {
+        return '<div class="taskrow"><a target="_blank" rel="noopener" href="' + esc(x.url) + '">' + esc(x.name) + '</a>' +
+          '<span class="who">' + esc(x.assignee || 'Unassigned') + '</span></div>';
+      }).join('');
+      asanaArea.innerHTML = '<p class="hint" style="margin-top:0">' + summary +
+        (asState.truncated ? ' · first 100 shown' : '') + '</p>' +
+        (blockedRows ? '<div class="grp"><h3>Blocked</h3>' + blockedRows + '</div>' : '');
+      if (asState.error) {
+        asanaArea.innerHTML += '<div class="secterr">Refresh failed — showing last data. ' + esc(fixCopy(asState.error, 'Asana')) + '</div>';
+      }
+    } else {
+      asanaArea.innerHTML = '<div class="secterr">Waiting for Asana…</div>';
+    }
+
+    // status line
+    var errs = [sfState.error, asState.error].filter(Boolean);
+    if (sfState.data || asState.data) {
+      var at = sfState.storedAt || asState.storedAt;
+      liveDot.className = 'dot ' + (errs.length ? 'err' : 'live');
+      liveStatus.textContent = 'Live · Ask Zeus record type only · updated ' +
+        (at ? new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'just now');
+    } else if (errs.length === 2) {
+      liveDot.className = 'dot err';
+      liveStatus.textContent = 'Live data unavailable';
+    }
+  }
+
+  function offline(msg) {
+    liveDot.className = 'dot';
+    liveStatus.textContent = msg;
+    sfArea.innerHTML = '<div class="secterr">Open this page from its claude.ai link (signed in) to see the live queue. Everything else on this console works offline.</div>';
+    asanaArea.innerHTML = '';
+  }
+
+  (function initLive() {
+    if (!window.claude || typeof window.claude.use !== 'function') {
+      offline('Static copy — live data runs on the claude.ai app link');
+      return;
+    }
+    window.claude.use('mcp').then(function (mcp) {
+      if (!mcp) { offline('Live data not available in this view'); return; }
+      mcp.watchTool(SF_SERVER, 'soqlQuery', { q: SOQL }, function (ev) {
+        if (ev.type === 'data') {
+          var p = ev.result.payload;
+          if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+          if (p && p.records) {
+            sfState.data = p; sfState.error = null;
+            sfState.storedAt = ev.result.cache ? ev.result.cache.storedAt : Date.now();
+          }
+        } else {
+          sfState.error = ev.error;
+          if (AUTHZ[ev.error.code]) sfState.data = null;
+        }
+        renderQueue();
+      }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
+
+      mcp.watchTool(ASANA_SERVER, 'search_tasks', ASANA_INPUT, function (ev) {
+        if (ev.type === 'data') {
+          var p = ev.result.payload;
+          if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+          if (p && p.data) {
+            asState.truncated = p.data.length >= 100;
+            asState.data = p.data.map(function (task) {
+              var section = 'No section';
+              (task.memberships || []).forEach(function (m) {
+                if (m.section && SECTION_NAMES[m.section.gid]) section = SECTION_NAMES[m.section.gid];
+              });
+              return { name: task.name, section: section, due_on: task.due_on,
+                assignee: task.assignee && task.assignee.name, url: task.permalink_url };
+            });
+            asState.error = null;
+            asState.storedAt = ev.result.cache ? ev.result.cache.storedAt : Date.now();
+          }
+        } else {
+          asState.error = ev.error;
+          if (AUTHZ[ev.error.code]) asState.data = null;
+        }
+        renderQueue();
+      }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
+    });
+  })();
+
+  // ============================================================
+  // LAUNCH — prompt builder
+  // ============================================================
   var CLOSE_REASONS = ["Closed - Resolved","Closed - Resolved First Call","Closed - Email Sent",
     "Closed - Email Edited & Sent","Closed - Phone Call","Closed - No Action Required",
     "Closed - Internal Follow up","Closed - Duplicate","Closed - Spam","Closed - Abandoned"];
@@ -369,16 +638,13 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       : 'T1 — the assistant executes this after showing you the exact change and getting your go-ahead.';
   }
   dryrun.addEventListener('change', renderPreview);
-
-  function flash(btn, doneText) {
-    var t = btn.textContent; btn.textContent = doneText || 'Copied ✓';
-    setTimeout(function () { btn.textContent = t; }, 1500);
-  }
   document.getElementById('copy-prompt').addEventListener('click', function () {
-    navigator.clipboard.writeText(preview.textContent).then(function () { flash(document.getElementById('copy-prompt')); });
+    copyText(preview.textContent, document.getElementById('copy-prompt'));
   });
 
-  // ---------- offboarding runbook ----------
+  // ============================================================
+  // RUNBOOKS
+  // ============================================================
   var obName = document.getElementById('ob-name'), obUpn = document.getElementById('ob-upn'), obDate = document.getElementById('ob-date');
   var obSteps = document.getElementById('ob-steps');
 
@@ -415,7 +681,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         var wrap = document.createElement('div'); wrap.className = 'cmd';
         var pre = document.createElement('pre'); pre.textContent = s.c;
         var b = document.createElement('button'); b.textContent = 'copy';
-        b.addEventListener('click', function () { navigator.clipboard.writeText(s.c).then(function () { flash(b, 'copied ✓'); }); });
+        b.addEventListener('click', function () { copyText(s.c, b, 'copied ✓'); });
         wrap.appendChild(pre); wrap.appendChild(b); body.appendChild(wrap);
       }
       row.appendChild(n); row.appendChild(body);
@@ -429,23 +695,21 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     var text = '# Offboarding runbook — ' + name + ' (last day ' + date + ')\n' +
       '# Connect-MgGraph -Scopes "User.ReadWrite.All","Group.ReadWrite.All"\n\n' +
       obData().map(function (s, i) { return '# ' + (i + 1) + '. ' + s.t + '\n' + (s.c || '# (manual)'); }).join('\n\n');
-    navigator.clipboard.writeText(text).then(function () { flash(document.getElementById('ob-copy-all')); });
+    copyText(text, document.getElementById('ob-copy-all'));
   });
   document.getElementById('ob-copy-prompt').addEventListener('click', function () {
     var name = obName.value.trim() || '<name>', date = obDate.value || '<last day>';
-    navigator.clipboard.writeText('Offboard ' + name + ' — last day ' + date + '. Prepare the full checklist and the Graph commands, and update the case')
-      .then(function () { flash(document.getElementById('ob-copy-prompt')); });
+    copyText('Offboard ' + name + ' — last day ' + date + '. Prepare the full checklist and the Graph commands, and update the case',
+      document.getElementById('ob-copy-prompt'));
   });
   document.getElementById('onb-copy-prompt').addEventListener('click', function () {
-    navigator.clipboard.writeText('Onboard a new starter: <name>, <role>, starting <date>')
-      .then(function () { flash(document.getElementById('onb-copy-prompt')); });
+    copyText('Onboard a new starter: <name>, <role>, starting <date>', document.getElementById('onb-copy-prompt'));
   });
 
-  // ---------- generic copy buttons (reference) ----------
+  // generic copy buttons (reference)
   document.querySelectorAll('[data-copy]').forEach(function (b) {
     b.addEventListener('click', function () {
-      var src = document.querySelector(b.dataset.copy);
-      navigator.clipboard.writeText(src.textContent).then(function () { flash(b, 'copied ✓'); });
+      copyText(document.querySelector(b.dataset.copy).textContent, b, 'copied ✓');
     });
   });
 
