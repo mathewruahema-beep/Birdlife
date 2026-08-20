@@ -1,0 +1,95 @@
+name: Site Harvest
+
+# Cloud harvester: runs site-harvester on GitHub's runners (full internet
+# access) and commits the results back to this branch. Trigger it from the
+# Actions tab -> "Site Harvest" -> "Run workflow". Defaults harvest the AFO
+# journal; change the inputs to harvest any other site.
+#
+# NOTE: run this against branch claude/website-audit-migration-6ymaha —
+# that branch carries site-harvester/ and receives the results. This copy
+# on the default branch exists only so GitHub lists the workflow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Start URL to harvest"
+        required: true
+        default: "https://afo.birdlife.org.au/afo/index.php/afo"
+      name:
+        description: "Short name for output folder (harvest/<name>)"
+        required: true
+        default: "afo"
+      oai_endpoint:
+        description: "OAI-PMH endpoint (OJS journals only; blank to skip)"
+        required: false
+        default: "https://afo.birdlife.org.au/afo/index.php/afo/oai"
+      max_pages:
+        description: "Fetch cap (pages + assets)"
+        required: false
+        default: "8000"
+      delay:
+        description: "Seconds between requests"
+        required: false
+        default: "0.5"
+      wxr:
+        description: "Also produce a WordPress import file"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r site-harvester/requirements.txt
+
+      - name: OAI-PMH metadata harvest
+        if: ${{ inputs.oai_endpoint != '' }}
+        run: |
+          python3 site-harvester/oai_harvest.py "${{ inputs.oai_endpoint }}" \
+            --out "harvest/${{ inputs.name }}-oai" --delay "${{ inputs.delay }}"
+
+      - name: Full site crawl
+        run: |
+          WXR_FLAG=""
+          if [ "${{ inputs.wxr }}" = "true" ]; then WXR_FLAG="--wxr"; fi
+          python3 site-harvester/harvest.py "${{ inputs.url }}" \
+            --out "harvest/${{ inputs.name }}" \
+            --max-pages "${{ inputs.max_pages }}" \
+            --delay "${{ inputs.delay }}" $WXR_FLAG
+
+      - name: Show audit in run summary
+        if: always()
+        run: |
+          if [ -f "harvest/${{ inputs.name }}/AUDIT.md" ]; then
+            cat "harvest/${{ inputs.name }}/AUDIT.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload raw mirror as downloadable artifact (too big for git)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.name }}-raw-mirror
+          path: harvest/${{ inputs.name }}/raw
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Commit results to this branch (everything except raw mirror)
+        run: |
+          rm -rf "harvest/${{ inputs.name }}/raw"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add harvest/
+          git commit -m "Harvest results: ${{ inputs.name }} (${{ inputs.url }})" || { echo "nothing to commit"; exit 0; }
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
