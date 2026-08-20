@@ -1,0 +1,3123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://afo.birdlife.org.au/afo/lib/pkp/xml/oai2.xsl" ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+		http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2026-08-20T06:45:17Z</responseDate>
+	<request verb="ListRecords" metadataPrefix="oai_dc">https://afo.birdlife.org.au/afo/index.php/afo/oai</request>
+	<ListRecords>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1225</identifier>
+				<datestamp>2016-04-05T04:43:15Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Notes on the Black-winged Petrel Pterodroma nigripennis</dc:title>
+	<dc:creator>Klapste, Jaroslav</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1225</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 9, No 2 (1981)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1225/1799</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1928</identifier>
+				<datestamp>2016-04-07T04:52:21Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Some Notes From Noosa Heads, Queensland</dc:title>
+	<dc:creator>Peddie, H H</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1928</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 1, No 6 (1961)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1928/1664</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2122</identifier>
+				<datestamp>2021-03-18T03:31:01Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">J.N. Hobbs Medal 2018: Citation &amp;ndash; Andrew Barham Black</dc:title>
+	<dc:creator>Paton, David</dc:creator>
+	<dc:creator>Horton, Philippa</dc:creator>
+	<dc:creator>Paton, Penny</dc:creator>
+	<dc:description xml:lang="en-US">n/a</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2018-02-06</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2122</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 35 (2018)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2122/2152</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2018 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/686</identifier>
+				<datestamp>2016-02-12T03:17:13Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Supplementary Reeords of the Diet of Aquatic Birds and&amp;nbsp;Waders in New South Wales 1: Seabirds</dc:title>
+	<dc:creator>Rose, A B</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-12</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/686</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 18, No 6 (2000)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/686/670</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1260</identifier>
+				<datestamp>2016-04-05T04:42:06Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Nesting of the Grey Falcon Falco hypoleucos</dc:title>
+	<dc:creator>Cupper, Jack</dc:creator>
+	<dc:creator>Cupper, Lindsay</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1260</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 8, No 7 (1980)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1260/1760</dc:relation>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1960</identifier>
+				<datestamp>2016-04-07T04:53:42Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Osprey in Victoria</dc:title>
+	<dc:creator>Izzard, John</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1960</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 1, No 5 (1961)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1960/1696</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2157</identifier>
+				<datestamp>2021-03-18T03:44:38Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Predation of lizards by the White-faced Heron Egretta novaehollandiae</dc:title>
+	<dc:creator>Mo, Matthew</dc:creator>
+	<dc:description xml:lang="en-US">This note reports two observations of White-faced Herons Egretta novaehollandiae preying on lizards. Although predation of herpetofauna is well-known for Ardeidae species, predation on lizards by the White-faced Heron appears to have been recorded rarely, with just two published reports located.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2019-01-23</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2157</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 36 (2019)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2157/2177</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2019 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header status="deleted">
+				<identifier>oai:ojs.localhost:article/1243</identifier>
+				<datestamp>2016-04-05T00:06:16Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/718</identifier>
+				<datestamp>2016-02-19T00:48:42Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Bird Community Patterns in Fragmented Vegetation Zones Around Streambeds of the Northern Tablelands, New South Wales</dc:title>
+	<dc:creator>Chan, Ken</dc:creator>
+	<dc:description xml:lang="en-US">Bird counts were made at 39 plots from four open woodland sites, all within 200 m from a stream, near Arrnidale on the Northern Tablelands of New South Wales. Of three distinct vegetation zones, the riverine contained more bird individuals than the ecotone, which in turn contained more birds than the eucalypt woodland. More bird species were generally also found in the riverine zone. Three ecological guilds were identified according to the birds' foraging patterns. The two most abundant birds in the study area, the Fuscous Honeyeater Lichenostomus foscus and the White-plumed Honeyeater L penicillatus, attacked members of the foliage-gleaning guild more often than they did birds outside this guild. It is suggested that further fragmentation of the already narrow belts of the riverine and ecotone zones will increase interspecific competition for resources, resulting in the reduction of bird numbers and threatening the local survival of some species.
+&amp;nbsp;</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-19</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/718</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 16, No 1 (1995)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/718/702</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1293</identifier>
+				<datestamp>2016-04-05T04:41:16Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Notes on the Status and Behaviour of the Purple-crowned Fairy-wren Malurus coronatus in the Victoria River Downs area, Northern Territory</dc:title>
+	<dc:creator>Boekel, Con</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1293</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 8, No 3 (1979)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1293/1825</dc:relation>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1993</identifier>
+				<datestamp>2016-04-07T05:07:07Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Altona Survey Group - Tenth Anniversary</dc:title>
+	<dc:creator>Wheeler, W R</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1993</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 1, No 3 (1960)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1993/1729</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2191</identifier>
+				<datestamp>2021-03-18T03:44:23Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">J.N. Hobbs Medal 2020: Citation - Alan Stuart PhD</dc:title>
+	<dc:creator>Lindsey, Ann</dc:creator>
+	<dc:creator>Stewart, Robert</dc:creator>
+	<dc:description xml:lang="en-US">n/a</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2020-01-23</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2191</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 37 (2020)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2191/2210</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2020 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/29</identifier>
+				<datestamp>2016-02-05T00:17:26Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Learning about Cane Toads: Response to Donato &amp;amp; Potts (2004)</dc:title>
+	<dc:creator>Franklin, Donald C</dc:creator>
+	<dc:description xml:lang="en-US">The ability of Torresian Crows Corvus orru&amp;nbsp; in the Northern Territory to consume Cane Toads Bufo marinus without being poisoned is evidently an acquired behaviour. However, it may have been acquired on many occasions and need not involve cultural transmission of knowledge. There is insufficient information to determine the process by which these behaviours have become established.
+&amp;nbsp;
+&amp;nbsp;
+&amp;nbsp;
+&amp;nbsp;
+&amp;nbsp;
+&amp;nbsp;
+&amp;nbsp;</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-01-28</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/29</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 22, No 4 (2005)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/29/19</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/751</identifier>
+				<datestamp>2016-02-23T04:22:17Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Reproductive Behaviour of the Black-faced Cuckoo-shrike Coracina novaehollandiae</dc:title>
+	<dc:creator>Wood, K A</dc:creator>
+	<dc:description xml:lang="en-US">A pair of breeding Black-faced Cuckoo-shrikes Coracina novaehollandiae was observed raising two young from 20 days before fledging until they became independent. In a 91-day period, 29.7 hours were spent watching the nest and 66.5 hours watching and/or searching for family members after the young fledged. The breeding home range was 33 ha (core area 22 ha). One juvenile reached independence in 50-52 days after fledging, the other in 61-63 days. Information is presented on nest, nest site, voice, pair-bonding, brooding and feeding routine, care of the young, nestling and fledgling development, diet and pattern of diurnal activity.
+&amp;nbsp;</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-23</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/751</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 15, No 5 (1994)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/751/735</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1325</identifier>
+				<datestamp>2016-04-05T04:40:14Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">The Eggs of the Brush Cuckoo Cacomantis variolosus</dc:title>
+	<dc:creator>Beruldsen, G R</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1325</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 7, No 8 (1978)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1325/1856</dc:relation>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2030</identifier>
+				<datestamp>2021-03-18T03:45:22Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">New bird records from the Fortescue Marsh and nearby&amp;nbsp;claypans, Pilbara bioregion, Western Australia</dc:title>
+	<dc:creator>Trainor, Colin R.</dc:creator>
+	<dc:creator>Knuckey, Chris</dc:creator>
+	<dc:creator>Firth, Ronald S.C.</dc:creator>
+	<dc:description xml:lang="en-US">The Fortescue Marsh in the Pilbara bioregion, Western Australia, is an extensive ephemeral wetland that&amp;nbsp;fills episodically. It is considered as a potential Ramsar site and is recognised as a nationally important wetland and&amp;nbsp;an Important Bird Area. We surveyed birds at 21 sites on the Fortescue Marsh and a further 23 sites (44 sites in&amp;nbsp;total), including nearby claypans Coondiner Pool and Mungthannannie Pool, in the Fortescue Valley over 12 days in&amp;nbsp;March&amp;ndash;April and July 2012. A total of 100 bird species (34 waterbird and 66 landbird species) was recorded during the&amp;nbsp;survey. A further 86 bird species (including 28 waterbird species and 58 landbird species) were recorded for this area&amp;nbsp;from searches of databases and the literature (total of 187 species; 62 waterbirds). New and significant observations&amp;nbsp;during the survey included the first breeding record of Australian Shelduck Tadorna tadornoides for the Pilbara, the first&amp;nbsp;breeding records on the Marsh of Black-tailed Native-hen Tribonyx ventralis and Caspian Tern Hydroprogne caspia, and&amp;nbsp;the first record of Australian Painted Snipe Rostratula australis for the Fortescue Valley. Despite this area&amp;rsquo;s importance&amp;nbsp;to breeding and visiting waterbirds, the birds of the Fortescue Marsh remain surprisingly under-studied. We highlight&amp;nbsp;some significant but overlooked literature records of waterbirds on the Marsh. Further ground and aerial surveys, and&amp;nbsp;ongoing monitoring of this region would be valuable.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-24</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2030</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 33 (2016)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2030/2028</dc:relation>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2030/2029</dc:relation>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/downloadSuppFile/2030/2</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2224</identifier>
+				<datestamp>2024-07-18T02:37:13Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Obituary - Jerry (Gerald Richard) Olsen</dc:title>
+	<dc:creator>Debus, Stephen</dc:creator>
+	<dc:description xml:lang="en-US">n/a</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2021-02-02</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2224</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 38 (2021)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2224/2244</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2021 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/68</identifier>
+				<datestamp>2016-05-12T03:45:43Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Raptor observations in Darwin, Northern Territory</dc:title>
+	<dc:creator>Riddell, William</dc:creator>
+	<dc:description xml:lang="en-US">Some agonistic behaviour, foraging, prey items and nest-trees of the Brahminy Kite Haliastur indus, and additional information on a double-brooding pair of Brown Goshawks Accipiter fasciatus, in suburban Darwin, Northern Territory, are recorded. The exotic African Mahogany Khaya senegalensis tree is a popular nest-tree for the Kite and for the three Accipiter hawks in Darwin. The Rufous Owl Ninox rufa formerly bred in the Darwin Botanic Gardens, but has not done so since the nest-tree there was pruned.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-01-14</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/68</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 30, No 3 (2013)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/68/2024</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/784</identifier>
+				<datestamp>2016-02-26T05:33:07Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Tree Martins Occupying Fairy Martin Nests</dc:title>
+	<dc:creator>Griffiths, G A</dc:creator>
+	<dc:creator>Holyoak, D T</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-26</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/784</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 15, No 2 (1993)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/784/766</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1358</identifier>
+				<datestamp>2016-04-05T05:02:35Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Alexander Hugh Chisholm: 1890-1977</dc:title>
+	<dc:creator>Kloot, Tess</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1358</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 7, No 4 (1977)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1358/1883</dc:relation>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2256</identifier>
+				<datestamp>2022-12-12T14:00:51Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Ambient light energy intensity as a trigger for the dawn chorus: Patterns in five common eastern Australian bird species</dc:title>
+	<dc:creator>Wilkinson, Kevin E.</dc:creator>
+	<dc:creator>Palmer, Grant C.</dc:creator>
+	<dc:description xml:lang="en-US">The timing of the morning twilight commencement of bird song has been linked to mating, stores of food energy or territorial declarations, and is known to follow a structured, spaced order to avoid signal interference. The timing of vocalisations has been widely studied and varies with ambient and broader environmental variables, including moonlight and cloud cover.
+In this study, the commencement of morning song for five common species (Masked Lapwing Vanellus miles, Australian King- Parrot Alisterus scapularis, Lewinâ€™s Honeyeater Meliphaga lewinii, Eastern Yellow Robin Eopsaltria australis and Australian Magpie Gymnorhina tibicen) and the relationship with light energy intensity were investigated on the New South Wales Midnorth Coast, eastern Australia. It was determined that each species responded to a specific threshold light intensity as a trigger to commence singing. The timing of song commencement aligned with shifts in the required threshold light level, which was influenced by environmental variables such as moonlight (earlier) and cloudiness (later for some species). It is proposed that the structured routine of the first song of some birds, during nautical twilight, is a result of evolutionary variations in their eye structure, resulting in varying perceptions of the first morning light from the sky, leading to species commencing singing at different times.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2022-01-25</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2256</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 39 (2022)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2256/2279</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2022 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/102</identifier>
+				<datestamp>2016-02-05T00:21:21Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Brown Goshawk Accipiter fasciatus Attacking a Striated Heron Butorides striatus over the Sea</dc:title>
+	<dc:creator>Minton, Clive</dc:creator>
+	<dc:description xml:lang="en-US">This note describes an unsuccessful attack by a Brown Goshawk Accipiter fasciatus on a Striated Heron Butorides striatus that was flying over the sea.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-02</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/102</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 21, No 1 (2004)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/102/92</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/816</identifier>
+				<datestamp>2016-03-08T01:26:35Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Unusual Nests of the Laughing Kookaburra Dacelo novaeguineae</dc:title>
+	<dc:creator>Smith, L H</dc:creator>
+	<dc:description xml:lang="en-US">&amp;nbsp;
+An account is given of two unusual nests of the Laughing Kookaburra Dacelo novaeguineae, one in the bank of a creek and the other composed of sticks in a clump of mistletoe in a Yellow Gum Eucalyptus leucoxylon, in Tarnagulla, Victoria.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-08</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/816</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 14, No 6 (1992)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/816/798</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1390</identifier>
+				<datestamp>2016-04-05T05:28:50Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Marsh Crake as the Prey of the Black-shouldered Kite</dc:title>
+	<dc:creator>Doughty, C J</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1390</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 7, No 2 (1977)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1390/1909</dc:relation>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2289</identifier>
+				<datestamp>2023-12-21T01:23:39Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Observations of transoceanic movements by Nankeen Kestrels Falco cenchroides and a catalogue of terrestrial birds interacting with offshore vessels in Bass Strait, Australia</dc:title>
+	<dc:creator>Viola, Benjamin M.</dc:creator>
+	<dc:description xml:lang="en-US">How terrestrial avifauna interact with offshore infrastructure is relatively understudied. The migratory pathway and movements over Bass Strait (an expanse of ocean between Victoria and Tasmania, Australia) for many terrestrial species remains poorly known. Whilst working in Bass Strait, I observed multiple terrestrial species flying over deep offshore waters, up to distances of 35 nautical miles from the nearest coastline. Some of these species utilised offshore vessels as temporary refugia. Of particular note are several observations of Nankeen Kestrels Falco cenchroides. These observations are discussed, alongside an empirical list of species observed during my engagement with the offshore industry.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2023-01-03</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2289</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 40 (2023)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2289/2315</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2023 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/135</identifier>
+				<datestamp>2016-02-09T03:34:43Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Nocturnal Foraging by Kookaburras</dc:title>
+	<dc:creator>Campbell, Brett</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-09</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/135</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 19, No 3 (2001)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/135/125</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/848</identifier>
+				<datestamp>2016-03-08T04:38:04Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Eric Hosking's Birds: A Pioneer of Wildlife. A Tribute</dc:title>
+	<dc:creator>Hollands, David</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-08</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/848</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 14, No 3 (1991)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/848/830</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1422</identifier>
+				<datestamp>2016-04-05T05:45:45Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">White-backed Magpie Attempts to Feed Young Blackbirds</dc:title>
+	<dc:creator>Nevill, Jon</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1422</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 6, No 7 (1976)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1422/1163</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2321</identifier>
+				<datestamp>2024-12-20T08:03:26Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Note and photographs of a roosting White-throated Needletail Hirundapus caudacutus from New South Wales</dc:title>
+	<dc:creator>Vanderduys, Eric</dc:creator>
+	<dc:creator>Macdonald, Stewart</dc:creator>
+	<dc:creator>Pavey, Chris</dc:creator>
+	<dc:description xml:lang="en-US">White-throated Needletails Hirundapus caudacutus are very rarely recorded landing in Australia. Here we report on the circumstances of a roosting White-throated Needletail, from the Pilliga Forest, New South Wales. It was detected while we were undertaking targeted nocturnal fauna surveys. We describe the habitat type and provide photographs of the posture and context of a wild White-throated Needletail roosting. We speculate briefly about a potential failed attempt at predation of the Needletail by a Brown Falcon Falco berigora.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2024-02-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2321</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 41 (2024)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2321/2348</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2024 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/171</identifier>
+				<datestamp>2016-02-09T04:27:04Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Foraging Behaviour of a Peregrine Falcon Falco peregrinus</dc:title>
+	<dc:creator>Palmer, Grant C</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-09</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/171</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 19, No 8 (2002)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/171/161</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/881</identifier>
+				<datestamp>2016-03-22T04:18:20Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">The Post-juvenal Plumage of the Red-tailed Tropicbird Phaethon rubricauda</dc:title>
+	<dc:creator>Stokes, Tony</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-18</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/881</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 13, No 8 (1990)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/881/862</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1454</identifier>
+				<datestamp>2016-04-05T05:48:17Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Rainbow Lorikeets Breeding at Mount Eliza, Victoria</dc:title>
+	<dc:creator>Mitchell, Peggy</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1454</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 6, No 5 (1976)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1454/1195</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2356</identifier>
+				<datestamp>2025-12-23T02:49:02Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Lerp-feeding behaviour of the Australian King-Parrot Alisterus scapularis in suburban Sydney, New South Wales</dc:title>
+	<dc:creator>Sazima, Ivan</dc:creator>
+	<dc:creator>Sazima, Marlies</dc:creator>
+	<dc:description xml:lang="en-US">The staple food of the Australian King-Parrot Alisterus scapularis is fruits and seeds, in addition to nectar and insects, but the extent of use of lerps is poorly known. Here we describe and illustrate feeding behaviour of the King-Parrot on lerps and nymphs of the Aphalaridae psylloid Eucalyptolyma sp. The lerps were spread over young leaves of a Rough-barked Apple Angophora floribunda, and the King-Parrots took one leaf delicately between the mandibles at a time and scraped the lerps and the nymphs with the tongue. This observation of lerp-feeding by King-Parrots contributes to a better understanding of lerps as a food resource, including the seasonality and the frequency of use by parrots and other lerp-feeding birds.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2025-02-24</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2356</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 42 (2025)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2356/2383</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2025 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/429</identifier>
+				<datestamp>2016-01-16T10:26:16Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Observations on the Nesting Behaviour of the Brahminy Kite&amp;nbsp;Haliastur indus on Penang Island, Malaysia</dc:title>
+	<dc:creator>INDRAYANTO, PATRICIA; &lt;p&gt;p. 38-46&lt;/p&gt;</dc:creator>
+	<dc:creator>LATIP, NURUL SALMI ABDUL</dc:creator>
+	<dc:creator>SAH, SHAHRUL ANUAR MOHD</dc:creator>
+	<dc:description xml:lang="en-US">A study of the breeding behaviour of the Brahminy Kite Haliastur indus was conducted&amp;nbsp;at the campus of Universiti Sains Malaysia, Penang, Malaysia, from January to March 2009&amp;nbsp;for a total observation time of 50 h on 63 days. It was found that the pair of Kites covered the&amp;nbsp;egg for 91% of the total observation time. Although both the female and the male shared&amp;nbsp;incubation, the presumed female performed most (71%). The egg failed to hatch because the&amp;nbsp;nest fell down on the 40th day. The pair constructed a new nest adjacent to the former nest;&amp;nbsp;however, after 12 days the nest was abandoned because of disturbance by human activities&amp;nbsp;close to the nest-site. Prey captured and brought to the nest consisted mostly of fish.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-01-16</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/429</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 28, No 1 (2011)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/429/413</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1712</identifier>
+				<datestamp>2016-04-07T03:45:23Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Freckled Duck in South-western Victoria</dc:title>
+	<dc:creator>Smith, F T H</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1712</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 3, No 5 (1969)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1712/1452</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/461</identifier>
+				<datestamp>2016-01-22T00:14:26Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Breeding Sites of the Australian Pelican Pelecanus&amp;nbsp;conspicillatus in Victoria</dc:title>
+	<dc:creator>Oâ€™BRIEN, M B</dc:creator>
+	<dc:creator>CORRICK, A H</dc:creator>
+	<dc:creator>LACEY, G</dc:creator>
+	<dc:description xml:lang="en-US">Published records and all available unpublished records of breeding by the Australian&amp;nbsp;Pelican Pelecanus conspicillatus in Victoria have been critically assessed. Authentic records&amp;nbsp;(i.e. those with details of nests, eggs and/or young) indicate that this species has bred at&amp;nbsp;only eight locations since 1970 and at two additional locations before this. Two of these&amp;nbsp;10 locations (Lake Buloke and the Gippsland Lakes) had not been used before 1996, five&amp;nbsp;have been used frequently, and the remainder have been used only intermittently. Although&amp;nbsp;the breeding population of Pelicans fluctuates widely between years, the presence of the&amp;nbsp;Pelican as a breeding waterbird in Victoria seems to be secure as it is able to utilise new&amp;nbsp;sites when conditions become conducive to nesting. In Victoria, the sites used regularly are&amp;nbsp;all on semi-permanent or permanent saline wetlands, typically on small islands in coastal&amp;nbsp;lakes or embayments. Freshwater wetlands are sometimes used when islands and a reliable&amp;nbsp;fish supply are present. There are only two locations (Mud Islands and Lake Corangamite)&amp;nbsp;that have been used within the last 4 years for breeding, and there appears to have been a&amp;nbsp;shift in breeding from French Island in Western Port to Mud Islands in Port Phillip Bay.&amp;nbsp;Pelicans are vulnerable to disturbance at all Victorian breeding sites.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-01-19</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/461</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 27, No 1 (2010)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/461/446</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1037</identifier>
+				<datestamp>2016-03-29T01:35:54Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Observations on the Sooty Owl Tyto tenebricosa in South-east Queensland</dc:title>
+	<dc:creator>Beruldsen, Gordon R</dc:creator>
+	<dc:description xml:lang="en-US">Field observations have been undertaken on Sooty Owls Tyto tenebricosa in the D'Aguilar Range in south-east Queensland since February 1983. Tape recordings were obtained of their calls and playback was used to locate the birds. The Owls were strongly territorial and during the courtship period (usually March-April) before egg laying they responded aggressively to playback At other times they were generally silent and did not respond. Data were obtained on vocalisations and routines during the breeding season: at dusk males gave a territorial call from or near the roost and then patrolled their territory, giving regular calls often at approximately 20 min. intervals from predictable points, for the first 2-3 h of darkness. They did not call on some nights during this period, and brooding females answered only the first evening call of the male. A previously unrecorded call (the male's food-presentation call during incubation) is described. Most breeding took place in winter (incubation June-July), with one record for December-January. A fledgling discovered in October was dependent on the adults until the following March; the male resumed territorial calling within two months of its disappearance. Six known territories in the study area have been permanently occupied by the Owls for 8-10 years.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-29</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1037</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 11, No 7 (1986)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1037/1010</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1744</identifier>
+				<datestamp>2016-04-07T04:21:38Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">The Nesting of the Black Swan in the Royal&amp;nbsp;Botanic Gardens, Melbourne</dc:title>
+	<dc:creator>Cooper, Roy p</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1744</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 3, No 2 (1967)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1744/1483</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/496</identifier>
+				<datestamp>2016-01-18T22:58:09Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Diet of the Eastern Barn Owl Tyto (javanica) delicatula in&amp;nbsp;Diamantina National Park, South-western Queensland, in 2008&amp;ndash;2009</dc:title>
+	<dc:creator>DEBUS, S J S</dc:creator>
+	<dc:creator>LEY, A J</dc:creator>
+	<dc:creator>ROSE, A B</dc:creator>
+	<dc:description xml:lang="en-US">The diet of the Eastern Barn Owl Tyto (javanica) delicatula was determined by analysis of&amp;nbsp;185 pellets from a roost in Diamantina National Park, Queensland, collected in March&amp;ndash;April&amp;nbsp;and September 2008 and May 2009. The diet comprised 47% mammals (17.5% dasyurids,&amp;nbsp;29.5% rodents), 7% birds, &amp;lt;1% lizards, &amp;lt;1% frogs, and 45% insects by number, and 80%&amp;nbsp;mammals (24% dasyurids, 56% rodents), 15% birds, &amp;lt;1% lizards and frogs, and 5% insects&amp;nbsp;by biomass. Some new records of native mammals (two dasyurids, three rodents) were&amp;nbsp;obtained for Owl pellets from within the Park.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-01-19</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/496</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 27, No 4 (2010)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/496/480</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1070</identifier>
+				<datestamp>2016-03-29T02:24:34Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Diurnal Raptors Roosting on the Ground at Night</dc:title>
+	<dc:creator>Baker-Gabb, D J</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-29</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1070</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 11, No 3 (1985)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1070/1041</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1778</identifier>
+				<datestamp>2021-03-18T03:45:22Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Purple Swamphens Porphyrio porphyrio and Dusky Moorhens&amp;nbsp;Gallinula tenebrosa climbing trees and feeding on lerps</dc:title>
+	<dc:creator>Seymour, John</dc:creator>
+	<dc:description xml:lang="en-US">During an outbreak of the lerp-forming insect Glycaspis brimblecombei (Hemiptera: Aphalaridae) on River&amp;nbsp;Red Gums Eucalyptus camaldulensis near Adelaide, South Australia, Purple Swamphens Porphyrio porphyrio and&amp;nbsp;Dusky Moorhens Gallinula tenebrosa climbed trees to feed on lerps. The Swamphens climbed up to 8 m above groundor&amp;nbsp;water-level, the Moorhens up to 4 m. The Swamphens usually obtained lerps in situ by pecking or by drawing leaves&amp;nbsp;through the bill. Sometimes an individual detached a branch and flew with it to the ground to feed there. The Moorhens&amp;nbsp;took lerps only by pecking in situ.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-24</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1778</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 33 (2016)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1778/1517</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/530</identifier>
+				<datestamp>2016-02-04T23:52:57Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Some Vocal Characteristics and Call Variation in the Australian Corvids</dc:title>
+	<dc:creator>Lawrence, Clare</dc:creator>
+	<dc:description xml:lang="en-US">Some vocal characteristics and call variation in the Australian crows and ravens were studied by sonagraphic analysis of tape-recorded calls. The species grouped according to mean maximum emphasised frequency (Australian Raven Corvus coronoides, Forest Raven C. tasmanicus and Torresian Crow C. orru with lower-frequency calls, versus Little Raven C. mellori and Little Crow C. bennetti with higher-frequency calls). The Australian Raven had significantly longer syllables than the other species, but there were no significant interspecific differences in intersyllable length. Calls of Southern C.t. tasmanicus and Northern Forest Ravens C.t. boreus did not differ significantly in any measured character, except for normalised syllable length (phrases with the long terminal note excluded). Northern Forest Ravens had longer normalised syllables than Tasmanian birds; Victorian birds were intermediate. No evidence was found for dialects or regional variation within Tasmania, and calls from the mainland clustered with those from Tasmania.
+&amp;nbsp;</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-01-28</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/530</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 22, No 2 (2005)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/530/514</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1103</identifier>
+				<datestamp>2016-04-07T05:51:43Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Red-rumped Swallows in North Queensland</dc:title>
+	<dc:creator>Squire, John</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-29</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1103</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 10, No 8 (1984)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1103/1959</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1810</identifier>
+				<datestamp>2016-04-07T04:31:14Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Little Whimbrels and other Waders at a North Queensland&amp;nbsp;Airport.</dc:title>
+	<dc:creator>Smith, F T H</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1810</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 2, No 7 (1966)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1810/1549</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/563</identifier>
+				<datestamp>2016-02-04T23:29:27Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Breeding Territories and Breeding Success of the Jacky Winter Microeca fascinans in South-eastern Queensland</dc:title>
+	<dc:creator>WOOD, K A</dc:creator>
+	<dc:creator>THOMPSON, NICCI</dc:creator>
+	<dc:creator>LEY, ANDREW J</dc:creator>
+	<dc:description xml:lang="en-US">Breeding territories and breeding success of the Jacky Winter Microeca fascinans were&amp;nbsp;investigated in the 2005&amp;ndash;06 breeding season in 140 hectares of fragmented eucalyptwoodland&amp;nbsp;in south-eastern Queensland. The breeding density was eight territories in 140 hectares (one&amp;nbsp;pair per 17.5 ha) and the mean territory area of a breeding pair was 1.7 hectares (range&amp;nbsp;1&amp;ndash;3.1 ha, n = 8). All territories comprised similar proportions of box woodland and open&amp;nbsp;box woodland, characterised by patches of mature or sapling box trees, isolated live trees,&amp;nbsp;dead trees (standing and fallen), logs and stumps. Of 23 nests, 21 (91%) were in forks&amp;nbsp;consisting of a pair of dead branchlets near the extremity of a long live branch in eucalypt&amp;nbsp;trees estimated to be &amp;gt;160 years old. The sample of nests is small, but the study suggests that&amp;nbsp;woodland without aged eucalypt trees might not provide the species&amp;rsquo; preferred nest-sites.&amp;nbsp;Three nests failed before incubation was observed. Of the remaining 20 nests with eggs,&amp;nbsp;five nests produced seven fledglings, resulting in a nesting success of 25%, an estimated&amp;nbsp;breeding success of 17.5%, and productivity of 0.88 young per territory in 2005&amp;ndash;06. The&amp;nbsp;post-fledging dependence period for one juvenile was ~9 weeks.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-01-27</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/563</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 25, No 3 (2008)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/563/549</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1135</identifier>
+				<datestamp>2016-03-29T05:08:03Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Tree Martins Nesting in Caves</dc:title>
+	<dc:creator>Wall, L E</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-29</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1135</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 10, No 5 (1984)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1135/1075</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1842</identifier>
+				<datestamp>2016-04-07T04:39:12Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">The Oriental Pratincole (Glareola pratincola) near Melbourne.</dc:title>
+	<dc:creator>Cooper, Roy P</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1842</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 2, No 4 (1964)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1842/1580</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/595</identifier>
+				<datestamp>2016-01-27T22:47:02Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">First Record of the Short-billed Dowitcher Limnodromus griseus in Australia</dc:title>
+	<dc:creator>CAMPBELL, JEFF</dc:creator>
+	<dc:creator>MINTON, CLIVE</dc:creator>
+	<dc:description xml:lang="en-US">A record of a Short-billed Dowitcher Limnodromus griseus caught in a cannon-net at&amp;nbsp;Corner Inlet, Victoria, on 18 June 1995 was accepted by the Birds Australia Rarities&amp;nbsp;Committee (Case no. 195). This is the first record of this species in Australia. Recent evidence&amp;nbsp;to support this identification, as a Short-billed Dowitcher rather than a Long-billed&amp;nbsp;Dowitcher L. scolopaceus, is reviewed.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-01-28</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/595</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 24, No 3 (2007)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/595/581</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1168</identifier>
+				<datestamp>2016-04-07T05:58:48Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Some Breeding Data for the Grey Fantail Rhipidura fuliginosa</dc:title>
+	<dc:creator>Sedgwick, Eric H</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-29</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1168</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 10, No 1 (1983)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1168/1968</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1875</identifier>
+				<datestamp>2016-04-07T04:44:08Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">A Victorian Record of the Oriental Pratincole&amp;nbsp;(Glareola pratincola)</dc:title>
+	<dc:creator>Smith, F T H</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1875</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 2, No 1 (1963)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1875/1612</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2068</identifier>
+				<datestamp>2021-03-18T03:45:05Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">The range and habitat of the Kalkadoon Grasswren Amytornis ballarae</dc:title>
+	<dc:creator>Harrington, Graham</dc:creator>
+	<dc:creator>McKeown, Adam</dc:creator>
+	<dc:creator>Venables, Brian</dc:creator>
+	<dc:description xml:lang="en-US">In this paper we discuss the results of the first comprehensive survey of the range and habitat of the Kalkadoon Grasswren Amytornis ballarae. This grasswren is of particular interest because (1) It is not classed as a Restricted Range Species by BirdLife International although we show that it occupies &amp;lt;50 000 km2; (2) This species lives in a fireprone environment, and the habitat is unsuitable for at least 3 years after fire. The movement and fate of the birds in these circumstances is unknown; (3) It is sympatric with the Carpentarian Grasswren A. dorotheae over part of its range, raising questions about competition between the species; and (4) The spatial and behavioural separation from the closely related Dusky Grasswren A. purnelli is not well defined. In 2008 and 2009, we visited 195 locations in firescars of known age within the known range of the Kalkadoon Grasswren and played calls of Kalkadoon and Carpentarian Grasswrens at 6&amp;ndash;10 sites in each, totalling 1491 survey sites. We encountered 81 groups of Kalkadoon Grasswrens. They showed a marked preference for metamorphosed sandstone and marble. They were almost always found on rocky hills, but if on flat areas they were within 300 m of hills. Spinifex Triodia spp. dominated the ground-layer at all the sites where Kalkadoon Grasswrens were located. Ground-cover by spinifex increased annually after fire and plateaued after 6 years. Kalkadoon Grasswrens had returned to 30% of 3- and 4-year-old firescars, but occurred in 90% of locations surveyed which had not been burnt for &amp;ge;10 years. No grasswrens were encountered in surveys between the currently published ranges of the Dusky Grasswren in the Northern Territory and the Kalkadoon Grasswren in Queensland. This paper provides a distribution map, and defines the habitat variables for the Kalkadoon Grasswren. Our mapping shows that the range of the Kalkadoon Grasswren is ~40 000 km2, which qualifies it as a BirdLife International Restricted Range Species. We argue that an Important Bird Area should be declared for conserving and monitoring this species alone, where it is not sympatric with the Carpentarian Grasswren.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2017-01-25</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2068</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 34 (2017)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2068/2079</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2017 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/632</identifier>
+				<datestamp>2016-01-27T22:52:36Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Plural-breeding Australian Magpies Gymnorhina tibicen dorsalis Nesting Annually in the Same Tree</dc:title>
+	<dc:creator>FULTON, GRAHAM R</dc:creator>
+	<dc:description xml:lang="en-US">A single social group of plural-breeding Western Australian Magpies Gymnorhina tibicen&amp;nbsp;dorsalis had two concurrently active nests in the same Marri Corymbia calophylla tree over three&amp;nbsp;consecutive years 2003&amp;ndash;05. Western Australian Magpies are social birds that breed co-operatively,&amp;nbsp;although they have not been reported previously with nests in the same tree. These nests were&amp;nbsp;positioned such that the centre of the tree did not obstruct the visibility from one to the other.&amp;nbsp;Nesting this closely may facilitate intraspecific brood parasitism, which has been reported in&amp;nbsp;plural-breeding Magpies. Double nesting in this tree was most likely caused by the tree&amp;rsquo;s isolation&amp;nbsp;in a field that formed most of the group&amp;rsquo;s feeding range, within which Magpies generally showed&amp;nbsp;aggression only to larger birds.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-01-28</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/632</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 23, No 4 (2006)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/632/618</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1202</identifier>
+				<datestamp>2016-03-29T05:58:10Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Xanthochroism in the House Sparrow Passer domesticus</dc:title>
+	<dc:creator>Klapste, Jaroslav</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-29</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1202</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 9, No 5 (1982)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1202/1114</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1907</identifier>
+				<datestamp>2016-04-07T04:48:41Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Nesting of the Red-backed Kingfisher</dc:title>
+	<dc:creator>Hobbs, J N</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1907</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 1, No 8 (1962)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1907/1643</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2100</identifier>
+				<datestamp>2021-03-18T03:31:01Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">A photographic guide for ageing nestlings of two Australian brood-parasitic cuckoo species: Horsfield&amp;rsquo;s Bronze-Cuckoo Chalcites basalis and the Fan-tailed Cuckoo Cacomantis flabelliformis</dc:title>
+	<dc:creator>Feeney, William</dc:creator>
+	<dc:creator>Ryan, Thomas</dc:creator>
+	<dc:creator>Kennerley, James</dc:creator>
+	<dc:creator>Poje, Colleen</dc:creator>
+	<dc:creator>Clarke, Lacey</dc:creator>
+	<dc:creator>Scheuering, Miles</dc:creator>
+	<dc:creator>Webster, Michael</dc:creator>
+	<dc:description xml:lang="en-US">Accurate ageing of nestling birds is important for a variety of ecological, evolutionary and ornithological research. However, this can be difficult when nests are found after the eggs have hatched, especially for less-common species such as brood-parasitic cuckoos. Here we present a photographic guide for ageing nestlings of two species of Australian cuckoo: Horsfield&amp;rsquo;s Bronze-Cuckoo Chalcites basalis and the Fan-tailed Cuckoo Cacomantis flabelliformis. Evidence of chick rejection by several hosts of bronze-cuckoos Chalcites spp. and counter-adaptations in cuckoo nestlings has prompted increased research attention in this subject. This guide will help facilitate these efforts as well as research into the ecologies of other unstudied cuckoos.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2018-02-06</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2100</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 35 (2018)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2100/2117</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2018 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/664</identifier>
+				<datestamp>2016-01-27T22:51:25Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Foraging, Breeding Behaviour and Diet of a Family of Blackshouldered&amp;nbsp;Kites Elanus axillaris near Tamworth,&amp;nbsp;New South Wales</dc:title>
+	<dc:creator>DEBUS, S J S</dc:creator>
+	<dc:creator>OLDE, G S</dc:creator>
+	<dc:creator>MARSHALL, N</dc:creator>
+	<dc:creator>MEYER, J</dc:creator>
+	<dc:creator>ROSE, A B</dc:creator>
+	<dc:description xml:lang="en-US">The foraging, breeding behaviour and diet of a family of Black-shouldered Kites Elanus&amp;nbsp;axillaris were studied by 68 hours of observation from the incubation period to the end of the&amp;nbsp;post-fledging period, and by analysis of pellets, near Tamworth on the North-west Slopes of New&amp;nbsp;South Wales in April&amp;ndash;July 2004. The male Kite foraged mostly in mid morning and early to mid&amp;nbsp;afternoon, aerially (82% of search time), with 77% of 44 attacks successful. Pellets (n = 30)&amp;nbsp;consisted entirely of House Mice Mus domesticus, and observed prey items were mice (n = 58)&amp;nbsp;or mouse-sized mammals (n = 3). The male&amp;rsquo;s capture, consumption and prey-delivery rates&amp;nbsp;peaked in the week before fledging (mean 0.9, 1.2 and 1.2 captures/h in the incubation, nestling&amp;nbsp;and post-fledging phases, respectively). The female performed most care of eggs and nestlings,&amp;nbsp;though the male performed a minor share of incubation and brooding. The nestling period lasted&amp;nbsp;36 days, and post-fledging period at least 36 days with parental feeding for at least 22 days.&amp;nbsp;Parental behaviour, vocalisations, hunting behaviour, and development of juveniles are described.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-01-28</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/664</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 23, No 3 (2006)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/664/649</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1237</identifier>
+				<datestamp>2016-04-05T04:43:27Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Square-tailed Kite Flight Display</dc:title>
+	<dc:creator>Debus, Stephen J S</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1237</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 9, No 1 (1981)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1237/1810</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1939</identifier>
+				<datestamp>2016-04-07T04:52:21Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Mass-Bathing in North Queensland</dc:title>
+	<dc:creator>Officer, H R</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1939</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 1, No 6 (1961)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1939/1675</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2133</identifier>
+				<datestamp>2021-03-18T03:44:38Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Prey-caching in the Nankeen Kestrel Falco cenchroides, and a review of caching in other Australian falcons</dc:title>
+	<dc:creator>Fitzsimons, James A.</dc:creator>
+	<dc:creator>Thomas, Janelle L.</dc:creator>
+	<dc:creator>Debus, Stephen J.S.</dc:creator>
+	<dc:description xml:lang="en-US">We describe two instances of a Nankeen Kestrel Falco cenchroides caching a House Mouse Mus musculus in winter: (1) beneath ground vegetation, and (2) beneath a clod of earth in a ploughed field. As caching is seldom reported in this or other Australian falcons, we review reports of caching by Australian falcons, and by Northern Hemisphere kestrels in which the habit is well studied.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2019-01-23</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2133</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 36 (2019)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2133/2156</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2019 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/697</identifier>
+				<datestamp>2016-02-12T05:25:23Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">The Juvenile Food-begging Calls and Associated Aspects in the Australian 'Broad-tailed' (Platycercine) Parrots</dc:title>
+	<dc:creator>Courtney, John</dc:creator>
+	<dc:description xml:lang="en-US">The juvenile food-begging calls of representative species of seven of the II traditional genera of 'broad-tailed' (platycercine) parrots from Australia were studied and compared with those of other Australian parrots and cockatoos. Three subgroups were defined. One subgroup (Melopsittacus, Pezoporus) , thought to be the most 'primitive', possesses a pure-sounding quavering whistle which remains unchanged with age of chick. The two other subgroups (Neophema and the 'advanced' platycercines) have an age-related, progressively changing juvenile food-begging call. This is atypical of other Australian parrots and cockatoos, all of which have an unchanging begging call until it is discarded on independence. It is concluded that members of this large group traditionally known as the 'broad-tailed' parrots are more closely related to one another than to other parrots, and therefore are monophyletic even though the group may be of considerable antiquity.
+&amp;nbsp;</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-12</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/697</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 17, No 4 (1997)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/697/681</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1272</identifier>
+				<datestamp>2016-04-05T04:42:23Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Diurnal Clustering of White-breasted Woodswallows</dc:title>
+	<dc:creator>Noske, Richard A</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1272</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 8, No 6 (1980)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1272/1773</dc:relation>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1971</identifier>
+				<datestamp>2016-04-07T05:11:23Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Bird Notes from Queensland</dc:title>
+	<dc:creator>Nielson, Lloyd</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1971</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 1, No 4 (1960)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1971/1707</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2169</identifier>
+				<datestamp>2021-03-18T03:44:38Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Regional variation in iris colour of the White-browed Scrubwren Sericornis frontalis complex in digital photographs</dc:title>
+	<dc:creator>Cake, Martin</dc:creator>
+	<dc:description xml:lang="en-US">A large sample (n = 590) of location-tagged digital photographs was examined to assess regional or subspecific variation in iris colour of the White-browed Scrubwren Sericornis frontalis complex, which may be a diagnostic character misrepresented in the literature. The irides of the western/Spotted Scrubwren group (maculatus, balstoni, mellori, ashbyi) were found to be consistently more blue-green in colour compared with the remainder of the complex; this difference approached criteria for diagnosability and matched reported taxon boundaries. Lack of variation within the western group suggests a genetic rather than an ecophenotypic basis. Since juveniles of both groups have similar irides, this difference probably represents the acquisition of yellow-orange pigmentation with maturity in eastern but not western birds.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2019-01-23</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2169</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 36 (2019)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2169/2189</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2019 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header status="deleted">
+				<identifier>oai:ojs.localhost:article/2188</identifier>
+				<datestamp>2020-08-13T23:42:53Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/729</identifier>
+				<datestamp>2016-02-23T03:50:58Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">The Successful Rehabilitation of Two Powerful Owl Fledglings</dc:title>
+	<dc:creator>McNabb, E G</dc:creator>
+	<dc:description xml:lang="en-US">In separate incidents in south-central Victoria in 1989, two Powerful Owl Ninox strenua fledglings were successfully rehabilitated. In one case the owlet was fostered with a pair of owls that had a single fledgling of similar age to the 'orphan'; in the other case the owlet was reunited with its parents. These experiences demonstrate that wild pairs of Powerful Owls will accept fostered young, and that 'branchers' can be fostered.
+&amp;nbsp;</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-23</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/729</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 15, No 7 (1994)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/729/712</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1304</identifier>
+				<datestamp>2016-04-05T04:41:29Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">A Note on the Yellow-breasted Boatbill.</dc:title>
+	<dc:creator>Keller, Ralph</dc:creator>
+	<dc:creator>Keller, Daphne</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1304</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 8, No 2 (1979)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1304/1836</dc:relation>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2006</identifier>
+				<datestamp>2016-04-07T05:08:26Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">The Forty-spotted Pardalote</dc:title>
+	<dc:creator>Gellibrand, R I</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2006</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 1, No 2 (1959)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2006/1743</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2202</identifier>
+				<datestamp>2021-03-18T03:44:23Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">An observation of Sugar Gliders evicting nesting White-throated Treecreepers from a nest box in central Victoria</dc:title>
+	<dc:creator>Terry, William</dc:creator>
+	<dc:description xml:lang="en-US">This note describes the eviction of nesting White-throated Treecreepers Cormobates leucophaea from a nest box by a Sugar Glider Petaurus breviceps in central Victoria. Predation of the birds and eggs was not observed.
+&amp;nbsp;
+&amp;nbsp;</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2020-01-23</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2202</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 37 (2020)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2202/2223</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2020 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/40</identifier>
+				<datestamp>2016-02-04T23:43:23Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Breeding and Flocking:Comparison of Seasonal Wetland Habitat Use by the Brolga Grus rubicunda in South-western Victoria</dc:title>
+	<dc:creator>Sheldon, Rebecca A</dc:creator>
+	<dc:description xml:lang="en-US">Systematic investigation of temporal use of habitats by the Brolga Crus rubicunda is lacking, The aim of this study was to examine six wetland characteristics and their relation to Brolga flocking and breeding habitat for the south-western Victorian Brolga population, During the breeding season Brolgas were restricted to freshwater meadows and shallow freshwater marshes with an average water depth of 0,26 m (Standard Deviation, S,D, 0,06 m) and area of 15,71 ha (S,D, 18,04 ha), Breeding sites were characterised by having a substantial cover of emergent aquatic vegetation (mean 82.41 %, S,D, 12,72% ), which was significantly greater than th at recorded for flocking sites (Z = -5,863, df =56, P&amp;lt;O,OOl), In comparison, flocking sites had more variable salinity (fresh to saline), area (3,25-2565,17 ha) and wetland classification (shallow freshwater marsh to permanent saline), Flocking sites had significantly greater average water depth (t = - 5,542, df =56, P &amp;lt;0,001), wetland area (Z = -4,829, df =56, P &amp;lt;0,0001) and number of water sources (t = -6.472, df =56, P &amp;lt;0,0001) than breeding sites, Flocking sites potentially maintained summer inundation by being fed by two or more water sources (mean 2,21 , S,D, 0,68), This variable nature of habitats used by the Brolga and the variation in habitat use create a challenge for the effective long-term management and conservation of the species,
+&amp;nbsp;</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-01-28</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/40</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 22, No 1 (2005)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/40/30</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/763</identifier>
+				<datestamp>2016-02-26T06:13:01Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Some Additional Food Items of Two Parrots</dc:title>
+	<dc:creator>Ley, Andrew J</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-26</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/763</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 15, No 4 (1993)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/763/746</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1336</identifier>
+				<datestamp>2016-04-05T04:40:44Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Little Corella in Eastern Victoria</dc:title>
+	<dc:creator>Cross, R W</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1336</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 7, No 6 (1978)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1336/1866</dc:relation>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2041</identifier>
+				<datestamp>2021-03-18T03:45:22Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Stranger in the valley: Expansion in the range of the Spiny-cheeked&amp;nbsp;Honeyeater in central eastern New South Wales</dc:title>
+	<dc:creator>McAllan, Ian A.W.</dc:creator>
+	<dc:creator>Lindsay, Kurtis J.</dc:creator>
+	<dc:description xml:lang="en-US">Evidence is given for a relatively recent eastward movement in the distribution of the Spiny-cheeked&amp;nbsp;Honeyeater Acanthagenys rufogularis into the Cudgegong and Hunter River Valleys of central New South Wales. Since&amp;nbsp;the 1980s, this species has colonised ~200 km to the east, crossing the Great Dividing Range in the process. It is&amp;nbsp;speculated that this change in distribution may be related to increasing temperatures, particularly minimum temperatures&amp;nbsp;in winter. There have been no adverse interactions noted with other bird species so far, though there is the potential for&amp;nbsp;a negative impact on the Critically Endangered Regent Honeyeater Anthochaera phrygia.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-24</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2041</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 33 (2016)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2041/2042</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2235</identifier>
+				<datestamp>2021-12-21T20:12:39Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Yellow-throated Honeyeater Nesoptilotis flavicollis parental care, foraging ecology and social behaviour compared with the White-eared Honeyeater N. leucotis</dc:title>
+	<dc:creator>Donaghey, Richard H.</dc:creator>
+	<dc:description xml:lang="en-US">The Yellow-throated Honeyeater Nesoptilotis flavicollis  (Meliphagidae) is endemic to Tasmania and the Bass Strait islands. A watch at a nest attended by a colour-banded male and his mate revealed that the three nestlings were fed at a mean rate of 18.3 meals per hour 2 days before fledging. The female delivered more than half the meals and the male contributed at least 34% of them. Thus, this study showed that both the male and female of a pair fed the nestlings, contrary to previous reports that only the female feeds nestlings. Both male and female fed the fledglings. The foraging ecology, social behaviour and nesting ecology of the Yellow-throated Honeyeater and its sister species, the White-eared Honeyeater N. leucotis, are compared.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2021-02-02</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2235</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 38 (2021)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2235/2256</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2021 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/79</identifier>
+				<datestamp>2016-05-05T06:51:16Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">The Breeding Cycle of a Pair of Pacific Bazas Aviceda Subcristata in South-eastern Queensland</dc:title>
+	<dc:creator>James, Peter</dc:creator>
+	<dc:description xml:lang="en-US">A family of Pacific Bazas Aviceda subcristata was observed from nest-building to independence of the juvenile over the period of 19 December 2002 to 31 March 2003. The nest-building and pre-laying phase took 16 days, the incubation period 29 days, the nestling period 35 days, and the post-fledgling dependence at least 22 days, of which the juvenile was fully dependent on parental feeding for 15 days. Parental roles, and the nestling's diet, growth and development, are described.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-02</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/79</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 21, No 4 (2004)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/79/69</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/795</identifier>
+				<datestamp>2016-02-26T04:10:45Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">An&amp;nbsp;Albino Cape Petrel Daption capense off Tasmania</dc:title>
+	<dc:creator>Reid, Tim</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-26</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/795</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 15, No 1 (1993)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/795/777</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1369</identifier>
+				<datestamp>2016-04-05T05:14:57Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">First record of the Jabiru in Central Australia.</dc:title>
+	<dc:creator>Klapste, Jaroslav</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1369</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 7, No 3 (1977)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1369/1141</dc:relation>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2268</identifier>
+				<datestamp>2022-12-12T14:00:50Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Recent observations of Plains-wanderers Pedionomus torquatus at Fowlers Gap Arid Zone Research Station, New South Wales</dc:title>
+	<dc:creator>Smith, Matt S.</dc:creator>
+	<dc:creator>Gorta, Simon B.Z.</dc:creator>
+	<dc:creator>Roberts, Bridget</dc:creator>
+	<dc:creator>Leggett, Keith E. A.</dc:creator>
+	<dc:description xml:lang="en-US">Plains-wanderers  Pedionomus torquatus  are Critically Endangered grassland birds that are rarely observed in arid New South Wales (NSW). In autumn 2022, however, this species was twice observed at Fowlers Gap Arid Zone Research Station in the north-west of the state. These observations occurred following significant summer rains in habitat dominated by bare ground, low  Sclerolaena  species and sparse Curly Mitchell Grass Astrebla lappacea tussocks. Since the late 1980s, there have been only four other records from the NSW arid zone, all of which have occurred since spring 2020.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2022-01-25</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2268</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 39 (2022)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2268/2291</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2022 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/113</identifier>
+				<datestamp>2016-02-05T01:33:38Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">A Successful Extra-limital Breeding Record of the Black Kite Milvus migrans South-west of Melbourne, Victoria</dc:title>
+	<dc:creator>McDonald, Paul G</dc:creator>
+	<dc:description xml:lang="en-US">In October 2001 a nest of the Black Kite Milvus migrans was detected 35 km south-west of Melbourne, Victoria, well outside the known breeding range of this species. Subsequently, this pair successfully fledged two offspring in early January in early January, 2002, with the first- and second-fledged young obtaining independence in just 12 and 10 days respectively. Small numbers of Black Kites are frequently found in the study area, but have not previously been observed breeding. Unusually low numbers of Whistling Kites Haliastur sphenurus in the study area in 2001 may have facilitated the successful breeding by the Black Kites.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/113</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 20, No 1 (2003)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/113/103</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/827</identifier>
+				<datestamp>2016-03-08T01:20:36Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Vocal Mimicry of Larger Honeyeaters by the Regent Honeyeater Xanthomya phrygia</dc:title>
+	<dc:creator>Veerman, Philip A</dc:creator>
+	<dc:description xml:lang="en-US">This paper presents evidence of solitary Regent Honeyeaters Xanthomyza phrygia associating with a variety of larger honeyeaters and mimicking the calls of those other species. The significance of this behaviour is discussed along with a summary of other aspects of the Regent Honeyeater's vocal behaviour. It may be a unique case of vocal mimicry used for deception.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-08</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/827</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 14, No 5 (1992)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/827/809</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1401</identifier>
+				<datestamp>2016-04-05T05:42:32Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Brown Pigeon- a New Victorian Bird</dc:title>
+	<dc:creator>Sudbury, Aidan</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1401</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 7, No 1 (1977)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1401/1921</dc:relation>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2300</identifier>
+				<datestamp>2024-07-18T04:57:09Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Differences in bird community structure between riparian and upland zones in a New Guinean rainforest</dc:title>
+	<dc:creator>Korejs, Kryštof</dc:creator>
+	<dc:creator>Riegert, Jan</dc:creator>
+	<dc:creator>Kigl, Michael</dc:creator>
+	<dc:creator>Novotny, Vojtech</dc:creator>
+	<dc:description xml:lang="en-US">Riparian forests serve as important habitats that enhance diversity of bird species and perform crucial ecosystem functions in tropical forest landscapes. We compared the community structure (represented by functional trait composition) and diversity (represented by Shannon index) of birds in riparian and upland zones in a semi-continuous primary rainforest in Papua New Guinea. Distance sampling was applied to provide unbiased abundance estimates. Bird community structure was examined by principal coordinate analysis of neighbour matrices (PCNM) in the Canoco 5 program. Analysis of diversity was performed using mixed-effects linear models in R 3.5.1. Species diversity was marginally higher in riparian zones (P = 0.065). Community structure differed significantly in riparian and upland zones (P = 0.008). Invertivorous and omnivorous birds preferred riparian habitats but frugivorous and nectivorous birds avoided riparian zones. Birds in riparian zones were characterised by preferences for high-density forest interior but birds in upland areas mostly occupied exposed canopy layers. Beak dimensions were greater in riparian zones but body mass, and lengths of wing and tarsus were greater in upland zones. Species found in riparian zones had greater geographical ranges than those in upland zones. Our results highlight the adaptability of a rainforest bird community to natural disturbances characterised by localised river flooding and riverbank erosion. For example, small invertivorous and omnivorous birds can navigate disturbed vegetation and exploit river-associated invertebrate food supply while moving to alternative food sources during intensive flooding. On the other hand, large frugivorous and nectarivorous birds are mostly sedentary and require an intact canopy layer for foraging, responding poorly to changes in vegetation structure. By moving beyond species-level relationships when examining bird community structure, we were able to better interpret and connect our findings with other studies on bird communities in tropical rainforest.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2023-01-03</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2300</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 40 (2023)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2300/2326</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2023 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/146</identifier>
+				<datestamp>2016-02-12T03:27:06Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">A Common Name for the Norfolk Island Pigeon</dc:title>
+	<dc:creator>McAllan, Ian A W</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-12</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/146</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 18, No 4 (1999)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/146/136</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/860</identifier>
+				<datestamp>2016-03-08T02:32:54Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Predation of Willie Wagtail and Fledglings by Pied Butcherbird</dc:title>
+	<dc:creator>Tarburton, Michael K</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-08</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/860</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 14, No 2 (1991)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/860/842</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1433</identifier>
+				<datestamp>2016-04-05T05:47:05Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">A Queensland record of the Asiatic Dowitcher</dc:title>
+	<dc:creator>Gardner, Tom</dc:creator>
+	<dc:creator>Gardner, Pam</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1433</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 6, No 6 (1976)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1433/1174</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2333</identifier>
+				<datestamp>2024-12-20T08:03:26Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Book Review: Australian Falcons: The secret lives of our fastest birds of prey</dc:title>
+	<dc:creator>Debus, Stephen</dc:creator>
+	<dc:description xml:lang="en-US">n/a</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2024-02-07</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2333</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 41 (2024)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2333/2361</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2024 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/182</identifier>
+				<datestamp>2016-02-09T03:49:36Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Review - The Flight of the Emu: A Hundred Years of Australian Ornithology 1901-2001</dc:title>
+	<dc:creator>Ley, Andrew</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-09</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/182</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 19, No 6-7 (2002)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/182/172</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/892</identifier>
+				<datestamp>2016-03-22T04:15:11Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Review - The Food of Australian Birds, 1 Non-Passerines</dc:title>
+	<dc:creator>Debus, Stephen</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-18</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/892</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 13, No 7 (1990)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/892/872</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1465</identifier>
+				<datestamp>2016-04-05T05:54:54Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Food and Habits of two Treecreepers</dc:title>
+	<dc:creator>Baldwin, Merle</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1465</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 6, No 4 (1975)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1465/1206</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2367</identifier>
+				<datestamp>2025-12-23T02:49:01Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Sighting of a Red-backed Fairy-wren Malurus melanocephalus in the Blue Mountains, New South Wales</dc:title>
+	<dc:creator>Mo, Matthew</dc:creator>
+	<dc:creator>Mo, Elouise</dc:creator>
+	<dc:description xml:lang="en-US">This note records a sighting of a male Red-backed Fairy-wren Malurus melanocephalus, identified readily by its distinctive breeding plumage, in Hazelbrook in the Blue Mountains, New South Wales. Although the species appears to have historically occurred in the Sydney region, its distribution contracted north soon after European settlement, with modern records placing Dungog and the Myall Lakes area as the southern limits. Our sighting occurred ~180 km south-west of these locations. This bird may have been an escapee from captivity or a vagrant, or there may be an established population of the species in the vicinity that is yet to be documented. It was observed in a flock of brown-coloured fairy-wrens; however, we were not certain whether these individuals were conspecifics or other species of fairy-wrens.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2025-02-24</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2367</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 42 (2025)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2367/2398</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2025 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/214</identifier>
+				<datestamp>2016-02-12T03:05:22Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">An Additional Record of the Star Finch from the South of its Range</dc:title>
+	<dc:creator>McAllan, Ian A W</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-12</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/214</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 18, No 7 (2000)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/214/204</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/925</identifier>
+				<datestamp>2016-03-22T05:17:40Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Regular Double-brooding by Clamorous Reed-Warblers Acrocephalus stentoreus in the Canberra Region</dc:title>
+	<dc:creator>Lenz, M</dc:creator>
+	<dc:description xml:lang="en-US">During territory-mapping of the breeding bird community on the campus of the Australian National University, Canberra, in the 1978-79 season 36 territories of the Clamorous Reed-Warbler Acrocephalus stentoreus were recorded. In 29 territories dependent young were heard and/or seen (a search for nests was not undertaken) between early November and early March; in all 39 broods were recorded. Of these 11 were found between early November and late December, 28 between early January and early March. In 19 of the territories only one brood was noted, however in 10 both a first and a second brood were recorded. Additional observations in other years in the same area and elsewhere in the Canberra region have confirmed that at least part of the Reed-Warbler population raises two broods in a season.
+&amp;nbsp;</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-22</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/925</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 13, No 3 (1989)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/925/904</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1497</identifier>
+				<datestamp>2016-04-05T06:04:08Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Green Rosella of Tasmania</dc:title>
+	<dc:creator>Sharland, Michael</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1497</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 5, No 7 (1974)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1497/1238</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/2399</identifier>
+				<datestamp>2026-07-27T01:50:24Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Book review - Australian Hawks and Eagles: A window into the hidden world of raptors, including bazas, buzzards, harriers, kites and ospreys</dc:title>
+	<dc:creator>Debus, Stephen</dc:creator>
+	<dc:description xml:lang="en-US">n/a</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2026-02-10</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2399</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 43 (2026)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/2399/2433</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2026 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/246</identifier>
+				<datestamp>2016-02-12T03:44:36Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Review- Zoological Catalogue of Australia 37.2, Aves (Columbidae to Coraciidae)</dc:title>
+	<dc:creator>Debus, Stephen</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-12</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/246</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 17, No 6 (1998)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/246/235</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/957</identifier>
+				<datestamp>2016-03-22T05:29:33Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Australian Field Ornithology Index, Volume 12, 1987-1988</dc:title>
+	<dc:creator>Field Ornithology, Australian</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-22</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/957</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 12, No 8 (1988)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/957/934</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1530</identifier>
+				<datestamp>2016-04-05T06:29:52Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Notes on the Gull-Billed Tern</dc:title>
+	<dc:creator>Bourke, P A</dc:creator>
+	<dc:creator>Lowe, V T</dc:creator>
+	<dc:creator>Lowe, T G</dc:creator>
+	<dc:description xml:lang="en-US">This paper is in two parts, the first dealing with references to the species in the literature, and the second covering observations at a nesting colony at Lake Tutchewop, near Mystic Park, Victoria.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1530</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 5, No 3 (1973)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1530/1271</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/281</identifier>
+				<datestamp>2016-02-12T04:37:21Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Welcome to John Peter</dc:title>
+	<dc:creator>Debus, Stephen</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-12</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/281</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 17, No 1 (1997)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/281/270</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/989</identifier>
+				<datestamp>2016-03-22T05:54:49Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Australian Kestrels Falco cenchroides Feeding on Bats</dc:title>
+	<dc:creator>Lewis, M J</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-03-22</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/989</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 12, No 4 (1987)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/989/964</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/1562</identifier>
+				<datestamp>2016-04-05T06:46:19Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Another Cattle Egret Nesting Colony</dc:title>
+	<dc:creator>Wheeler, Eric</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-04-05</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1562</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 5, No 1 (1973)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/1562/1303</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2016 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:ojs.localhost:article/313</identifier>
+				<datestamp>2016-02-19T00:43:06Z</datestamp>
+				<setSpec>afo:ART</setSpec>
+			</header>
+			<metadata>
+<oai_dc:dc
+	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+	http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+	<dc:title xml:lang="en-US">Review - Birds of Southwestern Australia. An atlas of changes in distribution and abundance of the wheatbelt fauna</dc:title>
+	<dc:creator>Robinson, Doug</dc:creator>
+	<dc:description xml:lang="en-US">No abstract available.</dc:description>
+	<dc:publisher xml:lang="en-US">Australian Field Ornithology</dc:publisher>
+	<dc:contributor xml:lang="en-US"></dc:contributor>
+	<dc:date>2016-02-19</dc:date>
+	<dc:type>info:eu-repo/semantics/article</dc:type>
+	<dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+	<dc:type xml:lang="en-US">Peer-reviewed Article</dc:type>
+	<dc:format>application/pdf</dc:format>
+	<dc:identifier>https://afo.birdlife.org.au/afo/index.php/afo/article/view/313</dc:identifier>
+	<dc:source xml:lang="en-US">Australian Field Ornithology; Vol 16, No 4 (1995)</dc:source>
+	<dc:language>eng</dc:language>
+	<dc:relation>https://afo.birdlife.org.au/afo/index.php/afo/article/view/313/302</dc:relation>
+	<dc:rights xml:lang="en-US">Copyright (c) 2015 Australian Field Ornithology</dc:rights>
+</oai_dc:dc>
+			</metadata>
+		</record>
+		<resumptionToken expirationDate="2026-08-21T06:45:17Z"
+			completeListSize="2348"
+			cursor="700">13ec0b6b63945ce141e4e556db543170</resumptionToken>
+	</ListRecords>
+</OAI-PMH>

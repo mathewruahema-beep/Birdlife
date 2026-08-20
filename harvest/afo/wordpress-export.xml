@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0"
+  xmlns:excerpt="http://wordpress.org/export/1.2/excerpt/"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:wp="http://wordpress.org/export/1.2/">
+<channel>
+  <title>Harvested: https://afo.birdlife.org.au/afo/index.php/afo</title>
+  <link>https://afo.birdlife.org.au/afo/index.php/afo</link>
+  <description>Site harvest for migration</description>
+  <language>en-AU</language>
+  <wp:wxr_version>1.2</wp:wxr_version>
+
+</channel>
+</rss>
