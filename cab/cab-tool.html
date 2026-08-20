@@ -237,6 +237,7 @@ fieldset.systems label { font-weight: 400; font-size: .9rem; display: inline-fle
     <button role="tab" aria-selected="true" data-tab="register">Register</button>
     <button role="tab" aria-selected="false" data-tab="new">New change</button>
     <button role="tab" aria-selected="false" data-tab="agenda">CAB agenda</button>
+    <button role="tab" aria-selected="false" data-tab="report">Report</button>
     <button role="tab" aria-selected="false" data-tab="process">Process</button>
   </nav>
 </header>
@@ -375,6 +376,21 @@ fieldset.systems label { font-weight: 400; font-size: .9rem; display: inline-fle
       <button class="btn small" id="copy-agenda">Copy agenda as Markdown</button>
     </div>
     <div data-dyn id="agenda-panels"></div>
+  </section>
+
+  <!-- ================= REPORT ================= -->
+  <section id="tab-report" hidden>
+    <div class="filterbar">
+      <label for="r-from" style="font-weight:600;font-size:.875rem">Period</label>
+      <input type="date" id="r-from">
+      <span style="color:var(--muted)">to</span>
+      <input type="date" id="r-to">
+      <div class="spacer"></div>
+      <button class="btn small primary" id="copy-report">Copy report as Markdown</button>
+      <button class="btn small" id="dl-report" hidden>Download .md</button>
+    </div>
+    <div class="notice info" style="margin:0 0 12px">Generated live from the register. Before sending: add a 2–3 sentence narrative and the count of unrecorded changes discovered — see <span class="mono">cab/CAB-REPORTING.md</span>.</div>
+    <div data-dyn id="report-panels"></div>
   </section>
 
   <!-- ================= PROCESS ================= -->
@@ -729,6 +745,120 @@ function agendaMarkdown() {
   return md;
 }
 
+/* ---------- report ---------- */
+function upcomingFreezes(days) {
+  const out = [], today = new Date(todayISO());
+  for (const f of state.freezes) {
+    for (const yr of [today.getFullYear(), today.getFullYear() + 1]) {
+      const from = new Date(yr + "-" + f.from);
+      const to = new Date((f.from <= f.to ? yr : yr + 1) + "-" + f.to);
+      if (to >= today && (from - today) / 864e5 <= days) {
+        out.push({ label: f.label, from: from.toISOString().slice(0,10), to: to.toISOString().slice(0,10) });
+        break;
+      }
+    }
+  }
+  return out.sort((a, b) => a.from < b.from ? -1 : 1);
+}
+
+function reportData(from, to) {
+  const cs = state.changes;
+  const inP = d => d && d >= from && d <= to;
+  const decisions = [], implemented = [], closed = [];
+  for (const c of cs) for (const l of (c.log || [])) {
+    if (!inP(l.t)) continue;
+    if (/^(Approve|Reject|Defer|Reopen|Schedule|Logged as Standard)/.test(l.action)) decisions.push({ c, l });
+    else if (l.action === "Mark implemented" || /^Logged as Emergency/.test(l.action)) implemented.push({ c, l });
+    else if (/^Close/.test(l.action)) closed.push({ c, l });
+  }
+  const closedAll = cs.filter(c => c.status === "closed");
+  const p = {
+    submitted: cs.filter(c => inP(c.created)),
+    decisions, implemented, closed,
+    failed: closed.filter(x => ["failed", "rolledback"].includes(x.c.outcome)),
+    highOpen: cs.filter(c => c.risk === "high" && !["closed", "rejected"].includes(c.status)),
+    debt: cs.filter(c => c.status === "deferred"),
+    retro: cs.filter(c => c.type === "emergency" && c.status === "implemented"),
+    freezes: upcomingFreezes(90)
+  };
+  const pct = (a, b) => b ? Math.round(100 * a / b) + "%" : "—";
+  p.metrics = [
+    ["Change success rate", pct(closed.filter(x => x.c.outcome === "success").length, closed.length),
+      pct(closedAll.filter(c => c.outcome === "success").length, closedAll.length), "≥ 90%"],
+    ["Emergency ratio", pct(p.submitted.filter(c => c.type === "emergency").length, p.submitted.length),
+      pct(cs.filter(c => c.type === "emergency").length, cs.length), "< 15%"],
+    ["Rolled back / failed", String(p.failed.length),
+      String(closedAll.filter(c => ["failed", "rolledback"].includes(c.outcome)).length), "0"]
+  ];
+  p.summary = p.submitted.length + " submitted · " + decisions.length + " decisions · " +
+    implemented.length + " implemented · " + closed.length + " closed · " +
+    cs.filter(c => !["closed", "rejected"].includes(c.status)).length + " open on the register (" +
+    p.highOpen.length + " High)";
+  return p;
+}
+
+function reportPeriod() {
+  return [$("#r-from").value || "0000-01-01", $("#r-to").value || "9999-12-31"];
+}
+
+function renderReport() {
+  const [from, to] = reportPeriod();
+  const p = reportData(from, to);
+  const line = c => '<div class="agenda-item"><span class="id">' + c.id + "</span> " +
+    esc(c.title) + " " + riskPill(c) + " " + statusPill(c) + "</div>";
+  const logLine = x => '<div class="agenda-item"><span class="id">' + x.c.id + "</span> " +
+    esc(x.c.title) + " — <b>" + esc(x.l.action) + "</b> by " + esc(x.l.who) +
+    " (" + esc(x.l.t) + ")" + (x.l.note ? " · " + esc(x.l.note) : "") + "</div>";
+  const none = '<p style="color:var(--muted);margin:0">None this period.</p>';
+  const panel = (title, body) => '<div class="panel"><h2>' + title + "</h2>" + body + "</div>";
+  $("#report-panels").innerHTML =
+    panel("Summary", "<p style='margin:0'>" + esc(p.summary) + "</p>") +
+    panel("Decisions this period (" + p.decisions.length + ")", p.decisions.map(logLine).join("") || none) +
+    panel("Implemented (" + p.implemented.length + ")", p.implemented.map(logLine).join("") || none) +
+    panel("Closed (" + p.closed.length + ")", p.closed.map(x =>
+      '<div class="agenda-item"><span class="id">' + x.c.id + "</span> " + esc(x.c.title) +
+      " — <b>" + esc(OUTCOME_LABEL[x.c.outcome] || "") + "</b> (" + esc(x.l.t) + ")</div>").join("") || none) +
+    panel("Failed or rolled back — PIR (" + p.failed.length + ")", p.failed.map(logLine).join("") || none) +
+    panel("High-risk pipeline (" + p.highOpen.length + ")", p.highOpen.map(line).join("") || none) +
+    panel("Decisions needed (" + p.debt.length + ")", p.debt.map(c =>
+      line(c) + (c.log && c.log.length ? '<p style="color:var(--muted);font-size:.85rem;margin:2px 0 8px">' +
+      esc(c.log[c.log.length - 1].note || "") + "</p>" : "")).join("") || none) +
+    panel("Emergency retro reviews pending (" + p.retro.length + ")", p.retro.map(line).join("") || none) +
+    panel("Freeze windows — next 90 days", p.freezes.map(f =>
+      '<div class="agenda-item">' + esc(f.label) + ' <span class="id">' + f.from + " → " + f.to + "</span></div>").join("") || none) +
+    panel("Metrics", '<div class="tablewrap" style="box-shadow:none"><table class="register" style="min-width:0">' +
+      "<thead><tr><th>Measure</th><th>This period</th><th>All time</th><th>Target</th></tr></thead><tbody>" +
+      p.metrics.map(m => "<tr><td>" + m.map(esc).join("</td><td class='date'>") + "</td></tr>").join("") +
+      "</tbody></table></div>");
+}
+
+function reportMarkdown() {
+  const [from, to] = reportPeriod();
+  const p = reportData(from, to);
+  const ln = c => "- **" + c.id + "** " + c.title + " — " + RISK_LABEL[c.risk] + " risk, " + STATUS_LABEL[c.status] + "\n";
+  const lg = x => "- **" + x.c.id + "** " + x.c.title + " — " + x.l.action + " by " + x.l.who +
+    " (" + x.l.t + ")" + (x.l.note ? ": " + x.l.note : "") + "\n";
+  const sec = (t, body) => "\n## " + t + "\n" + (body || "- none\n");
+  let md = "# CAB report — BirdLife Australia ICT\n**Period:** " + from + " to " + to +
+    " · **Prepared by:** " + meName() + " · Generated from the Flightpath register\n" +
+    "\n> _Narrative: (add 2–3 sentences here)_\n> _Unrecorded changes discovered this period: (add count)_\n" +
+    sec("Summary", "- " + p.summary + "\n") +
+    sec("Decisions this period", p.decisions.map(lg).join("")) +
+    sec("Implemented", p.implemented.map(lg).join("")) +
+    sec("Closed", p.closed.map(x => "- **" + x.c.id + "** " + x.c.title + " — " +
+      (OUTCOME_LABEL[x.c.outcome] || "") + " (" + x.l.t + ")\n").join("")) +
+    sec("Failed or rolled back — PIR", p.failed.map(lg).join("")) +
+    sec("High-risk pipeline", p.highOpen.map(ln).join("")) +
+    sec("Decisions needed from the Steering Group", p.debt.map(c =>
+      ln(c) + (c.log && c.log.length && c.log[c.log.length - 1].note ?
+      "  - " + c.log[c.log.length - 1].note + "\n" : "")).join("")) +
+    sec("Emergency retro reviews pending", p.retro.map(ln).join("")) +
+    sec("Freeze windows — next 90 days", p.freezes.map(f => "- " + f.label + ": " + f.from + " to " + f.to + "\n").join("")) +
+    "\n## Metrics\n| Measure | This period | All time | Target |\n|---|---|---|---|\n" +
+    p.metrics.map(m => "| " + m.join(" | ") + " |\n").join("");
+  return md;
+}
+
 function renderForm() {
   const type = $("#c-type").value;
   $("#score-block").style.display = type === "standard" ? "none" : "";
@@ -768,7 +898,8 @@ function renderAll() {
 /* ---------- events ---------- */
 document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => {
   document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", x === b ? "true" : "false"));
-  ["register","new","agenda","process"].forEach(t => { $("#tab-" + t).hidden = t !== b.dataset.tab; });
+  ["register","new","agenda","report","process"].forEach(t => { $("#tab-" + t).hidden = t !== b.dataset.tab; });
+  if (b.dataset.tab === "report") renderReport();
 }));
 
 $("#me").addEventListener("change", () => {
@@ -844,6 +975,20 @@ $("#change-form").addEventListener("submit", e => {
   renderForm();
 });
 
+["#r-from", "#r-to"].forEach(s => $(s).addEventListener("change", renderReport));
+
+$("#copy-report").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(reportMarkdown()); toast("Report copied as Markdown."); }
+  catch (e) { toast("Couldn't access the clipboard in this view."); }
+});
+
+$("#dl-report").addEventListener("click", async () => {
+  if (!downloadsApi) return;
+  const name = "cab-report-" + ($("#r-to").value || todayISO()) + ".md";
+  try { await downloadsApi.save({ filename: name, data: reportMarkdown() }); toast("Report downloaded."); }
+  catch (err) { if (err && err.code !== "declined") toast("Download unavailable in this view."); }
+});
+
 $("#copy-agenda").addEventListener("click", async () => {
   const md = agendaMarkdown();
   try { await navigator.clipboard.writeText(md); toast("Agenda copied as Markdown."); }
@@ -877,7 +1022,11 @@ $("#export-csv").addEventListener("click", async () => {
     artifactApi = await window.claude.use("artifact");
     downloadsApi = await window.claude.use("downloads");
   }
-  if (downloadsApi) $("#export-csv").hidden = false;
+  if (downloadsApi) { $("#export-csv").hidden = false; $("#dl-report").hidden = false; }
+
+  const back30 = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
+  $("#r-from").value = back30;
+  $("#r-to").value = todayISO();
 
   if (artifactApi) {
     mode = "shared";

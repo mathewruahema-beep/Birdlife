@@ -315,10 +315,20 @@ means approved & scheduled; *Hypercare* means implemented, in verification.
 
 ## Repository layout
 
+**Reporting** (`cab/CAB-REPORTING.md`): the CAB reports monthly to the ICT
+Steering Group and quarterly to leadership, generated in one click from the
+tool's **Report** tab (period-filtered decisions, implemented/closed with
+outcomes, PIRs, High-risk pipeline, decisions-needed ask list, freeze
+lookahead, metrics vs target). Reports are archived in Confluence (ICT space)
+and under `cab/reports/` here. Rule that makes it work: reports are generated
+from the register only — if a change isn't in the register, it didn't happen.
+
 ```
 README.md                            findings, admin runbook, routine consolidation
 cab/CAB-PROCESS.md                   Change Advisory Board process (v1.0)
+cab/CAB-REPORTING.md                 CAB reporting process (v1.0)
 cab/cab-tool.html                    Flightpath CAB tool source as published
+cab/reports/                         monthly CAB reports (audit trail)
 dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
 ```
