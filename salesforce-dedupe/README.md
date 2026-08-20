@@ -39,6 +39,11 @@ force-app/main/default/
 config/scorecard.json Machine-readable mirror of the rule set
 scripts/apex/         dry-run-now, merge-now, schedule-nightly, unschedule,
                       last-run-summary
+docs/DUPLICATE-SOURCES.md  Root-cause inventory of every duplicate-creating
+                      process + the staging-first remediation plan
+board/                Source of the interactive program board (live at
+                      https://claude.ai/code/artifact/76712b3d-9d81-488a-974b-777343a58dae —
+                      the artifact is the live copy; this file is the seed)
 ```
 
 ## Deployment — staging first, always

@@ -1,0 +1,273 @@
+<title>Duplicate Defence</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style id="css">
+:root{
+  --ground:#F5F4EE; --surface:#FFFFFF; --surface2:#EDEDE4; --ink:#1C2420; --muted:#5C6961;
+  --line:#D8DAD0; --accent:#17604E; --accent-ink:#FFFFFF; --accent-soft:#E1EDE7;
+  --crit:#AC4E28; --warn:#9A7B24; --ok:#2E7D4F; --chip:#E9E9DF;
+  --shadow:0 10px 28px rgba(28,36,32,.10);
+}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#111714; --surface:#1A211D; --surface2:#151C18; --ink:#E7ECE8; --muted:#94A29A;
+    --line:#2A342E; --accent:#4FC49C; --accent-ink:#0C1410; --accent-soft:#1E3A30;
+    --crit:#E08A5F; --warn:#D3B25C; --ok:#63C08A; --chip:#232C27;
+    --shadow:0 10px 28px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#111714; --surface:#1A211D; --surface2:#151C18; --ink:#E7ECE8; --muted:#94A29A;
+  --line:#2A342E; --accent:#4FC49C; --accent-ink:#0C1410; --accent-soft:#1E3A30;
+  --crit:#E08A5F; --warn:#D3B25C; --ok:#63C08A; --chip:#232C27;
+  --shadow:0 10px 28px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--ground);color:var(--ink);font:15px/1.55 "Public Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1360px;margin:0 auto;padding:28px 28px 80px}
+header.top{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;margin-bottom:6px}
+.masthead h1{font:700 30px/1.1 "Archivo",system-ui,sans-serif;letter-spacing:-.015em;margin:0}
+.masthead .sub{color:var(--muted);margin:6px 0 0;max-width:62ch}
+.savebox{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.savechip{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;padding:7px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--surface)}
+.savechip.dirty{color:var(--warn);border-color:var(--warn)}
+.savechip.err{color:var(--crit);border-color:var(--crit)}
+.stamp{font:400 11px/1 "IBM Plex Mono",monospace;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;margin:20px 0 8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font:600 22px/1.1 "Archivo",sans-serif;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:12.5px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 16px;align-items:center}
+.filters .lbl{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.fchip{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:13px;color:var(--muted)}
+.fchip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.board{display:grid;grid-template-columns:repeat(4,minmax(250px,1fr));gap:14px;align-items:start}
+@media(max-width:1080px){.board{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.board{grid-template-columns:1fr}.wrap{padding:18px 14px 60px}}
+.col{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px;min-height:180px}
+.col.dragover{border-color:var(--accent);background:var(--accent-soft)}
+.colhead{display:flex;align-items:baseline;justify-content:space-between;padding:4px 6px 10px}
+.colhead h2{font:600 13px/1 "Archivo",sans-serif;letter-spacing:.1em;text-transform:uppercase;margin:0}
+.colhead .n{font:500 12px/1 "IBM Plex Mono",monospace;color:var(--muted)}
+.cards{display:flex;flex-direction:column;gap:8px;min-height:40px}
+.card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--sev,var(--muted));border-radius:9px;padding:10px 12px 9px;text-align:left;width:100%;box-shadow:none;transition:box-shadow .15s}
+.card:hover{box-shadow:var(--shadow)}
+.card[data-sev="high"]{--sev:var(--crit)}
+.card[data-sev="med"]{--sev:var(--warn)}
+.card[data-sev="low"]{--sev:var(--ok)}
+.card .t{font:600 14.5px/1.3 "Archivo",sans-serif;margin:0 0 4px}
+.card .ev{font:400 12px/1.45 "IBM Plex Mono",monospace;color:var(--muted);margin:0}
+.cmeta{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--chip);color:var(--muted)}
+.movers{margin-left:auto;display:flex;gap:2px}
+.movers button{padding:2px 7px;border-radius:6px;color:var(--muted);font-size:13px}
+.movers button:hover{background:var(--accent-soft);color:var(--accent)}
+.card.dragging{opacity:.45}
+.empty{color:var(--muted);font-size:12.5px;text-align:center;padding:14px 6px}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,14,12,.45);opacity:0;pointer-events:none;transition:opacity .18s}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(480px,100vw);background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow);transform:translateX(102%);transition:transform .2s ease;overflow-y:auto;z-index:20;padding:26px 28px 40px}
+body.open .scrim{opacity:1;pointer-events:auto}
+body.open .drawer{transform:none}
+@media(prefers-reduced-motion:reduce){.drawer,.scrim,.card{transition:none}}
+.drawer .close{position:absolute;top:14px;right:14px;font-size:20px;color:var(--muted);padding:6px 10px;border-radius:8px}
+.drawer .close:hover{background:var(--surface2)}
+.drawer h3{font:700 21px/1.2 "Archivo",sans-serif;margin:6px 0 4px;padding-right:36px;text-wrap:balance}
+.drawer .dmeta{display:flex;gap:8px;margin:10px 0 18px;flex-wrap:wrap}
+.dsec{margin:16px 0}
+.dsec h4{font:600 11px/1 "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 7px}
+.dsec p,.dsec li{margin:0 0 6px;font-size:14px}
+.dsec ul{margin:0;padding-left:18px}
+.dsec .next{background:var(--accent-soft);border-radius:8px;padding:10px 12px;font-weight:500}
+.dmove{display:flex;gap:6px;flex-wrap:wrap;margin-top:20px}
+.dmove button{border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:13px;background:var(--surface)}
+.dmove button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.ro-banner{display:none;background:var(--warn);color:#fff;border-radius:8px;padding:8px 14px;font-size:13px;margin:10px 0}
+body.readonly .ro-banner{display:block}
+body.readonly .movers,body.readonly .dmove{display:none}
+footer.note{margin-top:26px;color:var(--muted);font-size:12.5px;max-width:78ch}
+footer.note code{font-family:"IBM Plex Mono",monospace;font-size:12px}
+</style>
+
+<div id="root" class="wrap" aria-live="polite"></div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="d-title"></aside>
+
+<script type="application/json" id="board-state">{"updated": "2026-08-20 12:20 UTC", "stats": [{"v": "101,691", "l": "unhandled Plauti duplicate groups (mop-up backlog)"}, {"v": "11,521", "l": "contacts created in the last 180 days"}, {"v": "9,734", "l": "of those by integrations & bulk loads (bots + imports)"}, {"v": "99.9%", "l": "of new contacts have no LeadSource (provenance blind)"}], "cards": [{"id": "engine", "title": "Scorecard merge automation", "system": "This repo", "sev": "high", "col": "dev", "evidence": "Built & pushed: 8 Plauti scenarios mirrored, guardrails, audit object. Ships dry-run ON.", "root": "101,691 unhandled Plauti groups and no automated, auditable merge path — the daily Plauti job finds 100-score groups but merging is manual and permission-blocked (Asana: 'Plauti bulk merge permissions').", "solution": ["Deploy salesforce-dedupe to staging; run dry-run batch", "Review Dedupe_Merge_Audit__c scorecards (outcomes, Blocked list)", "Supervised live run capped at 50 merges; then raise cap", "Schedule nightly 9pm AEST; retire Plauti 'Clone: Daily Contact Merge' clone job"], "depends": "Staging sandbox access; sf CLI deploy; sign-off to enable Auto_Merge_Enabled__c", "next": "sf project deploy start to birdlife--staging, then scripts/apex/dry-run-now.apex"}, {"id": "woo-keys", "title": "WooCommerce sync has no dedupe keys in prod", "system": "WooCommerce", "sev": "high", "col": "backlog", "evidence": "Duplicate-check keys exist on staging miniOrange mappings only — production mappings have none.", "root": "miniOrange Object Data Sync upserts orders/contacts without duplicate-check keys in production, so any order that loses its Salesforce Id mapping creates a fresh record.", "solution": ["Copy the staging mapping duplicate-check keys to a prod-shaped staging config", "Regression-test order lifecycle (paid, renewal, refund) against the keys", "Promote mapping config to production in a change window", "Grant FLS to the integration user on every mapped field first (10.3% of syncs already fail on FLS)"], "depends": "Karishma Week-4 refund-flow decision gate; Xecurify support", "next": "Export prod + staging mapping configs and diff them; book the staging test"}, {"id": "woo-writeback", "title": "Order write-back gap (Salesforce UUID: None)", "system": "WooCommerce", "sev": "high", "col": "backlog", "evidence": "Two real paid orders observed with 'Salesforce UUID: None' post meta — next status change duplicates the order/contact.", "root": "The plugin sometimes fails to write the returned Salesforce Id into WordPress post meta; without it, every later sync of that order is treated as new.", "solution": ["Weekly exception report: WooCommerce orders missing salesforce_Opportunity_ID meta (Zapier or WP-CLI)", "Deliberate write-back test after any mapping change", "Backfill missing meta from Salesforce for open orders"], "depends": "WooCommerce API keys (rotate first — old keys were exposed in routine prompts)", "next": "Stand up the exception report against the staging store"}, {"id": "bots", "title": "Bird Bot integrations write as System Administrator", "system": "Integrations", "sev": "high", "col": "backlog", "evidence": "birdbot1 (sysadmin profile): 2,965 contact creates /180d. birdbot2 (Base Integration Profile): 1,464.", "root": "Integration bots create ~4,400 contacts per 180 days; birdbot1 does it on a System Administrator profile, and which external system drives each bot is undocumented — no upsert-key governance possible.", "solution": ["Map each birdbot to its owning integration (login history + connected apps)", "Move birdbot1 to a scoped integration profile + permission set", "Require upsert on a registered external Id per integration", "Stamp LeadSource per integration so provenance stops being archaeology"], "depends": "Integration owners (Xecurify, Zapier, Ortto) to confirm credentials in use", "next": "Pull LoginHistory + OAuth tokens for birdbot1/2 and name the owning systems"}, {"id": "imports", "title": "Bulk imports without matching", "system": "Imports", "sev": "high", "col": "backlog", "evidence": "Keith Tsui 5,305 + Nina Lewis 776 contact creates /180d — the single largest intake path.", "root": "Data loads that insert instead of upsert (no Supporter ID / email matching) mint duplicates in batches; Plauti's 'Clone: New Contacts' job found 1,302 duplicate groups among recent creates.", "solution": ["Import SOP: NPSP Data Import with matching rules, or upsert on Supporter ID / email external Id", "Plauti single-upload check for ad-hoc files", "Rehearse every production load in staging with the real file first"], "depends": null, "next": "Write the one-page import SOP and walk Keith & Nina through it"}, {"id": "raisely", "title": "Raisely API bypasses UI duplicate rules", "system": "Raisely", "sev": "med", "col": "backlog", "evidence": "Raisely upserts on Raisely_UUID__c as its integration user; UI dedupe never fires on API writes.", "root": "A supporter who signs up with a new email gets a new Raisely UUID and therefore a new contact; MoveData duplicate rules exist but their API action/alerting is unverified.", "solution": ["Verify MoveData Contact/Account rule action on the API path (Report + alert)", "Staging test matrix: same email/new UUID, new email/same person", "Detection stays with the nightly scorecard automation — do NOT modify managed MoveData flows"], "depends": "MoveData support for rule behaviour questions", "next": "Run the staging payload matrix and record what each rule does"}, {"id": "refunds", "title": "Refund & cancellation sync defects", "system": "WooCommerce", "sev": "med", "col": "backlog", "evidence": "Verified staging order #22553: refund creates a second POSITIVE payment; stage set to raw 'refunded'; Stripe re_ id never synced.", "root": "Same write-back family as the order gap: refund/cancel events create malformed duplicate financial records and never deactivate memberships.", "solution": ["Fix-or-accept decision at the Week-4 gate", "If fix: map shop_order_refund to negative payment + valid stage; sync Stripe refund id", "Deactivate Subscription_Member__c on cancellation"], "depends": "Karishma Soni Week-4 decision gate", "next": "Put the decision on the Week-4 gate agenda with the #22553 evidence"}, {"id": "identity", "title": "Identity key register & platform keys", "system": "Architecture", "sev": "med", "col": "backlog", "evidence": "Supporter ID, Raisely_UUID__c, WooCommerce post meta, Ortto person id, LearnUpon… every system keys differently.", "root": "Each integration can re-create a supporter the others already know because there is no shared external-Id contract.", "solution": ["Identity-key register: which system owns which external Id field", "Use Contact Platform Key objects as the join table", "Rule: every new integration must upsert on a registered external Id before go-live"], "depends": "Outputs of the bot-mapping card", "next": "Draft the register from the existing Platform Key objects"}, {"id": "provenance", "title": "LeadSource provenance stamping", "system": "Architecture", "sev": "low", "col": "backlog", "evidence": "11,515 of 11,521 recent contact creates have a blank LeadSource.", "root": "No intake path stamps its origin, so duplicate analysis requires CreatedById archaeology and reports can't segment by channel.", "solution": ["Default LeadSource per integration user (flow or per-integration config)", "Validation nudge for manual UI creates"], "depends": null, "next": "Add LeadSource defaults in the same pass as the bot re-profiling"}, {"id": "pardot", "title": "Pardot / B2BMA contact creates", "system": "Pardot", "sev": "low", "col": "dev", "evidence": "397 creates /180d by the B2BMA Integration user; hard cutover 31 Aug 2026.", "root": "Pardot-side sync creates contacts; the decommission removes the source — the risk is the Ortto replacement becoming a new one.", "solution": ["Verify AccountEngagementSync__c retained through uninstall", "Confirm Ortto sync stays read-heavy (Lead not synced; retention ceiling blocks expansion)", "Post-cutover: confirm B2BMA user stops creating records"], "depends": "Pardot decommission plan (hard stop 31 Aug 2026)", "next": "Add a post-cutover check to the decommission runbook"}, {"id": "ui", "title": "Staff manual entry prevention", "system": "Salesforce UI", "sev": "low", "col": "live", "evidence": "Plauti runs Name+Email-Exact on INSERT and All Email on INSERT/UPDATE/FLOW; NPSP email rule active.", "root": "Manual UI entry is the smallest source (~550 creates /180d across staff) and is already fenced at point of entry.", "solution": ["Keep Plauti entry scenarios and the native NPSP email rule active", "Fold LeadSource stamping into the same layouts when touched"], "depends": null, "next": "No action — monitor via the nightly scorecard"}]}</script>
+
+<script id="app">
+(function(){
+"use strict";
+var COLS=[["backlog","Backlog"],["dev","In development"],["test","Testing"],["live","Live"]];
+var SEVL={high:"High impact",med:"Medium impact",low:"Low impact"};
+var state=JSON.parse(document.getElementById("board-state").textContent);
+var filterSys="All", openId=null, dirty=false, publishTimer=null, artifactNS=null, readonly=false, saveState="saved";
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+
+function systems(){var s=[];state.cards.forEach(function(c){if(s.indexOf(c.system)<0)s.push(c.system)});return s}
+
+function render(){
+  var root=document.getElementById("root");
+  var h='<header class="top"><div class="masthead"><h1>Duplicate Defence</h1>'
+    +'<p class="sub">BirdLife Zeus duplicate-elimination program — every process that mints duplicates, and the fix for each, staging-first. Move cards as work progresses; changes save to this page for everyone.</p></div>'
+    +'<div class="savebox"><span class="savechip'+(saveState==="dirty"?" dirty":saveState==="err"?" err":"")+'" id="savechip">'+(saveState==="saved"?"Saved":saveState==="saving"?"Saving…":saveState==="dirty"?"Unsaved changes":"Save failed — will retry on next change")+'</span>'
+    +'<span class="stamp">evidence: prod 20 Aug 2026 · updated '+esc(state.updated)+'</span></div></header>';
+  h+='<div class="ro-banner">Read-only view — you can browse cards but moves won’t be saved.</div>';
+  h+='<div class="stats">';
+  state.stats.forEach(function(s){h+='<div class="stat"><b>'+esc(s.v)+'</b><span>'+esc(s.l)+'</span></div>'});
+  h+='</div>';
+  h+='<div class="filters"><span class="lbl">System</span>';
+  ["All"].concat(systems()).forEach(function(s){
+    h+='<button class="fchip" data-f="'+esc(s)+'" aria-pressed="'+(filterSys===s)+'">'+esc(s)+'</button>';
+  });
+  h+='</div><div class="board">';
+  COLS.forEach(function(col){
+    var cards=state.cards.filter(function(c){return c.col===col[0]&&(filterSys==="All"||c.system===filterSys)});
+    h+='<section class="col" data-col="'+col[0]+'"><div class="colhead"><h2>'+col[1]+'</h2><span class="n">'+cards.length+'</span></div><div class="cards">';
+    if(!cards.length)h+='<div class="empty">Nothing here'+(filterSys!=="All"?" for "+esc(filterSys):"")+'</div>';
+    cards.forEach(function(c){
+      var ci=COLS.map(function(x){return x[0]}).indexOf(c.col);
+      h+='<div class="card" role="button" tabindex="0" draggable="true" data-id="'+esc(c.id)+'" data-sev="'+esc(c.sev)+'">'
+        +'<p class="t">'+esc(c.title)+'</p><p class="ev">'+esc(c.evidence)+'</p>'
+        +'<div class="cmeta"><span class="tag">'+esc(c.system)+'</span><span class="tag">'+SEVL[c.sev]+'</span>'
+        +'<span class="movers">'
+        +(ci>0?'<button data-mv="-1" data-id="'+esc(c.id)+'" aria-label="Move left" title="Move left">◀</button>':'')
+        +(ci<COLS.length-1?'<button data-mv="1" data-id="'+esc(c.id)+'" aria-label="Move right" title="Move right">▶</button>':'')
+        +'</span></div></div>';
+    });
+    h+='</div></section>';
+  });
+  h+='</div><footer class="note">Companion to the <code>salesforce-dedupe</code> package (branch <code>claude/salesforce-duplicate-merge-automation-3jk7iv</code>): rules mirror the live Plauti scenarios; detail per card in <code>docs/DUPLICATE-SOURCES.md</code>. Auto-merge only ever fires at Name+Email exact 100 with ≥2.5 ID points and guardrails green.</footer>';
+  root.innerHTML=h;
+  if(openId)renderDrawer();
+}
+
+function renderDrawer(){
+  var c=state.cards.filter(function(x){return x.id===openId})[0];
+  var d=document.getElementById("drawer");
+  if(!c){d.innerHTML="";document.body.classList.remove("open");return}
+  var h='<button class="close" id="dclose" aria-label="Close">✕</button>'
+    +'<h3 id="d-title">'+esc(c.title)+'</h3>'
+    +'<div class="dmeta"><span class="tag">'+esc(c.system)+'</span><span class="tag">'+SEVL[c.sev]+'</span></div>'
+    +'<div class="dsec"><h4>Evidence</h4><p>'+esc(c.evidence)+'</p></div>'
+    +'<div class="dsec"><h4>Root cause</h4><p>'+esc(c.root)+'</p></div>'
+    +'<div class="dsec"><h4>Solution (build in development first)</h4><ul>'+c.solution.map(function(s){return"<li>"+esc(s)+"</li>"}).join("")+'</ul></div>'
+    +(c.depends?'<div class="dsec"><h4>Depends on</h4><p>'+esc(c.depends)+'</p></div>':"")
+    +'<div class="dsec"><h4>Next action</h4><p class="next">'+esc(c.next)+'</p></div>'
+    +'<div class="dmove" role="group" aria-label="Stage">'+COLS.map(function(col){
+      return '<button data-set="'+col[0]+'" aria-pressed="'+(c.col===col[0])+'">'+col[1]+'</button>';
+    }).join("")+'</div>';
+  d.innerHTML=h;
+  document.body.classList.add("open");
+}
+
+function moveCard(id,col){
+  var c=state.cards.filter(function(x){return x.id===id})[0];
+  if(!c||c.col===col)return;
+  c.col=col;
+  markDirty();render();
+}
+
+function markDirty(){
+  if(readonly)return;
+  dirty=true;saveState="dirty";
+  state.updated=new Date().toISOString().slice(0,16).replace("T"," ")+" UTC";
+  if(publishTimer)clearTimeout(publishTimer);
+  publishTimer=setTimeout(doPublish,1400);
+}
+
+function pageSource(){
+  var css=document.getElementById("css").textContent;
+  var app=document.getElementById("app").textContent;
+  var json=JSON.stringify(state).replace(/</g,"\\u003c");
+  var SC="script";
+  return "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"
+    +'<meta name="viewport" content="width=device-width,initial-scale=1">'
+    +"<title>Duplicate Defence</title>"
+    +'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">'
+    +"<style id=\"css\">"+css+"</style></head><body>"
+    +'<div id="root" class="wrap" aria-live="polite"></div>'
+    +'<div class="scrim" id="scrim"></div>'
+    +'<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="d-title"></aside>'
+    +"<"+SC+" type=\"application/json\" id=\"board-state\">"+json+"</"+SC+">"
+    +"<"+SC+" id=\"app\">"+app+"</"+SC+">"
+    +"</body></html>";
+}
+
+function doPublish(){
+  if(!artifactNS||readonly||!dirty)return;
+  dirty=false;saveState="saving";render();
+  artifactNS.publish(pageSource())
+    .then(function(){saveState="saved";render()})
+    .catch(function(e){
+      if(e&&(e.code==="not_writer"||e.code==="not_granted"||e.code==="not_declared"||e.code==="consent_required")){
+        readonly=true;document.body.classList.add("readonly");saveState="saved";render();
+      }else if(e&&e.code==="conflict"){
+        /* a newer version won; the shell reloads this view */
+      }else{
+        saveState="err";dirty=true;render();
+      }
+    });
+}
+
+document.addEventListener("click",function(ev){
+  var t=ev.target.closest("button,.card");
+  if(!t)return;
+  if(t.id==="dclose"){openId=null;document.body.classList.remove("open");return}
+  if(t.dataset.f){filterSys=t.dataset.f;render();return}
+  if(t.dataset.mv){
+    ev.stopPropagation();
+    var order=COLS.map(function(x){return x[0]});
+    var c=state.cards.filter(function(x){return x.id===t.dataset.id})[0];
+    var idx=order.indexOf(c.col)+parseInt(t.dataset.mv,10);
+    if(idx>=0&&idx<order.length)moveCard(c.id,order[idx]);
+    return;
+  }
+  if(t.dataset.set){moveCard(openId,t.dataset.set);return}
+  if(t.classList.contains("card")){openId=t.dataset.id;render();return}
+});
+document.getElementById("scrim").addEventListener("click",function(){openId=null;document.body.classList.remove("open")});
+document.addEventListener("keydown",function(ev){
+  if(ev.key==="Escape"&&openId){openId=null;document.body.classList.remove("open")}
+  if(ev.key==="Enter"&&ev.target.classList&&ev.target.classList.contains("card")){openId=ev.target.dataset.id;render()}
+});
+document.addEventListener("dragstart",function(ev){
+  var card=ev.target.closest?ev.target.closest(".card"):null;
+  if(!card)return;
+  ev.dataTransfer.setData("text/plain",card.dataset.id);
+  card.classList.add("dragging");
+});
+document.addEventListener("dragend",function(ev){
+  var card=ev.target.closest?ev.target.closest(".card"):null;
+  if(card)card.classList.remove("dragging");
+});
+document.addEventListener("dragover",function(ev){
+  var col=ev.target.closest?ev.target.closest(".col"):null;
+  if(col){ev.preventDefault();col.classList.add("dragover")}
+});
+document.addEventListener("dragleave",function(ev){
+  var col=ev.target.closest?ev.target.closest(".col"):null;
+  if(col)col.classList.remove("dragover");
+});
+document.addEventListener("drop",function(ev){
+  var col=ev.target.closest?ev.target.closest(".col"):null;
+  if(!col)return;
+  ev.preventDefault();col.classList.remove("dragover");
+  var id=ev.dataTransfer.getData("text/plain");
+  if(id)moveCard(id,col.dataset.col);
+});
+
+render();
+
+if(window.claude&&window.claude.use){
+  window.claude.use("artifact").then(function(ns){
+    artifactNS=ns;
+    if(!ns){readonly=true;document.body.classList.add("readonly");render()}
+  });
+}else{readonly=true;document.body.classList.add("readonly");render()}
+})();
+</script>

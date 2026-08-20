@@ -279,7 +279,20 @@ They have been redacted from the backup in this repo, but:
 README.md                            findings, admin runbook, routine consolidation
 dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
+salesforce-dedupe/                   scorecard-driven duplicate merge automation
+                                     (Plauti-aligned rules, guardrails, audit object),
+                                     duplicate-sources remediation plan, and the
+                                     Duplicate Defence program board
 ```
+
+## Duplicate management
+
+`salesforce-dedupe/` holds the production dedupe build: an Apex merge
+automation whose rules mirror the live Plauti scenarios (verified from prod
+20 Aug 2026), a per-group merge scorecard on `Dedupe_Merge_Audit__c`, and the
+SOP guardrails (portal-user master, active recurring giving, deceased
+conflicts) enforced in code. It ships dry-run ON / auto-merge OFF.
+Program tracking: [Duplicate Defence board](https://claude.ai/code/artifact/76712b3d-9d81-488a-974b-777343a58dae).
 
 The HTML is kept for reference and as the design template the morning routine
 rebuilds against. It is not itself the live artefact — the routine republishes to
