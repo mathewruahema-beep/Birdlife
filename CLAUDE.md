@@ -61,6 +61,8 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
 - `README.md` — how to use the assistant remotely, dashboard findings, Salesforce
   admin runbook, routine consolidation history.
 - `docs/using-the-assistant.md` — remote access channels and the prompt playbook.
+- `docs/entra-admin-connector.md` — the plan to promote Tier 2 Entra/Exchange
+  actions to approve-only direct execution.
 - `dashboard/ict-dashboard.html` — the ICT dashboard design template; the live copy
   is republished each weekday by the `ICT Dashboard` routine.
 - `routines/` — scheduled-routine definitions and backups (credentials redacted).

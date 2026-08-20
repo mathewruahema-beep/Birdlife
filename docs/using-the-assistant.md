@@ -39,7 +39,8 @@ queuing work from a locked-down machine.
   M365 user-level mail/calendar.
 - **T2 — prepares for an admin** (Entra/Exchange admin not yet connected): account
   create/disable, licences, distribution lists, mailbox access, MFA resets. You get
-  the exact Graph PowerShell or click-path, ready to run.
+  the exact Graph PowerShell or click-path, ready to run. The plan to promote these
+  to direct execution is [`entra-admin-connector.md`](entra-admin-connector.md).
 - **T3 — designs only**: Salesforce configuration (fields, flows, validation rules)
   — precise change specs for an admin to implement.
 
