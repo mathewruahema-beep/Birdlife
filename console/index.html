@@ -606,8 +606,8 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<div class="preview">' + esc(a.prompt) + '</div>' +
       '<div class="btnrow" style="margin-top:0">' +
       '<button class="btn sm copyplan">Copy &amp; ask Claude</button>' +
-      (caseId && live.mcp ? '<button class="btn sm ghost workbtn" data-id="' + esc(caseId) + '">Respond / close…</button>' : '') +
-      (taskId && live.mcp ? '<button class="btn sm ghost taskbtn" data-id="' + esc(taskId) + '">Comment / move / complete…</button>' : '') +
+      (caseId && live.mcp ? '<button class="btn sm ghost workbtn" data-id="' + esc(caseId) + '" data-cat="' + esc(a.cat || '') + '">Respond / close…</button>' : '') +
+      (taskId && live.mcp ? '<button class="btn sm ghost taskbtn" data-id="' + esc(taskId) + '" data-cat="' + esc(a.cat || '') + '">Comment / move / complete…</button>' : '') +
       (extra || '') + '</div>' +
       (caseId || taskId ? '<div class="wbslot"></div>' : '') + '</div>';
   }
@@ -828,6 +828,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<p class="hint" style="margin-top:8px">“Save as Outlook draft” puts it in your Drafts to send from Outlook. “Send now” sends it as you, immediately, threaded on the original — it asks for a second tap first. Pick a draft above, then make it yours before sending.</p>' +
       '<div class="wbmsg" aria-live="polite"></div></div>';
     wireDraftChips(slot);
+    slot.querySelector('.mw-text').value = voiceDrafts('email', first)[1].text;
     var text = slot.querySelector('.mw-text'), msg = slot.querySelector('.wbmsg'),
         dBtn = slot.querySelector('.mw-draft'), sBtn = slot.querySelector('.mw-send');
     slot.querySelector('.mw-cancel').addEventListener('click', function () { slot.innerHTML = ''; wbOpen = false; renderQueue(); });
@@ -930,6 +931,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
           '<button class="btn sm ghost tm-cancel">Cancel</button></div>' +
           '<p class="hint" style="margin-top:8px">Teams doesn’t let this page send messages — copy your reply, then tap “Open the chat in Teams” and paste it. Two taps and it’s said.</p></div>';
         wireDraftChips(slot);
+        slot.querySelector('.tm-text').value = voiceDrafts('teams', '')[0].text;
         slot.querySelector('.tm-copy').addEventListener('click', function () {
           var ta = slot.querySelector('.tm-text');
           if (!ta.value.trim()) { return; }
@@ -951,14 +953,14 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       b.addEventListener('click', function () {
         var slot = b.closest('.plan').querySelector('.wbslot');
         if (slot.innerHTML) { slot.innerHTML = ''; wbOpen = false; renderQueue(); return; }
-        openWorkbench(slot, b.dataset.id);
+        openWorkbench(slot, b.dataset.id, b.dataset.cat);
       });
     });
     root.querySelectorAll('.taskbtn').forEach(function (b) {
       b.addEventListener('click', function () {
         var slot = b.closest('.plan').querySelector('.wbslot');
         if (slot.innerHTML) { slot.innerHTML = ''; wbOpen = false; renderQueue(); return; }
-        openTaskWorkbench(slot, b.dataset.id);
+        openTaskWorkbench(slot, b.dataset.id, b.dataset.cat);
       });
     });
     root.querySelectorAll('.mailbtn').forEach(function (b) {
@@ -971,7 +973,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   }
 
   // ---- the task workbench: comment, move between sections, or mark complete ----
-  function openTaskWorkbench(slot, gid) {
+  function openTaskWorkbench(slot, gid, cat) {
     var x = taskIndex[gid];
     if (!x) return;
     wbOpen = true;
@@ -990,6 +992,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<p class="hint" style="margin-top:8px">Comments post to the task as you. If you’ve written a comment, Move and Mark complete post it first. Every button asks for a second tap — nothing changes on the first.</p>' +
       '<div class="wbmsg" aria-live="polite"></div></div>';
     wireDraftChips(slot);
+    slot.querySelector('.tw-text').value = voiceDrafts('task', '')[cat === 'Stuck' || cat === 'Not ticked off' ? 1 : 0].text;
     var text = slot.querySelector('.tw-text'), moveSel = slot.querySelector('.tw-move'),
         msg = slot.querySelector('.wbmsg'),
         cBtn = slot.querySelector('.tw-comment'), mBtn = slot.querySelector('.tw-movebtn'),
@@ -1080,8 +1083,15 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     });
   }
 
+  // Which voice draft fits the situation the advice engine flagged?
+  function caseDraftFor(cat) {
+    if (cat === 'They replied' || cat === 'Time to decide') return 1;   // Resolved
+    if (cat === 'Give them a nudge') return 2;                          // Nudge
+    return 0;                                                           // Acknowledge
+  }
+
   // ---- the workbench: respond on the case and close it, with your confirmation ----
-  function openWorkbench(slot, cid) {
+  function openWorkbench(slot, cid, cat) {
     var r = caseIndex[cid];
     if (!r) return;
     wbOpen = true; // pause background re-renders while you're typing
@@ -1103,7 +1113,9 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<div class="wbmsg" aria-live="polite"></div></div>';
     wireDraftChips(slot);
     var text = slot.querySelector('.wb-text'), pub = slot.querySelector('.wb-pub'),
-        reason = slot.querySelector('.wb-reason'), typeEl = slot.querySelector('.wb-type'),
+        reason = slot.querySelector('.wb-reason'), typeEl = slot.querySelector('.wb-type');
+    text.value = voiceDrafts('case', '')[caseDraftFor(cat)].text;
+    var
         msg = slot.querySelector('.wbmsg'),
         postBtn = slot.querySelector('.wb-post'), closeBtn = slot.querySelector('.wb-close');
     slot.querySelector('.wb-cancel').addEventListener('click', function () {
