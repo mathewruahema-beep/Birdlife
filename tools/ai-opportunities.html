@@ -1,0 +1,737 @@
+<title>AI Opportunity Radar</title>
+<style>
+  :root{
+    --ground:#F6F8F6; --surface:#FFFFFF; --surface-2:#EFF3F0;
+    --line:#DCE4DF; --line-strong:#C3D0C8;
+    --ink:#17211C; --ink-2:#4A5A52; --ink-3:#7B8C83;
+    --accent:#0E6E5A; --accent-soft:#D6EAE3; --accent-ink:#0A5546;
+    --good:#2E7D52; --good-soft:#DCEDE3;
+    --warn:#9A6410; --warn-soft:#F6ECD8;
+    --crit:#A03A31; --crit-soft:#F7E2DF;
+    --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#101512; --surface:#18201C; --surface-2:#1F2924;
+      --line:#2A362F; --line-strong:#3A4941;
+      --ink:#E4EDE7; --ink-2:#A3B3AA; --ink-3:#758880;
+      --accent:#4FC0A2; --accent-soft:#1B3830; --accent-ink:#6FD0B5;
+      --good:#5FBF88; --good-soft:#17301F;
+      --warn:#D9A441; --warn-soft:#33290F;
+      --crit:#E0796E; --crit-soft:#38201C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#101512; --surface:#18201C; --surface-2:#1F2924;
+    --line:#2A362F; --line-strong:#3A4941;
+    --ink:#E4EDE7; --ink-2:#A3B3AA; --ink-3:#758880;
+    --accent:#4FC0A2; --accent-soft:#1B3830; --accent-ink:#6FD0B5;
+    --good:#5FBF88; --good-soft:#17301F;
+    --warn:#D9A441; --warn-soft:#33290F;
+    --crit:#E0796E; --crit-soft:#38201C;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:32px 20px 72px;
+  }
+  .wrap{max-width:1100px; margin:0 auto; display:flex; flex-direction:column; gap:40px}
+
+  /* ---- masthead ---- */
+  .masthead{display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap;
+    border-bottom:2px solid var(--ink); padding-bottom:14px}
+  h1{margin:0; font-size:25px; font-weight:640; letter-spacing:-.02em; text-wrap:balance}
+  .masthead .role{color:var(--ink-2); font-size:13.5px; margin-top:3px; max-width:62ch}
+  .stamp{font-family:var(--mono); font-size:11px; color:var(--ink-3); text-align:right; line-height:1.7;
+    text-transform:uppercase; letter-spacing:.05em}
+  .stamp b{color:var(--ink-2); font-weight:500}
+
+  /* ---- shared ---- */
+  .eyebrow{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.13em;
+    color:var(--ink-3); font-weight:500}
+  section{display:flex; flex-direction:column; gap:12px}
+  h2{margin:0; font-size:15px; font-weight:620; letter-spacing:-.005em}
+  .sec-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap;
+    border-bottom:1px solid var(--line); padding-bottom:8px}
+  .sec-head .note{font-size:12.5px; color:var(--ink-3)}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:8px}
+
+  .chip{display:inline-flex; align-items:center; gap:5px; font-family:var(--mono); font-size:10.5px;
+    text-transform:uppercase; letter-spacing:.07em; padding:2px 8px; border-radius:99px;
+    border:1px solid var(--line-strong); color:var(--ink-2); white-space:nowrap}
+  .chip.q-do{background:var(--good-soft); color:var(--good); border-color:transparent}
+  .chip.q-bet{background:var(--warn-soft); color:var(--warn); border-color:transparent}
+  .chip.q-fill{background:var(--accent-soft); color:var(--accent-ink); border-color:transparent}
+  .chip.q-park{background:var(--surface-2); color:var(--ink-3); border-color:transparent}
+  .chip.stage-live{background:var(--accent-soft); color:var(--accent-ink); border-color:transparent}
+
+  button{font-family:var(--sans); font-size:13px; cursor:pointer; border-radius:6px;
+    border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
+    padding:7px 14px}
+  button:hover{background:var(--surface-2)}
+  button.primary{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:560}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost{border-color:transparent; background:transparent; color:var(--ink-2)}
+  button.ghost:hover{background:var(--surface-2)}
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--accent); outline-offset:1px}
+
+  /* ---- summary tiles ---- */
+  .tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px}
+  .tile{padding:14px 16px; display:flex; flex-direction:column; gap:2px}
+  .tile .num{font-size:27px; font-weight:640; letter-spacing:-.02em; line-height:1.15}
+  .tile .lbl{font-size:12.5px; color:var(--ink-2)}
+  .tile .sub{font-size:11.5px; color:var(--ink-3)}
+
+  /* ---- matrix ---- */
+  .matrix-card{padding:18px 18px 10px}
+  .matrix-scroll{overflow-x:auto}
+  .matrix-legend{display:flex; gap:18px; flex-wrap:wrap; padding:8px 4px 6px; font-size:12px; color:var(--ink-2)}
+  .lg{display:inline-flex; align-items:center; gap:7px}
+  .dot{width:11px; height:11px; border-radius:50%; flex:none}
+  .dot.solid{background:var(--accent)}
+  .dot.ring{background:var(--surface); border:2.5px solid var(--accent)}
+  .dot.faded{background:var(--line-strong)}
+  .tooltip{position:fixed; z-index:30; pointer-events:none; background:var(--surface);
+    border:1px solid var(--line-strong); border-radius:7px; padding:9px 12px; max-width:270px;
+    box-shadow:0 6px 22px rgba(0,0,0,.14); font-size:12.5px; display:none}
+  .tooltip b{display:block; font-size:13px; margin-bottom:2px}
+  .tooltip .tm{font-family:var(--mono); font-size:10.5px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.06em}
+
+  /* ---- register ---- */
+  .reg-controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  .reg-controls select{font-family:var(--sans); font-size:12.5px; padding:6px 9px; border-radius:6px;
+    border:1px solid var(--line-strong); background:var(--surface); color:var(--ink)}
+  .opps{display:flex; flex-direction:column; gap:10px}
+  .opp{padding:0; overflow:hidden}
+  .opp-head{display:flex; align-items:center; gap:12px; padding:13px 16px; cursor:pointer; flex-wrap:wrap}
+  .opp-head:hover{background:var(--surface-2)}
+  .opp-rank{font-family:var(--mono); font-size:11px; color:var(--ink-3); width:22px; flex:none; text-align:right}
+  .opp-title{font-weight:600; font-size:14px; flex:1 1 220px; min-width:0}
+  .opp-title .area{display:block; font-size:11.5px; color:var(--ink-3); font-weight:400}
+  .scorebars{display:flex; flex-direction:column; gap:4px; width:150px; flex:none}
+  .sb{display:grid; grid-template-columns:14px 1fr 26px; gap:6px; align-items:center;
+    font-family:var(--mono); font-size:10px; color:var(--ink-3)}
+  .sb .track{display:block; height:5px; background:var(--surface-2); border-radius:3px; overflow:hidden}
+  .sb .fill{display:block; height:100%; border-radius:3px; background:var(--accent)}
+  .sb .val{text-align:right; color:var(--ink-2); font-variant-numeric:tabular-nums}
+  .opp-body{border-top:1px solid var(--line); padding:14px 16px 16px; display:none;
+    flex-direction:column; gap:12px; background:var(--surface)}
+  .opp.open .opp-body{display:flex}
+  .opp-body p{margin:0; font-size:13.5px; color:var(--ink-2); max-width:75ch}
+  .opp-body .why{font-size:12.5px; color:var(--ink-3); border-left:2px solid var(--line-strong); padding-left:10px}
+  .dims{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:6px 26px; font-size:12.5px}
+  .dim{display:grid; grid-template-columns:1fr auto; gap:10px; color:var(--ink-2);
+    border-bottom:1px dashed var(--line); padding:3px 0}
+  .dim .v{font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--ink)}
+  .opp-actions{display:flex; gap:8px}
+  .empty{padding:26px 16px; text-align:center; color:var(--ink-3); font-size:13.5px}
+
+  /* ---- builder ---- */
+  .builder{padding:18px; display:flex; flex-direction:column; gap:18px}
+  .fgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px}
+  .field{display:flex; flex-direction:column; gap:5px}
+  .field label{font-size:12.5px; font-weight:560; color:var(--ink-2)}
+  .field input[type=text], .field input[type=number], .field select, .field textarea{
+    font-family:var(--sans); font-size:13.5px; padding:8px 10px; border-radius:6px;
+    border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); width:100%}
+  .field textarea{resize:vertical; min-height:60px}
+  .sliders{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px 30px}
+  .slider-group{display:flex; flex-direction:column; gap:12px}
+  .slider-group>.eyebrow{border-bottom:1px solid var(--line); padding-bottom:5px}
+  .sl{display:flex; flex-direction:column; gap:3px}
+  .sl .sl-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px}
+  .sl .sl-head label{font-size:13px; font-weight:560}
+  .sl .sl-head .cur{font-family:var(--mono); font-size:11px; color:var(--accent-ink); font-variant-numeric:tabular-nums}
+  .sl input[type=range]{width:100%; accent-color:var(--accent)}
+  .sl .hint{font-size:11.5px; color:var(--ink-3); min-height:1.4em}
+  .builder-foot{display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    border-top:1px solid var(--line); padding-top:14px}
+  .preview{display:flex; align-items:center; gap:10px; font-size:13px; color:var(--ink-2); flex-wrap:wrap}
+  .preview .pv{font-family:var(--mono); font-size:12px; font-variant-numeric:tabular-nums}
+  .spacer{flex:1}
+
+  /* ---- guide ---- */
+  .guide{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px}
+  .gcol{padding:16px; display:flex; flex-direction:column; gap:9px}
+  .gcol h3{margin:0; font-size:13.5px; font-weight:620; display:flex; align-items:center; gap:8px}
+  .gmark{width:9px; height:9px; border-radius:50%; flex:none}
+  .gcol ul{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:7px;
+    font-size:13px; color:var(--ink-2)}
+  .gcol li b{color:var(--ink); font-weight:560}
+
+  /* ---- data mgmt ---- */
+  .io{display:flex; flex-direction:column; gap:10px}
+  .io textarea{font-family:var(--mono); font-size:11.5px; padding:10px; border-radius:6px; width:100%;
+    border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); min-height:90px; display:none}
+  .io.show-io textarea{display:block}
+  .io-row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+  .io .msg{font-size:12.5px; color:var(--ink-3)}
+
+  footer{border-top:1px solid var(--line); padding-top:14px; font-size:12px; color:var(--ink-3);
+    display:flex; flex-direction:column; gap:4px}
+  @media (prefers-reduced-motion:no-preference){
+    .opp, .tile{transition:background .12s ease}
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">BirdLife Australia · ICT &amp; Digital</div>
+      <h1>AI Opportunity Radar</h1>
+      <div class="role">Capture the work AI could take on, score it the same way every time,
+        and see at a glance what to do first. Seeded from what the operational data already shows.</div>
+    </div>
+    <div class="stamp">
+      Scores <b>workshop estimates</b><br>
+      Saved <b>in this browser</b><br>
+      Scale <b>1–5 per dimension</b>
+    </div>
+  </header>
+
+  <!-- summary -->
+  <section>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <!-- matrix -->
+  <section>
+    <div class="sec-head">
+      <h2>Value × feasibility</h2>
+      <span class="note">Each dot is one opportunity · hover for detail · midlines at 3.5</span>
+    </div>
+    <div class="card matrix-card">
+      <div class="matrix-scroll"><div id="matrix"></div></div>
+      <div class="matrix-legend">
+        <span class="lg"><span class="dot solid"></span>Piloting or in production</span>
+        <span class="lg"><span class="dot ring"></span>Idea or assessing</span>
+        <span class="lg"><span class="dot faded"></span>Parked</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- register -->
+  <section>
+    <div class="sec-head">
+      <h2>Opportunity register</h2>
+      <span class="note" id="reg-count"></span>
+    </div>
+    <div class="reg-controls">
+      <select id="f-area" aria-label="Filter by area"></select>
+      <select id="f-stage" aria-label="Filter by stage"></select>
+      <select id="f-sort" aria-label="Sort order">
+        <option value="score">Sort: combined score</option>
+        <option value="value">Sort: value</option>
+        <option value="feas">Sort: feasibility</option>
+        <option value="hours">Sort: est. hours saved</option>
+      </select>
+      <div class="spacer"></div>
+      <button class="primary" id="btn-new">Add an opportunity</button>
+    </div>
+    <div class="opps" id="opps"></div>
+  </section>
+
+  <!-- builder -->
+  <section id="builder-section" hidden>
+    <div class="sec-head">
+      <h2 id="builder-title">Add an opportunity</h2>
+      <span class="note">Score each dimension 1–5 — the hints tell you what a 1 and a 5 look like</span>
+    </div>
+    <form class="card builder" id="builder" novalidate>
+      <div class="fgrid">
+        <div class="field" style="grid-column:1/-1">
+          <label for="b-name">Name — what would we call this?</label>
+          <input type="text" id="b-name" required placeholder="e.g. First-response drafting for Zeus emails">
+        </div>
+        <div class="field">
+          <label for="b-area">Area</label>
+          <select id="b-area"></select>
+        </div>
+        <div class="field">
+          <label for="b-stage">Stage</label>
+          <select id="b-stage"></select>
+        </div>
+        <div class="field">
+          <label for="b-hours">Est. hours saved per year <span style="font-weight:400;color:var(--ink-3)">(optional)</span></label>
+          <input type="number" id="b-hours" min="0" step="10" placeholder="e.g. 120">
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label for="b-desc">What it does</label>
+          <textarea id="b-desc" placeholder="One or two sentences: the task today, and what AI would do instead."></textarea>
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label for="b-why">Why now — the evidence</label>
+          <textarea id="b-why" placeholder="Numbers or observations that make this real, e.g. '410 of 425 cases arrive by email'."></textarea>
+        </div>
+      </div>
+
+      <div class="sliders">
+        <div class="slider-group">
+          <div class="eyebrow">Value — is it worth doing?</div>
+          <div id="sl-value"></div>
+        </div>
+        <div class="slider-group">
+          <div class="eyebrow">Feasibility — can we actually do it?</div>
+          <div id="sl-feas"></div>
+        </div>
+      </div>
+
+      <div class="builder-foot">
+        <div class="preview" id="preview"></div>
+        <div class="spacer"></div>
+        <button type="button" class="ghost" id="btn-cancel">Cancel</button>
+        <button type="submit" class="primary" id="btn-save">Save opportunity</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- recognition guide -->
+  <section>
+    <div class="sec-head">
+      <h2>How to recognise an AI opportunity</h2>
+      <span class="note">Use this while scoring — the signals map to the feasibility dimensions</span>
+    </div>
+    <div class="guide">
+      <div class="card gcol">
+        <h3><span class="gmark" style="background:var(--good)"></span>Strong signals</h3>
+        <ul>
+          <li><b>High volume, same shape.</b> The task repeats weekly or daily — 410 of 425 Zeus cases arrive as free-text email.</li>
+          <li><b>Language in, language out.</b> Reading, classifying, summarising, drafting — AI's home ground.</li>
+          <li><b>An easy human check.</b> The output is quick to verify, so review costs minutes, not the task itself.</li>
+          <li><b>Data already reachable.</b> Salesforce, NetSuite, Microsoft 365, Asana and Zapier are all connected — no digitisation project first.</li>
+          <li><b>A person stays in the loop.</b> AI drafts, a human sends.</li>
+        </ul>
+      </div>
+      <div class="card gcol">
+        <h3><span class="gmark" style="background:var(--crit)"></span>Red flags</h3>
+        <ul>
+          <li><b>Decisions about people</b> — hiring, performance, member sanctions — with no human review.</li>
+          <li><b>Sensitive data leaving governed systems.</b> Member, donor or payroll data pasted into unapproved tools.</li>
+          <li><b>Rare and irreversible.</b> A task done twice a year with high stakes — the setup never pays back and the risk never shrinks.</li>
+          <li><b>Tacit knowledge.</b> The rules live in one person's head and nowhere else — document first, automate second.</li>
+          <li><b>The demo is the easy 80%.</b> If the hard 20% still needs the expert every time, the saving is smaller than it looks.</li>
+        </ul>
+      </div>
+      <div class="card gcol">
+        <h3><span class="gmark" style="background:var(--warn)"></span>Guardrails for every pilot</h3>
+        <ul>
+          <li><b>Human review before it reaches anyone outside</b> — members, donors, volunteers, the public.</li>
+          <li><b>Keep data in governed systems.</b> Work through approved connectors, not copy-paste; respect the Privacy Act handling of member data.</li>
+          <li><b>Bound the pilot and measure.</b> One queue, one month, a before/after number — then decide.</li>
+          <li><b>Make provenance visible.</b> Log what AI touched, the same principle the ICT dashboard applies to scope.</li>
+          <li><b>Name an owner.</b> An opportunity with no owner is a Parked item wearing a different chip.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- data management -->
+  <section>
+    <div class="sec-head">
+      <h2>Your data</h2>
+      <span class="note">Stored in this browser only — export before clearing or sharing</span>
+    </div>
+    <div class="io" id="io">
+      <div class="io-row">
+        <button id="btn-export">Copy register as JSON</button>
+        <button id="btn-import">Paste / import JSON</button>
+        <button id="btn-reset" class="ghost">Reset to seed register</button>
+        <span class="msg" id="io-msg"></span>
+      </div>
+      <textarea id="io-text" aria-label="JSON import area" placeholder="Paste a previously exported register here, then press Import below."></textarea>
+      <div class="io-row" id="io-confirm" style="display:none">
+        <button class="primary" id="btn-import-go">Import — replaces the current register</button>
+        <button class="ghost" id="btn-import-cancel">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>Scores are workshop estimates on a shared 1–5 scale, not measurements — their job is to make trade-offs comparable, not precise.</div>
+    <div>Seed register recognised from the 6 Aug 2026 Ask Zeus data pull, the ICT Operations Project Plan, and known finance/supporter workflows. Excluded: anything requiring member personal data in ungoverned tools.</div>
+  </footer>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+'use strict';
+const AREAS = ['ICT','Finance','Fundraising','Membership & Supporters','Conservation & Science','Communications','People & Culture','Org-wide'];
+const STAGES = ['Idea','Assessing','Piloting','In production','Parked'];
+const VDIMS = [
+  {k:'volume',  n:'Volume & frequency',      hints:['A few times a year','Monthly','Weekly','Most days','Daily, high volume']},
+  {k:'time',    n:'Time saved per instance', hints:['Seconds','A few minutes','15–30 minutes','About an hour','Half a day or more']},
+  {k:'quality', n:'Error & risk reduction',  hints:['Errors rare or harmless today','Occasional small slips','Regular rework','Errors reach people outside','Errors cost money or trust']},
+  {k:'mission', n:'Mission & service impact',hints:['Internal convenience only','Helps one team','Faster service to staff','Better experience for members/donors','Directly advances conservation work']},
+];
+const FDIMS = [
+  {k:'data',      n:'Data readiness',       hints:['Paper or scattered files','Spreadsheets, inconsistent','Digital but messy','In a governed system','Clean and API-reachable today']},
+  {k:'clarity',   n:'Task clarity',         hints:['Pure judgement, undocumented','Rules in one head','Rules exist, exceptions common','Documented with few exceptions','Well-defined, output easy to verify']},
+  {k:'integration',n:'Integration ease',    hints:['Deep custom build','New system needed','Some glue work','Fits existing tools with config','Works with what we run today']},
+  {k:'safety',    n:'Safety & sensitivity', hints:['Sensitive data, irreversible acts','Sensitive data, review possible','Moderate stakes','Low stakes, internal only','Low stakes and fully reviewable']},
+];
+const ALLDIMS = VDIMS.concat(FDIMS);
+const MID = 3.5;
+const LS_KEY = 'birdlife-ai-opps-v1';
+
+/* Seed register — recognised from BirdLife Australia's own operational data.
+   d = [volume,time,quality,mission, data,clarity,integration,safety], each 1–5. */
+const SEED = [
+  {id:'zeus-triage', name:'Zeus email triage & first-response drafting', area:'ICT', stage:'Assessing', hours:250,
+   desc:'Read each inbound Ask Zeus email, classify it, suggest the case Type, and draft a first response for the technician to review and send.',
+   why:'410 of 425 cases arrive by email (96.5%) and 5 of 8 New cases sit past the 2-business-day first-touch mark, the oldest 21 days.',
+   d:[5,3,3,3, 4,4,4,4]},
+  {id:'type-backfill', name:'Case Type auto-classification', area:'ICT', stage:'Idea', hours:60,
+   desc:'Classify the Type field on open and historical Zeus cases from subject and description, queued for one-click human confirmation.',
+   why:'65% of the open queue (13 of 20) has no Type, so every category report runs on a field blank on two-thirds of live records.',
+   d:[4,2,4,2, 4,4,4,5]},
+  {id:'identity-lifecycle', name:'Onboarding & offboarding runbook assistant', area:'ICT', stage:'Assessing', hours:300,
+   desc:'Turn a new-starter or departure notice into the full checklist — accounts, licences, groups, mailboxes — with each step pre-drafted for admin approval.',
+   why:'IAM (49) + Departing Staff (22) + New User (16) = 87 of the last 425 cases: 20% of everything ICT handles, against an existing Employment Hero → Entra sync.',
+   d:[4,4,4,3, 3,4,2,3]},
+  {id:'self-service', name:'Self-service ICT answers assistant', area:'ICT', stage:'Idea', hours:150,
+   desc:'A staff-facing assistant answering the common how-do-I questions (password, MFA, shared mailboxes, Teams) before they become cases.',
+   why:'Ask Zeus is single-channel with zero self-service: every question, however small, becomes an email and then a case.',
+   d:[4,2,2,3, 3,3,3,4]},
+  {id:'phish-triage', name:'Phishing report triage', area:'ICT', stage:'Idea', hours:80,
+   desc:'Classify user-reported suspicious emails, check indicators against Defender, and draft the verdict reply; a technician confirms before anything is actioned.',
+   why:'Phishing reports are frequent, template-shaped, and the cost of a slow answer is someone clicking the link while they wait.',
+   d:[3,2,4,2, 4,4,4,4]},
+  {id:'dedupe-assist', name:'Duplicate contact merge assistant', area:'Membership & Supporters', stage:'Parked', hours:120,
+   desc:'Score Plauti duplicate candidates in Salesforce, explain each match in plain language, and queue high-confidence merges for human approval.',
+   why:'Duplicate management is one of three explicitly Blocked decision-debt items — the tech exists; the responsibility call does not. Parked until it is made.',
+   d:[3,3,4,3, 4,3,3,2]},
+  {id:'bank-rec', name:'Bank reconciliation match suggestions', area:'Finance', stage:'Idea', hours:200,
+   desc:'Suggest matches between bank lines, Stripe/WooCommerce payouts and NetSuite records, with a confidence note per match; finance accepts or rejects each.',
+   why:'A standing bank-rec backlog and a known unreconciled-income gap — matching is exactly the high-volume, verifiable pattern AI handles well.',
+   d:[4,4,4,2, 3,4,3,3]},
+  {id:'meeting-actions', name:'Meeting minutes to Asana actions', area:'Org-wide', stage:'Piloting', hours:100,
+   desc:'Draft action items from meeting transcripts and file them into the right Asana project and section, assigned and dated, pending a nod from the meeting owner.',
+   why:'Granola and Zoom transcripts already exist; the join between meetings and tracked work is currently a human retyping into a spreadsheet column.',
+   d:[3,2,2,2, 4,3,4,5]},
+  {id:'donor-drafts', name:'Donor & member reply drafting', area:'Fundraising', stage:'Idea', hours:180,
+   desc:'Draft replies to routine donor and member queries — receipts, membership changes, event questions — in BirdLife voice, always human-sent.',
+   why:'Routine correspondence is high-volume and template-adjacent, but it reaches supporters directly, so review is non-negotiable and scored accordingly.',
+   d:[3,3,2,4, 3,3,3,2]},
+  {id:'grant-drafts', name:'Grant application & report drafting assist', area:'Conservation & Science', stage:'Idea', hours:160,
+   desc:'First-draft funding applications and acquittal reports from project notes and prior submissions; program leads edit rather than start from blank pages.',
+   why:'Grant writing is seasonal, deadline-bound and consumes senior conservation staff time that could go to program work.',
+   d:[3,4,2,5, 3,2,4,4]},
+  {id:'birdata-qa', name:'Birdata observation anomaly screening', area:'Conservation & Science', stage:'Idea', hours:220,
+   desc:'Flag improbable citizen-science records — out-of-range species, impossible counts, date slips — for expert reviewers instead of blanket manual checks.',
+   why:'Birdata volume grows faster than reviewer time; screening is triage for experts, never auto-rejection of a volunteer’s record.',
+   d:[4,3,4,5, 3,3,2,4]},
+  {id:'web-alt-text', name:'Website alt-text & content tagging', area:'Communications', stage:'Idea', hours:60,
+   desc:'Generate alt text and taxonomy tags for images and articles across the WordPress estate, reviewed in batches by the comms team.',
+   why:'Accessibility debt accumulates one image at a time across birdlife.org.au; batch review makes the fix hours, not weeks.',
+   d:[2,2,2,3, 4,4,4,5]},
+];
+
+/* ---------- state ---------- */
+let opps = load();
+let editingId = null;
+
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){ const p = JSON.parse(raw); if(Array.isArray(p) && p.length) return p; }
+  }catch(e){}
+  return JSON.parse(JSON.stringify(SEED));
+}
+function persist(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(opps)); }catch(e){} }
+
+/* ---------- scoring ---------- */
+const avg = a => a.reduce((s,x)=>s+x,0)/a.length;
+const valueOf = o => avg(o.d.slice(0,4));
+const feasOf  = o => avg(o.d.slice(4,8));
+const scoreOf = o => (valueOf(o)+feasOf(o))/2;
+function quadrant(o){
+  const v = valueOf(o) >= MID, f = feasOf(o) >= MID;
+  if(v && f)  return {key:'do',   label:'Do first', cls:'q-do'};
+  if(v && !f) return {key:'bet',  label:'Big bet',  cls:'q-bet'};
+  if(!v && f) return {key:'fill', label:'Fill-in',  cls:'q-fill'};
+  return {key:'park', label:'Park', cls:'q-park'};
+}
+const fmt = n => (Math.round(n*10)/10).toFixed(1);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- summary tiles ---------- */
+function renderTiles(){
+  const doFirst = opps.filter(o=>quadrant(o).key==='do').length;
+  const live = opps.filter(o=>o.stage==='Piloting'||o.stage==='In production').length;
+  const hours = opps.filter(o=>o.stage!=='Parked').reduce((s,o)=>s+(+o.hours||0),0);
+  document.getElementById('tiles').innerHTML = [
+    {n:opps.length, l:'Opportunities on the radar', s:'across '+new Set(opps.map(o=>o.area)).size+' areas'},
+    {n:doFirst, l:'In the Do-first quadrant', s:'value and feasibility both above 3.5'},
+    {n:live, l:'Piloting or in production', s:'ideas that have left the whiteboard'},
+    {n:hours.toLocaleString(), l:'Est. hours saved per year', s:'sum of estimates, parked items excluded'},
+  ].map(t=>`<div class="card tile"><div class="num">${t.n}</div><div class="lbl">${t.l}</div><div class="sub">${t.s}</div></div>`).join('');
+}
+
+/* ---------- matrix ---------- */
+function renderMatrix(){
+  const W=980, H=520, m={t:34, r:24, b:46, l:56};
+  const iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const X = v => m.l + (v-1)/4*iw;
+  const Y = v => m.t + ih - (v-1)/4*ih;
+  const css = getComputedStyle(document.documentElement);
+  const C = n => css.getPropertyValue(n).trim();
+
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:640px;display:block" role="img" aria-label="Scatter of opportunities by feasibility and value">`;
+  // quadrant washes
+  s += `<rect x="${X(MID)}" y="${m.t}" width="${X(5)-X(MID)}" height="${Y(MID)-m.t}" fill="${C('--good-soft')}" opacity="0.45"/>`;
+  s += `<rect x="${m.l}" y="${m.t}" width="${X(MID)-m.l}" height="${Y(MID)-m.t}" fill="${C('--warn-soft')}" opacity="0.35"/>`;
+  s += `<rect x="${X(MID)}" y="${Y(MID)}" width="${X(5)-X(MID)}" height="${Y(1)-Y(MID)}" fill="${C('--accent-soft')}" opacity="0.28"/>`;
+  // grid
+  for(let v=2; v<=4; v++){
+    s += `<line x1="${X(v)}" y1="${m.t}" x2="${X(v)}" y2="${Y(1)}" stroke="${C('--line')}" stroke-width="1"/>`;
+    s += `<line x1="${m.l}" y1="${Y(v)}" x2="${X(5)}" y2="${Y(v)}" stroke="${C('--line')}" stroke-width="1"/>`;
+  }
+  // midlines
+  s += `<line x1="${X(MID)}" y1="${m.t}" x2="${X(MID)}" y2="${Y(1)}" stroke="${C('--line-strong')}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  s += `<line x1="${m.l}" y1="${Y(MID)}" x2="${X(5)}" y2="${Y(MID)}" stroke="${C('--line-strong')}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  // axes
+  s += `<line x1="${m.l}" y1="${Y(1)}" x2="${X(5)}" y2="${Y(1)}" stroke="${C('--line-strong')}" stroke-width="1.5"/>`;
+  s += `<line x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${Y(1)}" stroke="${C('--line-strong')}" stroke-width="1.5"/>`;
+  const tick = (v)=>{ s += `<text x="${X(v)}" y="${Y(1)+20}" text-anchor="middle" font-size="11" font-family="${css.getPropertyValue('--mono')}" fill="${C('--ink-3')}">${v}</text>`;
+    s += `<text x="${m.l-12}" y="${Y(v)+4}" text-anchor="end" font-size="11" font-family="${css.getPropertyValue('--mono')}" fill="${C('--ink-3')}">${v}</text>`; };
+  [1,2,3,4,5].forEach(tick);
+  s += `<text x="${(m.l+X(5))/2}" y="${H-8}" text-anchor="middle" font-size="12" fill="${C('--ink-2')}">Feasibility — can we do it?</text>`;
+  s += `<text x="16" y="${(m.t+Y(1))/2}" text-anchor="middle" font-size="12" fill="${C('--ink-2')}" transform="rotate(-90 16 ${(m.t+Y(1))/2})">Value — is it worth it?</text>`;
+  // quadrant labels
+  const ql = (x,y,t,anchor)=>`<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="10.5" letter-spacing="1.5" font-family="${css.getPropertyValue('--mono')}" fill="${C('--ink-3')}">${t}</text>`;
+  s += ql(X(5)-10, m.t+18, 'DO FIRST', 'end');
+  s += ql(m.l+10, m.t+18, 'BIG BETS', 'start');
+  s += ql(X(5)-10, Y(1)-12, 'FILL-INS', 'end');
+  s += ql(m.l+10, Y(1)-12, 'PARK', 'start');
+
+  // collision nudge: spread dots that share rounded coords
+  const taken = {};
+  const pts = opps.map(o=>{
+    let x=X(feasOf(o)), y=Y(valueOf(o));
+    const key = Math.round(x/14)+','+Math.round(y/14);
+    const n = taken[key]||0; taken[key]=n+1;
+    if(n>0){ const a=n*2.4; x+=Math.cos(a)*13*Math.ceil(n/2); y+=Math.sin(a)*13*Math.ceil(n/2); }
+    return {o,x,y};
+  });
+  for(const p of pts){
+    const live = p.o.stage==='Piloting'||p.o.stage==='In production';
+    const parked = p.o.stage==='Parked';
+    const fill = parked ? C('--line-strong') : (live ? C('--accent') : C('--surface'));
+    const stroke = parked ? 'none' : C('--accent');
+    s += `<circle cx="${p.x}" cy="${p.y}" r="7.5" fill="${fill}" ${stroke!=='none'?`stroke="${stroke}" stroke-width="2.5"`:''}/>`;
+    s += `<circle cx="${p.x}" cy="${p.y}" r="15" fill="transparent" data-id="${esc(p.o.id)}" style="cursor:pointer"/>`;
+  }
+  s += `</svg>`;
+  const el = document.getElementById('matrix');
+  el.innerHTML = s;
+
+  const tip = document.getElementById('tooltip');
+  el.querySelectorAll('circle[data-id]').forEach(c=>{
+    c.addEventListener('mousemove', ev=>{
+      const o = opps.find(x=>x.id===c.dataset.id); if(!o) return;
+      const q = quadrant(o);
+      tip.innerHTML = `<b>${esc(o.name)}</b><span class="tm">${esc(o.area)} · ${esc(o.stage)}</span>
+        <div style="margin-top:5px">Value <b style="display:inline">${fmt(valueOf(o))}</b> · Feasibility <b style="display:inline">${fmt(feasOf(o))}</b> · ${q.label}</div>`;
+      tip.style.display='block';
+      const tw = tip.offsetWidth, pad=14;
+      let lx = ev.clientX+pad; if(lx+tw > innerWidth-8) lx = ev.clientX-tw-pad;
+      tip.style.left = lx+'px'; tip.style.top = (ev.clientY+pad)+'px';
+    });
+    c.addEventListener('mouseleave', ()=> tip.style.display='none');
+    c.addEventListener('click', ()=>{
+      const row = document.querySelector(`.opp[data-id="${CSS.escape(c.dataset.id)}"]`);
+      if(row){ row.classList.add('open'); row.scrollIntoView({behavior:'smooth', block:'center'}); }
+    });
+  });
+}
+
+/* ---------- register ---------- */
+function fillSelect(el, items, allLabel){
+  el.innerHTML = (allLabel?`<option value="">${allLabel}</option>`:'') +
+    items.map(a=>`<option>${esc(a)}</option>`).join('');
+}
+function renderRegister(){
+  const fa = document.getElementById('f-area').value;
+  const fs = document.getElementById('f-stage').value;
+  const sort = document.getElementById('f-sort').value;
+  let list = opps.filter(o => (!fa || o.area===fa) && (!fs || o.stage===fs));
+  const keyFns = {score:scoreOf, value:valueOf, feas:feasOf, hours:o=>+o.hours||0};
+  list.sort((a,b)=>keyFns[sort](b)-keyFns[sort](a));
+
+  document.getElementById('reg-count').textContent =
+    list.length===opps.length ? `${opps.length} opportunities` : `${list.length} of ${opps.length} shown`;
+
+  const wrap = document.getElementById('opps');
+  if(!list.length){ wrap.innerHTML = `<div class="card empty">Nothing matches these filters — clear them, or add the first opportunity for this area.</div>`; return; }
+
+  wrap.innerHTML = list.map((o,i)=>{
+    const q = quadrant(o);
+    const v = valueOf(o), f = feasOf(o);
+    const liveCls = (o.stage==='Piloting'||o.stage==='In production') ? ' stage-live' : '';
+    const dims = ALLDIMS.map((d,ix)=>`<div class="dim"><span>${d.n}</span><span class="v">${o.d[ix]} / 5</span></div>`).join('');
+    return `<div class="card opp" data-id="${esc(o.id)}">
+      <div class="opp-head" role="button" tabindex="0" aria-expanded="false">
+        <span class="opp-rank">${String(i+1).padStart(2,'0')}</span>
+        <span class="opp-title">${esc(o.name)}<span class="area">${esc(o.area)}${o.hours?` · ~${(+o.hours).toLocaleString()} h/yr`:''}</span></span>
+        <span class="chip ${q.cls}">${q.label}</span>
+        <span class="chip${liveCls}">${esc(o.stage)}</span>
+        <span class="scorebars">
+          <span class="sb"><span>V</span><span class="track"><span class="fill" style="width:${(v-1)/4*100}%"></span></span><span class="val">${fmt(v)}</span></span>
+          <span class="sb"><span>F</span><span class="track"><span class="fill" style="width:${(f-1)/4*100}%"></span></span><span class="val">${fmt(f)}</span></span>
+        </span>
+      </div>
+      <div class="opp-body">
+        <p>${esc(o.desc)}</p>
+        ${o.why?`<p class="why">${esc(o.why)}</p>`:''}
+        <div class="dims">${dims}</div>
+        <div class="opp-actions">
+          <button data-act="edit">Edit</button>
+          <button data-act="del" class="ghost">Remove</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  wrap.querySelectorAll('.opp-head').forEach(h=>{
+    const toggle = ()=>{ const o=h.parentElement; o.classList.toggle('open');
+      h.setAttribute('aria-expanded', o.classList.contains('open')); };
+    h.addEventListener('click', toggle);
+    h.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); } });
+  });
+  wrap.querySelectorAll('button[data-act]').forEach(b=>{
+    b.addEventListener('click', e=>{
+      const id = b.closest('.opp').dataset.id;
+      if(b.dataset.act==='edit') openBuilder(id);
+      else { opps = opps.filter(o=>o.id!==id); persist(); renderAll(); }
+    });
+  });
+}
+
+/* ---------- builder ---------- */
+function sliderRow(d, val){
+  return `<div class="sl">
+    <div class="sl-head"><label for="sl-${d.k}">${d.n}</label><span class="cur" id="cur-${d.k}">${val} / 5</span></div>
+    <input type="range" id="sl-${d.k}" min="1" max="5" step="1" value="${val}" data-k="${d.k}">
+    <div class="hint" id="hint-${d.k}">${d.hints[val-1]}</div>
+  </div>`;
+}
+function buildSliders(vals){
+  document.getElementById('sl-value').innerHTML = VDIMS.map((d,i)=>sliderRow(d, vals[i])).join('');
+  document.getElementById('sl-feas').innerHTML = FDIMS.map((d,i)=>sliderRow(d, vals[i+4])).join('');
+  document.querySelectorAll('#builder input[type=range]').forEach(r=>{
+    r.addEventListener('input', ()=>{
+      const d = ALLDIMS.find(x=>x.k===r.dataset.k);
+      document.getElementById('cur-'+d.k).textContent = r.value+' / 5';
+      document.getElementById('hint-'+d.k).textContent = d.hints[r.value-1];
+      updatePreview();
+    });
+  });
+  updatePreview();
+}
+function readSliders(){ return ALLDIMS.map(d=>+document.getElementById('sl-'+d.k).value); }
+function updatePreview(){
+  const d = readSliders();
+  const o = {d};
+  const q = quadrant(o);
+  document.getElementById('preview').innerHTML =
+    `<span class="pv">Value ${fmt(valueOf(o))} · Feasibility ${fmt(feasOf(o))}</span><span class="chip ${q.cls}">${q.label}</span>`;
+}
+function openBuilder(id){
+  editingId = id || null;
+  const o = id ? opps.find(x=>x.id===id) : null;
+  document.getElementById('builder-title').textContent = o ? 'Edit opportunity' : 'Add an opportunity';
+  document.getElementById('btn-save').textContent = o ? 'Save changes' : 'Save opportunity';
+  document.getElementById('b-name').value = o?o.name:'';
+  document.getElementById('b-area').value = o?o.area:'ICT';
+  document.getElementById('b-stage').value = o?o.stage:'Idea';
+  document.getElementById('b-hours').value = o&&o.hours?o.hours:'';
+  document.getElementById('b-desc').value = o?o.desc:'';
+  document.getElementById('b-why').value = o?(o.why||''):'';
+  buildSliders(o?o.d.slice():[3,3,3,3,3,3,3,3]);
+  const sec = document.getElementById('builder-section');
+  sec.hidden = false;
+  sec.scrollIntoView({behavior:'smooth', block:'start'});
+  document.getElementById('b-name').focus();
+}
+function closeBuilder(){ document.getElementById('builder-section').hidden = true; editingId = null; }
+
+document.getElementById('btn-new').addEventListener('click', ()=>openBuilder(null));
+document.getElementById('btn-cancel').addEventListener('click', closeBuilder);
+document.getElementById('builder').addEventListener('submit', e=>{
+  e.preventDefault();
+  const name = document.getElementById('b-name').value.trim();
+  if(!name){ document.getElementById('b-name').focus(); return; }
+  const rec = {
+    id: editingId || ('opp-'+Date.now().toString(36)),
+    name,
+    area: document.getElementById('b-area').value,
+    stage: document.getElementById('b-stage').value,
+    hours: +document.getElementById('b-hours').value || 0,
+    desc: document.getElementById('b-desc').value.trim(),
+    why: document.getElementById('b-why').value.trim(),
+    d: readSliders(),
+  };
+  if(editingId){ opps = opps.map(o=>o.id===editingId?rec:o); }
+  else opps.push(rec);
+  persist(); closeBuilder(); renderAll();
+  document.querySelector(`.opp[data-id="${CSS.escape(rec.id)}"]`)?.scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+/* ---------- data mgmt ---------- */
+const ioMsg = t => { document.getElementById('io-msg').textContent = t; setTimeout(()=>{document.getElementById('io-msg').textContent='';}, 4000); };
+document.getElementById('btn-export').addEventListener('click', async ()=>{
+  const json = JSON.stringify(opps, null, 2);
+  const ta = document.getElementById('io-text');
+  document.getElementById('io').classList.add('show-io');
+  ta.value = json;
+  try{ await navigator.clipboard.writeText(json); ioMsg('Copied to clipboard — also shown below.'); }
+  catch(e){ ta.select(); ioMsg('Clipboard blocked — select and copy the text below.'); }
+});
+document.getElementById('btn-import').addEventListener('click', ()=>{
+  document.getElementById('io').classList.add('show-io');
+  document.getElementById('io-text').value='';
+  document.getElementById('io-confirm').style.display='flex';
+  document.getElementById('io-text').focus();
+});
+document.getElementById('btn-import-cancel').addEventListener('click', ()=>{
+  document.getElementById('io').classList.remove('show-io');
+  document.getElementById('io-confirm').style.display='none';
+});
+document.getElementById('btn-import-go').addEventListener('click', ()=>{
+  try{
+    const p = JSON.parse(document.getElementById('io-text').value);
+    if(!Array.isArray(p) || !p.every(o=>o.name && Array.isArray(o.d) && o.d.length===8)) throw 0;
+    opps = p.map(o=>({...o, id:o.id||('opp-'+Math.abs(JSON.stringify(o).split('').reduce((a,c)=>a*31+c.charCodeAt(0)|0,7)).toString(36))}));
+    persist(); renderAll();
+    document.getElementById('io').classList.remove('show-io');
+    document.getElementById('io-confirm').style.display='none';
+    ioMsg('Imported '+opps.length+' opportunities.');
+  }catch(e){ ioMsg('That isn’t a valid register export — nothing was changed.'); }
+});
+let resetArmed = false;
+document.getElementById('btn-reset').addEventListener('click', e=>{
+  if(!resetArmed){ resetArmed = true; e.target.textContent = 'Really reset? Unsaved entries are lost'; e.target.classList.remove('ghost');
+    setTimeout(()=>{ resetArmed=false; e.target.textContent='Reset to seed register'; e.target.classList.add('ghost'); }, 4000);
+    return; }
+  opps = JSON.parse(JSON.stringify(SEED)); persist(); renderAll();
+  resetArmed=false; e.target.textContent='Reset to seed register'; e.target.classList.add('ghost');
+  ioMsg('Reset to the 12 seed opportunities.');
+});
+
+/* ---------- boot ---------- */
+fillSelect(document.getElementById('f-area'), AREAS, 'All areas');
+fillSelect(document.getElementById('f-stage'), STAGES, 'All stages');
+fillSelect(document.getElementById('b-area'), AREAS);
+fillSelect(document.getElementById('b-stage'), STAGES);
+['f-area','f-stage','f-sort'].forEach(id=>document.getElementById(id).addEventListener('change', renderRegister));
+function renderAll(){ renderTiles(); renderMatrix(); renderRegister(); }
+renderAll();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderMatrix);
+</script>

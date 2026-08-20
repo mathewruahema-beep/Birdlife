@@ -278,8 +278,24 @@ They have been redacted from the backup in this repo, but:
 ```
 README.md                            findings, admin runbook, routine consolidation
 dashboard/ict-dashboard.html         dashboard source as published
+tools/ai-opportunities.html          AI Opportunity Radar — capture & scoring tool
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
 ```
+
+## AI Opportunity Radar
+
+`tools/ai-opportunities.html` is a self-contained tool for building and recognising
+AI opportunities across BirdLife Australia. It scores each candidate on four value
+dimensions and four feasibility dimensions (1–5 each), plots the register on a
+value × feasibility matrix (Do first / Big bets / Fill-ins / Park), and carries a
+recognition guide — the signals, red flags and guardrails to apply while scoring.
+
+It ships pre-seeded with 12 opportunities recognised from this repo's own findings
+and the wider systems estate: Zeus email triage (96.5% email intake), Type
+auto-classification (65% of open cases blank), the identity-lifecycle runbook (20%
+of ICT volume), bank-rec match suggestions, the Plauti dedupe assistant (parked on
+the same decision-debt item the dashboard tracks), and others. Entries persist in
+the browser's localStorage; the register can be exported and imported as JSON.
 
 The HTML is kept for reference and as the design template the morning routine
 rebuilds against. It is not itself the live artefact — the routine republishes to
