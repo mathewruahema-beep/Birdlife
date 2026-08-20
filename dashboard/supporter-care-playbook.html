@@ -1,0 +1,563 @@
+<title>Supporter Care on Zeus</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Public+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#FAFAF6; --ink:#26301F; --muted:#6B7265; --line:#DDE0D4;
+  --accent:#2E6E4E; --accent-ink:#FFFFFF; --accent-soft:#EAF1EC;
+  --ochre:#A66B21; --ochre-soft:#F6EEDF;
+  --card:#FFFFFF; --well:#F2F3EC; --shadow:0 1px 2px rgba(38,48,31,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#171B16; --ink:#E5E8E0; --muted:#9AA294; --line:#333B31;
+    --accent:#6FBF95; --accent-ink:#10241A; --accent-soft:#1F2A23;
+    --ochre:#D89A4E; --ochre-soft:#2A2318;
+    --card:#1E241D; --well:#20261F; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#171B16; --ink:#E5E8E0; --muted:#9AA294; --line:#333B31;
+  --accent:#6FBF95; --accent-ink:#10241A; --accent-soft:#1F2A23;
+  --ochre:#D89A4E; --ochre-soft:#2A2318;
+  --card:#1E241D; --well:#20261F; --shadow:none;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:'Public Sans',system-ui,sans-serif;
+  line-height:1.6;margin:0;font-size:16px}
+main{max-width:880px;margin:0 auto;padding:2.5rem 1.25rem 5rem}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;line-height:1.15;text-wrap:balance;font-weight:600}
+h1{font-size:2.2rem;margin:.2rem 0 .5rem}
+h2{font-size:1.4rem;margin:1.8rem 0 .7rem}
+h3{font-size:1.1rem;margin:1.4rem 0 .4rem}
+p{margin:.6rem 0;max-width:72ch}
+a{color:var(--accent)}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);margin:0}
+.badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.68rem;
+  letter-spacing:.08em;padding:.15rem .55rem;border-radius:3px;
+  background:var(--ochre-soft);color:var(--ochre);border:1px solid var(--ochre);vertical-align:middle}
+.lede{font-size:1.05rem}
+/* tabs */
+nav.tabs{display:flex;flex-wrap:wrap;gap:.4rem;margin:1.4rem 0 0;border-bottom:2px solid var(--line);padding-bottom:0}
+nav.tabs button{font-family:'IBM Plex Mono',monospace;font-size:.78rem;letter-spacing:.05em;
+  background:none;border:none;border-bottom:3px solid transparent;color:var(--muted);
+  padding:.55rem .8rem;cursor:pointer;margin-bottom:-2px}
+nav.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+nav.tabs button:hover{color:var(--ink)}
+nav.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+section[role="tabpanel"]{display:none;padding-top:1.2rem}
+section[role="tabpanel"].active{display:block}
+/* stats + bars */
+.statrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem;margin:1.2rem 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:.85rem .95rem;box-shadow:var(--shadow)}
+.stat b{display:block;font-family:'Fraunces',Georgia,serif;font-size:1.65rem;font-weight:600;
+  font-variant-numeric:tabular-nums;color:var(--accent)}
+.stat span{font-size:.78rem;color:var(--muted)}
+.bars{margin:1rem 0;display:flex;flex-direction:column;gap:.45rem}
+.bar{display:grid;grid-template-columns:200px 1fr 70px;gap:.7rem;align-items:center;font-size:.85rem}
+.bar .track{background:var(--well);border-radius:3px;height:16px;overflow:hidden}
+.bar .fill{background:var(--accent);height:100%;border-radius:3px;min-width:2px}
+.bar.warn .fill{background:var(--ochre)}
+.bar .n{font-family:'IBM Plex Mono',monospace;font-size:.78rem;text-align:right;font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto;margin:1rem 0}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);text-align:left;font-weight:500;padding:.45rem .7rem;border-bottom:2px solid var(--line)}
+td{padding:.45rem .7rem;border-bottom:1px solid var(--line);vertical-align:top}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;font-family:'IBM Plex Mono',monospace;font-size:.85rem}
+tr.hl td{background:var(--accent-soft);font-weight:600}
+.note{background:var(--accent-soft);border-left:3px solid var(--accent);padding:.7rem 1rem;border-radius:0 6px 6px 0;margin:1rem 0;font-size:.92rem}
+.caution{background:var(--ochre-soft);border-left:3px solid var(--ochre);padding:.7rem 1rem;border-radius:0 6px 6px 0;margin:1rem 0;font-size:.92rem}
+.lifecycle{font-family:'IBM Plex Mono',monospace;font-size:.78rem;background:var(--card);border:1px solid var(--line);
+  border-radius:6px;padding:.85rem 1rem;overflow-x:auto;white-space:nowrap;margin:1rem 0;color:var(--muted)}
+.lifecycle b{color:var(--accent);font-weight:500}
+code{font-family:'IBM Plex Mono',monospace;font-size:.85em;background:var(--accent-soft);padding:.06em .3em;border-radius:3px}
+pre{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:.8rem 1rem;overflow-x:auto;
+  font-family:'IBM Plex Mono',monospace;font-size:.78rem;line-height:1.5}
+/* pipeline explorer */
+.pipe{display:flex;flex-direction:column;gap:0;margin:1.2rem 0}
+.pipe .stagebtn{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:8px;
+  padding:.9rem 1.1rem;cursor:pointer;font:inherit;color:var(--ink);width:100%;box-shadow:var(--shadow)}
+.pipe .stagebtn h4{margin:0 0 .2rem;font-family:'IBM Plex Mono',monospace;font-size:.76rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--accent);font-weight:500}
+.pipe .stagebtn p{margin:0;font-size:.88rem;color:var(--muted)}
+.pipe .stagebtn[aria-expanded="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.pipe .stagebtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pipe .arrow{text-align:center;color:var(--muted);padding:.2rem 0;line-height:1}
+.hwi{border:1px solid var(--accent);border-top:none;border-radius:0 0 8px 8px;margin:-6px 0 0;
+  padding:1rem 1.1rem .9rem;background:var(--card);display:none}
+.hwi.open{display:block}
+.hwi .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.hwi h5{margin:.2rem 0 .3rem;font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ochre);font-weight:500}
+.hwi ul{margin:.2rem 0;padding-left:1.1rem;font-size:.85rem}
+.hwi li{margin:.25rem 0}
+/* simulator */
+.sim{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1.1rem 1.2rem;margin:1.2rem 0;box-shadow:var(--shadow)}
+.sim .simhead{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;
+  border-bottom:1px solid var(--line);padding-bottom:.6rem;margin-bottom:.8rem}
+.sim .simhead b{font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--accent)}
+.sim .steps{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--muted)}
+.sim label{display:block;font-size:.78rem;color:var(--muted);margin:.55rem 0 .1rem}
+.sim input[type=text]{width:100%;max-width:420px;padding:.45rem .6rem;border:1px solid var(--line);
+  border-radius:5px;background:var(--paper);color:var(--ink);font:inherit;font-size:.9rem}
+.sim input[type=text]:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.simnav{display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap}
+button.btn{background:var(--accent);color:var(--accent-ink);border:none;border-radius:5px;
+  padding:.5rem 1rem;font:inherit;font-size:.88rem;font-weight:600;cursor:pointer}
+button.btn.ghost{background:none;color:var(--accent);border:1px solid var(--accent)}
+button.btn:focus-visible{outline:2px solid var(--ochre);outline-offset:2px}
+.simwarn{background:var(--ochre-soft);border-left:3px solid var(--ochre);padding:.5rem .8rem;
+  border-radius:0 5px 5px 0;font-size:.85rem;margin:.6rem 0}
+.orgfx{font-size:.85rem;background:var(--well);border-radius:6px;padding:.7rem .9rem;margin:.6rem 0}
+.orgfx b{color:var(--accent)}
+/* playbook */
+.phase{background:var(--card);border:1px solid var(--line);border-radius:8px;margin:.7rem 0;box-shadow:var(--shadow)}
+.phase>button{width:100%;text-align:left;background:none;border:none;color:var(--ink);font:inherit;
+  padding:.85rem 1.1rem;cursor:pointer;display:flex;gap:.8rem;align-items:baseline}
+.phase>button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:8px}
+.phase .pnum{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--accent);white-space:nowrap}
+.phase .ptitle{font-weight:600}
+.phase .pmeta{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--muted);white-space:nowrap}
+.phase .pbody{display:none;padding:0 1.1rem 1rem;border-top:1px solid var(--line)}
+.phase.open .pbody{display:block}
+.phase .pbody .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:.8rem 0}
+.phase h5{margin:.2rem 0 .3rem;font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ochre);font-weight:500}
+.phase .pbody ul{margin:.2rem 0;padding-left:1.1rem;font-size:.85rem}
+.checks{margin:.6rem 0 0}
+.checks label{display:flex;gap:.55rem;align-items:flex-start;font-size:.87rem;padding:.28rem 0;cursor:pointer}
+.checks input{accent-color:var(--accent);margin-top:.25rem;flex:none}
+.checks input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.checks .done{color:var(--muted);text-decoration:line-through}
+.gate{font-size:.82rem;background:var(--accent-soft);border-radius:5px;padding:.45rem .7rem;margin-top:.7rem}
+.gate b{color:var(--accent)}
+.progressbar{height:8px;background:var(--well);border-radius:4px;overflow:hidden;margin:.6rem 0 1rem}
+.progressbar div{height:100%;background:var(--accent);border-radius:4px;transition:width .3s}
+@media (prefers-reduced-motion: reduce){.progressbar div{transition:none}}
+/* calculator */
+.calc{display:grid;grid-template-columns:1fr;gap:1.2rem;margin:1.2rem 0}
+@media(min-width:700px){.calc{grid-template-columns:1fr 1fr}}
+.calcpanel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1rem 1.2rem;box-shadow:var(--shadow)}
+.calcpanel label{display:block;font-size:.82rem;margin:.9rem 0 .15rem}
+.calcpanel label b{font-family:'IBM Plex Mono',monospace;font-size:.82rem;color:var(--accent);float:right;font-variant-numeric:tabular-nums}
+.calcpanel input[type=range]{width:100%;accent-color:var(--accent)}
+.calcpanel input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.result b{display:block;font-family:'Fraunces',Georgia,serif;font-size:2rem;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.result span{font-size:.8rem;color:var(--muted)}
+.result + .result{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line)}
+footer{margin-top:3rem;padding-top:1.1rem;border-top:1px solid var(--line);font-size:.78rem;color:var(--muted)}
+ul{padding-left:1.3rem}
+li{margin:.28rem 0}
+.pill{font-family:'IBM Plex Mono',monospace;font-size:.76rem;background:var(--accent-soft);color:var(--accent);
+  padding:.05rem .4rem;border-radius:3px;white-space:nowrap}
+</style>
+
+<main>
+<p class="eyebrow">BirdLife Australia · Salesforce production (Zeus)</p>
+<h1>Supporter Care on Zeus</h1>
+<p class="lede">The supporter-care case process, verified live from production — and an interactive
+walkthrough of the <strong>Update Supporter Contact Details</strong> automation: how it works, why it's
+built this way, what it's worth, and the exact process to take it live.
+<span class="badge">BUILT AS DRAFT — NOTHING ACTIVE</span></p>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button role="tab" id="tab-0" aria-selected="true" aria-controls="panel-0">Overview</button>
+  <button role="tab" id="tab-1" aria-selected="false" aria-controls="panel-1">Today's process</button>
+  <button role="tab" id="tab-2" aria-selected="false" aria-controls="panel-2">The automation</button>
+  <button role="tab" id="tab-3" aria-selected="false" aria-controls="panel-3">Try it</button>
+  <button role="tab" id="tab-4" aria-selected="false" aria-controls="panel-4">Solution playbook</button>
+  <button role="tab" id="tab-5" aria-selected="false" aria-controls="panel-5">Impact</button>
+</nav>
+
+<!-- ============ OVERVIEW ============ -->
+<section role="tabpanel" id="panel-0" class="active" aria-labelledby="tab-0">
+<div class="statrow">
+  <div class="stat"><b>14,757</b><span>supporter-care cases / year</span></div>
+  <div class="stat"><b>65%</b><span>arrive by email-to-case</span></div>
+  <div class="stat"><b>524</b><span>unacknowledged in "New" today</span></div>
+  <div class="stat"><b>73%</b><span>closed with no Sub Type tag</span></div>
+</div>
+<p>Three findings drive everything on this page:</p>
+<ul>
+  <li><strong>~44% of closures involve no substantive supporter outcome</strong> — no-action,
+  manually-sent autoreplies, spam, duplicates, abandoned. Another 29% close by sending a template email.</li>
+  <li><strong>The team can't see its own workload.</strong> 10,719 of 14,757 cases carry no Sub Type,
+  so the tagged process volumes below are floors.</li>
+  <li><strong>The top repeatable process is Update Contact Details</strong> — 674/yr tagged (realistically
+  2–3×), fully deterministic, entirely inside Salesforce, and its closing step is <em>already automated</em>
+  by the live "Auto close case" flow.</li>
+</ul>
+<div class="note"><strong>Where things stand:</strong> the automation is designed and built as deployable
+metadata on branch <code>claude/supporter-care-automation-design-2epbbp</code> — three flows, all
+<code>Draft</code> status, so nothing can execute. The <em>Solution playbook</em> tab is the process to
+take it from here to live, with a checklist you can tick off as you go (saved in your browser).</div>
+<p>Use the tabs: <em>Today's process</em> shows the verified current state. <em>The automation</em>
+explains each stage — how, why, impact. <em>Try it</em> is a hands-on simulation of what an agent will
+experience. <em>Solution playbook</em> is the rollout process. <em>Impact</em> lets you model the benefit
+with your own assumptions.</p>
+</section>
+
+<!-- ============ TODAY ============ -->
+<section role="tabpanel" id="panel-1" aria-labelledby="tab-1">
+<h2>How a supporter-care case moves today</h2>
+<p>Supporter Care runs on the <strong>General Enquiry Case</strong> record type. One assignment rule
+routes inbound cases to queues — <span class="pill">Supporter Care</span> <span class="pill">Membership</span>
+<span class="pill">Regular Giving</span> <span class="pill">eStore Support</span> and 30 others — and a
+live flow stamps the record type from the owning queue.</p>
+
+<h3>Intake channels (last 365 days)</h3>
+<div class="bars" id="intakeBars"></div>
+
+<div class="lifecycle">New ─▶ In Progress ─▶ Pending / On Hold-Internal / Waiting-External ─▶ Response Received ─▶ <b>Closed</b></div>
+
+<p><strong>Closing is reason-driven and already semi-automated.</strong> <code>Case_Closed_Reason__c</code>
+is mandatory (validation rule); the active flow <em>Auto close case</em> flips Status to Closed the moment
+a reason is saved. Everything between "case created" and "reason saved" is manual — production has no
+acknowledgement, triage or resolution automation on these cases.</p>
+
+<h3>How 14,386 cases closed (last 365 days)</h3>
+<div class="bars" id="closureBars"></div>
+<p>Toggle the lens: <button class="btn ghost" id="lensBtn" type="button">Group by effort type</button></p>
+<div id="lensOut"></div>
+
+<h3>The repeatable processes (tagged Sub Types)</h3>
+<div class="tablewrap"><table>
+<tr><th>Sub Type</th><th class="n">Cases/yr (floor)</th><th>Automatable?</th></tr>
+<tr class="hl"><td>Update Contact Details</td><td class="n">674</td><td>Yes — this build</td></tr>
+<tr><td>Update Recurring Payment</td><td class="n">497</td><td>Same pattern, after the Payments2Us decision</td></tr>
+<tr><td>Membership Renewal</td><td class="n">430</td><td>Same pattern, after the membership rebuild</td></tr>
+<tr><td>Receipt + Donation Acknowledgement</td><td class="n">300</td><td>Blocked on Conga replacement</td></tr>
+<tr><td>Unsubscribe</td><td class="n">174</td><td>Near-fully automatable, phase 2</td></tr>
+</table></div>
+</section>
+
+<!-- ============ AUTOMATION ============ -->
+<section role="tabpanel" id="panel-2" aria-labelledby="tab-2">
+<h2>The automation — click each stage for how / why / impact</h2>
+<p>Pattern: <strong>Triage-and-Guided-Resolve</strong>. Three stages; the third already exists in
+production and is reused untouched.</p>
+<div class="pipe" id="pipe"></div>
+<div class="caution"><strong>Deliberately not in this design:</strong> no writing of supporter data
+straight from email content; no auto-closing anything a human hasn't approved; no changes to assignment
+rules, queues, record types or existing flows; deceased notices excluded; no AI components in phase 1.
+Licence impact: zero — the org is at 70/70 and this consumes none.</div>
+</section>
+
+<!-- ============ SIMULATOR ============ -->
+<section role="tabpanel" id="panel-3" aria-labelledby="tab-3">
+<h2>Try it — the agent experience, simulated</h2>
+<p>This is a faithful simulation of the <em>Update Supporter Details</em> screen flow using a fictional
+supporter. What takes 10–15 minutes of navigating Contact, Household, NPSP address and email templates
+today becomes this:</p>
+<div class="sim" id="sim"></div>
+<p style="font-size:.85rem;color:var(--muted)">Simulation only — no data leaves this page. The real flow
+runs from a quick action on the Case page and writes to Salesforce exactly as shown in the final step.</p>
+</section>
+
+<!-- ============ PLAYBOOK ============ -->
+<section role="tabpanel" id="panel-4" aria-labelledby="tab-4">
+<h2>Solution playbook — from Draft to live</h2>
+<p>Six phases, each with how / why / impact and a checklist. Ticks save in your browser, so you can use
+this page to run the rollout. <strong>Gates are hard:</strong> don't start a phase until the previous
+gate is met.</p>
+<div class="progressbar" aria-hidden="true"><div id="pbfill" style="width:0%"></div></div>
+<p id="pbtext" style="font-size:.8rem;color:var(--muted);margin-top:-0.6rem"></p>
+<div id="phases"></div>
+<p style="margin-top:1rem"><button class="btn ghost" id="resetChecks" type="button">Reset checklist</button></p>
+</section>
+
+<!-- ============ IMPACT ============ -->
+<section role="tabpanel" id="panel-5" aria-labelledby="tab-5">
+<h2>Impact — model it with your own assumptions</h2>
+<p>Defaults are the conservative figures from the design doc: tagged volume only, 10 minutes saved per
+guided resolve, and manual holding-replies on a fifth of email cases. Drag the sliders; results update live.</p>
+<div class="calc">
+  <div class="calcpanel">
+    <h3 style="margin-top:0">Assumptions</h3>
+    <label>Update-details cases per year <b id="vCases"></b>
+      <input type="range" id="sCases" min="200" max="2200" step="25" value="674" aria-label="Update details cases per year"></label>
+    <label>Minutes saved per guided resolve <b id="vMins"></b>
+      <input type="range" id="sMins" min="4" max="15" step="1" value="10" aria-label="Minutes saved per case"></label>
+    <label>Email cases needing a manual holding-reply (%) <b id="vAckPct"></b>
+      <input type="range" id="sAckPct" min="0" max="60" step="5" value="20" aria-label="Percent of email cases manually acknowledged"></label>
+    <label>Loaded staff cost per hour (AUD) <b id="vRate"></b>
+      <input type="range" id="sRate" min="35" max="90" step="5" value="55" aria-label="Staff cost per hour"></label>
+  </div>
+  <div class="calcpanel">
+    <h3 style="margin-top:0">Annual result</h3>
+    <div class="result"><b id="rHours"></b><span>staff hours returned per year</span></div>
+    <div class="result"><b id="rDollars"></b><span>equivalent value per year</span></div>
+    <div class="result"><b id="rPayback"></b><span>payback on the ~5-day build (incl. UAT &amp; pilot)</span></div>
+  </div>
+</div>
+<h3>What the calculator can't count</h3>
+<ul>
+  <li><strong>Instant acknowledgement for every email/web supporter</strong> — the 524-case "New" backlog
+  stops being a supporter-visible problem on day one, regardless of resolution speed.</li>
+  <li><strong>The 73% untagged problem shrinks</strong> — every flow-resolved case is tagged, and intake
+  classification proposes tags on the rest. In a year you get a truthful workload picture, which is what
+  picks automation #2 and #3.</li>
+  <li><strong>Risk down:</strong> addresses go through NPSP correctly every time; recurring-giving and
+  duplicate warnings appear at the moment of edit, not after the next mail-out bounces.</li>
+  <li><strong>A reusable pattern</strong> for Update Recurring Payment (497/yr), Membership Renewal
+  (430/yr), Receipt resend (post-Conga) and Unsubscribe (174/yr).</li>
+</ul>
+</section>
+
+<footer>All figures live-queried from Salesforce production, 20 Aug 2026. Metadata package:
+<code>salesforce/supporter-care-automation/</code> · design doc:
+<code>docs/supporter-care-process-and-automation-design.md</code> on branch
+<code>claude/supporter-care-automation-design-2epbbp</code>. Simulation uses fictional supporter data.
+Checklist state is stored only in your browser.</footer>
+</main>
+
+<script>
+(function(){
+"use strict";
+/* ---------- tabs ---------- */
+var tabs=document.querySelectorAll('[role=tab]');
+tabs.forEach(function(t){t.addEventListener('click',function(){
+  tabs.forEach(function(o){o.setAttribute('aria-selected','false');
+    document.getElementById(o.getAttribute('aria-controls')).classList.remove('active');});
+  t.setAttribute('aria-selected','true');
+  document.getElementById(t.getAttribute('aria-controls')).classList.add('active');
+});});
+
+/* ---------- bars ---------- */
+function bars(el,data,max,warnSet){
+  data.forEach(function(d){
+    var row=document.createElement('div');row.className='bar'+(warnSet&&warnSet.indexOf(d[0])>=0?' warn':'');
+    row.innerHTML='<span>'+d[0]+'</span><div class="track"><div class="fill" style="width:'+
+      (100*d[1]/max)+'%"></div></div><span class="n">'+d[1].toLocaleString()+'</span>';
+    el.appendChild(row);
+  });
+}
+bars(document.getElementById('intakeBars'),[
+ ['Email',9574],['Phone',1571],['Web',1443],['Outgoing',611],['Voice Message',511],
+ ['Internal',474],['Social (Brandwatch)',334],['Letter',236]],9574);
+bars(document.getElementById('closureBars'),[
+ ['No Action Required',4376],['Email Sent',3199],['Phone Call',1411],['Resolved',1399],
+ ['Email Edited & Sent',976],['Autoreply (manual!)',632],['Internal Follow up',573],
+ ['Abandoned',530],['Duplicate / Spam',815]],4376,
+ ['No Action Required','Autoreply (manual!)','Abandoned','Duplicate / Spam']);
+
+/* ---------- closure lens toggle ---------- */
+var lensOn=false;
+document.getElementById('lensBtn').addEventListener('click',function(){
+  lensOn=!lensOn;this.textContent=lensOn?'Show raw reasons':'Group by effort type';
+  var out=document.getElementById('lensOut');
+  out.innerHTML=lensOn?
+   '<div class="bars">'+
+   '<div class="bar warn"><span>No supporter outcome (44%)</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="n">6,353</span></div>'+
+   '<div class="bar"><span>Template email (29%)</span><div class="track"><div class="fill" style="width:65.7%"></div></div><span class="n">4,175</span></div>'+
+   '<div class="bar"><span>Bespoke work (27%)</span><div class="track"><div class="fill" style="width:60.7%"></div></div><span class="n">3,858</span></div>'+
+   '</div><p style="font-size:.85rem">Under a third of Supporter Care’s closures are genuinely bespoke. The other two groups are what the automation targets.</p>':'';
+});
+
+/* ---------- pipeline explorer ---------- */
+var stages=[
+ {t:'A · Intake — acknowledge & classify',s:'Record-triggered flow, fires once when an email/web case is created',
+  how:['Runs after save on Case create; guards: General Enquiry record type (looked up by DeveloperName, no hardcoded IDs), Origin Email/Web, a supplied email, not Do-Not-Email, not a bounce',
+   'Sends an instant acknowledgement carrying the case number, logged against the case',
+   'Scans subject + body for keywords ("change of address", "receipt", "unsubscribe"…) and stamps a proposed Type + Sub Type'],
+  why:['Acknowledgement is the one thing 524 waiting supporters actually notice — and it costs nothing to do instantly',
+   'Classification only proposes; a wrong guess costs an agent one picklist change, a right one saves the tagging step entirely',
+   'Suppression rules mean it can never email a bounced address or a do-not-contact supporter'],
+  imp:['~100+ hours/yr of manual holding-replies removed (632 cases/yr were closed as manually-sent autoreplies)',
+   'Every email/web supporter gets a same-minute response with a reference number',
+   'Sub Type coverage climbs from 27% toward complete — the data that picks automation #2']},
+ {t:'B · Resolve — guided screen flow',s:'"Update Supporter Details" quick action on the Case page — try it in the next tab',
+  how:['Verifies the case has a matched Contact (never guesses or creates one); shows verification hints',
+   'Pre-fills current values; the agent changes only what the supporter asked for, once',
+   'Address changes create a new NPSP household address (npsp__Address__c, default=true) so the whole household updates and history is kept',
+   'Warns when the supporter has NPSP Recurring Donations or Payments2Us Recurring Payments, or when an email change touches the Plauti duplicate match key',
+   'Sends a confirmation email, then stamps Sub Type + Closed Reason "Closed - Email Sent"'],
+  why:['Human-in-the-loop by design: identity verification is judgement, so it stays with the agent — the flow removes navigation, re-keying and template hunting, not judgement',
+   'NPSP Household model: editing Contact.MailingAddress directly desyncs households — the subflow makes the correct path the easy path',
+   'Recurring-giving spans two systems (1,778 NPSP + 392 Payments2Us) — the flow checks both, because any single-object check is wrong in this org'],
+  imp:['10–15 minutes of clicking becomes 2–3 minutes of confirming: ~110–170 hours/yr on tagged volume alone',
+   'Cycle time falls from 1–5 days to same-touch',
+   'Every resolved case is correctly tagged and closed with a consistent reason']},
+ {t:'C · Close — existing "Auto close case" flow',s:'Already live in production. Reused untouched.',
+  how:['The live flow watches for a saved Case Closed Reason and flips Status to Closed — exactly as it has since 2023'],
+  why:['The close mechanic is the most battle-tested automation on the Case object; reusing it means zero new close logic, zero regression surface, and the build inherits a pattern agents already trust'],
+  imp:['Nothing changes here — which is the point. The riskiest part of the lifecycle stays exactly as it is']}];
+var pipe=document.getElementById('pipe');
+stages.forEach(function(st,i){
+  var b=document.createElement('button');b.className='stagebtn';b.setAttribute('aria-expanded','false');
+  b.innerHTML='<h4>'+st.t+'</h4><p>'+st.s+'</p>';
+  var d=document.createElement('div');d.className='hwi';
+  d.innerHTML='<div class="cols"><div><h5>How</h5><ul>'+st.how.map(function(x){return '<li>'+x+'</li>';}).join('')+
+   '</ul></div><div><h5>Why this way</h5><ul>'+st.why.map(function(x){return '<li>'+x+'</li>';}).join('')+
+   '</ul></div><div><h5>Impact</h5><ul>'+st.imp.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div></div>';
+  b.addEventListener('click',function(){
+    var open=b.getAttribute('aria-expanded')==='true';
+    b.setAttribute('aria-expanded',String(!open));d.classList.toggle('open',!open);
+  });
+  pipe.appendChild(b);pipe.appendChild(d);
+  if(i<stages.length-1){var a=document.createElement('div');a.className='arrow';a.textContent='▼';pipe.appendChild(a);}
+});
+
+/* ---------- simulator ---------- */
+var simState={step:0,fn:'Robin',ln:'Wren',em:'robin.wren@example.com',
+  st:'12 Banksia Court',ct:'FAIRFIELD',sa:'VIC',pc:'3078'};
+var simEl=document.getElementById('sim');
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function simRender(){
+  var s=simState,h='';
+  h+='<div class="simhead"><b>Update Supporter Details — simulation</b><span class="steps">Step '+(s.step+1)+' of 5</span></div>';
+  if(s.step===0){
+    h+='<p><b>Case 00139201</b> · New · Origin: Email · Supporter Care queue</p>'+
+    '<p style="font-size:.9rem;background:var(--well);border-radius:6px;padding:.7rem .9rem">'+
+    '<em>From: robin.wren@example.com — "Hi, we’ve moved house. Could you update my address to 48 Wattlebird Way, Clifton Hill VIC 3068? Thanks, Robin"</em></p>'+
+    '<p>The intake flow has already: sent Robin an acknowledgement with the case number, and proposed '+
+    '<span class="pill">Supporter Information / Update Contact Details</span>. The agent clicks the '+
+    '<b>Update Supporter Details</b> action.</p>'+
+    '<div class="simnav"><button class="btn" data-go="1">Launch the action ▸</button></div>';
+  } else if(s.step===1){
+    h+='<p><b>Contact matched:</b> Robin Wren · robin.wren@example.com · Household N-20441</p>'+
+    '<p style="font-size:.9rem">Verify you are replying to this supporter before saving changes. '+
+    'If the case had no matched Contact, the flow stops here — it never guesses or creates one.</p>'+
+    '<div class="simwarn">⚠ <b>This supporter has an active NPSP Recurring Donation.</b> Check receipting and mailing follow the new details.</div>'+
+    '<div class="simnav"><button class="btn" data-go="2">Verified — continue ▸</button><button class="btn ghost" data-go="0">◂ Back</button></div>';
+  } else if(s.step===2){
+    h+='<p>Current values are pre-filled — change only what Robin asked for.</p>'+
+    '<label for="simfn">First Name</label><input type="text" id="simfn" value="'+esc(s.fn)+'">'+
+    '<label for="simln">Last Name</label><input type="text" id="simln" value="'+esc(s.ln)+'">'+
+    '<label for="simem">Email <span style="color:var(--ochre)">(changing this alters the duplicate match key)</span></label>'+
+    '<input type="text" id="simem" value="'+esc(s.em)+'">'+
+    '<div class="simnav"><button class="btn" data-go="3">Next: address ▸</button><button class="btn ghost" data-go="1">◂ Back</button></div>';
+  } else if(s.step===3){
+    h+='<p><b>Address change</b> — a new NPSP household address will be created and set as default; '+
+    'the whole household updates and history is preserved. Leave street blank to skip.</p>'+
+    '<label for="simst">New Street</label><input type="text" id="simst" value="48 Wattlebird Way">'+
+    '<label for="simct">New City / Suburb</label><input type="text" id="simct" value="CLIFTON HILL">'+
+    '<label for="simsa">New State</label><input type="text" id="simsa" value="VIC">'+
+    '<label for="simpc">New Postcode</label><input type="text" id="simpc" value="3068">'+
+    '<div class="simnav"><button class="btn" data-go="4">Save and send confirmation ▸</button><button class="btn ghost" data-go="2">◂ Back</button></div>';
+  } else {
+    h+='<p><b>Done — elapsed time: about two minutes.</b> What just happened in the org:</p>'+
+    '<div class="orgfx">✓ <b>Contact updated</b> — only the changed fields<br>'+
+    '✓ <b>npsp__Address__c created</b> on Household N-20441, set as default — NPSP propagates to all household members<br>'+
+    '✓ <b>Confirmation email sent</b> to Robin and logged on the case<br>'+
+    '✓ <b>Case stamped</b>: Sub Type "Update Contact Details", Closed Reason "Closed - Email Sent"<br>'+
+    '✓ <b>Existing "Auto close case" flow closes the case</b> — no new close logic anywhere</div>'+
+    '<p style="font-size:.88rem">The same request today averages 1–5 days elapsed and 10–15 minutes of '+
+    'agent time across Contact, Household, address records and email templates.</p>'+
+    '<div class="simnav"><button class="btn ghost" data-go="0">↺ Run it again</button></div>';
+  }
+  simEl.innerHTML=h;
+  simEl.querySelectorAll('[data-go]').forEach(function(b){
+    b.addEventListener('click',function(){
+      ['fn','ln','em'].forEach(function(k){var el=document.getElementById('sim'+k);if(el)simState[k]=el.value;});
+      simState.step=parseInt(b.getAttribute('data-go'),10);simRender();
+    });
+  });
+}
+simRender();
+
+/* ---------- playbook ---------- */
+var phases=[
+ {n:'Phase 1',t:'Scope sign-off',m:'Owner: Mathew · ~1 day',
+  how:['Review the design doc and this page','Confirm the chosen process, the human-in-the-loop stance, and the exclusions (deceased notices, no auto-writes)','Confirm the pilot lead — Lee Christian holds 362 of the 524 open cases and is the natural pilot user'],
+  why:['A signed scope prevents the build growing sideways during UAT — the single biggest cause of stalled flow projects','The Supporter Care lead validating the manual-process description catches anything the data couldn’t show'],
+  imp:['Everything downstream inherits a fixed target; changes after this point are consciously re-scoped, not absorbed'],
+  checks:['Design doc reviewed and scope approved','Supporter Care lead has validated the manual-process description','Pilot agents nominated (2–3)'],
+  gate:'Written OK from Mathew + Supporter Care lead.'},
+ {n:'Phase 2',t:'Deploy to staging',m:'Owner: SF admin/dev · ~half day',
+  how:['<code>sf project deploy validate --manifest manifest/package.xml</code> against staging, then <code>deploy start</code>','Flows arrive as Draft — inert until activated','Remember: staging record IDs differ from production; the build looks up the record type by DeveloperName precisely so nothing needs re-mapping'],
+  why:['Staging-first is non-negotiable in this org — membership periods, SKUs and IDs all differ deliberately','A validate-only run is the true syntax gate the local build couldn’t provide'],
+  imp:['Zero production exposure while every subsequent phase runs'],
+  checks:['Validate-only deploy passes in staging','Flows deployed to staging as Draft','Sandbox email deliverability configured for testing (Setup → Email Deliverability)'],
+  gate:'Clean deploy, all three flows visible in staging Setup → Flows.'},
+ {n:'Phase 3',t:'UAT in staging',m:'Owner: SF admin + 1 agent · ~2 days',
+  how:['Activate in staging only, in order: address subflow → screen flow → quick action → intake flow','Run the test matrix: bounce case, Do-Not-Email case, no-contact case, two-member household (address must follow both), contact with NPSP recurring donation, contact with Payments2Us recurring payment, email change with an open Plauti duplicate','Check the acknowledgement suppresses correctly and logs against the case'],
+  why:['The test matrix is built from this org’s real landmines — household desync, dual recurring-giving systems, dedupe keys — not generic flow tests'],
+  imp:['Every known failure mode exercised before a single production supporter is touched'],
+  checks:['All seven matrix scenarios pass in staging','Acknowledgement + confirmation wording approved by Supporter Care','Send-from address decided (org-wide address, not the running user)'],
+  gate:'All matrix scenarios pass; wording signed off.'},
+ {n:'Phase 4',t:'Deploy to production (still Draft)',m:'Owner: SF admin/dev · ~1 hour',
+  how:['Same two commands against production','Flows land as Draft — still nothing can execute','Add the quick action to the General Enquiry page layout but leave flows inactive'],
+  why:['Separating "deploy" from "activate" means go-live is a one-click, one-flow-at-a-time decision with instant rollback (deactivate)'],
+  imp:['Production carries the build with zero behaviour change until you choose otherwise'],
+  checks:['Production validate passes','Flows in production as Draft','Quick action deployed and on the layout'],
+  gate:'Production deploy clean; nothing active.'},
+ {n:'Phase 5',t:'Pilot',m:'Owner: pilot agents · 2 weeks',
+  how:['Activate the subflow + screen flow only (intake flow stays off)','2–3 pilot agents use the quick action on real update-details cases','Track: minutes per case, cycle time, tag coverage, anything the flow couldn’t handle — via the "flow vs manual" report'],
+  why:['The screen flow is agent-facing and reversible per-case; piloting it before the supporter-facing intake flow keeps all risk internal','Two weeks gives a real before/after with the report, not anecdotes'],
+  imp:['Evidence, not opinion, decides org-wide activation — and produces the baseline the Impact tab’s numbers can be checked against'],
+  checks:['Subflow + screen flow active in production','Pilot agents briefed','Two weeks of measured pilot data collected','Pilot review held — keep / fix / stop decision recorded'],
+  gate:'Pilot metrics beat manual handling and agents want to keep it.'},
+ {n:'Phase 6',t:'Go live + measure',m:'Owner: Mathew · ongoing',
+  how:['Activate the intake flow — the only supporter-facing piece — last','Announce to the whole Supporter Care team; add the action to onboarding notes','Review the adoption report monthly; when Sub Type coverage improves, use it to pick automation #2 (Unsubscribe or Update Recurring Payment)'],
+  why:['Activating the outward-facing flow only after the inward-facing one is proven means supporters’ first contact with the automation is already polished'],
+  imp:['Full benefit unlocked: instant acknowledgement org-wide, ~110–170+ hours/yr returned, tagging data compounding toward the next build'],
+  checks:['Intake flow active','Team briefed','Monthly adoption review scheduled','Automation #2 candidate selected from improved tag data'],
+  gate:'This one never closes — it becomes the operating rhythm.'}];
+var LS='sc-playbook-v1',saved={};
+try{saved=JSON.parse(localStorage.getItem(LS)||'{}');}catch(e){saved={};}
+function saveChecks(){try{localStorage.setItem(LS,JSON.stringify(saved));}catch(e){}}
+var phEl=document.getElementById('phases'),totalChecks=0;
+phases.forEach(function(p,pi){
+  totalChecks+=p.checks.length;
+  var d=document.createElement('div');d.className='phase'+(pi===0?' open':'');
+  var hd=document.createElement('button');
+  hd.innerHTML='<span class="pnum">'+p.n+'</span><span class="ptitle">'+p.t+'</span><span class="pmeta">'+p.m+'</span>';
+  hd.setAttribute('aria-expanded',pi===0?'true':'false');
+  hd.addEventListener('click',function(){var o=d.classList.toggle('open');hd.setAttribute('aria-expanded',String(o));});
+  var bd=document.createElement('div');bd.className='pbody';
+  bd.innerHTML='<div class="cols"><div><h5>How</h5><ul>'+p.how.map(function(x){return '<li>'+x+'</li>';}).join('')+
+   '</ul></div><div><h5>Why</h5><ul>'+p.why.map(function(x){return '<li>'+x+'</li>';}).join('')+
+   '</ul></div><div><h5>Impact</h5><ul>'+p.imp.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div></div>'+
+   '<div class="checks"></div><div class="gate"><b>Gate:</b> '+p.gate+'</div>';
+  var ck=bd.querySelector('.checks');
+  p.checks.forEach(function(c,ci){
+    var id='c'+pi+'_'+ci,lab=document.createElement('label');
+    var checked=!!saved[id];
+    lab.innerHTML='<input type="checkbox" id="'+id+'" '+(checked?'checked':'')+'><span class="'+(checked?'done':'')+'">'+c+'</span>';
+    lab.querySelector('input').addEventListener('change',function(){
+      saved[id]=this.checked;this.nextElementSibling.classList.toggle('done',this.checked);
+      saveChecks();progress();
+    });
+    ck.appendChild(lab);
+  });
+  d.appendChild(hd);d.appendChild(bd);phEl.appendChild(d);
+});
+function progress(){
+  var n=0;for(var k in saved){if(saved[k])n++;}
+  document.getElementById('pbfill').style.width=(100*n/totalChecks)+'%';
+  document.getElementById('pbtext').textContent=n+' of '+totalChecks+' checklist items done';
+}
+progress();
+document.getElementById('resetChecks').addEventListener('click',function(){
+  saved={};saveChecks();
+  phEl.querySelectorAll('input[type=checkbox]').forEach(function(c){c.checked=false;c.nextElementSibling.classList.remove('done');});
+  progress();
+});
+
+/* ---------- calculator ---------- */
+function calc(){
+  var cases=+document.getElementById('sCases').value,
+      mins=+document.getElementById('sMins').value,
+      ackPct=+document.getElementById('sAckPct').value,
+      rate=+document.getElementById('sRate').value;
+  document.getElementById('vCases').textContent=cases.toLocaleString();
+  document.getElementById('vMins').textContent=mins+' min';
+  document.getElementById('vAckPct').textContent=ackPct+'%';
+  document.getElementById('vRate').textContent='$'+rate;
+  var resolveH=cases*mins/60,
+      ackH=9574*(ackPct/100)*1.5/60,
+      hours=resolveH+ackH,dollars=hours*rate,
+      buildCost=5*7.5*rate,
+      payback=dollars>0?Math.max(1,Math.round(buildCost/dollars*52)):0;
+  document.getElementById('rHours').textContent=Math.round(hours).toLocaleString()+' h';
+  document.getElementById('rDollars').textContent='$'+Math.round(dollars).toLocaleString();
+  document.getElementById('rPayback').textContent=payback>0?('~'+payback+' week'+(payback>1?'s':'')):'—';
+}
+['sCases','sMins','sAckPct','sRate'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',calc);
+});
+calc();
+})();
+</script>
