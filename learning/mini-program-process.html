@@ -1,0 +1,544 @@
+<title>The Mini Program Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper: #F6F7F4;
+    --paper-raised: #FFFFFF;
+    --ink: #1B2420;
+    --ink-soft: #4A5650;
+    --ink-faint: #7A857F;
+    --line: #DDE2DC;
+    --accent: #0A8A4A;
+    --accent-bright: #07C160;
+    --accent-wash: #E4F3EA;
+    --gate: #B3402F;
+    --gate-wash: #F7E9E6;
+    --mono-bg: #EDF0EB;
+    --shadow: 0 1px 3px rgba(27,36,32,.08), 0 6px 20px rgba(27,36,32,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #141A17;
+      --paper-raised: #1C2420;
+      --ink: #E8ECE8;
+      --ink-soft: #A9B5AD;
+      --ink-faint: #77837B;
+      --line: #2C3630;
+      --accent: #3ECC7E;
+      --accent-bright: #07C160;
+      --accent-wash: #1B2E23;
+      --gate: #E07A63;
+      --gate-wash: #33211C;
+      --mono-bg: #232B26;
+      --shadow: 0 1px 3px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #141A17;
+    --paper-raised: #1C2420;
+    --ink: #E8ECE8;
+    --ink-soft: #A9B5AD;
+    --ink-faint: #77837B;
+    --line: #2C3630;
+    --accent: #3ECC7E;
+    --accent-bright: #07C160;
+    --accent-wash: #1B2E23;
+    --gate: #E07A63;
+    --gate-wash: #33211C;
+    --mono-bg: #232B26;
+    --shadow: 0 1px 3px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.3);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+  h1, h2, h3, .display {
+    font-family: "Noto Serif SC", "Songti SC", Georgia, serif;
+    text-wrap: balance;
+    line-height: 1.25;
+  }
+  code, .mono {
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: .85em;
+    background: var(--mono-bg);
+    padding: .1em .35em;
+    border-radius: 4px;
+  }
+  a { color: var(--accent); }
+
+  .frame { display: flex; max-width: 1100px; margin: 0 auto; gap: 2.5rem; padding: 0 1.25rem; }
+  nav.toc {
+    position: sticky; top: 0; align-self: flex-start;
+    width: 210px; flex-shrink: 0;
+    padding: 2.5rem 0 2rem;
+    max-height: 100vh; overflow-y: auto;
+  }
+  nav.toc .brand {
+    font-family: "Noto Serif SC", Georgia, serif;
+    font-weight: 900; font-size: 1.05rem; line-height: 1.3;
+    margin-bottom: 1.5rem;
+  }
+  nav.toc .brand span { color: var(--accent); }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  nav.toc a {
+    display: block; padding: .35rem .6rem;
+    color: var(--ink-soft); text-decoration: none;
+    font-size: .84rem; border-radius: 6px; border-left: 2px solid transparent;
+  }
+  nav.toc a:hover { background: var(--accent-wash); color: var(--ink); }
+  nav.toc a.active { border-left-color: var(--accent); color: var(--accent); background: var(--accent-wash); font-weight: 500; }
+  nav.toc a:focus-visible, button:focus-visible, .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  main { flex: 1; min-width: 0; padding: 2.5rem 0 6rem; }
+  main > section { max-width: 68ch; margin-bottom: 4.5rem; scroll-margin-top: 1.5rem; }
+
+  .eyebrow {
+    font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: .4rem;
+  }
+  h1 { font-size: clamp(1.9rem, 4.5vw, 2.7rem); font-weight: 900; margin: 0 0 1rem; }
+  h2 { font-size: 1.45rem; font-weight: 700; margin: 0 0 1rem; }
+  h3 { font-size: 1.05rem; font-weight: 700; margin: 1.75rem 0 .5rem; }
+  .lede { font-size: 1.08rem; color: var(--ink-soft); }
+  p { margin: 0 0 1rem; }
+  .zh { font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 500; }
+
+  .callout {
+    background: var(--paper-raised); border: 1px solid var(--line);
+    border-radius: 10px; padding: 1rem 1.25rem; margin: 1.25rem 0;
+    box-shadow: var(--shadow);
+  }
+  .callout.gate { border-left: 4px solid var(--gate); background: var(--gate-wash); border-color: var(--gate-wash); box-shadow: none; }
+  .callout.gate strong:first-child { color: var(--gate); }
+  .callout.go { border-left: 4px solid var(--accent); background: var(--accent-wash); border-color: var(--accent-wash); box-shadow: none; }
+
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  .table-scroll { overflow-x: auto; margin: 1.25rem 0; border: 1px solid var(--line); border-radius: 10px; background: var(--paper-raised); }
+  th, td { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  th { font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+
+  .steps { list-style: none; counter-reset: step; margin: 1.5rem 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+  .steps > li {
+    counter-increment: step; position: relative;
+    padding: 0 0 1.75rem 3.25rem;
+  }
+  .steps > li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: 0;
+    width: 2.1rem; height: 2.1rem; border-radius: 50%;
+    background: var(--accent-wash); color: var(--accent);
+    font-family: "Noto Serif SC", Georgia, serif; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .steps > li::after {
+    content: ""; position: absolute; left: calc(1.05rem - 1px); top: 2.3rem; bottom: .2rem;
+    width: 2px; background: var(--line);
+  }
+  .steps > li:last-child::after { display: none; }
+  .steps > li.gate-step::before { background: var(--gate-wash); color: var(--gate); }
+  .steps h3 { margin: .2rem 0 .35rem; }
+  .steps p { margin-bottom: .35rem; font-size: .95rem; color: var(--ink-soft); }
+  .steps .who { font-size: .78rem; color: var(--ink-faint); letter-spacing: .04em; }
+  .steps .who b { color: var(--ink-soft); font-weight: 500; }
+
+  /* Flashcards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .9rem; margin-top: 1.25rem; }
+  .card {
+    perspective: 900px; cursor: pointer; border: none; background: none; padding: 0;
+    font: inherit; color: inherit; text-align: left; min-height: 150px;
+  }
+  .card-inner {
+    position: relative; width: 100%; height: 100%; min-height: 150px;
+    transition: transform .5s; transform-style: preserve-3d;
+  }
+  @media (prefers-reduced-motion: reduce) { .card-inner { transition: none; } }
+  .card.flipped .card-inner { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute; inset: 0; backface-visibility: hidden;
+    background: var(--paper-raised); border: 1px solid var(--line); border-radius: 10px;
+    padding: .9rem 1rem; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; justify-content: center; gap: .25rem;
+  }
+  .card-face.back { transform: rotateY(180deg); font-size: .82rem; line-height: 1.45; color: var(--ink-soft); justify-content: flex-start; }
+  .card-face .hanzi { font-family: "Noto Serif SC", serif; font-size: 1.35rem; font-weight: 700; }
+  .card-face .pinyin { font-size: .78rem; color: var(--accent); letter-spacing: .03em; }
+  .card-face .gloss { font-size: .82rem; color: var(--ink-faint); }
+  .card-face.back b { color: var(--ink); }
+  .card-hint { font-size: .8rem; color: var(--ink-faint); margin-top: .75rem; }
+
+  /* Checklist */
+  .check-group { margin: 1.5rem 0; }
+  .check-group h3 { margin-bottom: .6rem; }
+  .check {
+    display: flex; gap: .7rem; align-items: flex-start;
+    padding: .55rem .75rem; border-radius: 8px; cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .check:hover { background: var(--paper-raised); border-color: var(--line); }
+  .check input { margin-top: .3rem; accent-color: var(--accent-bright); width: 1rem; height: 1rem; flex-shrink: 0; }
+  .check .t { font-size: .92rem; }
+  .check .t small { display: block; color: var(--ink-faint); font-size: .78rem; }
+  .check input:checked ~ .t { color: var(--ink-faint); text-decoration: line-through; text-decoration-color: var(--accent-bright); }
+  .progress-wrap { position: sticky; top: 0; background: var(--paper); padding: .75rem 0; z-index: 2; }
+  .progress-bar { height: 8px; background: var(--mono-bg); border-radius: 99px; overflow: hidden; }
+  .progress-bar div { height: 100%; width: 0; background: var(--accent-bright); border-radius: 99px; transition: width .3s; }
+  .progress-label { font-size: .78rem; color: var(--ink-faint); margin-top: .35rem; }
+  .reset-btn {
+    font: inherit; font-size: .8rem; color: var(--ink-faint); background: none;
+    border: 1px solid var(--line); border-radius: 6px; padding: .25rem .7rem; cursor: pointer; margin-top: 1rem;
+  }
+  .reset-btn:hover { color: var(--gate); border-color: var(--gate); }
+
+  .offline-note { font-size: .8rem; color: var(--ink-faint); border-top: 1px solid var(--line); padding-top: 1rem; margin-top: 3rem; }
+
+  @media (max-width: 800px) {
+    .frame { flex-direction: column; gap: 0; }
+    nav.toc { position: static; width: 100%; max-height: none; padding-bottom: 0; }
+    nav.toc ol { flex-direction: row; flex-wrap: wrap; }
+    nav.toc a { border-left: none; border-bottom: 2px solid transparent; }
+    nav.toc a.active { border-bottom-color: var(--accent); }
+  }
+</style>
+
+<div class="frame">
+<nav class="toc" aria-label="Sections">
+  <div class="brand">The Mini Program<br><span>Playbook</span></div>
+  <ol>
+    <li><a href="#big-picture">1 · The big picture</a></li>
+    <li><a href="#players">2 · The players</a></li>
+    <li><a href="#gates">3 · The two gates</a></li>
+    <li><a href="#scope">4 · Deciding scope</a></li>
+    <li><a href="#tech">5 · Technical calls</a></li>
+    <li><a href="#release">6 · Review &amp; release</a></li>
+    <li><a href="#process">7 · The process, end to end</a></li>
+    <li><a href="#managing">8 · Managing it</a></li>
+    <li><a href="#glossary">9 · Glossary trainer</a></li>
+    <li><a href="#checklist">10 · Your checklist</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="big-picture">
+  <p class="eyebrow">A plain-English field guide</p>
+  <h1>Building ANWA as a WeChat Mini Program</h1>
+  <p class="lede">Everything in the investigation handoff, translated into ordinary language: what a Mini Program actually is, why this project could be stopped before it starts, what has to be decided, and how to run the whole thing without getting burned.</p>
+
+  <h2 style="margin-top:2.5rem">1 · The big picture</h2>
+  <p>A <b>Mini Program</b> (<span class="zh">小程序</span>) is an app that lives <em>inside</em> WeChat. Users never visit an app store — they search, scan a QR code, or tap a share, and the app opens instantly inside WeChat itself. For an education business in China this matters enormously, because WeChat is where your students already are.</p>
+  <p>The critical decision, already made: <b>this is a real, separate app — not the website wrapped in a frame.</b> A wrapper was considered and rejected. That one sentence explains almost everything that follows, because a Mini Program is a separate world with:</p>
+  <ul>
+    <li>its own <b>login system</b> (not the website's),</li>
+    <li>its own <b>payment rail</b> (not the website's),</li>
+    <li>its own <b>release process</b> — every version is reviewed by Tencent before the public sees it,</li>
+    <li>its own <b>regulatory review</b>, stricter than anything the website faced.</li>
+  </ul>
+  <p>What it <em>shares</em> with the website is the data and the business rules: the same courses, the same students, the same prices. The art of this project is sharing those things exactly once, while accepting that the front end is new.</p>
+  <div class="callout go">
+    <strong>What already works.</strong> The website has already been moved onto Chinese infrastructure — server in Guangzhou, Chinese database, WeChat login proven, WeChat Pay wired up, ICP filing done. The Mini Program builds on that foundation; it does not repeat it.
+  </div>
+  <div class="callout">
+    <strong>The current stage is investigation, not construction.</strong> The deliverable right now is a written recommendation — a document, not code. Building starts only after the two "gate" questions in section 3 are answered, because either one can invalidate the whole plan.
+  </div>
+</section>
+
+<section id="players">
+  <h2>2 · The players — three WeChat accounts, and the humans behind them</h2>
+  <p>ANWA owns <b>three separate WeChat properties</b>. They look similar, they are all real, and confusing them once cost a full day. Think of them as three different storefronts with three different keys:</p>
+  <div class="table-scroll"><table>
+    <tr><th>Property</th><th>Plain English</th><th>State</th></tr>
+    <tr>
+      <td><b>Official Account</b><br><span class="zh">服务号</span><br><code>wxd872cc6f39051da2</code></td>
+      <td>ANWA's presence inside WeChat's built-in browser. Handles login when someone opens the website inside WeChat.</td>
+      <td>Certified. Login working today.</td>
+    </tr>
+    <tr>
+      <td><b>Website App</b><br><span class="zh">网站应用</span><br><code>wxb59ede2ba485a76b</code></td>
+      <td>Lets someone on a desktop computer log in to the website by scanning a QR code with their phone.</td>
+      <td>Verified working.</td>
+    </tr>
+    <tr>
+      <td><b>Mini Program</b><br><span class="zh">小程序</span><br><code>wxa771184f0d69e0e4</code></td>
+      <td><b>This project.</b> The in-WeChat app to be built.</td>
+      <td>Registered — but nobody has ever looked inside its admin console. <b>Doing that is task one.</b></td>
+    </tr>
+  </table></div>
+  <p>Now the humans. This is the single biggest source of delay, so learn it cold:</p>
+  <ul>
+    <li><b>The client controls the WeChat admin consoles.</b> Leroy is only an <em>operator</em> on the Official Account — he cannot see secrets, change core settings, or touch payment configuration.</li>
+    <li><b>The merchant platform is a fourth, separate system</b> (pay.weixin.qq.com) with its own logins. Nobody on the dev side has access at all.</li>
+    <li>Anything needing core settings, an AppSecret, or merchant configuration <b>must be scheduled with Terry or the account administrator</b>. Every such request is a multi-day round trip. Batch them.</li>
+  </ul>
+  <div class="callout">
+    <strong>Hard-won tip.</strong> You cannot tell from the outside whether a WeChat app ID is an Official Account or a Mini Program — probing anonymously gives the same error for both. Only the console (or the secret key) tells you. Get console facts before writing code; three release cycles were once wasted on a question the console answered in seconds.
+  </div>
+</section>
+
+<section id="gates">
+  <h2>3 · The two gates — questions that can kill the project</h2>
+  <p>Before any code, two questions must be answered. These are not details; either one can send the team back to the drawing board.</p>
+
+  <div class="callout gate">
+    <strong>Gate 1 — Is ANWA even allowed to sell courses in a Mini Program?</strong>
+    <p style="margin:.5rem 0 0">Every Mini Program must declare a <b>service category</b> (<span class="zh">类目</span>), and education/training categories demand qualification papers — typically a <b>private school operating permit</b> (<span class="zh">办学许可证</span>) issued to a mainland Chinese company. Selling courses under the wrong category gets the app taken down. The Official Account being certified proves <em>nothing</em> here — different platform, different review. Must establish: which category ANWA's content falls under, whether the owning entity holds the papers, and — if not — whether an information-only app (no enrolment, no payment) still meets the business goal.</p>
+  </div>
+
+  <div class="callout gate">
+    <strong>Gate 2 — Do all three WeChat properties belong to the same company?</strong>
+    <p style="margin:.5rem 0 0">WeChat gives each user a different ID in each property — <em>unless</em> the properties are bound under one <b>Open Platform</b> (<span class="zh">开放平台</span>) account, in which case the user also gets a shared <b>UnionID</b>. That UnionID is the mechanism for recognising "this Mini Program user is the same student who enrolled on the website." If the properties sit under different companies, identities can't be linked automatically (students would have to re-verify by email), and connecting the payment account becomes slow. Confirm all three app IDs sit under one Open Platform account; if not, binding them is a prerequisite, not a footnote.</p>
+  </div>
+
+  <p>Everything else in this guide assumes these gates open. If Gate 1 closes, the project changes shape entirely (informational app, or no app). If Gate 2 closes, timelines stretch and the login design changes.</p>
+</section>
+
+<section id="scope">
+  <h2>4 · Deciding scope — most of the website stays on the website</h2>
+  <p>Mini Programs are deliberately constrained: the core download is capped at <b>2 MB</b> (20 MB total with add-on packages), fonts and web features are restricted, and every release waits for review. You do not port a whole learning platform into that box.</p>
+  <p>The website's surface is huge — catalogue, enrolment, checkout, video player, assignments, quizzes, discussions, certificates, instructor tools, admin, CMS, support, referrals. The handoff's working hypothesis for version 1, to be challenged rather than accepted:</p>
+  <ul>
+    <li><b>In:</b> browse courses · enrol and pay · watch lessons · track progress</li>
+    <li><b>Out:</b> everything instructor-facing and admin-facing — that stays on the web.</li>
+  </ul>
+  <p>The recommendation document must state the v1 scope <em>and the reasoning for every exclusion</em>. "Small on purpose" is the posture: each feature added is more review surface, more package weight, and more compliance exposure.</p>
+</section>
+
+<section id="tech">
+  <h2>5 · The technical calls, in plain English</h2>
+
+  <h3>How the app talks to the server — the main decision</h3>
+  <p>The website's front end and back end speak a private dialect (tRPC) that assumes a browser with cookies. A Mini Program has neither. Three options are on the table:</p>
+  <ul>
+    <li><b>Build a small, purpose-made API</b> inside the existing server for the Mini Program, reusing the business logic underneath. <em>(The handoff leans here.)</em></li>
+    <li><b>Force the website's dialect into the Mini Program</b> — possible, but fights the platform.</li>
+    <li><b>Build a whole second backend</b> — almost certainly overkill, and dangerous: two copies of pricing or enrolment rules will drift apart.</li>
+  </ul>
+  <p>The iron rule regardless of choice: <b>business logic lives in exactly one place.</b> The migration already demonstrated what divergence costs — a stale cached component silently blanked a homepage section for hours.</p>
+
+  <h3>Login is a different mechanism, same identity</h3>
+  <p>Website login: WeChat asks the user's permission → website gets a session cookie. Mini Program login: the app calls <code>wx.login()</code> → gets a one-time code → the server trades it with WeChat for that user's Mini Program ID. No cookies; the app keeps its own token in storage.</p>
+  <p>The identity questions: can the existing session system issue tokens for this new kind of client? And how does a returning website student get recognised? The clean answer is the UnionID (Gate 2); the proven fallback is the email-verification link step the website already uses. One schema fact to remember: <b>the same person has a different WeChat ID in the Mini Program than in the Official Account</b> — the database already has a column for the shared UnionID, but storing the second per-app ID needs a decision.</p>
+
+  <h3>Payment — same engine, different registration</h3>
+  <p>Mini Program payment is its own rail: same underlying WeChat Pay machinery the website will use, but bound to the Mini Program's app ID and triggered by an in-app call. The existing payment adapter already does the hard parts (signing, decrypting notifications, offline tests). The blocker is administrative, not technical: <b>the merchant account (<span class="zh">商户号</span>) must be linked to the Mini Program's app ID</b>, which needs both the merchant super-admin and the app administrator — i.e. the client, i.e. latency. Start that early.</p>
+
+  <h3>Video — check it before believing it</h3>
+  <p>Course video sits on Tencent's video service. Confirm early that it plays inside a Mini Program — player component, signed URLs, and whether the anti-piracy setup carries over. This is a classic late-project ambush; the handoff says check it first, not last.</p>
+
+  <h3>Framework — native or translated?</h3>
+  <p>Two philosophies: write in WeChat's own native language (closest to the platform, zero code shared with the React website), or use a translation layer like Taro or uni-app (React-flavoured, some sharing, plus a new category of bugs). The handoff's warning: be sceptical of "we can share components with the website" — in practice sharing ends at types and pure logic, and over-claiming costs more than it saves. Weigh the team's actual skills, then recommend.</p>
+</section>
+
+<section id="release">
+  <h2>6 · Review, compliance, and how releases actually work</h2>
+  <p>This is the part with no equivalent in Western web development, so it deserves its own mental model:</p>
+  <ul>
+    <li><b>Every release is reviewed by Tencent.</b> Turnaround is days, not minutes. You cannot hotfix your way out of a mistake the same afternoon. Release planning must absorb this.</li>
+    <li><b>A privacy declaration is mandatory.</b> Since 2023, a Mini Program must declare what personal information it collects (<span class="zh">隐私协议</span>) before it may even call the APIs that touch that data. Not optional; blocks release.</li>
+    <li><b>There are safe testing lanes.</b> A developer version (<span class="zh">开发版</span>) and a beta/trial version (<span class="zh">体验版</span>) let the team and the client test on real phones without any public release or review. Use them; never test in production.</li>
+    <li><b>China's privacy law (PIPL) applies</b> to everything collected, exactly as it already does for the website.</li>
+  </ul>
+  <div class="callout">
+    <strong>Rhythm to internalise:</strong> build → developer version (team phones) → beta version (client's phones) → submit for review → wait days → public release. Plan features in batches sized to that cycle.
+  </div>
+</section>
+
+<section id="process">
+  <h2>7 · The process, end to end</h2>
+  <p>Here is the whole journey as one ordered sequence. Steps marked in red are the gates. "Client" means Terry or the account administrator — the people with console access.</p>
+  <ol class="steps">
+    <li>
+      <h3>Open the Mini Program console and record the facts</h3>
+      <p>The app ID exists but its console has never been examined. Establish: registered to which company, what category, what state.</p>
+      <div class="who">Needs: <b>client console access</b> · Output: facts, before any code</div>
+    </li>
+    <li class="gate-step">
+      <h3>Gate 1 — category qualification</h3>
+      <p>Which education category applies, and does the entity hold the permit? If not: what's the fallback, and does it still meet the goal?</p>
+      <div class="who">Needs: <b>client documents</b> · Can invalidate the whole plan</div>
+    </li>
+    <li class="gate-step">
+      <h3>Gate 2 — one company, one Open Platform account</h3>
+      <p>Confirm all three WeChat properties are bound together so users share a UnionID and payment binding is simple.</p>
+      <div class="who">Needs: <b>client console access</b> · Changes login design and timeline if closed</div>
+    </li>
+    <li>
+      <h3>Write the recommendation document</h3>
+      <p>Seven sections: feasibility verdict · v1 scope with exclusions · API decision · login &amp; identity design · framework choice · phased effort estimate · risk list (what forces a rebuild vs. a fix). Lives in <code>docs/</code>.</p>
+      <div class="who">Needs: <b>gates answered</b> · This is the current workstream's actual deliverable</div>
+    </li>
+    <li>
+      <h3>Start the slow administrative clocks</h3>
+      <p>Merchant-account-to-app-ID binding; Open Platform binding if missing; qualification paperwork if missing. All client-side, all slow — start them the moment the plan is approved.</p>
+      <div class="who">Needs: <b>client + merchant super-admin</b> · Runs in parallel with build</div>
+    </li>
+    <li>
+      <h3>Build v1 against the plan</h3>
+      <p>Small scope: browse, enrol, pay, watch, track. Business logic stays in its one home on the server. Video playback verified early.</p>
+      <div class="who">Needs: <b>dev team</b> · On its own branch; production stays quarantined</div>
+    </li>
+    <li>
+      <h3>Test in the safe lanes</h3>
+      <p>Developer version on team phones, then beta version on the client's phones. Privacy declaration filed before APIs that need it.</p>
+      <div class="who">Needs: <b>dev + client testers</b></div>
+    </li>
+    <li>
+      <h3>Submit for review, wait, release</h3>
+      <p>Days of turnaround per release. First release proves the pipeline; iterate in batches thereafter.</p>
+      <div class="who">Needs: <b>Tencent review</b> · Repeats for every version forever</div>
+    </li>
+  </ol>
+</section>
+
+<section id="managing">
+  <h2>8 · Managing it — the three rules that keep you safe</h2>
+  <p><b>Rule 1: Facts before code.</b> Every question that a console screen can answer should be answered there, not by experiment. Log what you find; the handoff exists because console facts were expensive to rediscover.</p>
+  <p><b>Rule 2: Respect the latency of the client.</b> The critical path of this project is not engineering — it is access. AppSecrets, merchant settings, qualification documents all route through Terry or the administrator. Manage it like a supply chain: batch requests, ask early, always have engineering work that isn't blocked on them.</p>
+  <p><b>Rule 3: Nothing touches production.</b> The production quarantine from the migration is still active. This work lives on its own branch, and testing happens in the Mini Program's developer/beta lanes — never on the live site or a live release.</p>
+  <p>And the posture for the current phase: you are producing a <em>recommendation</em>. Resist the pull to start building; the gates exist precisely because building first has a known failure mode here (an app that can never legally launch, or users who can never be recognised).</p>
+</section>
+
+<section id="glossary">
+  <h2>9 · Glossary trainer</h2>
+  <p>These are the terms that will come up in every conversation with the client and every console screen. Tap a card to flip it; tap again to flip back. Quiz yourself until the Chinese reads as easily as the English.</p>
+  <div class="cards" id="cards"></div>
+  <p class="card-hint">Cards are keyboard-accessible — Tab to a card, Enter or Space to flip.</p>
+</section>
+
+<section id="checklist">
+  <h2>10 · Your checklist</h2>
+  <p>Your working state, saved in this browser — it persists offline and between visits (per device; it does not sync).</p>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div id="pbar"></div></div>
+    <div class="progress-label" id="plabel"></div>
+  </div>
+  <div id="checks"></div>
+  <button class="reset-btn" id="resetBtn">Reset checklist</button>
+
+  <div class="offline-note">
+    <b>Using this guide offline:</b> save this single file anywhere (laptop, phone, USB stick) and open it in any browser — no internet needed. Fonts fall back gracefully; the flashcards and checklist work fully offline. Source handoff: <i>HANDOFF — ANWA WeChat Mini Program (investigation)</i>, 2026-08-09.
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+  // ---------- Glossary flashcards ----------
+  const TERMS = [
+    ["小程序", "xiǎochéngxù", "Mini Program", "An app that runs inside WeChat itself — no app store, opened by search, QR scan, or share. <b>What this project builds.</b>"],
+    ["服务号", "fúwùhào", "Official Account", "ANWA's certified service account — powers login inside WeChat's browser. A different property from the Mini Program, with a different review."],
+    ["开放平台", "kāifàng píngtái", "Open Platform", "WeChat's umbrella account (open.weixin.qq.com). Bind all your properties under it and users get a shared UnionID across them. <b>Gate 2 hinges on this.</b>"],
+    ["UnionID", "—", "shared user ID", "The one ID a person keeps across all properties bound to the same Open Platform account. The clean way to recognise a website student inside the Mini Program."],
+    ["openid", "—", "per-app user ID", "A person's ID <i>within one property</i>. The same student has a <b>different</b> openid in the Mini Program than in the Official Account."],
+    ["类目", "lèimù", "service category", "The declared category of a Mini Program. Education categories demand qualification papers. <b>Gate 1 hinges on this.</b>"],
+    ["办学许可证", "bànxué xǔkězhèng", "school operating permit", "The licence typically required to sell courses in an education-category Mini Program. Issued to a mainland Chinese entity."],
+    ["商户号", "shānghùhào", "merchant account", "The WeChat Pay merchant identity (pay.weixin.qq.com — a separate system, separate logins). Must be <b>linked to the Mini Program's app ID</b> before it can charge anyone."],
+    ["隐私协议", "yǐnsī xiéyì", "privacy declaration", "Mandatory declaration of what personal data the app collects. Must be filed before the app may call data-touching APIs. Blocks release if missing."],
+    ["体验版", "tǐyànbǎn", "beta / trial version", "A test build the client's phones can run via invitation — no public release, no review. Test here, never in production."],
+    ["开发版", "kāifābǎn", "developer version", "The build the dev team runs on their own phones during development. First stop in the release rhythm."],
+    ["微信认证", "wēixìn rènzhèng", "WeChat certification", "Verification of an account's identity. The Official Account has it — but it says <b>nothing</b> about Mini Program category qualification."],
+    ["ICP备案", "ICP bèi'àn", "ICP filing", "The government registration required to host a website in mainland China. Already done for the web platform."],
+    ["wx.login()", "—", "Mini Program sign-in", "The app-side call that starts login: returns a one-time code the server trades with WeChat for the user's openid (and UnionID if bound)."],
+  ];
+  const cardsEl = document.getElementById("cards");
+  TERMS.forEach(([zh, py, en, back]) => {
+    const b = document.createElement("button");
+    b.className = "card";
+    b.setAttribute("aria-label", zh + " — flip for meaning");
+    b.innerHTML = `<div class="card-inner">
+      <div class="card-face"><div class="hanzi">${zh}</div><div class="pinyin">${py}</div><div class="gloss">${en}</div></div>
+      <div class="card-face back">${back}</div>
+    </div>`;
+    b.addEventListener("click", () => b.classList.toggle("flipped"));
+    cardsEl.appendChild(b);
+  });
+
+  // ---------- Checklist with localStorage ----------
+  const GROUPS = [
+    ["Learn the ground", [
+      ["Read this whole guide once, top to bottom", ""],
+      ["Can name the three WeChat properties and what each is for", "Official Account · Website App · Mini Program"],
+      ["Know who holds which keys", "Leroy = operator only · Terry/admin = consoles · merchant platform = separate logins"],
+      ["Flipped every glossary card without peeking", ""],
+    ]],
+    ["Open the gates", [
+      ["Mini Program console examined; owner entity and category recorded", "First task — needs client access"],
+      ["Gate 1 answered: category + qualification documents confirmed (or fallback agreed)", "Can invalidate the plan"],
+      ["Gate 2 answered: all three app IDs confirmed under one Open Platform account", "UnionID + payment binding depend on it"],
+    ]],
+    ["Produce the recommendation", [
+      ["Feasibility verdict written", ""],
+      ["v1 scope defined, with reasons for every exclusion", ""],
+      ["API-layer decision written, rejected options included", ""],
+      ["Login & identity-linking design written", "UnionID path + email-link fallback"],
+      ["Framework recommendation written", "Weighted by the team's real skills"],
+      ["Phased effort estimate + risk list written", "Flag what forces a rebuild vs. a fix"],
+      ["Document delivered in docs/ — no code started before the gates opened", ""],
+    ]],
+    ["Start the slow clocks (once the plan is approved)", [
+      ["Merchant account ↔ Mini Program app ID binding requested", "Needs merchant super-admin + app admin"],
+      ["Open Platform binding requested (if Gate 2 found it missing)", ""],
+      ["Video playback inside a Mini Program verified early", "Player, signed URLs, anti-piracy"],
+      ["Privacy declaration drafted", "Blocks release if missing"],
+    ]],
+  ];
+  const KEY = "anwa-mp-checklist-v1";
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { state = {}; }
+  const checksEl = document.getElementById("checks");
+  const pbar = document.getElementById("pbar"), plabel = document.getElementById("plabel");
+  let total = 0;
+  GROUPS.forEach(([title, items], gi) => {
+    const g = document.createElement("div");
+    g.className = "check-group";
+    g.innerHTML = `<h3>${title}</h3>`;
+    items.forEach(([text, sub], ii) => {
+      total++;
+      const id = `c-${gi}-${ii}`;
+      const label = document.createElement("label");
+      label.className = "check";
+      label.innerHTML = `<input type="checkbox" id="${id}" ${state[id] ? "checked" : ""}>
+        <span class="t">${text}${sub ? `<small>${sub}</small>` : ""}</span>`;
+      label.querySelector("input").addEventListener("change", (e) => {
+        state[id] = e.target.checked;
+        try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (err) {}
+        paint();
+      });
+      g.appendChild(label);
+    });
+    checksEl.appendChild(g);
+  });
+  function paint() {
+    const done = Object.values(state).filter(Boolean).length;
+    pbar.style.width = (100 * done / total) + "%";
+    plabel.textContent = done + " of " + total + " done" + (done === total ? " — ready to run this process." : "");
+  }
+  paint();
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    if (!confirm("Clear all checklist progress on this device?")) return;
+    state = {};
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    document.querySelectorAll(".check input").forEach(i => i.checked = false);
+    paint();
+  });
+
+  // ---------- Active nav highlighting ----------
+  const links = [...document.querySelectorAll("nav.toc a")];
+  const sections = links.map(a => document.querySelector(a.getAttribute("href")));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        links.forEach(l => l.classList.toggle("active", l.getAttribute("href") === "#" + en.target.id));
+      }
+    });
+  }, { rootMargin: "-20% 0px -70% 0px" });
+  sections.forEach(s => s && obs.observe(s));
+</script>
