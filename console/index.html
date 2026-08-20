@@ -230,6 +230,10 @@
     <div class="filterbar" id="filterbar" hidden></div>
     <div id="next-area"></div>
     <div id="sf-area"></div>
+    <h2>Inbox — from real people</h2>
+    <div id="mail-area"></div>
+    <h2>Teams — recent chat</h2>
+    <div id="teams-area"></div>
     <h2>Project board</h2>
     <div id="asana-area"></div>
     <div class="install"><b>Make it an app:</b> in Samsung Internet tap ≡ → <b>Add page to</b> →
@@ -392,7 +396,11 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   // ============================================================
   // TODAY — live data via the artifact mcp capability
   // ============================================================
-  var SF_SERVER = 'Salesforce Production', ASANA_SERVER = 'Asana';
+  var SF_SERVER = 'Salesforce Production', ASANA_SERVER = 'Asana', M365_SERVER = 'Microsoft 365';
+  var MY_NAME = 'Mathew Hema', MY_ADDR = 'mathew.hema@birdlife.org.au';
+  var MAIL_INPUT = { folderName: 'Inbox', afterDateTime: '3 days ago', limit: 25, order: 'newest' };
+  var TEAMS_INPUT = { query: 'a', afterDateTime: '2 days ago', limit: 25 };   // 'a': broadest literal substring the scan path accepts
+  var AUTOMATED_SENDER = /no-?reply|donotreply|notification|newsletter|marketing|mailer|automated|@(email|mail|news|updates|info)\./i;
   var SOQL = "SELECT CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate, LastModifiedDate FROM Case WHERE RecordType.DeveloperName = 'Zeus' AND IsClosed = false ORDER BY CreatedDate ASC LIMIT 200";
   var ASANA_INPUT = { completed: false, projects_any: "1211042432693678", limit: 100,
     opt_fields: "name,assignee.name,due_on,memberships.section.name,permalink_url" };
@@ -412,9 +420,13 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   var sfState = { data: null, storedAt: null, error: null };
   var asState = { data: null, storedAt: null, error: null };
   var caseFilter = 'all';
-  var live = { mcp: null, sf: SF_SERVER, as: ASANA_SERVER };
+  var live = { mcp: null, sf: SF_SERVER, as: ASANA_SERVER, m365: M365_SERVER };
   var caseIndex = {};
   var taskIndex = {};
+  var mailIndex = {};
+  var teamsIndex = {};
+  var mailState = { data: null, storedAt: null, error: null };
+  var teamsState = { data: null, storedAt: null, error: null };
   var wbOpen = false;
   var PROJECT_GID = '1211042432693678';
   var SECTION_GIDS = {};   // name -> gid
@@ -538,6 +550,54 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       why: '', action: 'Get the latest before nudging.',
       prompt: 'Summarise where the Asana task "' + x.name + '" is up to and what would move it forward' };
   }
+
+  // ---- drafts in Mathew's voice (from the email-voice profile) ----
+  function firstNameOf(s) {
+    if (!s) return '';
+    var n = s.indexOf('@') > -1 ? s.split('@')[0].split(/[._-]/)[0] : s.split(/\s+/)[0];
+    return n ? n.charAt(0).toUpperCase() + n.slice(1).toLowerCase() : '';
+  }
+  function voiceDrafts(kind, first) {
+    var hi = first ? 'Hi ' + first + ',\n\n' : '';
+    if (kind === 'case') return [
+      { label: 'Acknowledge', text: hi + 'Thanks for logging this — it is with us and I will come back to you either way.\n\nThanks' },
+      { label: 'Resolved', text: hi + 'This is sorted now — [what was done]. Give it another go and let me know if anything still looks off, otherwise I will close the job.\n\nThanks' },
+      { label: 'Nudge', text: hi + 'Just checking in on this one — is it still an issue on your side? If it has sorted itself out I will close the job, otherwise tell me what you are still seeing.\n\nThanks' } ];
+    if (kind === 'task') return [
+      { label: 'Update', text: 'Picked this up — I will come back with a firm date rather than an estimate.' },
+      { label: 'Decision', text: 'Decision recorded: [the decision]. Next step is [who] by [when], and I will confirm either way.' } ];
+    if (kind === 'email') return [
+      { label: 'Quick thanks', text: hi + 'Got it — I will take a look and come back to you either way.\n\nThanks' },
+      { label: 'Working reply', text: hi + 'OK I have picked this up. [The answer or decision, with the one reason that matters.]\n\nNext step is with me and I will give you a firm date rather than an estimate.\n\nThanks' } ];
+    return [
+      { label: 'Quick', text: 'OK — on it and I will come back to you either way.' },
+      { label: 'Working', text: 'OK [the answer]. [Next step, named owner, when] — I will confirm either way.' } ];
+  }
+  function draftChips(kind, first) {
+    return '<div class="row" style="margin-top:2px">Write it for me:' +
+      voiceDrafts(kind, first).map(function (d, i) {
+        return ' <button class="btn sm ghost vdraft" data-kind="' + kind + '" data-i="' + i + '" data-first="' + esc(first || '') + '">' + esc(d.label) + '</button>';
+      }).join('') + '</div>';
+  }
+  function wireDraftChips(slot) {
+    slot.querySelectorAll('.vdraft').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var ta = slot.querySelector('textarea');
+        if (ta) { ta.value = voiceDrafts(b.dataset.kind, b.dataset.first)[+b.dataset.i].text; ta.focus(); }
+      });
+    });
+  }
+
+  // Some M365 tools return one JSON object per content block, not a single payload.
+  function blockItems(result) {
+    var out = [];
+    (result.content || []).forEach(function (b) {
+      if (b.type !== 'text') return;
+      try { var o = JSON.parse(b.text); if (o && typeof o === 'object') out.push(o); } catch (e) {}
+    });
+    return out;
+  }
+  function stripHtml(s) { var d = document.createElement('div'); d.innerHTML = s || ''; return (d.textContent || '').replace(/\s+/g, ' ').trim(); }
 
   function planHtml(a, extra, caseId, taskId) {
     return '<div class="plan">' +
@@ -702,6 +762,9 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       asanaArea.innerHTML = '<div class="secterr">Waiting for Asana…</div>';
     }
 
+    renderMailArea(now);
+    renderTeamsArea();
+
     // ---- status line ----
     var errs = [sfState.error, asState.error].filter(Boolean);
     if (recs || tasks) {
@@ -713,6 +776,168 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       liveDot.className = 'dot err';
       liveStatus.textContent = 'Live data unavailable';
     }
+  }
+
+  // ---- Inbox: recent mail from real people, reply in Mathew's voice ----
+  function renderMailArea(now) {
+    var mailArea = document.getElementById('mail-area');
+    if (mailState.error && !mailState.data) {
+      mailArea.innerHTML = '<div class="secterr">' + esc(fixCopy(mailState.error, 'Microsoft 365')) + '</div>'; return;
+    }
+    if (!mailState.data) { mailArea.innerHTML = '<div class="secterr">Waiting for Outlook…</div>'; return; }
+    var people = mailState.data.filter(function (m) {
+      return m.sender && !AUTOMATED_SENDER.test(m.sender) && m.sender.toLowerCase() !== MY_ADDR;
+    }).sort(function (a, b) {
+      if (!!a.isRead !== !!b.isRead) return a.isRead ? 1 : -1;
+      return (b.receivedDateTime || '').localeCompare(a.receivedDateTime || '');
+    }).slice(0, 8);
+    if (!people.length) { mailArea.innerHTML = '<div class="secterr">Nothing from real people in the last three days.</div>'; return; }
+    mailArea.innerHTML = people.map(function (m) {
+      mailIndex[m.id] = m;
+      var first = firstNameOf(m.sender);
+      var when = m.receivedDateTime ? new Date(m.receivedDateTime).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+      var snippet = (m.summary || '').replace(/[\r\n]+/g, ' ').slice(0, 160);
+      return '<details class="caseitem"><summary>' +
+        '<span class="ttl">' + esc(first) + ' <span class="sub">· ' + esc(m.subject || '(no subject)') + '</span></span>' +
+        (m.isRead ? '' : '<span class="badge s-New">Unread</span>') +
+        '<span class="age">' + esc(when) + '</span></summary>' +
+        '<div class="plan"><p class="why-full">' + esc(snippet) + '…</p>' +
+        '<div class="preview">Draft a reply to ' + esc(m.sender) + ' about "' + esc(m.subject || '') + '" — key points: [what you want to say]</div>' +
+        '<div class="btnrow" style="margin-top:0">' +
+        '<button class="btn sm copyplan">Copy &amp; ask Claude</button>' +
+        (live.mcp ? '<button class="btn sm ghost mailbtn" data-id="' + esc(m.id) + '">Reply…</button>' : '') +
+        '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(m.webLink || '#') + '">Open in Outlook ↗</a>' +
+        '</div><div class="wbslot"></div></div></details>';
+    }).join('');
+    if (mailState.error) mailArea.innerHTML += '<div class="secterr">Couldn’t refresh just now — this is the last good data. ' + esc(fixCopy(mailState.error, 'Microsoft 365')) + '</div>';
+    wireCopyPlans(mailArea);
+  }
+
+  function openMailWorkbench(slot, id) {
+    var m = mailIndex[id];
+    if (!m) return;
+    wbOpen = true;
+    var first = firstNameOf(m.sender);
+    slot.innerHTML = '<div class="workbench">' +
+      '<textarea class="mw-text" placeholder="Your reply to ' + esc(first) + '…"></textarea>' +
+      draftChips('email', first) +
+      '<div class="btnrow" style="margin-top:8px">' +
+      '<button class="btn sm mw-draft">Save as Outlook draft</button>' +
+      '<button class="btn sm danger mw-send">Send now</button>' +
+      '<button class="btn sm ghost mw-cancel">Cancel</button></div>' +
+      '<p class="hint" style="margin-top:8px">“Save as Outlook draft” puts it in your Drafts to send from Outlook. “Send now” sends it as you, immediately, threaded on the original — it asks for a second tap first. Pick a draft above, then make it yours before sending.</p>' +
+      '<div class="wbmsg" aria-live="polite"></div></div>';
+    wireDraftChips(slot);
+    var text = slot.querySelector('.mw-text'), msg = slot.querySelector('.wbmsg'),
+        dBtn = slot.querySelector('.mw-draft'), sBtn = slot.querySelector('.mw-send');
+    slot.querySelector('.mw-cancel').addEventListener('click', function () { slot.innerHTML = ''; wbOpen = false; renderQueue(); });
+    function armM(btn, armedText, run) {
+      btn.dataset.orig = btn.textContent;
+      btn.addEventListener('click', function () {
+        if (btn.dataset.armed !== '1') {
+          btn.dataset.armed = '1'; btn.textContent = armedText;
+          setTimeout(function () { if (btn.dataset.armed === '1') { btn.dataset.armed = ''; btn.textContent = btn.dataset.orig; } }, 5000);
+          return;
+        }
+        btn.dataset.armed = ''; run();
+      });
+    }
+    function makeDraft() {
+      return live.mcp.callTool(live.m365, 'outlook_create_reply_draft',
+        { messageId: id, body: text.value.trim(), bodyType: 'text' })
+        .then(function (res) {
+          var p = res.payload; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+          if (!p || !p.id) { var items = blockItems(res); p = items[0] || null; }
+          return p;
+        });
+    }
+    armM(dBtn, 'Tap again to save the draft', function () {
+      if (!text.value.trim()) { msg.className = 'wbmsg bad'; msg.textContent = 'Write (or pick) the reply first.'; return; }
+      dBtn.disabled = sBtn.disabled = true; msg.className = 'wbmsg'; msg.textContent = 'Saving draft…';
+      makeDraft().then(function (p) {
+        msg.className = 'wbmsg ok';
+        msg.textContent = '✓ Draft saved in your Outlook Drafts — review and send from there.';
+        if (p && p.webLink) msg.innerHTML += ' <a target="_blank" rel="noopener" href="' + esc(p.webLink) + '">Open it ↗</a>';
+        wbOpen = false;
+      }).catch(function (err) {
+        msg.className = 'wbmsg bad';
+        msg.textContent = err && err.code === 'tool_error' ? 'Outlook said no: ' + (err.message || 'draft failed') + '.' : fixCopy(err, 'Microsoft 365');
+        dBtn.disabled = sBtn.disabled = false;
+      });
+    });
+    armM(sBtn, 'Tap again to SEND to ' + first + ' now', function () {
+      if (!text.value.trim()) { msg.className = 'wbmsg bad'; msg.textContent = 'Write (or pick) the reply first.'; return; }
+      dBtn.disabled = sBtn.disabled = true; msg.className = 'wbmsg'; msg.textContent = 'Creating the reply…';
+      makeDraft().then(function (p) {
+        if (!p || !p.id) throw { code: 'tool_error', message: 'the draft was created but its id could not be read — check Drafts in Outlook and send from there' };
+        msg.textContent = 'Sending…';
+        return live.mcp.callTool(live.m365, 'outlook_send_draft', { messageId: p.id }).then(function () {
+          msg.className = 'wbmsg ok';
+          msg.textContent = '✓ Sent to ' + first + ' — it will thread on the original and sits in your Sent Items.';
+          wbOpen = false;
+        });
+      }).catch(function (err) {
+        msg.className = 'wbmsg bad';
+        msg.textContent = err && err.code === 'tool_error' ? 'Outlook said no: ' + (err.message || 'send failed') + '. If a draft was created it is in your Drafts folder.' : fixCopy(err, 'Microsoft 365');
+        dBtn.disabled = sBtn.disabled = false;
+      });
+    });
+  }
+
+  // ---- Teams: recent messages said to you; reply is copy + deep link (no send API) ----
+  function renderTeamsArea() {
+    var teamsArea = document.getElementById('teams-area');
+    if (teamsState.error && !teamsState.data) {
+      teamsArea.innerHTML = '<div class="secterr">' + esc(fixCopy(teamsState.error, 'Microsoft 365')) + '</div>'; return;
+    }
+    if (!teamsState.data) { teamsArea.innerHTML = '<div class="secterr">Waiting for Teams…</div>'; return; }
+    var latestPerChat = {};
+    teamsState.data.forEach(function (t) {
+      if (!t.chatId || (t.from && t.from.displayName === MY_NAME)) return;
+      var cur = latestPerChat[t.chatId];
+      if (!cur || (t.createdDateTime || '') > (cur.createdDateTime || '')) latestPerChat[t.chatId] = t;
+    });
+    var msgs = Object.keys(latestPerChat).map(function (k) { return latestPerChat[k]; })
+      .sort(function (a, b) { return (b.createdDateTime || '').localeCompare(a.createdDateTime || ''); }).slice(0, 6);
+    if (!msgs.length) { teamsArea.innerHTML = '<div class="secterr">No recent Teams messages from others.</div>'; return; }
+    teamsArea.innerHTML = msgs.map(function (t) {
+      teamsIndex[t.id] = t;
+      var who = (t.from && t.from.displayName) || 'Someone';
+      var snippet = stripHtml(t.summary).slice(0, 160);
+      var when = t.createdDateTime ? new Date(t.createdDateTime).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+      var deep = 'https://teams.microsoft.com/l/message/' + encodeURIComponent(t.chatId) + '/' + encodeURIComponent(t.id);
+      return '<details class="caseitem"><summary>' +
+        '<span class="ttl">' + esc(who) + ' <span class="sub">· ' + esc(snippet.slice(0, 60)) + '…</span></span>' +
+        '<span class="age">' + esc(when) + '</span></summary>' +
+        '<div class="plan"><p class="why-full">“' + esc(snippet) + '…”</p>' +
+        '<div class="wbslot"></div>' +
+        '<div class="btnrow" style="margin-top:0">' +
+        '<button class="btn sm teamsbtn" data-id="' + esc(t.id) + '">Write a reply…</button>' +
+        '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(deep) + '">Open the chat in Teams ↗</a>' +
+        '</div></div></details>';
+    }).join('');
+    if (teamsState.error) teamsArea.innerHTML += '<div class="secterr">Couldn’t refresh just now — this is the last good data. ' + esc(fixCopy(teamsState.error, 'Microsoft 365')) + '</div>';
+    teamsArea.querySelectorAll('.teamsbtn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var slot = b.closest('.plan').querySelector('.wbslot');
+        if (slot.innerHTML) { slot.innerHTML = ''; wbOpen = false; renderQueue(); return; }
+        var t = teamsIndex[b.dataset.id];
+        wbOpen = true;
+        slot.innerHTML = '<div class="workbench">' +
+          '<textarea class="tm-text" placeholder="Your reply…"></textarea>' +
+          draftChips('teams', firstNameOf((t.from && t.from.displayName) || '')) +
+          '<div class="btnrow" style="margin-top:8px"><button class="btn sm tm-copy">Copy the reply</button>' +
+          '<button class="btn sm ghost tm-cancel">Cancel</button></div>' +
+          '<p class="hint" style="margin-top:8px">Teams doesn’t let this page send messages — copy your reply, then tap “Open the chat in Teams” and paste it. Two taps and it’s said.</p></div>';
+        wireDraftChips(slot);
+        slot.querySelector('.tm-copy').addEventListener('click', function () {
+          var ta = slot.querySelector('.tm-text');
+          if (!ta.value.trim()) { return; }
+          copyText(ta.value, slot.querySelector('.tm-copy'), 'Copied ✓ — now open Teams');
+        });
+        slot.querySelector('.tm-cancel').addEventListener('click', function () { slot.innerHTML = ''; wbOpen = false; renderQueue(); });
+      });
+    });
   }
 
   function wireCopyPlans(root) {
@@ -736,6 +961,13 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         openTaskWorkbench(slot, b.dataset.id);
       });
     });
+    root.querySelectorAll('.mailbtn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var slot = b.closest('.plan').querySelector('.wbslot');
+        if (slot.innerHTML) { slot.innerHTML = ''; wbOpen = false; renderQueue(); return; }
+        openMailWorkbench(slot, b.dataset.id);
+      });
+    });
   }
 
   // ---- the task workbench: comment, move between sections, or mark complete ----
@@ -748,6 +980,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       .map(function (s) { return '<option value="' + esc(SECTION_GIDS[s] || '') + '">' + esc(s) + '</option>'; }).join('');
     slot.innerHTML = '<div class="workbench">' +
       '<textarea class="tw-text" placeholder="Add a comment — what happened, what’s decided, what’s next…"></textarea>' +
+      draftChips('task', '') +
       '<div class="row"><label>Move to: <select class="tw-move"><option value="">— pick a section —</option>' + moveOpts + '</select></label></div>' +
       '<div class="btnrow" style="margin-top:4px">' +
       '<button class="btn sm tw-comment">Post comment</button>' +
@@ -756,6 +989,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<button class="btn sm ghost tw-cancel">Cancel</button></div>' +
       '<p class="hint" style="margin-top:8px">Comments post to the task as you. If you’ve written a comment, Move and Mark complete post it first. Every button asks for a second tap — nothing changes on the first.</p>' +
       '<div class="wbmsg" aria-live="polite"></div></div>';
+    wireDraftChips(slot);
     var text = slot.querySelector('.tw-text'), moveSel = slot.querySelector('.tw-move'),
         msg = slot.querySelector('.wbmsg'),
         cBtn = slot.querySelector('.tw-comment'), mBtn = slot.querySelector('.tw-movebtn'),
@@ -858,6 +1092,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       : '';
     slot.innerHTML = '<div class="workbench">' +
       '<textarea class="wb-text" placeholder="Write your response here — what was done, or what the requester should do next…"></textarea>' +
+      draftChips('case', '') +
       '<div class="row"><label><input type="checkbox" class="wb-pub" checked> Visible to the requester on the case</label></div>' +
       '<div class="row"><label>Close reason: <select class="wb-reason">' + reasonOpts + '</select></label>' + typeSel + '</div>' +
       '<div class="btnrow" style="margin-top:4px">' +
@@ -866,6 +1101,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<button class="btn sm ghost wb-cancel">Cancel</button></div>' +
       '<p class="hint" style="margin-top:8px">A case comment is not an email — the requester sees it on the case (and gets a notification only if case alerts are on). For an emailed reply, use Ask → Draft a reply. Every button asks you to tap twice — nothing is written on the first tap.</p>' +
       '<div class="wbmsg" aria-live="polite"></div></div>';
+    wireDraftChips(slot);
     var text = slot.querySelector('.wb-text'), pub = slot.querySelector('.wb-pub'),
         reason = slot.querySelector('.wb-reason'), typeEl = slot.querySelector('.wb-type'),
         msg = slot.querySelector('.wbmsg'),
@@ -968,9 +1204,11 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   function offline(msg) {
     liveDot.className = 'dot';
     liveStatus.textContent = msg;
-    sfArea.innerHTML = '<div class="secterr">Open this page from its claude.ai link (signed in) to see the live queue. Everything else on this console works offline.</div>';
+    sfArea.innerHTML = '<div class="secterr">Open this page from its claude.ai link (signed in) to see the live queue, inbox and Teams. Everything else on this console works offline.</div>';
     asanaArea.innerHTML = '';
     nextArea.innerHTML = '';
+    document.getElementById('mail-area').innerHTML = '';
+    document.getElementById('teams-area').innerHTML = '';
   }
 
   (function initLive() {
@@ -987,14 +1225,39 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
           var names = (res.servers || []).map(function (s) { return s.server; });
           var sf = names.find(function (n) { return /salesforce/i.test(n); }) || SF_SERVER;
           var as = names.find(function (n) { return /asana/i.test(n); }) || ASANA_SERVER;
-          startWatches(mcp, sf, as);
-        }).catch(function () { startWatches(mcp, SF_SERVER, ASANA_SERVER); });
-      } catch (e) { startWatches(mcp, SF_SERVER, ASANA_SERVER); }
+          var m3 = names.find(function (n) { return /microsoft|365|office|outlook/i.test(n); }) || M365_SERVER;
+          startWatches(mcp, sf, as, m3);
+        }).catch(function () { startWatches(mcp, SF_SERVER, ASANA_SERVER, M365_SERVER); });
+      } catch (e) { startWatches(mcp, SF_SERVER, ASANA_SERVER, M365_SERVER); }
     });
   })();
 
-  function startWatches(mcp, sfServer, asanaServer) {
-      live.mcp = mcp; live.sf = sfServer; live.as = asanaServer;
+  function startWatches(mcp, sfServer, asanaServer, m365Server) {
+      live.mcp = mcp; live.sf = sfServer; live.as = asanaServer; live.m365 = m365Server || M365_SERVER;
+
+      mcp.watchTool(live.m365, 'outlook_email_search', MAIL_INPUT, function (ev) {
+        if (ev.type === 'data') {
+          var items = blockItems(ev.result).filter(function (o) { return o.id && o.sender; });
+          mailState.data = items; mailState.error = null;
+          mailState.storedAt = ev.result.cache ? ev.result.cache.storedAt : Date.now();
+        } else {
+          mailState.error = ev.error;
+          if (AUTHZ[ev.error.code]) mailState.data = null;
+        }
+        renderQueue();
+      }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
+
+      mcp.watchTool(live.m365, 'chat_message_search', TEAMS_INPUT, function (ev) {
+        if (ev.type === 'data') {
+          var items = blockItems(ev.result).filter(function (o) { return o.id && o.chatId; });
+          teamsState.data = items; teamsState.error = null;
+          teamsState.storedAt = ev.result.cache ? ev.result.cache.storedAt : Date.now();
+        } else {
+          teamsState.error = ev.error;
+          if (AUTHZ[ev.error.code]) teamsState.data = null;
+        }
+        renderQueue();
+      }, { cache: { staleTime: 120000 }, refetchInterval: 600000 });
       mcp.watchTool(sfServer, 'soqlQuery', { q: SOQL }, function (ev) {
         if (ev.type === 'data') {
           var p = ev.result.payload;

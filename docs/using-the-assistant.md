@@ -15,7 +15,12 @@ this on your phone. The Today tab shows the live Ask Zeus queue and Asana board
 case opens a workbench that can post a response on the case and close it (reason +
 type handled, two-tap confirm, internal audit comment, verified by re-query). The
 project board shows every section except Backlog, and each task has the same
-workbench: comment, move between sections, or mark complete — verified the same way. The
+workbench: comment, move between sections, or mark complete — verified the same way.
+It also shows recent Inbox mail from real people (reply in Mathew's voice — save as
+an Outlook draft or send, threaded on the original) and recent Teams messages
+(reply drafted to copy + a deep link into the chat; Teams has no send API).
+Every reply surface offers voice drafts from the email-voice profile to pick,
+edit, and execute. The
 Ask tab composes exact prompts for a Claude session; Runbooks generates the full
 offboarding PowerShell sequence from a name and UPN; Reference carries close
 reasons, Asana section gids, and the scoped SOQL. Source lives at `console/index.html` in this repo — tell any
