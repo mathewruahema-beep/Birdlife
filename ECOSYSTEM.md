@@ -72,10 +72,12 @@ outstanding — which means the current keys must be treated as burned.
 
 Options, in order of preference:
 
-1. **Direct REST with env-var credentials.** Rotate the keys, store the new
-   `ck_/cs_` pair as environment variables in the Claude Code environment (never in
-   prompt text), and the parked WooCommerce order-sync check in the consolidated
-   routine can be un-parked the same day. Cheapest, no new vendors.
+1. **Direct REST with env-var credentials — built, awaiting setup.** The client
+   (`woocommerce/wc.py`), runbook (`woocommerce/README.md`) and project skill
+   (`.claude/skills/birdlife-woocommerce/`) are in this repo. Three user steps
+   remain: rotate the burned keys, set `WOO_CK`/`WOO_CS` env vars, and allow
+   `birdlife.org.au` on the environment's network policy — **verified blocked
+   (CONNECT 403) on 20 Aug 2026**, so the allowlist step is mandatory.
 2. **Zapier WooCommerce app.** Exists (11 read / 17 write / 9 search actions) but
    requires the **paid WooCommerce Zapier extension plugin** installed on the site —
    a licence purchase and a Blitzm/WP admin task. Worth it only if Zaps need
@@ -139,8 +141,8 @@ gap; revisit if the membership rebuild increases release cadence.
 | # | Action | Effort | Who/where | Context gained |
 |---|---|---|---|---|
 | 1 | Attach Salesforce + Asana connectors to the dashboard routine | 2 min | claude.ai UI (manual, one-time) | Dashboard actually refreshes with live data |
-| 2 | Rotate WooCommerce API keys | 15 min | WP admin → WooCommerce → REST API | Closes an open credential exposure |
-| 3 | Store new Woo keys as env vars; un-park the order-sync check | 30 min | Claude Code environment settings + routine prompt | Order flow visible end-to-end |
+| 2 | Rotate WooCommerce API keys (new key: **Read** permission) | 15 min | WP admin → WooCommerce → REST API | Closes an open credential exposure |
+| 3 | Set `WOO_CK`/`WOO_CS` env vars + allow `birdlife.org.au` egress; then un-park the order-sync check | 30 min | Claude Code environment settings (vars + network) | Order flow visible end-to-end via `woocommerce/wc.py` |
 | 4 | Connect Employment Hero Payroll in Zapier (read-only) | 10 min | Zapier UI authentication | Starters/leavers visible; feeds onboarding automation |
 | 5 | Decide: Zapier WooCommerce extension — buy or skip | decision | ICT + Blitzm | Woo triggers for Zaps (only if needed beyond #3) |
 | 6 | Post-Ortto-cutover: disable Pardot Zapier actions | 10 min | Zapier | Removes a stale write surface |
