@@ -4,7 +4,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
 		http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-	<responseDate>2026-08-20T06:44:08Z</responseDate>
+	<responseDate>2026-08-20T06:59:50Z</responseDate>
 	<request verb="ListSets">https://afo.birdlife.org.au/afo/index.php/afo/oai</request>
 	<ListSets>
 		<set>

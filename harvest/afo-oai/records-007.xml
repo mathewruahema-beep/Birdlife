@@ -4,7 +4,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
 		http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-	<responseDate>2026-08-20T06:44:48Z</responseDate>
+	<responseDate>2026-08-20T07:00:40Z</responseDate>
 	<request verb="ListRecords" metadataPrefix="oai_dc">https://afo.birdlife.org.au/afo/index.php/afo/oai</request>
 	<ListRecords>
 		<record>
@@ -3154,8 +3154,8 @@ New South Wales. Over a 3.5-year period (1990â€“1994), which encompassed pr
 </oai_dc:dc>
 			</metadata>
 		</record>
-		<resumptionToken expirationDate="2026-08-21T06:44:48Z"
+		<resumptionToken expirationDate="2026-08-21T07:00:40Z"
 			completeListSize="2348"
-			cursor="600">be19e2fd7ae649dc04928a4379e3bd76</resumptionToken>
+			cursor="600">b665003e969eff68992c5b0dd08b0271</resumptionToken>
 	</ListRecords>
 </OAI-PMH>

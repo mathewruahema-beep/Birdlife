@@ -1,0 +1,98 @@
+---
+url: https://afo.birdlife.org.au/afo/index.php/afo/index
+title: "Australian Field Ornithology"
+description: ""
+---
+
+[Home](https://afo.birdlife.org.au/afo/index.php/afo/index) > [Vol 43 (2026)](https://afo.birdlife.org.au/afo/index.php/afo/index)
+
+*Australian Field Ornithology* is a peer-reviewed journal publishing original papers on a broad spectrum of topics relating to Australasian ornithology, including ecology, behaviour and history of individual species and groups. 
+**AFO is open access so no login is required to access the articles.**
+
+## Current Issue
+
+Vol 43 (2026)
+
+### Table of Contents
+
+#### Articles
+
+|  | J.N. Hobbs Medal 2026 Citation – Dr Helen Raftery David Watson pp. 150 | PDF |
+|---|---|---|
+
+|  | Book Review  -  A Bird’s IQ: Innovation, Intelligence, and Problem Solving in the Avian World by Louis Lefebvre Clifford B. Frith pp. 148-149 | PDF |
+|---|---|---|
+
+|  | Roost-site fidelity and post-fire foraging in the nomadic Ground Cuckoo-shrike Coracina maxima in the Kimberley Thomas D. J. Sayers,									Tommy L. Landmann pp. 135-147 | PDF |
+|---|---|---|
+
+|  | Breeding and diet of the Rufous Owl Ninox rufa and Barking Owl N. connivens in Darwin, Northern Territory William Riddell pp. 130-134 | PDF |
+|---|---|---|
+
+|  | Using autonomous audio monitoring to detect the Powerful Owl Ninox strenua in peri-urban habitat James A. Deane,									Lyn Easton,									Geoffery Easton pp. 119-129 | PDF |
+|---|---|---|
+
+|  | Remote-tactile sensory system in the bill of Royal Spoonbills Platalea regia Kim W. Lowe pp. 111-118 | PDF |
+|---|---|---|
+
+|  | Photographs and observations suggest Variegated Fairy-wren Malurus lamberti × Superb Fairy-wren M. cyaneus hybridisation Jordan Boersma,									Martin Ross pp. 108-110 | PDF |
+|---|---|---|
+
+|  | Targeted bioacoustic surveys detect Plains-wanderers Pedionomus torquatus in Melbourne’s Western Grasslands Aaron Grinter,									Chris Hartnett,									Kathleen Armstrong pp. 101-107 | PDF |
+|---|---|---|
+
+|  | Observation of a Letter-winged Kite Elanus scriptus consuming avian prey Daniel Isaac Terrington,									Luke Downey pp. 98-100 | PDF |
+|---|---|---|
+
+|  | Edge-of-range camera-trap records of Superb Lyrebird Menura novaehollandiae in western and central-north Tasmania (2018–2025) Barry W. Brook,									Jessie C. Buettel pp 91-97 | PDF |
+|---|---|---|
+
+|  | Second nest of the Bougainville Honeyeater Stresemannia  bougainvillei , with the first description of a nest in situ, and   some new findings regarding its elevational distribution Jan-Uwe Schmidt pp. 88-90 | PDF |
+|---|---|---|
+
+|  | Cooperative breeding in Morotai Paradise Kingfisher Tanysiptera doris Alex J. Berryman pp. 86-87 | PDF |
+|---|---|---|
+
+|  | Further dietary samples of the Eastern Barn Owl Tyto javanica delicatula from the eastern Australian arid zone S.J.S. Debus,									L. Koungoulos,									M.C. McDowell,									L.R. Tang pp. 82-85 | PDF |
+|---|---|---|
+
+|  | Use of anthropogenic material for extended ornamented phenotype in two fairy-wren species Jaden Salett,									James A. Kennerley,									Ryan Jack,									Jon Coleman,									Michael S. Webster,									William E. Feeney,									Jordan Boersma pp. 77-81 | PDF |
+|---|---|---|
+
+|  | Book review - Australian Hawks and Eagles: A window into the hidden world of raptors, including bazas, buzzards, harriers, kites and ospreys Stephen Debus pp. 75-76 | PDF |
+|---|---|---|
+
+|  | The precarious status of the Endangered Forty-spotted Pardalote Pardalotus quadragintus on Flinders Island, Tasmania Sally L. Bryant,									Alan Wiltshire,									Keith Reid pp. 70-74 | PDF |
+|---|---|---|
+
+|  | Fatal collision of a White-throated Needletail Hirundapus caudacutus with a high-voltage powerline in central Queensland Andrew Jensen,									Joseph Trigger,									Gus Daly,									Ellliot Leach pp. 67-69 | PDF |
+|---|---|---|
+
+|  | Automated monitoring of the occurrence and flight behaviours of White-throated Needletails Hirundapus caudacutus caudacutus at an operational wind farm in Tasmania Keith Reid,									David Rogers pp. 60-66 | PDF |
+|---|---|---|
+
+|  | Nesting biology of the Wet Tropics endemic Fernwren Oreoscopus gutturalis Clifford B. Frith,									Dawn W. Frith pp. 53-59 | PDF |
+|---|---|---|
+
+|  | Studies of ibises in Victoria, III: Sexual dimorphism, sex ratio, breeding season, reproductive success, mating patterns, site fidelity, movements and survival of Australian White Ibis at three locations in southern Victoria Kim W. Lowe pp. 38-52 | PDF |
+|---|---|---|
+
+|  | Ship-assisted displacement of a Great Cormorant Phalacrocorax carbo and vagrant birds of subantarctic Macquarie Island Milan Sojitra,									Jaslyn Allnutt,									Helen Achurch pp. 31-37 | PDF |
+|---|---|---|
+
+|  | First description and photograph of the juvenile plumage of the New Britain Goshawk Tachyspiza princeps Thierry Quelennec,									Marianne Quelennec pp. 29-30 | PDF |
+|---|---|---|
+
+|  | A regular commensal foraging interaction between cranes and raptors on the Gulf Plains of north-western Queensland John D.A. Grant pp. 26-28 | PDF |
+|---|---|---|
+
+|  | A Laughing Kookaburra assists in raising Blue-winged Kookaburras’ offspring Clifford B. Frith,									Mary-Anne Addington,									Martin B. Willis pp. 24-25 | PDF |
+|---|---|---|
+
+|  | Agonistic behaviour of the Red Wattlebird Anthochaera carunculata towards an elapid snake Matthew Mo,									Scott Beno,									Bel Manria pp. 22-23 | PDF |
+|---|---|---|
+
+|  | Waterbirds and other birds of the Arcoona Lakes, arid South Australia, 2022–2023 Robert J. Dugand,									Genevieve L.T. Hayes pp. 1-21 | PDF |
+|---|---|---|
+
+ Added by planticle  End changes by planticle  Google Analytics  /Google Analytics
