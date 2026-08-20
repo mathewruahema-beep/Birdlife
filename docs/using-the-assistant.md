@@ -14,6 +14,8 @@ this on your phone. The Today tab shows the live Ask Zeus queue and Asana board
 (via your claude.ai connectors) with a prioritised "What to do next" list, and each
 case opens a workbench that can post a response on the case and close it (reason +
 type handled, two-tap confirm, internal audit comment, verified by re-query). The
+project board shows every section except Backlog, and each task has the same
+workbench: comment, move between sections, or mark complete — verified the same way. The
 Ask tab composes exact prompts for a Claude session; Runbooks generates the full
 offboarding PowerShell sequence from a name and UPN; Reference carries close
 reasons, Asana section gids, and the scoped SOQL. Source lives at `console/index.html` in this repo — tell any

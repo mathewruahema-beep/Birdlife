@@ -412,9 +412,20 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   var sfState = { data: null, storedAt: null, error: null };
   var asState = { data: null, storedAt: null, error: null };
   var caseFilter = 'all';
-  var live = { mcp: null, sf: SF_SERVER };
+  var live = { mcp: null, sf: SF_SERVER, as: ASANA_SERVER };
   var caseIndex = {};
+  var taskIndex = {};
   var wbOpen = false;
+  var PROJECT_GID = '1211042432693678';
+  var SECTION_GIDS = {};   // name -> gid
+  Object.keys(SECTION_NAMES).forEach(function (g) { SECTION_GIDS[SECTION_NAMES[g]] = g; });
+  var SECTION_ORDER = ['Blocked','In Development/Progress','Awaiting Response','Scoping/Requirements Gathering','Ready for Deployment','Hypercare','Done','No section'];
+  var SECTION_PLAIN = {
+    'Blocked': 'Stuck', 'In Development/Progress': 'Being worked on',
+    'Awaiting Response': 'Waiting on an answer', 'Scoping/Requirements Gathering': 'Still being scoped',
+    'Ready for Deployment': 'Ready to ship', 'Hypercare': 'Just shipped — watching',
+    'Done': 'In Done but not ticked off', 'No section': 'Not filed anywhere'
+  };
   var CLOSE_REASONS_ALL = ["Closed - Resolved","Closed - Resolved First Call","Closed - Email Sent",
     "Closed - Email Edited & Sent","Closed - Phone Call","Closed - No Action Required",
     "Closed - Internal Follow up","Closed - Duplicate","Closed - Spam","Closed - Abandoned"];
@@ -484,7 +495,51 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       prompt: 'Summarise case ' + r.CaseNumber + ' ("' + (r.Subject || '') + '") and how to resolve it' };
   }
 
-  function planHtml(a, extra, caseId) {
+  // Plain-English advice for a project task, by where it sits.
+  function adviceForTask(x, today) {
+    var who = x.assignee ? ' (with ' + x.assignee + ')' : '';
+    if (x.due_on && x.due_on < today) return {
+      p: 6, cat: 'Past due', cls: 'c-review',
+      why: 'Its due date (' + x.due_on + ') has passed' + who + '.',
+      action: 'Re-date it honestly or get it moving.',
+      prompt: 'The Asana task "' + x.name + '" is past its due date (' + x.due_on + '). Propose a realistic plan: new date, new owner, or done' };
+    if (x.section === 'Blocked') return {
+      p: 7, cat: 'Stuck', cls: 'c-board',
+      why: 'It’s sitting in Blocked' + who + '.',
+      action: 'Most blocked items need a decision, not more work — name whose call it is.',
+      prompt: 'Look at the Asana task "' + x.name + '" — what exactly is it blocked on, whose decision is it, and what would unblock it?' };
+    if (x.section === 'Done') return {
+      p: 8, cat: 'Not ticked off', cls: 'c-board',
+      why: 'It sits in Done but isn’t marked complete, so it still counts as open work.',
+      action: 'If it’s truly finished, mark it complete below.',
+      prompt: 'Is the Asana task "' + x.name + '" actually finished? If yes it should be marked complete; if not, which section should it be in?' };
+    if (x.section === 'No section') return {
+      p: 9, cat: 'Not filed', cls: 'c-board',
+      why: 'It belongs to no section, so it shows up in no view.',
+      action: 'File it where it belongs with Move below.',
+      prompt: 'The Asana task "' + x.name + '" isn’t in any section of the IT Operations Project Plan — which section should it go to?' };
+    if (x.section === 'Awaiting Response') return {
+      p: 9, cat: 'Waiting on an answer', cls: 'c-chase',
+      why: 'It’s parked waiting for someone to come back' + who + '.',
+      action: 'Chase the answer, or move it on if it has arrived.',
+      prompt: 'The Asana task "' + x.name + '" is in Awaiting Response — who are we waiting on, and draft the chase message' };
+    if (x.section === 'Ready for Deployment') return {
+      p: 9, cat: 'Ready to ship', cls: 'c-reply',
+      why: 'The work is done — it just needs a release slot.',
+      action: 'Pick a time and ship it.',
+      prompt: 'The Asana task "' + x.name + '" is Ready for Deployment — propose when and how to release it' };
+    if (!x.assignee) return {
+      p: 9, cat: 'No owner', cls: 'c-assign',
+      why: 'Nobody is assigned to it.',
+      action: 'Give it an owner so it moves.',
+      prompt: 'The Asana task "' + x.name + '" (' + x.section + ') has no assignee — suggest who on the ICT team should own it' };
+    return {
+      p: 10, cat: x.section, cls: 'c-board',
+      why: '', action: 'Get the latest before nudging.',
+      prompt: 'Summarise where the Asana task "' + x.name + '" is up to and what would move it forward' };
+  }
+
+  function planHtml(a, extra, caseId, taskId) {
     return '<div class="plan">' +
       (a.why ? '<p class="why-full">' + esc(a.why) + ' ' + esc(a.action || '') + '</p>'
              : '<p class="why-full">' + esc(a.action || '') + '</p>') +
@@ -492,8 +547,9 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<div class="btnrow" style="margin-top:0">' +
       '<button class="btn sm copyplan">Copy &amp; ask Claude</button>' +
       (caseId && live.mcp ? '<button class="btn sm ghost workbtn" data-id="' + esc(caseId) + '">Respond / close…</button>' : '') +
+      (taskId && live.mcp ? '<button class="btn sm ghost taskbtn" data-id="' + esc(taskId) + '">Comment / move / complete…</button>' : '') +
       (extra || '') + '</div>' +
-      (caseId ? '<div class="wbslot"></div>' : '') + '</div>';
+      (caseId || taskId ? '<div class="wbslot"></div>' : '') + '</div>';
   }
 
   function renderQueue() {
@@ -514,8 +570,9 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
              { n: old, l: 'Over a month', f: 'old', warn: old > 0 });
     }
     if (tasks) {
-      var blocked = tasks.filter(function (x) { return x.section === 'Blocked'; }).length;
-      var overdue = tasks.filter(function (x) { return x.due_on && x.due_on < new Date(now).toISOString().slice(0, 10); }).length;
+      var boardTasks = tasks.filter(function (x) { return x.section !== 'Backlog/Requests'; });
+      var blocked = boardTasks.filter(function (x) { return x.section === 'Blocked'; }).length;
+      var overdue = boardTasks.filter(function (x) { return x.due_on && x.due_on < new Date(now).toISOString().slice(0, 10); }).length;
       t.push({ n: blocked, l: 'Stuck', warn: blocked > 0 }, { n: overdue, l: 'Past due', warn: overdue > 0 });
     }
     tilesEl.innerHTML = t.map(function (x) {
@@ -547,16 +604,12 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         if (a) items.push({ p: a.p, cls: a.cls, cat: a.cat, title: r.CaseNumber + ' · ' + (r.Subject || ''), a: a, cid: cid,
           link: '<a class="btn sm ghost" target="_blank" rel="noopener" href="https://birdlifeaustralia.lightning.force.com/lightning/r/Case/' + esc(cid) + '/view">Open in Salesforce ↗</a>' });
       });
+      var today = new Date(now).toISOString().slice(0, 10);
       (tasks || []).forEach(function (x) {
-        var today = new Date(now).toISOString().slice(0, 10);
-        if (x.due_on && x.due_on < today) items.push({ p: 6, cls: 'c-review', cat: 'Past due', title: x.name,
-          a: { why: 'This task’s due date (' + x.due_on + ') has passed.', action: 'Re-date it honestly or get it moving.',
-               prompt: 'The Asana task "' + x.name + '" is past its due date (' + x.due_on + '). Propose a realistic plan: new date, new owner, or done' },
-          link: '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(x.url) + '">Open in Asana ↗</a>' });
-        else if (x.section === 'Blocked') items.push({ p: 7, cls: 'c-board', cat: 'Stuck', title: x.name,
-          a: { why: 'This task is sitting in Blocked' + (x.assignee ? ' with ' + x.assignee : '') + '.',
-               action: 'Most blocked items need a decision, not more work — name whose call it is.',
-               prompt: 'Look at the Asana task "' + x.name + '" — what exactly is it blocked on, whose decision is it, and what would unblock it?' },
+        if (x.section === 'Backlog/Requests') return;   // backlog stays out of view
+        taskIndex[x.gid] = x;
+        var ta = adviceForTask(x, today);
+        if (ta.p <= 8) items.push({ p: ta.p, cls: ta.cls, cat: ta.cat, title: x.name, a: ta, tid: x.gid,
           link: '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(x.url) + '">Open in Asana ↗</a>' });
       });
       items.sort(function (a, b) { return a.p - b.p; });
@@ -564,7 +617,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       nextArea.innerHTML = (top.length ? '<h2 style="margin-top:4px">What to do next</h2>' : '') +
         top.map(function (it) {
           return '<details class="next"><summary><span class="chip ' + it.cls + '">' + esc(it.cat) + '</span>' +
-            '<span class="ttl">' + esc(it.title) + '</span></summary>' + planHtml(it.a, it.link, it.cid) + '</details>';
+            '<span class="ttl">' + esc(it.title) + '</span></summary>' + planHtml(it.a, it.link, it.cid, it.tid) + '</details>';
         }).join('') +
         (items.length > top.length ? '<p class="hint">…and ' + (items.length - top.length) + ' more further down the list.</p>' : '');
       wireCopyPlans(nextArea);
@@ -616,20 +669,31 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     if (asState.error && !tasks) {
       asanaArea.innerHTML = '<div class="secterr">' + esc(fixCopy(asState.error, 'Asana')) + '</div>';
     } else if (tasks) {
-      var byS = {};
-      tasks.forEach(function (x) { byS[x.section] = (byS[x.section] || 0) + 1; });
-      var summary = Object.keys(byS).sort().map(function (s) { return esc(s) + ' ' + byS[s]; }).join(' · ');
-      var blockedRows = tasks.filter(function (x) { return x.section === 'Blocked'; }).map(function (x) {
-        var a = { why: 'Sitting in Blocked' + (x.assignee ? ' with ' + x.assignee : '') + '.',
-          action: 'Most blocked items need a decision, not more work.',
-          prompt: 'Look at the Asana task "' + x.name + '" — what exactly is it blocked on, whose decision is it, and what would unblock it?' };
-        return '<details class="taskitem next"><summary><span class="ttl">' + esc(x.name) + '</span>' +
-          '<span class="age">' + esc(x.assignee || 'No owner') + '</span></summary>' +
-          planHtml(a, '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(x.url) + '">Open in Asana ↗</a>') + '</details>';
-      }).join('');
-      asanaArea.innerHTML = '<p class="hint" style="margin-top:0">' + summary +
-        (asState.truncated ? ' · first 100 shown' : '') + '</p>' +
-        (blockedRows ? '<div class="grp"><h3>Stuck — tap one to see how to unstick it</h3>' + blockedRows + '</div>' : '');
+      var backlogN = tasks.filter(function (x) { return x.section === 'Backlog/Requests'; }).length;
+      var bySec = {};
+      tasks.forEach(function (x) {
+        if (x.section === 'Backlog/Requests') return;
+        taskIndex[x.gid] = x;
+        (bySec[x.section] = bySec[x.section] || []).push(x);
+      });
+      var todayStr = new Date(now).toISOString().slice(0, 10);
+      asanaArea.innerHTML = SECTION_ORDER.filter(function (s) { return bySec[s]; }).map(function (s) {
+        var rows = bySec[s].map(function (x) {
+          var a = adviceForTask(x, todayStr);
+          var dueBadge = x.due_on
+            ? '<span class="age' + (x.due_on < todayStr ? ' old' : '') + '">' + esc(x.due_on.slice(5)) + '</span>' : '';
+          return '<details class="taskitem"><summary>' +
+            '<span class="ttl">' + esc(x.name) + '</span>' +
+            '<span class="age">' + esc(x.assignee || 'No owner') + '</span>' + dueBadge +
+            '</summary>' + planHtml(a,
+              '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(x.url) + '">Open in Asana ↗</a>',
+              null, x.gid) + '</details>';
+        }).join('');
+        return '<div class="grp"><h3>' + esc(SECTION_PLAIN[s] || s) + ' (' + bySec[s].length + ')</h3>' + rows + '</div>';
+      }).join('') || '<div class="secterr">Nothing on the board outside the backlog.</div>';
+      asanaArea.innerHTML += '<p class="hint">Backlog is tucked away here — ' + backlogN + ' task' + (backlogN === 1 ? '' : 's') +
+        (asState.truncated ? ' · first 100 tasks shown' : '') +
+        '. <a target="_blank" rel="noopener" href="https://app.asana.com/1/443963187362944/project/1211042432693678">See the full board in Asana ↗</a></p>';
       if (asState.error) {
         asanaArea.innerHTML += '<div class="secterr">Couldn’t refresh just now — this is the last good data. ' + esc(fixCopy(asState.error, 'Asana')) + '</div>';
       }
@@ -664,6 +728,121 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         if (slot.innerHTML) { slot.innerHTML = ''; wbOpen = false; renderQueue(); return; }
         openWorkbench(slot, b.dataset.id);
       });
+    });
+    root.querySelectorAll('.taskbtn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var slot = b.closest('.plan').querySelector('.wbslot');
+        if (slot.innerHTML) { slot.innerHTML = ''; wbOpen = false; renderQueue(); return; }
+        openTaskWorkbench(slot, b.dataset.id);
+      });
+    });
+  }
+
+  // ---- the task workbench: comment, move between sections, or mark complete ----
+  function openTaskWorkbench(slot, gid) {
+    var x = taskIndex[gid];
+    if (!x) return;
+    wbOpen = true;
+    var moveOpts = SECTION_ORDER.filter(function (s) { return s !== 'No section' && s !== x.section; })
+      .concat(x.section === 'Backlog/Requests' ? [] : ['Backlog/Requests'])
+      .map(function (s) { return '<option value="' + esc(SECTION_GIDS[s] || '') + '">' + esc(s) + '</option>'; }).join('');
+    slot.innerHTML = '<div class="workbench">' +
+      '<textarea class="tw-text" placeholder="Add a comment — what happened, what’s decided, what’s next…"></textarea>' +
+      '<div class="row"><label>Move to: <select class="tw-move"><option value="">— pick a section —</option>' + moveOpts + '</select></label></div>' +
+      '<div class="btnrow" style="margin-top:4px">' +
+      '<button class="btn sm tw-comment">Post comment</button>' +
+      '<button class="btn sm tw-movebtn">Move it</button>' +
+      '<button class="btn sm danger tw-done">Mark complete</button>' +
+      '<button class="btn sm ghost tw-cancel">Cancel</button></div>' +
+      '<p class="hint" style="margin-top:8px">Comments post to the task as you. If you’ve written a comment, Move and Mark complete post it first. Every button asks for a second tap — nothing changes on the first.</p>' +
+      '<div class="wbmsg" aria-live="polite"></div></div>';
+    var text = slot.querySelector('.tw-text'), moveSel = slot.querySelector('.tw-move'),
+        msg = slot.querySelector('.wbmsg'),
+        cBtn = slot.querySelector('.tw-comment'), mBtn = slot.querySelector('.tw-movebtn'),
+        dBtn = slot.querySelector('.tw-done');
+    slot.querySelector('.tw-cancel').addEventListener('click', function () {
+      slot.innerHTML = ''; wbOpen = false; renderQueue();
+    });
+    function arm2(btn, armedText, run) {
+      btn.dataset.orig = btn.textContent;
+      btn.addEventListener('click', function () {
+        if (btn.dataset.armed !== '1') {
+          btn.dataset.armed = '1'; btn.textContent = typeof armedText === 'function' ? armedText() : armedText;
+          setTimeout(function () { if (btn.dataset.armed === '1') { btn.dataset.armed = ''; btn.textContent = btn.dataset.orig; } }, 5000);
+          return;
+        }
+        btn.dataset.armed = ''; run();
+      });
+    }
+    arm2(cBtn, 'Tap again to post the comment', function () {
+      if (!text.value.trim()) { msg.className = 'wbmsg bad'; msg.textContent = 'Write the comment first.'; return; }
+      doTaskWork(x, gid, { comment: text.value.trim() }, msg, [cBtn, mBtn, dBtn]);
+    });
+    arm2(mBtn, function () {
+      var s = moveSel.options[moveSel.selectedIndex];
+      return moveSel.value ? 'Tap again to move to ' + s.text : 'Pick a section first';
+    }, function () {
+      if (!moveSel.value) { msg.className = 'wbmsg bad'; msg.textContent = 'Pick a section to move it to.'; return; }
+      doTaskWork(x, gid, { comment: text.value.trim(), moveGid: moveSel.value,
+        moveName: moveSel.options[moveSel.selectedIndex].text }, msg, [cBtn, mBtn, dBtn]);
+    });
+    arm2(dBtn, 'Tap again to mark "' + x.name.slice(0, 40) + '" complete', function () {
+      doTaskWork(x, gid, { comment: text.value.trim(), complete: true }, msg, [cBtn, mBtn, dBtn]);
+    });
+  }
+
+  function doTaskWork(x, gid, opts, msg, btns) {
+    var mcp = live.mcp, as = live.as;
+    if (!mcp) { msg.className = 'wbmsg bad'; msg.textContent = 'Live connection lost — reload the page.'; return; }
+    btns.forEach(function (b) { b.disabled = true; });
+    msg.className = 'wbmsg'; msg.textContent = 'Working…';
+
+    var step = opts.comment
+      ? mcp.callTool(as, 'add_comment', { task_id: gid, text: opts.comment })
+      : Promise.resolve(null);
+
+    step.then(function () {
+      if (opts.complete) return mcp.callTool(as, 'update_tasks', { tasks: [{ task: gid, completed: true }] });
+      if (opts.moveGid) return mcp.callTool(as, 'update_tasks', { tasks: [{ task: gid,
+        add_projects: [{ project_id: PROJECT_GID, section_id: opts.moveGid }] }] });
+      return null;
+    }).then(function (res) {
+      // update_tasks reports per-task success/failure in its payload — check it
+      if (res) {
+        var p = res.payload; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+        if (p && p.failed && p.failed.length) {
+          throw { code: 'tool_error', message: (p.failed[0].errors && p.failed[0].errors[0] && (p.failed[0].errors[0].message || p.failed[0].errors[0])) || 'Asana rejected the update' };
+        }
+      }
+      // verify against a fresh read before declaring success
+      return mcp.callTool(as, 'get_task', { task_id: gid, include_comments: false, include_subtasks: false,
+        opt_fields: 'name,completed,memberships.section.gid,memberships.section.name' })
+        .then(function (v) {
+          var p = v.payload; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+          var task = p && p.data;
+          if (opts.complete) {
+            if (task && task.completed) { msg.className = 'wbmsg ok'; msg.textContent = '✓ Done — "' + x.name + '" is marked complete.'; }
+            else { msg.className = 'wbmsg bad'; msg.textContent = 'That didn’t stick — Asana still shows it incomplete. Check it in Asana.'; }
+          } else if (opts.moveGid) {
+            var inSec = task && (task.memberships || []).some(function (m) { return m.section && m.section.gid === opts.moveGid; });
+            if (inSec) { msg.className = 'wbmsg ok'; msg.textContent = '✓ Moved to ' + opts.moveName + '.'; }
+            else { msg.className = 'wbmsg bad'; msg.textContent = 'The move didn’t stick — check the task in Asana.'; }
+          } else {
+            msg.className = 'wbmsg ok'; msg.textContent = '✓ Comment posted on the task.';
+          }
+          wbOpen = false;
+          try { mcp.invalidate(as, 'search_tasks'); } catch (e) {}
+        }, function () {
+          msg.className = 'wbmsg ok';
+          msg.textContent = '✓ Written — but couldn’t re-check just now. Verify in Asana.';
+          wbOpen = false;
+        });
+    }).catch(function (err) {
+      msg.className = 'wbmsg bad';
+      msg.textContent = err && err.code === 'tool_error'
+        ? 'Asana said no: ' + (err.message || 'the update failed') + '.'
+        : fixCopy(err, 'Asana');
+      btns.forEach(function (b) { b.disabled = false; });
     });
   }
 
@@ -815,7 +994,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   })();
 
   function startWatches(mcp, sfServer, asanaServer) {
-      live.mcp = mcp; live.sf = sfServer;
+      live.mcp = mcp; live.sf = sfServer; live.as = asanaServer;
       mcp.watchTool(sfServer, 'soqlQuery', { q: SOQL }, function (ev) {
         if (ev.type === 'data') {
           var p = ev.result.payload;
@@ -842,7 +1021,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
               (task.memberships || []).forEach(function (m) {
                 if (m.section && SECTION_NAMES[m.section.gid]) section = SECTION_NAMES[m.section.gid];
               });
-              return { name: task.name, section: section, due_on: task.due_on,
+              return { gid: task.gid, name: task.name, section: section, due_on: task.due_on,
                 assignee: task.assignee && task.assignee.name, url: task.permalink_url };
             });
             asState.error = null;
