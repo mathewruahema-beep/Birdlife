@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>BirdLife Companion</title>
+  <meta name="description" content="Companion app for birdlife.org.au — news, events, membership and staff tools.">
+  <meta name="theme-color" content="#b3002d">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-header-inner">
+      <a class="brand" href="#/news" aria-label="BirdLife Companion home">
+        <img src="icons/icon.svg" alt="" width="34" height="34">
+        <span class="brand-name">BirdLife <em>Companion</em></span>
+      </a>
+      <div class="header-actions">
+        <span id="offline-badge" class="offline-badge" hidden>Offline — showing saved content</span>
+        <span id="demo-badge" class="demo-badge" hidden title="The live site API could not be reached; sample content is shown.">Demo data</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="view" class="view" tabindex="-1" aria-live="polite"></main>
+
+  <nav class="tabbar" aria-label="Main">
+    <a href="#/news" data-tab="news" class="tab">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9h10M7 12h10M7 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>News</span>
+    </a>
+    <a href="#/events" data-tab="events" class="tab">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 10h16M8 3v5M16 3v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Events</span>
+    </a>
+    <a href="#/membership" data-tab="membership" class="tab">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Membership</span>
+    </a>
+    <a href="#/staff" data-tab="staff" class="tab" id="staff-tab" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9l8-5 8 5v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 19v-5h6v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span>Staff</span>
+    </a>
+  </nav>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -277,6 +277,8 @@ They have been redacted from the backup in this repo, but:
 
 ```
 README.md                            findings, admin runbook, routine consolidation
+app/                                 BirdLife Companion — PWA companion to birdlife.org.au (see app/README.md)
+worker/                              Cloudflare Worker stub for the companion app's member API
 dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
 ```

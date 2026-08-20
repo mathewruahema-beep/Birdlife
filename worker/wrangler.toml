@@ -1,0 +1,12 @@
+name = "birdlife-companion-member-proxy"
+main = "member-proxy.js"
+compatibility_date = "2026-08-01"
+
+# Deploy:   npx wrangler deploy
+# Secrets:  npx wrangler secret put WC_CONSUMER_KEY
+#           npx wrangler secret put WC_CONSUMER_SECRET
+# Never put credentials in this file or in vars — it is committed to git.
+
+# Account: use the BirdLife Cloudflare account (see `wrangler whoami`);
+# uncomment and set before first deploy.
+# account_id = ""
