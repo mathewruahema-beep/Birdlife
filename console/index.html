@@ -596,6 +596,78 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       { label: 'Quick', text: 'OK — on it and I will come back to you either way.' },
       { label: 'Working', text: 'OK [the answer]. [Next step, named owner, when] — I will confirm either way.' } ];
   }
+  // ---- the smart reply engine: recognise the topic, answer it properly ----
+  // BirdLife's queue is mostly recurring topics with known playbook answers.
+  // First matching rule wins; each gives a complete body in Mathew's voice.
+  var TOPIC_RULES = [
+    { re: /phish|suspicious (email|link)|scam|spam email/i,
+      ack: "good call sending this in, and do not click anything in it. I am checking whether anyone else received it and getting the sender blocked, and I will come back with what we found rather than a guess.",
+      done: "that sender is now blocked and nothing of ours was touched — the message can be deleted. Thanks for flagging it rather than clicking it." },
+    { re: /portal|birdata|bof\b|lms\b|(can'?t|cannot|unable to) (log ?in|sign ?in)|login issue/i,
+      ack: "this is usually the portal email not matching the preferred email on the contact record. I am checking your record now and lining up the fix, and I will confirm once you can get in.",
+      done: "the email mismatch on your record is fixed. Try logging in again and tell me if it still will not let you in — otherwise I will close the job." },
+    { re: /password|mfa\b|2fa|authenticator|locked out|reset my/i,
+      ack: "the reset is prepared on our side. I will verify it is you before it goes ahead, and expect it done today — if you are locked out of anything else in the meantime tell me and I will prioritise it.",
+      done: "the reset is done — set your new details at next sign-in. If anything still will not let you in, tell me what you are seeing." },
+    { re: /shared mailbox|mailbox access|access to .{0,20}mailbox/i,
+      ack: "the mailbox access change is prepared. It needs the mailbox owner's OK and an admin to apply it, and I am asking for both today — I will confirm either way once it is live.",
+      done: "the mailbox access is live — it can take up to an hour to appear in Outlook. Tell me if it has not shown up by then." },
+    { re: /distribution (list|group)|email group|add .{0,30}to the .{0,30}list/i,
+      ack: "the distribution list change is prepared and with an admin to apply. I will confirm once it is done.",
+      done: "the distribution list change is done — new mail to that list will include the change from now." },
+    { re: /new (starter|employee|user)|onboard/i,
+      ack: "the account setup is underway — email address, licence and the right groups — and I will confirm when it is ready for their first day.",
+      done: "the account is ready — email, licence and groups are all in place. Details for their first sign-in are with their manager." },
+    { re: /depart|resign|leaver|offboard|last day/i,
+      ack: "the offboarding steps are lined up for their last day — sign-out everywhere, account disabled, mailbox preserved as shared, licence reclaimed. I will confirm each step as it is done.",
+      done: "the offboarding is complete — account disabled, sessions revoked, mailbox preserved as shared and the licence reclaimed. Anything outside Microsoft (Asana, Campaign Monitor) has been removed too." },
+    { re: /order|refund|payment|invoice|woocommerce|shop\b|stripe/i,
+      ack: "I am tracing it through the shop, payment and Salesforce records to see exactly where it stopped, and I will come back with what happened rather than a guess.",
+      done: "traced and fixed — the records now line up across the shop, payment and Salesforce. Tell me if anything on your side still looks off." },
+    { re: /salesforce|report|dashboard|record|contact|opportunit|duplicate/i,
+      ack: "I am looking at the Salesforce side of this now and will come back with either the fix or exactly what is wrong, rather than an estimate.",
+      done: "the change is made in Salesforce — check it from your side and tell me if anything still looks off, otherwise I will close the job." },
+    { re: /laptop|computer|hardware|monitor|phone\b|device/i,
+      ack: "I am checking what we have available and what the replacement cycle allows, and I will come back to you with the options rather than a maybe.",
+      done: "sorted — the equipment is arranged. Tell me when it arrives if anything is not right with it." },
+    { re: /teams|sharepoint|onedrive|file|folder|drive access/i,
+      ack: "access changes like this are quick once the owner confirms — I am asking them now and will apply it as soon as they do.",
+      done: "the access is in place — it can take a few minutes to show up. Tell me if you still cannot see it after that." }
+  ];
+  function topicFor(text) {
+    for (var i = 0; i < TOPIC_RULES.length; i++) if (TOPIC_RULES[i].re.test(text || '')) return TOPIC_RULES[i];
+    return null;
+  }
+  function smartCaseDraft(r, cat, first, description) {
+    var topic = topicFor((r.Subject || '') + ' ' + (description || '').slice(0, 1500));
+    var hi = first ? 'Hi ' + first + ',\n\n' : 'Hi there,\n\n';
+    if (cat === 'Give them a nudge') {
+      return hi + 'Just checking in on this one — is it still an issue on your side? If it has sorted itself out I will close the job, otherwise tell me what you are still seeing.\n\nThanks';
+    }
+    if (cat === 'They replied' || cat === 'Time to decide') {
+      return hi + (topic ? 'This should be sorted now — ' + topic.done : 'This is sorted now — give it another go and let me know if anything still looks off, otherwise I will close the job.') + '\n\nThanks';
+    }
+    return hi + (topic ? 'Thanks for logging this — ' + topic.ack : 'Thanks for logging this — it is with us and I will come back to you either way.') + '\n\nThanks';
+  }
+  function smartEmailDraft(m, first) {
+    var topic = topicFor((m.subject || '') + ' ' + (m.summary || ''));
+    var hi = first ? 'Hi ' + first + ',\n\n' : '';
+    if (topic) return hi + 'OK I have picked this up — ' + topic.ack + '\n\nThanks';
+    return hi + 'OK I have picked this up. [The answer or decision, with the one reason that matters.]\n\nNext step is with me and I will give you a firm date rather than an estimate.\n\nThanks';
+  }
+  function smartTeamsDraft(t) {
+    var topic = topicFor(stripHtml(t.summary));
+    if (topic) return 'OK — ' + topic.ack;
+    return 'OK — on it and I will come back to you either way.';
+  }
+  function smartTaskNote(x, cat) {
+    var topic = topicFor(x.name);
+    if (cat === 'Stuck' || cat === 'Not ticked off')
+      return 'Decision recorded: [the decision]. Next step is [who] by [when], and I will confirm either way.';
+    if (topic) return 'Picked this up — ' + topic.ack;
+    return 'Picked this up — I will come back with a firm date rather than an estimate.';
+  }
+
   function draftChips(kind, first) {
     return '<div class="row" style="margin-top:2px">Write it for me:' +
       voiceDrafts(kind, first).map(function (d, i) {
@@ -891,7 +963,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<p class="hint" style="margin-top:8px">“Save as Outlook draft” puts it in your Drafts to send from Outlook. “Send now” sends it as you, immediately, threaded on the original — it asks for a second tap first. Pick a draft above, then make it yours before sending.</p>' +
       '<div class="wbmsg" aria-live="polite"></div></div>';
     wireDraftChips(slot);
-    slot.querySelector('.mw-text').value = voiceDrafts('email', first)[1].text;
+    slot.querySelector('.mw-text').value = smartEmailDraft(m, first);
     var text = slot.querySelector('.mw-text'), msg = slot.querySelector('.wbmsg'),
         dBtn = slot.querySelector('.mw-draft'), sBtn = slot.querySelector('.mw-send');
     slot.querySelector('.mw-cancel').addEventListener('click', function () { slot.innerHTML = ''; wbOpen = false; renderQueue(); });
@@ -987,7 +1059,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
           '<button class="btn sm ghost tm-cancel">Cancel</button></div>' +
           '<p class="hint" style="margin-top:8px">Teams doesn’t let this page send messages — copy your reply, then tap “Open the chat in Teams” and paste it. Two taps and it’s said.</p></div>';
         wireDraftChips(slot);
-        slot.querySelector('.tm-text').value = voiceDrafts('teams', '')[0].text;
+        slot.querySelector('.tm-text').value = smartTeamsDraft(t);
         slot.querySelector('.tm-copy').addEventListener('click', function () {
           var ta = slot.querySelector('.tm-text');
           if (!ta.value.trim()) { return; }
@@ -1048,7 +1120,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<p class="hint" style="margin-top:8px">Comments post to the task as you. If you’ve written a comment, Move and Mark complete post it first. Every button asks for a second tap — nothing changes on the first.</p>' +
       '<div class="wbmsg" aria-live="polite"></div></div>';
     wireDraftChips(slot);
-    slot.querySelector('.tw-text').value = voiceDrafts('task', '')[cat === 'Stuck' || cat === 'Not ticked off' ? 1 : 0].text;
+    slot.querySelector('.tw-text').value = smartTaskNote(x, cat);
     var text = slot.querySelector('.tw-text'), moveSel = slot.querySelector('.tw-move'),
         msg = slot.querySelector('.wbmsg'),
         cBtn = slot.querySelector('.tw-comment'), mBtn = slot.querySelector('.tw-movebtn'),
@@ -1157,6 +1229,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         TYPE_OPTS.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('') + '</select></label>'
       : '';
     slot.innerHTML = '<div class="workbench">' +
+      '<p class="hint wb-context" style="margin:0 0 8px">Reading the case…</p>' +
       '<textarea class="wb-text" placeholder="Write your response here — what was done, or what the requester should do next…"></textarea>' +
       draftChips('case', '') +
       '<div class="row"><label><input type="checkbox" class="wb-pub" checked> Visible to the requester on the case</label></div>' +
@@ -1170,7 +1243,28 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     wireDraftChips(slot);
     var text = slot.querySelector('.wb-text'), pub = slot.querySelector('.wb-pub'),
         reason = slot.querySelector('.wb-reason'), typeEl = slot.querySelector('.wb-type');
-    text.value = voiceDrafts('case', '')[caseDraftFor(cat)].text;
+    // Prefill from what we know now; refine once the case body arrives.
+    text.value = smartCaseDraft(r, cat, '', '');
+    var prefill = text.value;
+    var ctxEl = slot.querySelector('.wb-context');
+    live.mcp.callTool(live.sf, 'soqlQuery',
+      { q: "SELECT Description, SuppliedName, Contact.Name FROM Case WHERE Id = '" + cid + "'" },
+      { cache: { staleTime: 120000 } })
+      .then(function (v) {
+        var p = v.payload; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+        var rec = p && p.records && p.records[0];
+        if (!rec) { ctxEl.textContent = ''; return; }
+        var who = (rec.Contact && rec.Contact.Name) || rec.SuppliedName || '';
+        var first = firstNameOf(who);
+        var desc = (rec.Description || '').replace(/\s+/g, ' ').trim();
+        ctxEl.innerHTML = desc
+          ? '<b>' + esc(who || 'They') + ' wrote:</b> “' + esc(desc.slice(0, 260)) + (desc.length > 260 ? '…' : '') + '”'
+          : (who ? '<b>Requester:</b> ' + esc(who) : '');
+        if (text.value === prefill) {   // only replace if Mathew hasn't started editing
+          text.value = smartCaseDraft(r, cat, first, desc);
+          prefill = text.value;
+        }
+      }, function () { ctxEl.textContent = ''; });
     var
         msg = slot.querySelector('.wbmsg'),
         postBtn = slot.querySelector('.wb-post'), closeBtn = slot.querySelector('.wb-close');
