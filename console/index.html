@@ -668,6 +668,23 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     return 'Picked this up — I will come back with a firm date rather than an estimate.';
   }
 
+  // Hand a fully-packaged question to Claude: share sheet on phones (pick the
+  // Claude app), clipboard fallback elsewhere. The prompt asks for reply-text
+  // only, so the answer pastes straight back into the box.
+  var VOICE_BRIEF = 'Write it in Mathew Hema\'s voice: warm, direct, no corporate filler, clauses joined with "and", "X rather than Y" contrasts, commitments like "I will come back to you either way", sign off "Thanks". ';
+  function askClaude(prompt, btn) {
+    if (navigator.share) {
+      navigator.share({ text: prompt }).then(function () { flash(btn, 'Handed to Claude ✓'); })
+        .catch(function () { copyText(prompt, btn, 'Copied ✓ — paste into Claude'); });
+    } else {
+      copyText(prompt, btn, 'Copied ✓ — paste into Claude');
+    }
+  }
+  function askBtnHtml(cls) {
+    return '<button class="btn sm ghost ' + cls + '">Ask Claude to write it ↗</button>';
+  }
+  var ASK_HINT = 'Ask Claude opens your share sheet — pick the Claude app, it will answer with just the reply text, then paste that back in here.';
+
   function draftChips(kind, first) {
     return '<div class="row" style="margin-top:2px">Write it for me:' +
       voiceDrafts(kind, first).map(function (d, i) {
@@ -959,11 +976,17 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<div class="btnrow" style="margin-top:8px">' +
       '<button class="btn sm mw-draft">Save as Outlook draft</button>' +
       '<button class="btn sm danger mw-send">Send now</button>' +
+      askBtnHtml('mw-ask') +
       '<button class="btn sm ghost mw-cancel">Cancel</button></div>' +
-      '<p class="hint" style="margin-top:8px">“Save as Outlook draft” puts it in your Drafts to send from Outlook. “Send now” sends it as you, immediately, threaded on the original — it asks for a second tap first. Pick a draft above, then make it yours before sending.</p>' +
+      '<p class="hint" style="margin-top:8px">“Save as Outlook draft” puts it in your Drafts to send from Outlook. “Send now” sends it as you, immediately, threaded on the original — it asks for a second tap first. ' + ASK_HINT + '</p>' +
       '<div class="wbmsg" aria-live="polite"></div></div>';
     wireDraftChips(slot);
     slot.querySelector('.mw-text').value = smartEmailDraft(m, first);
+    slot.querySelector('.mw-ask').addEventListener('click', function () {
+      askClaude('Email from ' + m.sender + ', subject "' + (m.subject || '') + '". It says: "' +
+        (m.summary || '').replace(/[\r\n]+/g, ' ').slice(0, 1200) + '". Write my reply email. ' + VOICE_BRIEF +
+        'Reply with ONLY the email body text, no subject line.', slot.querySelector('.mw-ask'));
+    });
     var text = slot.querySelector('.mw-text'), msg = slot.querySelector('.wbmsg'),
         dBtn = slot.querySelector('.mw-draft'), sBtn = slot.querySelector('.mw-send');
     slot.querySelector('.mw-cancel').addEventListener('click', function () { slot.innerHTML = ''; wbOpen = false; renderQueue(); });
@@ -1056,10 +1079,16 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
           '<textarea class="tm-text" placeholder="Your reply…"></textarea>' +
           draftChips('teams', firstNameOf((t.from && t.from.displayName) || '')) +
           '<div class="btnrow" style="margin-top:8px"><button class="btn sm tm-copy">Copy the reply</button>' +
+          askBtnHtml('tm-ask') +
           '<button class="btn sm ghost tm-cancel">Cancel</button></div>' +
-          '<p class="hint" style="margin-top:8px">Teams doesn’t let this page send messages — copy your reply, then tap “Open the chat in Teams” and paste it. Two taps and it’s said.</p></div>';
+          '<p class="hint" style="margin-top:8px">Teams doesn’t let this page send messages — copy your reply, then tap “Open the chat in Teams” and paste it. ' + ASK_HINT + '</p></div>';
         wireDraftChips(slot);
         slot.querySelector('.tm-text').value = smartTeamsDraft(t);
+        slot.querySelector('.tm-ask').addEventListener('click', function () {
+          askClaude('Teams message from ' + ((t.from && t.from.displayName) || 'a colleague') + ': "' +
+            stripHtml(t.summary).slice(0, 800) + '". Write my short chat reply. ' + VOICE_BRIEF.replace('sign off "Thanks". ', 'no sign-off, it is a chat. ') +
+            'Reply with ONLY the message text.', slot.querySelector('.tm-ask'));
+        });
         slot.querySelector('.tm-copy').addEventListener('click', function () {
           var ta = slot.querySelector('.tm-text');
           if (!ta.value.trim()) { return; }
@@ -1116,11 +1145,17 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<button class="btn sm tw-comment">Post comment</button>' +
       '<button class="btn sm tw-movebtn">Move it</button>' +
       '<button class="btn sm danger tw-done">Mark complete</button>' +
+      askBtnHtml('tw-ask') +
       '<button class="btn sm ghost tw-cancel">Cancel</button></div>' +
-      '<p class="hint" style="margin-top:8px">Comments post to the task as you. If you’ve written a comment, Move and Mark complete post it first. Every button asks for a second tap — nothing changes on the first.</p>' +
+      '<p class="hint" style="margin-top:8px">Comments post to the task as you. If you’ve written a comment, Move and Mark complete post it first. Every write button asks for a second tap — nothing changes on the first. ' + ASK_HINT + '</p>' +
       '<div class="wbmsg" aria-live="polite"></div></div>';
     wireDraftChips(slot);
     slot.querySelector('.tw-text').value = smartTaskNote(x, cat);
+    slot.querySelector('.tw-ask').addEventListener('click', function () {
+      askClaude('Asana task "' + x.name + '" in the IT Operations Project Plan, section ' + x.section +
+        (x.assignee ? ', assigned to ' + x.assignee : '') + '. Write my comment for the task — a status update or the decision that moves it. ' +
+        VOICE_BRIEF.replace('sign off "Thanks". ', '') + 'Reply with ONLY the comment text.', slot.querySelector('.tw-ask'));
+    });
     var text = slot.querySelector('.tw-text'), moveSel = slot.querySelector('.tw-move'),
         msg = slot.querySelector('.wbmsg'),
         cBtn = slot.querySelector('.tw-comment'), mBtn = slot.querySelector('.tw-movebtn'),
@@ -1237,8 +1272,9 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<div class="btnrow" style="margin-top:4px">' +
       '<button class="btn sm wb-post">Post response only</button>' +
       '<button class="btn sm danger wb-close">Post &amp; close the case</button>' +
+      askBtnHtml('wb-ask') +
       '<button class="btn sm ghost wb-cancel">Cancel</button></div>' +
-      '<p class="hint" style="margin-top:8px">A case comment is not an email — the requester sees it on the case (and gets a notification only if case alerts are on). For an emailed reply, use Ask → Draft a reply. Every button asks you to tap twice — nothing is written on the first tap.</p>' +
+      '<p class="hint" style="margin-top:8px">A case comment is not an email — the requester sees it on the case (and gets a notification only if case alerts are on). For an emailed reply, use Ask → Draft a reply. Every write button asks you to tap twice — nothing is written on the first tap. ' + ASK_HINT + '</p>' +
       '<div class="wbmsg" aria-live="polite"></div></div>';
     wireDraftChips(slot);
     var text = slot.querySelector('.wb-text'), pub = slot.querySelector('.wb-pub'),
@@ -1246,7 +1282,17 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     // Prefill from what we know now; refine once the case body arrives.
     text.value = smartCaseDraft(r, cat, '', '');
     var prefill = text.value;
+    var fetched = { first: '', who: '', desc: '' };
     var ctxEl = slot.querySelector('.wb-context');
+    slot.querySelector('.wb-ask').addEventListener('click', function () {
+      var framing = cat === 'They replied' || cat === 'Time to decide' ? 'telling them it is resolved'
+        : cat === 'Give them a nudge' ? 'nudging them for an update' : 'acknowledging it and saying what happens next';
+      askClaude('Salesforce case ' + r.CaseNumber + ' "' + (r.Subject || '') + '" (status: ' + r.Status +
+        (fetched.who ? ', requester: ' + fetched.who : '') + ').' +
+        (fetched.desc ? ' They wrote: "' + fetched.desc.slice(0, 1200) + '".' : '') +
+        ' Write the response to post on this case, ' + framing + '. ' + VOICE_BRIEF +
+        'Reply with ONLY the response text.', slot.querySelector('.wb-ask'));
+    });
     live.mcp.callTool(live.sf, 'soqlQuery',
       { q: "SELECT Description, SuppliedName, Contact.Name FROM Case WHERE Id = '" + cid + "'" },
       { cache: { staleTime: 120000 } })
@@ -1257,6 +1303,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         var who = (rec.Contact && rec.Contact.Name) || rec.SuppliedName || '';
         var first = firstNameOf(who);
         var desc = (rec.Description || '').replace(/\s+/g, ' ').trim();
+        fetched.first = first; fetched.who = who; fetched.desc = desc;
         ctxEl.innerHTML = desc
           ? '<b>' + esc(who || 'They') + ' wrote:</b> “' + esc(desc.slice(0, 260)) + (desc.length > 260 ? '…' : '') + '”'
           : (who ? '<b>Requester:</b> ' + esc(who) : '');
