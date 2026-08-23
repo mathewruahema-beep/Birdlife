@@ -1,7 +1,17 @@
-# BirdLife ICT Operations Dashboard
+# BirdLife AI ICT Assistant & Operations Dashboard
 
-Reporting and data-flow monitoring for the **Ask Zeus** ICT helpdesk queue (Salesforce)
-and the **IT Operations Project Plan** (Asana).
+This repository is two things:
+
+1. **The AI ICT Assistant** — open a Claude session on this repo from anywhere
+   (phone, browser, desktop) and it becomes BirdLife's ICT assistant: it triages
+   and works the Ask Zeus queue, progresses the Asana board, drafts requester
+   replies, and prepares admin fixes, using the operator knowledge versioned in
+   `.claude/skills/`. **Start here → [`docs/using-the-assistant.md`](docs/using-the-assistant.md)**
+   for access channels, the prompt playbook, and what it can execute vs prepare.
+   The assistant's charter and guardrails are in [`CLAUDE.md`](CLAUDE.md).
+
+2. **Reporting and data-flow monitoring** for the **Ask Zeus** ICT helpdesk queue
+   (Salesforce) and the **IT Operations Project Plan** (Asana) — everything below.
 
 | | |
 |---|---|
@@ -276,6 +286,11 @@ They have been redacted from the backup in this repo, but:
 ## Repository layout
 
 ```
+CLAUDE.md                            the AI ICT Assistant charter — loads into every session on this repo
+console/index.html                   the ICT Console — interactive prompt builder, runbook generator, quick reference
+                                     (published at https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e)
+.claude/skills/                      the nine birdlife-* operator-knowledge skills (versioned)
+docs/using-the-assistant.md          remote access channels + prompt playbook
 README.md                            findings, admin runbook, routine consolidation
 dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
