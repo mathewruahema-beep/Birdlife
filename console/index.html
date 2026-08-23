@@ -1016,8 +1016,17 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       return live.mcp.callTool(live.m365, 'outlook_create_reply_draft',
         { messageId: id, body: text.value.trim(), bodyType: 'text' })
         .then(function (res) {
-          var p = res.payload; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
-          if (!p || !p.id) { var items = blockItems(res); p = items[0] || null; }
+          // Observed live: this tool answers in plain text ("id: … webLink: …"),
+          // not JSON — parse both forms.
+          var raw = typeof res.payload === 'string' ? res.payload : '';
+          if (!raw && res.content && res.content[0] && res.content[0].text) raw = res.content[0].text;
+          var p = (res.payload && typeof res.payload === 'object') ? res.payload : null;
+          if (!p) { try { p = JSON.parse(raw); } catch (e) { p = null; } }
+          if (!p || !p.id) {
+            var mId = raw.match(/\bid:\s*([A-Za-z0-9+\/=_-]+)/);
+            var mW = raw.match(/webLink:\s*(\S+)/);
+            if (mId) p = { id: mId[1], webLink: mW ? mW[1] : null };
+          }
           return p;
         });
     }

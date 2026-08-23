@@ -20,7 +20,10 @@ It also shows recent Inbox mail from real people (reply in Mathew's voice — sa
 an Outlook draft or send, threaded on the original) and recent Teams messages
 (reply drafted to copy + a deep link into the chat; Teams has no send API).
 Every reply surface offers voice drafts from the email-voice profile to pick,
-edit, and execute. The
+edit, and execute, plus an "Ask Claude to write it" hand-off with the full
+context packaged. Voice works too: 🔊 Brief speaks the live summary aloud, and
+the 🎙 mic takes commands — "read the briefing", "show stuck tasks", "show
+unread emails", "open case 139005", "show everything". The
 Ask tab composes exact prompts for a Claude session; Runbooks generates the full
 offboarding PowerShell sequence from a name and UPN; Reference carries close
 reasons, Asana section gids, and the scoped SOQL. Source lives at `console/index.html` in this repo — tell any
