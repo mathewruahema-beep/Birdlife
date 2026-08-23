@@ -1,12 +1,12 @@
 # Routine: ICT overnight pre-draft (approve-first)
 
-**Status: ready to create — not yet live.** Creating scheduled routines was denied
-from the remote build session's permission mode (2026-08-23), so this is the
-complete definition. To make it live, either tell any interactive assistant
-session "create the overnight pre-draft routine from routines/overnight-pre-draft.md",
-or create it at claude.ai → Routines with the settings below. Attach the
-**Salesforce Production** connector to it (same one-time step as the dashboard
-routine) and turn on the push notification.
+**Status: CREATED 2026-08-23** — `trig_01EbMkfD4UcGUKLkUB1mNQ8V`, weekdays 5:30am
+AEST, fresh session per run. **One step outstanding:** attach the **Salesforce
+Production** connector to it at claude.ai → Routines (the API cannot store
+connector grants from this session — same one-time step as the dashboard
+routine), and optionally turn on the push notification there. Until the
+connector is attached, each run will report "Salesforce connector not
+available" and stop safely.
 
 | Setting | Value |
 |---|---|
