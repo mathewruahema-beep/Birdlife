@@ -68,6 +68,12 @@
 
   /* ---- queue tab ---- */
   .livebar { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .voicebtn {
+    flex: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 99px; font: 600 12.5px "Source Sans 3", sans-serif; padding: 4px 11px; cursor: pointer;
+  }
+  .voicebtn:hover { border-color: var(--euc); }
+  .voicebtn[aria-pressed="true"] { background: var(--euc); border-color: var(--euc); color: var(--btn-ink); }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--slate); flex: none; }
   .dot.live { background: var(--euc); }
   .dot.err { background: var(--red); }
@@ -225,7 +231,12 @@
 
   <!-- ============ TODAY (live) ============ -->
   <section class="panel" id="panel-queue">
-    <div class="livebar"><span class="dot" id="live-dot"></span><span id="live-status">Connecting to live data…</span></div>
+    <div class="livebar"><span class="dot" id="live-dot"></span><span id="live-status">Connecting to live data…</span>
+      <span style="flex:1"></span>
+      <button class="voicebtn" id="speak-btn" hidden aria-label="Read me the briefing">🔊 Brief</button>
+      <button class="voicebtn" id="mic-btn" hidden aria-label="Voice command">🎙 Voice</button>
+    </div>
+    <div class="hint" id="voice-status" style="margin:-6px 0 10px" hidden></div>
     <div class="tiles" id="tiles"></div>
     <div class="filterbar" id="filterbar" hidden></div>
     <div id="next-area"></div>
@@ -1506,6 +1517,132 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         renderQueue();
       }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
   }
+
+  // ============================================================
+  // VOICE — command mic + spoken briefing (browser speech engine)
+  // ============================================================
+  function parseVoiceCommand(s) {
+    s = (s || '').toLowerCase();
+    var m = s.match(/case\s*(?:number\s*)?([\d\s]{3,})/);
+    if (m) return { action: 'opencase', arg: m[1].replace(/\D/g, '') };
+    if (/\b(brief|briefing|read|summary|morning)\b|what.s (happening|new|waiting)/.test(s)) return { action: 'brief' };
+    if (/stuck|blocked/.test(s)) return { action: 'board', arg: 'blocked' };
+    if (/past due|overdue|late task/.test(s)) return { action: 'board', arg: 'overdue' };
+    if (/unread/.test(s)) return { action: 'mail-unread' };
+    if (/inbox|mail|email/.test(s)) return { action: 'go', arg: 'mail-area' };
+    if (/teams|chat/.test(s)) return { action: 'go', arg: 'teams-area' };
+    if (/board|project|task/.test(s)) return { action: 'go', arg: 'asana-area' };
+    if (/no owner|unassigned|intake/.test(s)) return { action: 'case', arg: 'unassigned' };
+    if (/just arrived|new case|arrived/.test(s)) return { action: 'case', arg: 'neu' };
+    if (/over a month|month old|aging|ageing|oldest/.test(s)) return { action: 'case', arg: 'old' };
+    if (/show (everything|all)|clear|reset/.test(s)) return { action: 'clear' };
+    if (/queue|cases|salesforce/.test(s)) return { action: 'go', arg: 'sf-area' };
+    return null;
+  }
+
+  function briefText() {
+    var bits = [];
+    if (sfState.data) {
+      var recs = sfState.data.records || [], now = Date.now();
+      var zeus = recs.filter(function (r) { return r.Owner && r.Owner.Name === 'Zeus'; }).length;
+      var old = recs.filter(function (r) { return daysAgo(r.CreatedDate, now) > 30; }).length;
+      bits.push(recs.length + ' open case' + (recs.length === 1 ? '' : 's') +
+        (zeus ? ', ' + zeus + ' waiting for an owner' : '') +
+        (old ? ', ' + old + ' older than a month' : ''));
+    }
+    if (asState.data) {
+      var bt = asState.data.filter(function (x) { return x.section !== 'Backlog/Requests'; });
+      var blocked = bt.filter(function (x) { return x.section === 'Blocked'; }).length;
+      if (blocked) bits.push(blocked + ' project task' + (blocked === 1 ? '' : 's') + ' stuck');
+    }
+    if (mailState.data) {
+      var unread = peopleMail().filter(function (m) { return !m.isRead; }).length;
+      if (unread) bits.push(unread + ' unread email' + (unread === 1 ? '' : 's') + ' from real people');
+    }
+    if (teamsState.data) {
+      var chats = teamsChats().length;
+      if (chats) bits.push(chats + ' recent Teams chat' + (chats === 1 ? '' : 's'));
+    }
+    if (!bits.length) return 'Live data has not loaded yet.';
+    var text = 'You have ' + bits.join('; ') + '.';
+    var firstNext = document.querySelector('#next-area details summary .ttl');
+    var firstCat = document.querySelector('#next-area details summary .chip');
+    if (firstNext && firstCat) text += ' Top of the list: ' + firstCat.textContent + ' — ' + firstNext.textContent + '.';
+    return text;
+  }
+
+  function speak(text) {
+    if (!('speechSynthesis' in window)) return false;
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      var voices = speechSynthesis.getVoices() || [];
+      var v = voices.find(function (x) { return /en[-_]AU/i.test(x.lang); }) ||
+              voices.find(function (x) { return /en[-_]GB/i.test(x.lang); });
+      if (v) u.voice = v;
+      u.rate = 1;
+      speechSynthesis.speak(u);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function execVoice(cmd) {
+    if (!cmd) return 'Didn’t catch that — try “read the briefing”, “show stuck tasks”, or “open case 139005”.';
+    if (cmd.action === 'brief') { var t = briefText(); speak(t); return t; }
+    if (cmd.action === 'go') { goTo(cmd.arg); return 'Here you go.'; }
+    if (cmd.action === 'clear') { caseFilter = 'all'; boardFilter = 'all'; mailFilter = 'all'; renderQueue(); return 'Showing everything.'; }
+    if (cmd.action === 'case') { caseFilter = cmd.arg; renderQueue(); goTo('sf-area'); return 'Filtered the queue.'; }
+    if (cmd.action === 'board') { boardFilter = cmd.arg; renderQueue(); goTo('asana-area'); return 'Filtered the board.'; }
+    if (cmd.action === 'mail-unread') { mailFilter = 'unread'; renderQueue(); goTo('mail-area'); return 'Unread mail only.'; }
+    if (cmd.action === 'opencase') {
+      var want = cmd.arg.replace(/^0+/, '');
+      var hit = null;
+      document.querySelectorAll('#sf-area .caseitem, #next-area details').forEach(function (el) {
+        var ttl = el.querySelector('.ttl');
+        if (!hit && ttl && ttl.textContent.replace(/^0+/, '').indexOf(want) === 0) hit = el;
+      });
+      if (hit) { hit.open = true; hit.scrollIntoView({ behavior: 'smooth', block: 'start' }); return 'Opened it.'; }
+      return 'No open case matching ' + cmd.arg + ' on the board.';
+    }
+    return null;
+  }
+  // expose for automated tests
+  window.__voice = { parse: parseVoiceCommand, exec: execVoice, brief: briefText };
+
+  (function initVoice() {
+    var micBtn = document.getElementById('mic-btn');
+    var speakBtn = document.getElementById('speak-btn');
+    var vStatus = document.getElementById('voice-status');
+    function say(msg) { vStatus.hidden = false; vStatus.textContent = msg; }
+    if ('speechSynthesis' in window) {
+      speakBtn.hidden = false;
+      speakBtn.addEventListener('click', function () { var t = briefText(); say(t); speak(t); });
+    }
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) {
+      micBtn.hidden = false;
+      var rec = null;
+      micBtn.addEventListener('click', function () {
+        if (rec) { try { rec.stop(); } catch (e) {} rec = null; micBtn.setAttribute('aria-pressed', 'false'); return; }
+        rec = new SR();
+        rec.lang = 'en-AU'; rec.interimResults = false; rec.maxAlternatives = 1;
+        micBtn.setAttribute('aria-pressed', 'true');
+        say('Listening… try “read the briefing” or “show stuck tasks”.');
+        rec.onresult = function (ev) {
+          var heard = ev.results[0][0].transcript;
+          var out = execVoice(parseVoiceCommand(heard));
+          say('“' + heard + '” — ' + out);
+        };
+        rec.onerror = function (ev) {
+          say(ev.error === 'not-allowed'
+            ? 'Microphone blocked — allow it for this site in your browser settings.'
+            : 'Didn’t catch that — tap the mic and try again.');
+        };
+        rec.onend = function () { micBtn.setAttribute('aria-pressed', 'false'); rec = null; };
+        try { rec.start(); } catch (e) { say('Voice input is not available in this browser.'); }
+      });
+    }
+  })();
 
   // ============================================================
   // ASK — request builder
