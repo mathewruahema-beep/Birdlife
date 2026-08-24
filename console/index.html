@@ -212,7 +212,59 @@
   ul.tight { margin: 8px 0; padding-left: 20px; font-size: 14.5px; }
   ul.tight li { margin-bottom: 4px; }
   .panel[hidden] { display: none; }
+
+  /* ---- boot sequence (deliberately single-theme: a dark HUD) ---- */
+  #boot {
+    position: fixed; inset: 0; z-index: 99;
+    background: #0a1512;
+    color: #9fe8d2;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 22px; cursor: pointer;
+    font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+    transition: opacity .5s ease;
+  }
+  #boot.done { opacity: 0; pointer-events: none; }
+  .boot-rings { position: relative; width: 150px; height: 150px; }
+  .ring { position: absolute; border-radius: 50%; border: 1.5px solid transparent; }
+  .r1 { inset: 0; border-top-color: #6fc2ab; border-right-color: #6fc2ab44; animation: spin 2.2s linear infinite; }
+  .r2 { inset: 16px; border-bottom-color: #4a9c86; border-left-color: #4a9c8644; animation: spin 1.6s linear infinite reverse; }
+  .r3 { inset: 34px; border-top-color: #2e6e5e; border-left-color: #2e6e5e55; animation: spin 3s linear infinite; }
+  .boot-core {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 40px; animation: corepulse 2s ease-in-out infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes corepulse { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
+  .boot-greet {
+    font-family: "Fraunces", Georgia, serif; font-size: clamp(20px, 5.5vw, 28px);
+    color: #e6f4ee; letter-spacing: .01em; min-height: 1.3em;
+  }
+  .boot-lines { display: flex; flex-direction: column; gap: 7px; font-size: 13px; min-height: 96px; width: min(320px, 82vw); }
+  .boot-line { display: flex; gap: 10px; opacity: 0; animation: lineon .35s ease forwards; }
+  .boot-line .st { flex: none; width: 1.2em; color: #55806f; }
+  .boot-line.ok .st { color: #6fc2ab; }
+  .boot-line.bad .st { color: #e08a7c; }
+  .boot-line .lbl { flex: 1; color: #7fae9c; }
+  .boot-line.ok .lbl { color: #cfeade; }
+  @keyframes lineon { to { opacity: 1; } }
+  .boot-skip { position: absolute; bottom: 26px; font-size: 11px; color: #55806f; letter-spacing: .08em; text-transform: uppercase; }
+  @media (prefers-reduced-motion: reduce) {
+    .ring, .boot-core { animation: none; }
+    .boot-line { animation-duration: .01s; }
+  }
 </style>
+
+<div id="boot" aria-hidden="true">
+  <div class="boot-rings">
+    <div class="ring r1"></div>
+    <div class="ring r2"></div>
+    <div class="ring r3"></div>
+    <div class="boot-core">🪶</div>
+  </div>
+  <div class="boot-greet" id="boot-greet"></div>
+  <div class="boot-lines" id="boot-lines"></div>
+  <div class="boot-skip">tap anywhere to skip</div>
+</div>
 
 <div class="wrap">
   <header>
@@ -383,6 +435,56 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
 </div>
 
 <script>
+  // ---------- boot sequence ----------
+  (function initBoot() {
+    var boot = document.getElementById('boot');
+    var greetEl = document.getElementById('boot-greet');
+    var linesEl = document.getElementById('boot-lines');
+    var h = new Date().getHours();
+    greetEl.textContent = (h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening') + ', Mathew.';
+    var feeds = [
+      { key: 'sf', lbl: 'Salesforce — Ask Zeus queue', ready: function () { return sfState.data && (sfState.data.records || []).length + ' open cases'; }, err: function () { return sfState.error; } },
+      { key: 'as', lbl: 'Asana — IT Operations board', ready: function () { return asState.data && 'board loaded'; }, err: function () { return asState.error; } },
+      { key: 'ml', lbl: 'Outlook — inbox', ready: function () { if (!mailState.data) return null; var u = peopleMail().filter(function (m) { return !m.isRead; }).length; return u + ' unread'; }, err: function () { return mailState.error; } },
+      { key: 'tm', lbl: 'Teams — chats', ready: function () { return teamsState.data && teamsChats().length + ' recent'; }, err: function () { return teamsState.error; } }
+    ];
+    linesEl.innerHTML = feeds.map(function (f, i) {
+      return '<div class="boot-line" style="animation-delay:' + (0.25 + i * 0.22) + 's" id="bl-' + f.key + '">' +
+        '<span class="st">·</span><span class="lbl">' + esc(f.lbl) + '</span></div>';
+    }).join('');
+    var t0 = Date.now();
+    function dismiss() {
+      if (boot.classList.contains('done')) return;
+      boot.classList.add('done');
+      setTimeout(function () { boot.remove(); }, 550);
+      clearInterval(iv);
+    }
+    boot.addEventListener('click', dismiss);
+    var iv = setInterval(function () {
+      var allSettled = true;
+      feeds.forEach(function (f) {
+        var el = document.getElementById('bl-' + f.key);
+        if (!el || el.classList.contains('ok') || el.classList.contains('bad')) return;
+        var r = f.ready();
+        if (r) {
+          el.classList.add('ok');
+          el.querySelector('.st').textContent = '✓';
+          el.querySelector('.lbl').textContent = f.lbl + ' · ' + r;
+        } else if (f.err()) {
+          el.classList.add('bad');
+          el.querySelector('.st').textContent = '✕';
+        } else { allSettled = false; }
+      });
+      // offline copy (no live runtime): settle fast
+      if (!window.claude || typeof window.claude.use !== 'function') {
+        if (Date.now() - t0 > 1200) dismiss();
+        return;
+      }
+      if (allSettled && Date.now() - t0 > 2200) dismiss();   // let the moment land
+      if (Date.now() - t0 > 4500) dismiss();                  // never hold him hostage
+    }, 150);
+  })();
+
   // ---------- tabs ----------
   var tabs = document.querySelectorAll('nav [role="tab"]');
   tabs.forEach(function (t) {
