@@ -92,6 +92,8 @@
     flex: none; border: none; background: none; cursor: pointer; font-size: 16px;
     padding: 0 2px; line-height: 1.3;
   }
+  .secbrief { font-size: 14px; color: var(--muted); margin: -4px 0 12px; max-width: 62ch; }
+  .whereat { font-size: 13px; font-weight: 600; color: var(--euc-ink); margin: 0 0 6px; }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--slate); flex: none; }
   .dot.live { background: var(--euc); }
   .dot.err { background: var(--red); }
@@ -670,6 +672,73 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       prompt: 'Summarise case ' + r.CaseNumber + ' ("' + (r.Subject || '') + '") and how to resolve it' };
   }
 
+  // ---- "where it's at" one-liners: the story of each item and section ----
+  function caseBrief(r, now) {
+    var age = daysAgo(r.CreatedDate, now);
+    var quiet = r.LastModifiedDate ? daysAgo(r.LastModifiedDate, now) : age;
+    var who = (r.Owner && r.Owner.Name) || '';
+    var story;
+    if (r.Status === 'Waiting Response-External') story = 'waiting on the requester for ' + quiet + 'd';
+    else if (r.Status === 'Response Received') story = 'they replied ' + (quiet ? quiet + 'd ago' : 'today') + ' — ball is with us';
+    else if (r.Status === 'New') story = age >= 1 ? 'untouched since it arrived ' + age + 'd ago' : 'just arrived';
+    else if (r.Status === 'In Progress') story = 'being worked on, last touched ' + (quiet ? quiet + 'd ago' : 'today');
+    else story = 'parked (' + r.Status + ')';
+    return 'Open ' + age + 'd · ' + (who === 'Zeus' ? 'no owner yet' : 'with ' + who) + ' · ' + story + (r.Type ? '' : ' · no type set');
+  }
+  function taskBrief(x, today) {
+    var due = x.due_on
+      ? (x.due_on < today ? 'due ' + x.due_on + ' — overdue' : 'due ' + x.due_on)
+      : 'no due date';
+    return (SECTION_PLAIN[x.section] || x.section) + ' · ' + (x.assignee ? 'with ' + x.assignee : 'no owner') + ' · ' + due;
+  }
+  function queueBrief(recs, now) {
+    if (!recs.length) return 'The queue is empty.';
+    var owners = {}, wait = 0, work = 0, neu = 0, replied = 0, old = 0;
+    recs.forEach(function (r) {
+      var o = (r.Owner && r.Owner.Name) || '?';
+      owners[o] = (owners[o] || 0) + 1;
+      if (r.Status === 'Waiting Response-External') wait++;
+      else if (r.Status === 'Response Received') replied++;
+      else if (r.Status === 'New') neu++;
+      else if (r.Status === 'In Progress') work++;
+      if (daysAgo(r.CreatedDate, now) > 30) old++;
+    });
+    var ownerBits = Object.keys(owners).sort(function (a, b) { return owners[b] - owners[a]; })
+      .map(function (o) { return (o === 'Zeus' ? 'unassigned' : o.split(' ')[0]) + ' ' + owners[o]; }).join(', ');
+    var bits = [];
+    if (replied) bits.push(replied + ' with a reply waiting on us');
+    if (neu) bits.push(neu + ' brand new');
+    if (work) bits.push(work + ' being worked');
+    if (wait) bits.push(wait + ' waiting on requesters');
+    if (old) bits.push(old + ' over a month old');
+    return recs.length + ' open — ' + ownerBits + '. ' + bits.join(', ') + '.';
+  }
+  function boardBrief(bySec, today, backlogN) {
+    var bits = [], total = 0, overdue = 0;
+    SECTION_ORDER.forEach(function (s) {
+      if (!bySec[s] || s === 'Past due') return;
+      total += bySec[s].length;
+      bySec[s].forEach(function (x) { if (x.due_on && x.due_on < today) overdue++; });
+      bits.push(bySec[s].length + ' ' + (SECTION_PLAIN[s] || s).toLowerCase());
+    });
+    if (!total) return 'Nothing on the board outside the backlog.';
+    return total + ' in flight — ' + bits.join(', ') + (overdue ? '; ' + overdue + ' past due' : '') +
+      '. Backlog tucked away (' + backlogN + ').';
+  }
+  function inboxBrief(people) {
+    if (!people.length) return 'Nothing from real people in the last three days.';
+    var unread = people.filter(function (m) { return !m.isRead; });
+    var names = unread.slice(0, 3).map(function (m) { return firstNameOf(m.sender); }).join(', ');
+    return people.length + ' recent from real people' +
+      (unread.length ? ' — ' + unread.length + ' unread (' + names + (unread.length > 3 ? '…' : '') + ') waiting on you.' : ' — all read.');
+  }
+  function teamsSecBrief(msgs) {
+    if (!msgs.length) return 'No recent Teams messages from others.';
+    var newest = msgs[0];
+    return msgs.length + ' chat' + (msgs.length === 1 ? '' : 's') + ' — newest from ' +
+      ((newest.from && newest.from.displayName) || 'someone') + '.';
+  }
+
   // Plain-English advice for a project task, by where it sits.
   function adviceForTask(x, today) {
     var who = x.assignee ? ' (with ' + x.assignee + ')' : '';
@@ -851,8 +920,9 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   }
   function stripHtml(s) { var d = document.createElement('div'); d.innerHTML = s || ''; return (d.textContent || '').replace(/\s+/g, ' ').trim(); }
 
-  function planHtml(a, extra, caseId, taskId) {
+  function planHtml(a, extra, caseId, taskId, whereAt) {
     return '<div class="plan">' +
+      (whereAt ? '<p class="whereat">' + esc(whereAt) + '</p>' : '') +
       (a.why ? '<p class="why-full">' + esc(a.why) + ' ' + esc(a.action || '') + '</p>'
              : '<p class="why-full">' + esc(a.action || '') + '</p>') +
       '<div class="preview">' + esc(a.prompt) + '</div>' +
@@ -931,6 +1001,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         var cid = (r.attributes && r.attributes.url || '').split('/').pop();
         caseIndex[cid] = r;
         if (a) items.push({ p: a.p, cls: a.cls, cat: a.cat, title: r.CaseNumber + ' · ' + (r.Subject || ''), a: a, cid: cid,
+          where: caseBrief(r, now),
           link: '<a class="btn sm ghost" target="_blank" rel="noopener" href="https://birdlifeaustralia.lightning.force.com/lightning/r/Case/' + esc(cid) + '/view">Open in Salesforce ↗</a>' });
       });
       var today = new Date(now).toISOString().slice(0, 10);
@@ -939,6 +1010,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         taskIndex[x.gid] = x;
         var ta = adviceForTask(x, today);
         if (ta.p <= 8) items.push({ p: ta.p, cls: ta.cls, cat: ta.cat, title: x.name, a: ta, tid: x.gid,
+          where: taskBrief(x, today),
           link: '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(x.url) + '">Open in Asana ↗</a>' });
       });
       items.sort(function (a, b) { return a.p - b.p; });
@@ -946,7 +1018,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       nextArea.innerHTML = (top.length ? '<h2 style="margin-top:4px">What to do next</h2>' : '') +
         top.map(function (it) {
           return '<details class="next"><summary><span class="chip ' + it.cls + '">' + esc(it.cat) + '</span>' +
-            '<span class="ttl">' + esc(it.title) + '</span></summary>' + planHtml(it.a, it.link, it.cid, it.tid) + '</details>';
+            '<span class="ttl">' + esc(it.title) + '</span></summary>' + planHtml(it.a, it.link, it.cid, it.tid, it.where) + '</details>';
         }).join('') +
         (items.length > top.length ? '<p class="hint">…and ' + (items.length - top.length) + ' more further down the list.</p>' : '');
       wireCopyPlans(nextArea);
@@ -970,7 +1042,8 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       var order = Object.keys(groups).sort(function (a, b) {
         if (a === 'Zeus') return -1; if (b === 'Zeus') return 1; return a.localeCompare(b);
       });
-      sfArea.innerHTML = '<h2>The queue — who has what</h2>' + (order.length ? order.map(function (o) {
+      sfArea.innerHTML = '<h2>The queue — who has what</h2>' +
+        '<p class="secbrief">' + esc(queueBrief(recs, now)) + '</p>' + (order.length ? order.map(function (o) {
         var rows = groups[o].map(function (r) {
           var id = (r.attributes && r.attributes.url || '').split('/').pop();
           caseIndex[id] = r;
@@ -981,7 +1054,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
             '<span class="ttl">' + esc(r.CaseNumber) + ' <span class="sub">· ' + esc(r.Subject) + '</span></span>' +
             '<span class="badge ' + statusClass(r.Status) + '">' + esc(PLAIN_STATUS[r.Status] || r.Status) + '</span>' +
             '<span class="age' + (age > 30 ? ' old' : '') + '">' + age + 'd</span>' +
-            '</summary>' + planHtml(a, link, id) + '</details>';
+            '</summary>' + planHtml(a, link, id, null, caseBrief(r, now)) + '</details>';
         }).join('');
         var head = o === 'Zeus' ? 'Nobody’s yet — the intake queue (' + groups[o].length + ')' : esc(o) + ' (' + groups[o].length + ')';
         return '<div class="grp"><h3>' + head + '</h3>' + rows + '</div>';
@@ -1020,7 +1093,8 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         if (SECTION_ORDER.indexOf('Past due') < 0) SECTION_ORDER.unshift('Past due');
         boardBar = '<p class="filterbar" style="margin:0 0 10px">Showing only <b>past-due</b> tasks — <button id="boardclear">show the whole board</button></p>';
       }
-      asanaArea.innerHTML = boardBar;
+      asanaArea.innerHTML = boardBar +
+        '<p class="secbrief">' + esc(boardBrief(bySec, todayStr, backlogN)) + '</p>';
       asanaArea.innerHTML += SECTION_ORDER.filter(function (s) { return bySec[s]; }).map(function (s) {
         var rows = bySec[s].map(function (x) {
           var a = adviceForTask(x, todayStr);
@@ -1031,7 +1105,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
             '<span class="age">' + esc(x.assignee || 'No owner') + '</span>' + dueBadge +
             '</summary>' + planHtml(a,
               '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(x.url) + '">Open in Asana ↗</a>',
-              null, x.gid) + '</details>';
+              null, x.gid, taskBrief(x, todayStr)) + '</details>';
         }).join('');
         return '<div class="grp"><h3>' + esc(SECTION_PLAIN[s] || s) + ' (' + bySec[s].length + ')</h3>' + rows + '</div>';
       }).join('') || '<div class="secterr">' + (boardFilter !== 'all' ? 'Nothing matches this filter.' : 'Nothing on the board outside the backlog.') + '</div>';
@@ -1089,7 +1163,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       if (mc0) mc0.addEventListener('click', function () { mailFilter = 'all'; renderQueue(); });
       return;
     }
-    mailArea.innerHTML = mailBar + people.map(function (m) {
+    mailArea.innerHTML = '<p class="secbrief">' + esc(inboxBrief(peopleMail())) + '</p>' + mailBar + people.map(function (m) {
       mailIndex[m.id] = m;
       var first = firstNameOf(m.sender);
       var when = m.receivedDateTime ? new Date(m.receivedDateTime).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '';
@@ -1098,7 +1172,9 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         '<span class="ttl">' + esc(first) + ' <span class="sub">· ' + esc(m.subject || '(no subject)') + '</span></span>' +
         (m.isRead ? '' : '<span class="badge s-New">Unread</span>') +
         '<span class="age">' + esc(when) + '</span></summary>' +
-        '<div class="plan"><p class="why-full">' + esc(snippet) + '…</p>' +
+        '<div class="plan">' +
+        '<p class="whereat">From ' + esc(m.sender) + ' · ' + esc(when) + ' · ' + (m.isRead ? 'read' : 'unread — waiting on you') + '</p>' +
+        '<p class="why-full">' + esc(snippet) + '…</p>' +
         '<div class="preview">Draft a reply to ' + esc(m.sender) + ' about "' + esc(m.subject || '') + '" — key points: [what you want to say]</div>' +
         '<div class="btnrow" style="margin-top:0">' +
         '<button class="btn sm copyplan">Copy &amp; ask Claude</button>' +
@@ -1208,7 +1284,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     if (!teamsState.data) { teamsArea.innerHTML = '<div class="secterr">Waiting for Teams…</div>'; return; }
     var msgs = teamsChats().slice(0, 6);
     if (!msgs.length) { teamsArea.innerHTML = '<div class="secterr">No recent Teams messages from others.</div>'; return; }
-    teamsArea.innerHTML = msgs.map(function (t) {
+    teamsArea.innerHTML = '<p class="secbrief">' + esc(teamsSecBrief(msgs)) + '</p>' + msgs.map(function (t) {
       teamsIndex[t.id] = t;
       var who = (t.from && t.from.displayName) || 'Someone';
       var snippet = stripHtml(t.summary).slice(0, 160);
@@ -1217,7 +1293,9 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       return '<details class="caseitem"><summary>' +
         '<span class="ttl">' + esc(who) + ' <span class="sub">· ' + esc(snippet.slice(0, 60)) + '…</span></span>' +
         '<span class="age">' + esc(when) + '</span></summary>' +
-        '<div class="plan"><p class="why-full">“' + esc(snippet) + '…”</p>' +
+        '<div class="plan">' +
+        '<p class="whereat">From ' + esc(who) + ' · ' + esc(when) + ' · reply goes back in Teams</p>' +
+        '<p class="why-full">“' + esc(snippet) + '…”</p>' +
         '<div class="wbslot"></div>' +
         '<div class="btnrow" style="margin-top:0">' +
         '<button class="btn sm teamsbtn" data-id="' + esc(t.id) + '">Write a reply…</button>' +
