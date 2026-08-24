@@ -74,6 +74,24 @@
   }
   .voicebtn:hover { border-color: var(--euc); }
   .voicebtn[aria-pressed="true"] { background: var(--euc); border-color: var(--euc); color: var(--btn-ink); }
+  .cmdrow { display: flex; gap: 8px; margin: 0 0 14px; }
+  .cmdrow input {
+    flex: 1; min-width: 0; background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 99px; padding: 8px 14px;
+    font: 400 14.5px "Source Sans 3", sans-serif;
+  }
+  .cmdrow input:focus { outline: 2px solid var(--euc); outline-offset: 1px; }
+  #brief-bar {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: var(--euc-soft); border: 1px solid var(--line); border-radius: 10px;
+    padding: 11px 14px; margin: 14px 0 -6px; font-size: 14.5px; line-height: 1.45;
+  }
+  #brief-bar[hidden] { display: none; }
+  #brief-text { flex: 1; }
+  #brief-speak {
+    flex: none; border: none; background: none; cursor: pointer; font-size: 16px;
+    padding: 0 2px; line-height: 1.3;
+  }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--slate); flex: none; }
   .dot.live { background: var(--euc); }
   .dot.err { background: var(--red); }
@@ -274,6 +292,11 @@
     and the words to make it happen. Tap anything to dig in.</p>
   </header>
 
+  <div id="brief-bar" hidden>
+    <span id="brief-text"></span>
+    <button id="brief-speak" aria-label="Read this aloud">🔊</button>
+  </div>
+
   <nav role="tablist" aria-label="Console sections">
     <button role="tab" aria-selected="true" data-panel="queue">Today</button>
     <button role="tab" aria-selected="false" data-panel="launch">Ask</button>
@@ -289,6 +312,10 @@
       <button class="voicebtn" id="mic-btn" hidden aria-label="Voice command">🎙 Voice</button>
     </div>
     <div class="hint" id="voice-status" style="margin:-6px 0 10px" hidden></div>
+    <div class="cmdrow" id="cmd-row">
+      <input id="cmd-input" autocomplete="off" placeholder="Ask by typing — or tap the 🎤 on your keyboard">
+      <button class="btn sm" id="cmd-go">Go</button>
+    </div>
     <div class="tiles" id="tiles"></div>
     <div class="filterbar" id="filterbar" hidden></div>
     <div id="next-area"></div>
@@ -1024,6 +1051,13 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     renderMailArea(now);
     renderTeamsArea();
 
+    // ---- the always-visible briefing bar ----
+    if (sfState.data || asState.data || mailState.data || teamsState.data) {
+      var bb = document.getElementById('brief-bar');
+      bb.hidden = false;
+      document.getElementById('brief-text').textContent = briefText();
+    }
+
     // ---- status line ----
     var errs = [sfState.error, asState.error].filter(Boolean);
     if (recs || tasks) {
@@ -1728,9 +1762,32 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     if ('speechSynthesis' in window) {
       speakBtn.hidden = false;
       speakBtn.addEventListener('click', function () { var t = briefText(); say(t); speak(t); });
+      document.getElementById('brief-speak').addEventListener('click', function () { speak(briefText()); });
+    } else {
+      document.getElementById('brief-speak').hidden = true;
     }
+
+    // The command box: type it, or use the keyboard's own 🎤 dictation key —
+    // that works in every browser even where the frame can't reach the mic.
+    var cmdIn = document.getElementById('cmd-input');
+    function runCmd() {
+      var v = cmdIn.value.trim();
+      if (!v) return;
+      say('“' + v + '” — ' + execVoice(parseVoiceCommand(v)));
+      cmdIn.value = '';
+    }
+    document.getElementById('cmd-go').addEventListener('click', runCmd);
+    cmdIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') runCmd(); });
+
+    // The claude.ai frame may not delegate microphone access to this page.
+    // If policy blocks it, don't show a mic button that can never work.
+    var micPolicyBlocked = false;
+    try {
+      var fp = document.featurePolicy || document.permissionsPolicy;
+      if (fp && typeof fp.allowsFeature === 'function' && !fp.allowsFeature('microphone')) micPolicyBlocked = true;
+    } catch (e) {}
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SR) {
+    if (SR && !micPolicyBlocked) {
       micBtn.hidden = false;
       var rec = null;
       micBtn.addEventListener('click', function () {
@@ -1745,8 +1802,8 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
           say('“' + heard + '” — ' + out);
         };
         rec.onerror = function (ev) {
-          say(ev.error === 'not-allowed'
-            ? 'Microphone blocked — allow it for this site in your browser settings.'
+          say(ev.error === 'not-allowed' || ev.error === 'service-not-allowed'
+            ? 'This app frame can’t reach the microphone — use the 🎤 on your keyboard in the command box above instead. Same result, no permission needed.'
             : 'Didn’t catch that — tap the mic and try again.');
         };
         rec.onend = function () { micBtn.setAttribute('aria-pressed', 'false'); rec = null; };
