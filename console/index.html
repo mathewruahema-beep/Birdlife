@@ -107,6 +107,15 @@
   }
   .sysrow b { flex: none; }
   .sysrow span.det { color: var(--muted); }
+  .delta {
+    background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--euc);
+    border-radius: 0 10px 10px 0; padding: 12px 14px; margin-bottom: 14px; font-size: 14px;
+  }
+  .delta .dhead { display: flex; align-items: baseline; gap: 8px; font-weight: 700; margin-bottom: 6px; }
+  .delta .dhead .ago { color: var(--muted); font-weight: 400; font-size: 13px; flex: 1; }
+  .delta .dhead button { border: none; background: none; color: var(--muted); cursor: pointer; font-size: 15px; padding: 0 2px; }
+  .delta ul { margin: 0; padding-left: 4px; list-style: none; }
+  .delta li { margin: 3px 0; color: var(--ink); }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--slate); flex: none; }
   .dot.live { background: var(--euc); }
   .dot.err { background: var(--red); }
@@ -321,6 +330,7 @@
 
   <!-- ============ TODAY (live) ============ -->
   <section class="panel" id="panel-queue">
+    <div id="delta-area"></div>
     <div class="livebar"><span class="dot" id="live-dot"></span><span id="live-status">Connecting to live data…</span>
       <span style="flex:1"></span>
       <button class="voicebtn" id="speak-btn" hidden aria-label="Read me the briefing">🔊 Brief</button>
@@ -692,6 +702,113 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   function defaultAdvice(r) {
     return { action: 'Get the story before touching anything.',
       prompt: 'Summarise case ' + r.CaseNumber + ' ("' + (r.Subject || '') + '") and how to resolve it' };
+  }
+
+  // ---- memory: what changed since Mathew last looked ----
+  // Snapshot lives in this browser only; absent or blocked storage means
+  // the app simply opens without a change card. Never required to work.
+  var MEM_KEY = 'ict-console-memory-v1';
+  var prevSnap = null, deltaDone = false, deltaDismissed = false, deltaCount = 0;
+  try { prevSnap = JSON.parse(localStorage.getItem(MEM_KEY) || 'null'); } catch (e) { prevSnap = null; }
+
+  function humanAgo(ms) {
+    var m = Math.round(ms / 60000);
+    if (m < 60) return m + 'm ago';
+    var h = Math.round(m / 60);
+    if (h < 36) return h + 'h ago';
+    return Math.round(h / 24) + 'd ago';
+  }
+
+  function computeDelta(prev, recs, tasks, mailList, teamsList) {
+    var out = [];
+    if (prev.cases && recs) {
+      var curCases = {};
+      recs.forEach(function (r) { curCases[r.CaseNumber] = r; });
+      recs.forEach(function (r) {
+        var p = prev.cases[r.CaseNumber];
+        if (!p) out.push('📋 New case ' + r.CaseNumber + ' — ' + (r.Subject || '').slice(0, 34));
+        else {
+          if (p.s !== r.Status) out.push('📋 ' + r.CaseNumber + ' → ' + (PLAIN_STATUS[r.Status] || r.Status).toLowerCase());
+          var owner = (r.Owner && r.Owner.Name) || '';
+          if (p.o && owner && p.o !== owner) out.push('📋 ' + r.CaseNumber + ' now with ' + owner.split(' ')[0]);
+        }
+      });
+      Object.keys(prev.cases).forEach(function (num) {
+        if (!curCases[num]) out.push('📋 ' + num + ' closed or left the queue');
+      });
+    }
+    if (prev.tasks && tasks) {
+      var curTasks = {};
+      tasks.forEach(function (x) { if (x.section !== 'Backlog/Requests') curTasks[x.gid] = x; });
+      Object.keys(curTasks).forEach(function (g) {
+        var x = curTasks[g], p = prev.tasks[g];
+        if (!p) out.push('📌 New on the board: ' + x.name.slice(0, 34));
+        else if (p.s !== x.section) out.push('📌 “' + x.name.slice(0, 26) + '” → ' + (SECTION_PLAIN[x.section] || x.section).toLowerCase());
+      });
+      Object.keys(prev.tasks).forEach(function (g) {
+        if (!curTasks[g]) out.push('📌 “' + (prev.tasks[g].n || '').slice(0, 26) + '” done or off the board');
+      });
+    }
+    if (prev.mailIds && mailList) {
+      mailList.forEach(function (m) {
+        if (prev.mailIds.indexOf(m.id) < 0) out.push('✉️ New email from ' + firstNameOf(m.sender) + ' — ' + (m.subject || '').slice(0, 30));
+      });
+    }
+    if (prev.teamsIds && teamsList) {
+      teamsList.forEach(function (t) {
+        if (prev.teamsIds.indexOf(t.id) < 0) out.push('💬 New Teams message from ' + ((t.from && t.from.displayName) || 'someone'));
+      });
+    }
+    return out;
+  }
+
+  function renderDelta(recs, tasks, mailList, teamsList, now) {
+    var area = document.getElementById('delta-area');
+    if (deltaDismissed) { area.innerHTML = ''; return; }
+    if (!deltaDone) {
+      // wait for the two core feeds before judging what changed
+      if (!recs || !tasks) return;
+      deltaDone = true;
+      if (prevSnap && prevSnap.at && now - prevSnap.at > 30 * 60000) {
+        var lines = computeDelta(prevSnap, recs, tasks, mailList, teamsList);
+        deltaCount = lines.length;
+        var ago = humanAgo(now - prevSnap.at);
+        area.innerHTML = '<div class="delta"><div class="dhead">Since you last looked' +
+          '<span class="ago">' + esc(ago) + '</span>' +
+          '<button id="delta-close" aria-label="Dismiss">✕</button></div>' +
+          (lines.length
+            ? '<ul>' + lines.slice(0, 6).map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') +
+              (lines.length > 6 ? '<li>…and ' + (lines.length - 6) + ' more</li>' : '') + '</ul>'
+            : '<span style="color:var(--muted)">Nothing has changed. All quiet.</span>') +
+          '</div>';
+        var dc = document.getElementById('delta-close');
+        if (dc) dc.addEventListener('click', function () { deltaDismissed = true; renderQueue(); });
+      }
+    }
+  }
+
+  function saveSnap(recs, tasks, mailList, teamsList, now) {
+    try {
+      var snap = prevSnapMerge();
+      function prevSnapMerge() {
+        var old = null;
+        try { old = JSON.parse(localStorage.getItem(MEM_KEY) || 'null'); } catch (e) {}
+        var s = { at: now, cases: old && old.cases || {}, tasks: old && old.tasks || {},
+          mailIds: old && old.mailIds || [], teamsIds: old && old.teamsIds || [] };
+        if (recs) {
+          s.cases = {};
+          recs.forEach(function (r) { s.cases[r.CaseNumber] = { s: r.Status, o: (r.Owner && r.Owner.Name) || '' }; });
+        }
+        if (tasks) {
+          s.tasks = {};
+          tasks.forEach(function (x) { if (x.section !== 'Backlog/Requests') s.tasks[x.gid] = { s: x.section, n: x.name.slice(0, 40) }; });
+        }
+        if (mailList) s.mailIds = mailList.map(function (m) { return m.id; });
+        if (teamsList) s.teamsIds = teamsList.map(function (t) { return t.id; });
+        return s;
+      }
+      localStorage.setItem(MEM_KEY, JSON.stringify(snap));
+    } catch (e) { /* storage unavailable — the app works without memory */ }
   }
 
   // ---- cross-system linking: one piece of work often lives in three places ----
@@ -1229,6 +1346,12 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     renderMailArea(now, shownMail);
     renderTeamsArea(shownTeams);
     renderSystems();
+
+    // ---- memory: show what changed, then remember what's seen now ----
+    var memMail = mailState.data ? peopleMail() : null;
+    var memTeams = teamsState.data ? teamsChats() : null;
+    renderDelta(recs, tasks, memMail, memTeams, now);
+    if (deltaDone) saveSnap(recs, tasks, memMail, memTeams, now);
 
     // ---- the always-visible briefing bar ----
     if (sfState.data || asState.data || mailState.data || teamsState.data) {
@@ -1937,6 +2060,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     var text = 'You have ' + bits.join('; ') + '.';
     var alerts = sysHealth().filter(function (r) { return r.st === 'Alert'; });
     if (alerts.length) text += ' Heads up: ' + alerts[0].name.toLowerCase() + ' has tripped a data-flow alert.';
+    if (deltaCount && !deltaDismissed) text += ' ' + deltaCount + ' thing' + (deltaCount === 1 ? '' : 's') + ' changed since you last looked.';
     var firstNext = document.querySelector('#next-area details summary .ttl');
     var firstCat = document.querySelector('#next-area details summary .chip');
     if (firstNext && firstCat) text += ' Top of the list: ' + firstCat.textContent + ' — ' + firstNext.textContent + '.';
