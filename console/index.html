@@ -94,6 +94,19 @@
   }
   .secbrief { font-size: 14px; color: var(--muted); margin: -4px 0 12px; max-width: 62ch; }
   .whereat { font-size: 13px; font-weight: 600; color: var(--euc-ink); margin: 0 0 6px; }
+  .linkline { font-size: 13px; color: var(--muted); margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+  .linkchip {
+    border: 1px solid var(--line); background: var(--surface); color: var(--euc-ink);
+    border-radius: 99px; font: 600 12px "Source Sans 3", sans-serif; padding: 2px 9px; cursor: pointer;
+  }
+  .linkchip:hover { border-color: var(--euc); }
+  .sysrow {
+    display: flex; align-items: baseline; gap: 9px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .sysrow b { flex: none; }
+  .sysrow span.det { color: var(--muted); }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--slate); flex: none; }
   .dot.live { background: var(--euc); }
   .dot.err { background: var(--red); }
@@ -328,6 +341,8 @@
     <div id="teams-area"></div>
     <h2>Project board</h2>
     <div id="asana-area"></div>
+    <h2>Systems — is the data flowing?</h2>
+    <div id="sys-area"></div>
     <div class="install"><b>Make it an app:</b> in Samsung Internet tap ≡ → <b>Add page to</b> →
     <b>Home screen</b>; in Chrome tap ⋮ → <b>Add to Home screen</b>. It opens full-screen
     from its own icon. Live data needs you signed in to claude.ai in that browser —
@@ -569,6 +584,13 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   var teamsIndex = {};
   var mailState = { data: null, storedAt: null, error: null };
   var teamsState = { data: null, storedAt: null, error: null };
+  var sysState = { stripe: {}, orphans: {}, orphTotal: {}, rd: {} };
+  var SYS_QUERIES = {
+    stripe: "SELECT COUNT(Id) c FROM stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1",
+    orphans: "SELECT COUNT(Id) c FROM Case WHERE ContactId = null AND CreatedDate = LAST_N_DAYS:1 AND RecordType.DeveloperName='General_Enquiry_Case'",
+    orphTotal: "SELECT COUNT(Id) c FROM Case WHERE CreatedDate = LAST_N_DAYS:1 AND RecordType.DeveloperName='General_Enquiry_Case'",
+    rd: "SELECT COUNT(Id) c FROM RD_Change_Log__c WHERE CreatedDate = LAST_N_DAYS:1"
+  };
   var wbOpen = false;
   var boardFilter = 'all';
   var mailFilter = 'all';
@@ -670,6 +692,75 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   function defaultAdvice(r) {
     return { action: 'Get the story before touching anything.',
       prompt: 'Summarise case ' + r.CaseNumber + ' ("' + (r.Subject || '') + '") and how to resolve it' };
+  }
+
+  // ---- cross-system linking: one piece of work often lives in three places ----
+  var STOPWORDS = { request: 1, update: 1, issue: 1, support: 1, please: 1, birdlife: 1,
+    about: 1, with: 1, from: 1, your: 1, this: 1, that: 1, help: 1, question: 1, salesforce: 1 };
+  function sigTokens(s) {
+    return (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/)
+      .filter(function (w) { return w.length >= 4 && !STOPWORDS[w]; });
+  }
+  function tokensMatch(a, b) {
+    if (!a.length || !b.length) return false;
+    var setB = {}; b.forEach(function (w) { setB[w] = 1; });
+    var shared = a.filter(function (w) { return setB[w]; });
+    return shared.length >= 2 && shared.length * 2 >= Math.min(a.length, b.length);
+  }
+  var linkIndex = {};   // itemKey -> [{icon, label, target}]
+  function buildLinkIndex(recs, tasks, mails, teamMsgs) {
+    linkIndex = {};
+    var items = [];
+    (recs || []).forEach(function (r) {
+      var cid = (r.attributes && r.attributes.url || '').split('/').pop();
+      items.push({ key: 'it-case-' + cid, icon: '📋', label: r.CaseNumber,
+        tokens: sigTokens(r.Subject), num: r.CaseNumber.replace(/^0+/, '') });
+    });
+    (tasks || []).forEach(function (x) {
+      if (x.section === 'Backlog/Requests') return;
+      items.push({ key: 'it-task-' + x.gid, icon: '📌', label: x.name.slice(0, 26),
+        tokens: sigTokens(x.name), num: null, text: x.name });
+    });
+    (mails || []).forEach(function (m, i) {
+      items.push({ key: 'it-mail-' + i, icon: '✉️', label: firstNameOf(m.sender) + ': ' + (m.subject || '').slice(0, 18),
+        tokens: sigTokens((m.subject || '').replace(/^(re|fw|fwd):\s*/i, '')), num: null,
+        text: (m.subject || '') + ' ' + (m.summary || '') });
+    });
+    (teamMsgs || []).forEach(function (t, i) {
+      items.push({ key: 'it-teams-' + i, icon: '💬', label: (t.from && t.from.displayName || 'Chat').split(' ')[0],
+        tokens: sigTokens(stripHtml(t.summary)), num: null, text: stripHtml(t.summary) });
+    });
+    for (var i = 0; i < items.length; i++) {
+      for (var j = i + 1; j < items.length; j++) {
+        var A = items[i], B = items[j];
+        if (A.key.split('-')[1] === B.key.split('-')[1]) continue;   // same system: skip
+        var hit = false;
+        if (A.num && B.text && B.text.indexOf(A.num) >= 0) hit = true;        // case number quoted
+        else if (B.num && A.text && A.text.indexOf(B.num) >= 0) hit = true;
+        else if (tokensMatch(A.tokens, B.tokens)) hit = true;                  // same words, same work
+        if (hit) {
+          (linkIndex[A.key] = linkIndex[A.key] || []).push({ icon: B.icon, label: B.label, target: B.key });
+          (linkIndex[B.key] = linkIndex[B.key] || []).push({ icon: A.icon, label: A.label, target: A.key });
+        }
+      }
+    }
+  }
+  function linksHtml(key) {
+    var links = linkIndex[key];
+    if (!links || !links.length) return '';
+    return '<p class="linkline">Same piece of work:' + links.slice(0, 4).map(function (l) {
+      return ' <button class="linkchip" data-target="' + esc(l.target) + '">' + l.icon + ' ' + esc(l.label) + '</button>';
+    }).join('') + '</p>';
+  }
+  function wireLinkChips(root) {
+    root.querySelectorAll('.linkchip').forEach(function (b) {
+      b.addEventListener('click', function (ev) {
+        ev.preventDefault(); ev.stopPropagation();
+        var el = document.getElementById(b.dataset.target);
+        if (el) { el.open = true; el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        else { var vs = document.getElementById('voice-status'); vs.hidden = false; vs.textContent = 'That item isn’t on screen right now (a filter may be hiding it).'; }
+      });
+    });
   }
 
   // ---- "where it's at" one-liners: the story of each item and section ----
@@ -920,7 +1011,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   }
   function stripHtml(s) { var d = document.createElement('div'); d.innerHTML = s || ''; return (d.textContent || '').replace(/\s+/g, ' ').trim(); }
 
-  function planHtml(a, extra, caseId, taskId, whereAt) {
+  function planHtml(a, extra, caseId, taskId, whereAt, linkRow) {
     return '<div class="plan">' +
       (whereAt ? '<p class="whereat">' + esc(whereAt) + '</p>' : '') +
       (a.why ? '<p class="why-full">' + esc(a.why) + ' ' + esc(a.action || '') + '</p>'
@@ -931,6 +1022,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       (caseId && live.mcp ? '<button class="btn sm ghost workbtn" data-id="' + esc(caseId) + '" data-cat="' + esc(a.cat || '') + '">Respond / close…</button>' : '') +
       (taskId && live.mcp ? '<button class="btn sm ghost taskbtn" data-id="' + esc(taskId) + '" data-cat="' + esc(a.cat || '') + '">Comment / move / complete…</button>' : '') +
       (extra || '') + '</div>' +
+      (linkRow || '') +
       (caseId || taskId ? '<div class="wbslot"></div>' : '') + '</div>';
   }
 
@@ -939,6 +1031,16 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     var now = Date.now();
     var recs = sfState.data ? (sfState.data.records || []) : null;
     var tasks = asState.data;
+
+    // one shared view of what's on screen, so links and sections agree
+    var shownMail = null, shownTeams = null;
+    if (mailState.data) {
+      var ppl0 = peopleMail();
+      if (mailFilter === 'unread') ppl0 = ppl0.filter(function (m) { return !m.isRead; });
+      shownMail = ppl0.slice(0, 8);
+    }
+    if (teamsState.data) shownTeams = teamsChats().slice(0, 6);
+    buildLinkIndex(recs, tasks, shownMail, shownTeams);
 
     // ---- tiles: every number is a door — tap it to jump to (and filter) its section ----
     var t = [];
@@ -1018,7 +1120,9 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       nextArea.innerHTML = (top.length ? '<h2 style="margin-top:4px">What to do next</h2>' : '') +
         top.map(function (it) {
           return '<details class="next"><summary><span class="chip ' + it.cls + '">' + esc(it.cat) + '</span>' +
-            '<span class="ttl">' + esc(it.title) + '</span></summary>' + planHtml(it.a, it.link, it.cid, it.tid, it.where) + '</details>';
+            '<span class="ttl">' + esc(it.title) + '</span></summary>' +
+            planHtml(it.a, it.link, it.cid, it.tid, it.where,
+              linksHtml(it.cid ? 'it-case-' + it.cid : 'it-task-' + it.tid)) + '</details>';
         }).join('') +
         (items.length > top.length ? '<p class="hint">…and ' + (items.length - top.length) + ' more further down the list.</p>' : '');
       wireCopyPlans(nextArea);
@@ -1050,11 +1154,11 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
           var age = daysAgo(r.CreatedDate, now);
           var a = adviceFor(r, now) || defaultAdvice(r);
           var link = '<a class="btn sm ghost" target="_blank" rel="noopener" href="https://birdlifeaustralia.lightning.force.com/lightning/r/Case/' + esc(id) + '/view">Open in Salesforce ↗</a>';
-          return '<details class="caseitem"><summary>' +
+          return '<details class="caseitem" id="it-case-' + esc(id) + '"><summary>' +
             '<span class="ttl">' + esc(r.CaseNumber) + ' <span class="sub">· ' + esc(r.Subject) + '</span></span>' +
             '<span class="badge ' + statusClass(r.Status) + '">' + esc(PLAIN_STATUS[r.Status] || r.Status) + '</span>' +
             '<span class="age' + (age > 30 ? ' old' : '') + '">' + age + 'd</span>' +
-            '</summary>' + planHtml(a, link, id, null, caseBrief(r, now)) + '</details>';
+            '</summary>' + planHtml(a, link, id, null, caseBrief(r, now), linksHtml('it-case-' + id)) + '</details>';
         }).join('');
         var head = o === 'Zeus' ? 'Nobody’s yet — the intake queue (' + groups[o].length + ')' : esc(o) + ' (' + groups[o].length + ')';
         return '<div class="grp"><h3>' + head + '</h3>' + rows + '</div>';
@@ -1100,12 +1204,12 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
           var a = adviceForTask(x, todayStr);
           var dueBadge = x.due_on
             ? '<span class="age' + (x.due_on < todayStr ? ' old' : '') + '">' + esc(x.due_on.slice(5)) + '</span>' : '';
-          return '<details class="taskitem"><summary>' +
+          return '<details class="taskitem" id="it-task-' + esc(x.gid) + '"><summary>' +
             '<span class="ttl">' + esc(x.name) + '</span>' +
             '<span class="age">' + esc(x.assignee || 'No owner') + '</span>' + dueBadge +
             '</summary>' + planHtml(a,
               '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(x.url) + '">Open in Asana ↗</a>',
-              null, x.gid, taskBrief(x, todayStr)) + '</details>';
+              null, x.gid, taskBrief(x, todayStr), linksHtml('it-task-' + x.gid)) + '</details>';
         }).join('');
         return '<div class="grp"><h3>' + esc(SECTION_PLAIN[s] || s) + ' (' + bySec[s].length + ')</h3>' + rows + '</div>';
       }).join('') || '<div class="secterr">' + (boardFilter !== 'all' ? 'Nothing matches this filter.' : 'Nothing on the board outside the backlog.') + '</div>';
@@ -1122,8 +1226,9 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       asanaArea.innerHTML = '<div class="secterr">Waiting for Asana…</div>';
     }
 
-    renderMailArea(now);
-    renderTeamsArea();
+    renderMailArea(now, shownMail);
+    renderTeamsArea(shownTeams);
+    renderSystems();
 
     // ---- the always-visible briefing bar ----
     if (sfState.data || asState.data || mailState.data || teamsState.data) {
@@ -1146,15 +1251,12 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   }
 
   // ---- Inbox: recent mail from real people, reply in Mathew's voice ----
-  function renderMailArea(now) {
+  function renderMailArea(now, people) {
     var mailArea = document.getElementById('mail-area');
     if (mailState.error && !mailState.data) {
       mailArea.innerHTML = '<div class="secterr">' + esc(fixCopy(mailState.error, 'Microsoft 365')) + '</div>'; return;
     }
-    if (!mailState.data) { mailArea.innerHTML = '<div class="secterr">Waiting for Outlook…</div>'; return; }
-    var people = peopleMail();
-    if (mailFilter === 'unread') people = people.filter(function (m) { return !m.isRead; });
-    people = people.slice(0, 8);
+    if (!people) { mailArea.innerHTML = '<div class="secterr">Waiting for Outlook…</div>'; return; }
     var mailBar = mailFilter === 'unread'
       ? '<p class="filterbar" style="margin:0 0 10px">Showing only <b>unread</b> — <button id="mailclear">show all</button></p>' : '';
     if (!people.length) {
@@ -1163,12 +1265,12 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       if (mc0) mc0.addEventListener('click', function () { mailFilter = 'all'; renderQueue(); });
       return;
     }
-    mailArea.innerHTML = '<p class="secbrief">' + esc(inboxBrief(peopleMail())) + '</p>' + mailBar + people.map(function (m) {
+    mailArea.innerHTML = '<p class="secbrief">' + esc(inboxBrief(peopleMail())) + '</p>' + mailBar + people.map(function (m, mi) {
       mailIndex[m.id] = m;
       var first = firstNameOf(m.sender);
       var when = m.receivedDateTime ? new Date(m.receivedDateTime).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '';
       var snippet = (m.summary || '').replace(/[\r\n]+/g, ' ').slice(0, 160);
-      return '<details class="caseitem"><summary>' +
+      return '<details class="caseitem" id="it-mail-' + mi + '"><summary>' +
         '<span class="ttl">' + esc(first) + ' <span class="sub">· ' + esc(m.subject || '(no subject)') + '</span></span>' +
         (m.isRead ? '' : '<span class="badge s-New">Unread</span>') +
         '<span class="age">' + esc(when) + '</span></summary>' +
@@ -1180,7 +1282,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         '<button class="btn sm copyplan">Copy &amp; ask Claude</button>' +
         (live.mcp ? '<button class="btn sm ghost mailbtn" data-id="' + esc(m.id) + '">Reply…</button>' : '') +
         '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(m.webLink || '#') + '">Open in Outlook ↗</a>' +
-        '</div><div class="wbslot"></div></div></details>';
+        '</div>' + linksHtml('it-mail-' + mi) + '<div class="wbslot"></div></div></details>';
     }).join('');
     if (mailState.error) mailArea.innerHTML += '<div class="secterr">Couldn’t refresh just now — this is the last good data. ' + esc(fixCopy(mailState.error, 'Microsoft 365')) + '</div>';
     var mc = document.getElementById('mailclear');
@@ -1276,21 +1378,20 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   }
 
   // ---- Teams: recent messages said to you; reply is copy + deep link (no send API) ----
-  function renderTeamsArea() {
+  function renderTeamsArea(msgs) {
     var teamsArea = document.getElementById('teams-area');
     if (teamsState.error && !teamsState.data) {
       teamsArea.innerHTML = '<div class="secterr">' + esc(fixCopy(teamsState.error, 'Microsoft 365')) + '</div>'; return;
     }
-    if (!teamsState.data) { teamsArea.innerHTML = '<div class="secterr">Waiting for Teams…</div>'; return; }
-    var msgs = teamsChats().slice(0, 6);
+    if (!msgs) { teamsArea.innerHTML = '<div class="secterr">Waiting for Teams…</div>'; return; }
     if (!msgs.length) { teamsArea.innerHTML = '<div class="secterr">No recent Teams messages from others.</div>'; return; }
-    teamsArea.innerHTML = '<p class="secbrief">' + esc(teamsSecBrief(msgs)) + '</p>' + msgs.map(function (t) {
+    teamsArea.innerHTML = '<p class="secbrief">' + esc(teamsSecBrief(msgs)) + '</p>' + msgs.map(function (t, ti) {
       teamsIndex[t.id] = t;
       var who = (t.from && t.from.displayName) || 'Someone';
       var snippet = stripHtml(t.summary).slice(0, 160);
       var when = t.createdDateTime ? new Date(t.createdDateTime).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '';
       var deep = 'https://teams.microsoft.com/l/message/' + encodeURIComponent(t.chatId) + '/' + encodeURIComponent(t.id);
-      return '<details class="caseitem"><summary>' +
+      return '<details class="caseitem" id="it-teams-' + ti + '"><summary>' +
         '<span class="ttl">' + esc(who) + ' <span class="sub">· ' + esc(snippet.slice(0, 60)) + '…</span></span>' +
         '<span class="age">' + esc(when) + '</span></summary>' +
         '<div class="plan">' +
@@ -1300,9 +1401,10 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         '<div class="btnrow" style="margin-top:0">' +
         '<button class="btn sm teamsbtn" data-id="' + esc(t.id) + '">Write a reply…</button>' +
         '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + esc(deep) + '">Open the chat in Teams ↗</a>' +
-        '</div></div></details>';
+        '</div>' + linksHtml('it-teams-' + ti) + '</div></details>';
     }).join('');
     if (teamsState.error) teamsArea.innerHTML += '<div class="secterr">Couldn’t refresh just now — this is the last good data. ' + esc(fixCopy(teamsState.error, 'Microsoft 365')) + '</div>';
+    wireLinkChips(teamsArea);
     teamsArea.querySelectorAll('.teamsbtn').forEach(function (b) {
       b.addEventListener('click', function () {
         var slot = b.closest('.plan').querySelector('.wbslot');
@@ -1334,6 +1436,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   }
 
   function wireCopyPlans(root) {
+    wireLinkChips(root);
     root.querySelectorAll('.copyplan').forEach(function (b) {
       b.addEventListener('click', function () {
         var pv = b.closest('.plan').querySelector('.preview');
@@ -1644,6 +1747,35 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     });
   }
 
+  // ---- Systems: is the data flowing between the estate's moving parts? ----
+  function sysHealth() {
+    var rows = [];
+    var s = sysState.stripe, o = sysState.orphans, ot = sysState.orphTotal, rd = sysState.rd;
+    if (s.n != null) rows.push(s.n === 0
+      ? { cls: 'c-reply', st: 'Healthy', name: 'Shop payments → Salesforce', det: 'No Stripe sync errors in the last day.' }
+      : { cls: 'c-review', st: 'Alert', name: 'Shop payments → Salesforce', det: s.n + ' failed sync' + (s.n === 1 ? '' : 's') + ' in the last day — the sync log needs a look.' });
+    else if (s.err) rows.push({ cls: 'c-board', st: 'Unknown', name: 'Shop payments → Salesforce', det: 'Check unavailable right now.' });
+    if (o.n != null && ot.n != null && ot.n > 0) {
+      var rate = Math.round(100 * o.n / ot.n);
+      rows.push(rate < 40
+        ? { cls: 'c-reply', st: 'Healthy', name: 'Website enquiries → contacts', det: o.n + ' of ' + ot.n + ' (' + rate + '%) arrived without a matched contact — around the usual level.' }
+        : rate < 60
+          ? { cls: 'c-chase', st: 'Watch', name: 'Website enquiries → contacts', det: o.n + ' of ' + ot.n + ' (' + rate + '%) unmatched — higher than the ~25% baseline.' }
+          : { cls: 'c-review', st: 'Alert', name: 'Website enquiries → contacts', det: o.n + ' of ' + ot.n + ' (' + rate + '%) unmatched — the matching looks broken.' });
+    } else if (o.err || ot.err) rows.push({ cls: 'c-board', st: 'Unknown', name: 'Website enquiries → contacts', det: 'Check unavailable right now.' });
+    if (rd.n != null) rows.push({ cls: 'c-board', st: 'Info', name: 'Recurring giving', det: rd.n + ' change' + (rd.n === 1 ? '' : 's') + ' logged in the last day.' });
+    return rows;
+  }
+  function renderSystems() {
+    var el = document.getElementById('sys-area');
+    var rows = sysHealth();
+    if (!rows.length) { el.innerHTML = '<div class="secterr">Waiting for the health checks…</div>'; return; }
+    el.innerHTML = rows.map(function (r) {
+      return '<div class="sysrow"><span class="chip ' + r.cls + '">' + esc(r.st) + '</span><b>' + esc(r.name) + '</b><span class="det">' + esc(r.det) + '</span></div>';
+    }).join('') +
+    '<p class="hint">Not visible from here: WooCommerce order detail, the miniOrange/MoveData engines themselves, and the wider WordPress fleet — those need their own checks.</p>';
+  }
+
   function offline(msg) {
     liveDot.className = 'dot';
     liveStatus.textContent = msg;
@@ -1652,6 +1784,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     nextArea.innerHTML = '';
     document.getElementById('mail-area').innerHTML = '';
     document.getElementById('teams-area').innerHTML = '';
+    document.getElementById('sys-area').innerHTML = '';
   }
 
   (function initLive() {
@@ -1677,6 +1810,20 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
 
   function startWatches(mcp, sfServer, asanaServer, m365Server) {
       live.mcp = mcp; live.sf = sfServer; live.as = asanaServer; live.m365 = m365Server || M365_SERVER;
+
+      // estate health: small COUNT queries, slow cadence
+      Object.keys(SYS_QUERIES).forEach(function (k) {
+        mcp.watchTool(sfServer, 'soqlQuery', { q: SYS_QUERIES[k] }, function (ev) {
+          if (ev.type === 'data') {
+            var p = ev.result.payload;
+            if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+            sysState[k] = { n: p && p.records && p.records[0] ? p.records[0].c : null, err: null };
+          } else {
+            sysState[k] = { n: sysState[k].n, err: ev.error };
+          }
+          renderQueue();
+        }, { cache: { staleTime: 300000 }, refetchInterval: 900000 });
+      });
 
       mcp.watchTool(live.m365, 'outlook_email_search', MAIL_INPUT, function (ev) {
         if (ev.type === 'data') {
@@ -1788,6 +1935,8 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     }
     if (!bits.length) return 'Live data has not loaded yet.';
     var text = 'You have ' + bits.join('; ') + '.';
+    var alerts = sysHealth().filter(function (r) { return r.st === 'Alert'; });
+    if (alerts.length) text += ' Heads up: ' + alerts[0].name.toLowerCase() + ' has tripped a data-flow alert.';
     var firstNext = document.querySelector('#next-area details summary .ttl');
     var firstCat = document.querySelector('#next-area details summary .chip');
     if (firstNext && firstCat) text += ' Top of the list: ' + firstCat.textContent + ' — ' + firstNext.textContent + '.';
