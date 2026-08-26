@@ -1917,17 +1917,36 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     }
     window.claude.use('mcp').then(function (mcp) {
       if (!mcp) { offline('Live data not available in this view'); return; }
+      var started = false;
+      function startOnce(sf, as, m3) {
+        if (started) return;
+        started = true;
+        startWatches(mcp, sf, as, m3);
+        // Watchdog: if nothing has arrived (data or error) after 25s, say so
+        // honestly instead of spinning forever — the connector bridge can hang
+        // during platform blips.
+        setTimeout(function () {
+          var anything = sfState.data || sfState.error || asState.data || asState.error ||
+            mailState.data || mailState.error || teamsState.data || teamsState.error;
+          if (!anything) {
+            liveDot.className = 'dot err';
+            liveStatus.textContent = 'Still connecting — the connector service may be waking up. Close the app fully and reopen it.';
+          }
+        }, 25000);
+      }
       // Resolve the connector names this viewer actually has (display names
-      // can differ from the registered ones), then start the watches.
+      // can differ from the registered ones), then start the watches. If the
+      // lookup itself hangs, start anyway with the default names after 8s.
       try {
         mcp.listTools().then(function (res) {
           var names = (res.servers || []).map(function (s) { return s.server; });
           var sf = names.find(function (n) { return /salesforce/i.test(n); }) || SF_SERVER;
           var as = names.find(function (n) { return /asana/i.test(n); }) || ASANA_SERVER;
           var m3 = names.find(function (n) { return /microsoft|365|office|outlook/i.test(n); }) || M365_SERVER;
-          startWatches(mcp, sf, as, m3);
-        }).catch(function () { startWatches(mcp, SF_SERVER, ASANA_SERVER, M365_SERVER); });
-      } catch (e) { startWatches(mcp, SF_SERVER, ASANA_SERVER, M365_SERVER); }
+          startOnce(sf, as, m3);
+        }).catch(function () { startOnce(SF_SERVER, ASANA_SERVER, M365_SERVER); });
+      } catch (e) { startOnce(SF_SERVER, ASANA_SERVER, M365_SERVER); }
+      setTimeout(function () { startOnce(SF_SERVER, ASANA_SERVER, M365_SERVER); }, 8000);
     });
   })();
 
