@@ -2264,7 +2264,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     if (dryrun.checked) text += " (dry run — show me what you would change first)";
     preview.textContent = text;
     tierHint.textContent = current.tier === 'T2'
-      ? 'For this one, Claude prepares the exact fix for an admin to run (it doesn’t have Microsoft admin access yet) and updates the ticket.'
+      ? 'Ask this in a desktop Claude session and it executes with your approval (the entra-admin access is live there). From here, Claude prepares the exact fix ready to run and updates the ticket.'
       : 'Claude will do this for you — it shows you the exact change and waits for your go-ahead first.';
   }
   dryrun.addEventListener('change', renderPreview);

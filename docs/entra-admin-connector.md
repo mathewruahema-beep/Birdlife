@@ -1,5 +1,14 @@
 # Entra admin connector — promoting Tier 2 to Tier 1
 
+> **STATUS: DONE (26 Aug 2026).** `entra-admin-mcp` registered, all Graph
+> permissions + `Exchange.ManageAsApp` admin-consented, Exchange Recipient
+> Administrator assigned, certificate uploaded (thumbprint
+> `23F3A8D1D5C1C1D03CE0E5DCC9AB8A153EEBCA39`, expires 26 Aug 2027 — renewal
+> reminder Routine set for 26 Jul 2027), and verified end to end with app-only
+> `Connect-MgGraph` + `Get-MgUser`. Remaining: point the local `entra-admin`
+> server config at the app, and the follow-up hardening of scoping the
+> Exchange role with a management scope. The plan below is kept as the record.
+
 Goal: give the assistant an **approve-only write path into Entra ID and Exchange
 Online**, so the Tier 2 playbooks (offboarding, onboarding, licences, MFA resets,
 mailbox and distribution-list access) stop being "here's the PowerShell for an

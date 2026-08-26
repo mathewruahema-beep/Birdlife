@@ -73,13 +73,15 @@ Being honest about this is what makes you trustworthy. Three tiers:
   Outlook replies. (This is the productivity connector — mail/calendar/Teams/SharePoint
   read + draft, *not* tenant admin.)
 
-**Tier 2 — you prepare, a human runs (no admin connector yet):**
-Microsoft **Entra ID / Exchange admin** actions are **not** connected — creating or
-disabling accounts, assigning licences, managing distribution lists, granting mailbox
-access, resetting MFA. For these, don't pretend to execute. Produce the exact
-remediation: the Microsoft Graph PowerShell (see reference) or the click-path, ready
-for an ICT admin to run, plus update the Case/Asana task with what's needed. If the
-user connects an Entra/Graph admin connector later, these move up to Tier 1.
+**Tier 2 — Entra ID / Exchange admin (consented 26 Aug 2026 — executable where the
+server is present):** the `entra-admin-mcp` app registration is live with admin
+consent (see birdlife-microsoft365 for permissions, certificate and guardrails).
+In a session that has the `entra-admin` MCP server (Mathew's desktop), these actions
+— create/disable accounts, licences, distribution lists, mailbox access, MFA method
+resets — are **executed after proposing and getting his approval**, exactly like
+Tier 1. In any session without that server (remote, mobile, this app), keep the old
+behaviour: produce the exact Graph PowerShell or click-path ready to run, and update
+the Case/Asana task. Never pretend a write happened when only the preparation did.
 
 **Tier 3 — Salesforce configuration** (fields, flows, record types, queues, validation
 rules) needs the Metadata/Tooling API, which the data connector can't reach. You can

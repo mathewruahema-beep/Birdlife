@@ -135,7 +135,11 @@ Designed starter flow: create Entra user → assign M365 Business Premium → no
 - Capture the **personal** email at invite. Using the work email was the root cause of the broken invite loop.
 - Reactivate rehires; never duplicate.
 
-**Automation model Mathew has chosen: approve-only.** Unattended tasks detect and prepare; he approves the Entra writes. There is a local read-only Entra/Intune MCP server at `C:\azureintegration` (app `d8125f4d`); a write-tier `entra-admin` server exists but is **pending a separate app registration and admin consent**. Until that consent lands, treat every Entra write as "prepare and hand to Mathew", not "execute".
+**Automation model Mathew has chosen: approve-only.** Unattended tasks detect and prepare; he approves the Entra writes. There is a local read-only Entra/Intune MCP server at `C:\azureintegration` (app `d8125f4d`).
+
+**The write-tier app registration is LIVE (consented 26 Aug 2026): `entra-admin-mcp`** (client ID starts `bedc4239`). Graph application permissions consented: `User.ReadWrite.All`, `Group.ReadWrite.All`, `UserAuthenticationMethod.ReadWrite.All`, `Organization.Read.All`, `AuditLog.Read.All`, plus `Exchange.ManageAsApp` with the **Exchange Recipient Administrator** role. Credential: certificate only (thumbprint `23F3A8D1D5C1C1D03CE0E5DCC9AB8A153EEBCA39`, expires **26 Aug 2027** — renewal reminder Routine `trig_01Vp14cTKJCLnC7psjiRZnUC` fires 26 Jul 2027; no client secrets). Verified end to end with app-only `Connect-MgGraph` + `Get-MgUser`.
+
+What this changes: in a session with the `entra-admin` server (Mathew's desktop), Entra/Exchange writes are **executable after his approval** — offboarding, onboarding, licences, MFA method resets, mailbox-to-shared, mailbox permissions, DLs. Sessions without that server (remote/mobile) still prepare the exact commands. Never use this identity on the break-glass accounts, GA accounts, or Conditional Access. Follow-up hardening on the list: scope the Exchange role with a management scope instead of tenant-wide.
 
 ## Employment Hero → Entra sync (Logic App)
 
@@ -182,6 +186,6 @@ Vendors: SXIQ (`sxiq.*` service accounts), Blitzm, Envision CP, Xecurify/miniOra
 ## Operating rules
 1. **Report-only first** on every Conditional Access change, 7-14 days, with a written rollback.
 2. **Never blank an Entra field** without checking whether the EH sync will overwrite it back, or vice versa.
-3. **Prepare, do not execute, Entra writes** until the write-tier app registration has admin consent.
+3. **Entra writes: approve-then-execute** where the `entra-admin` server is present (desktop); prepare-and-hand-over everywhere else. Always propose the exact change first.
 4. Named per-user security-weakness data (who lacks MFA, last logins) is **confidential**. Do not paste it into shared documents or tickets.
 5. The security data here is dated 19-30 Jun 2026. Re-verify before asserting current state.
