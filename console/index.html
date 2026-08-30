@@ -513,8 +513,8 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     var h = new Date().getHours();
     greetEl.textContent = (h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening') + ', Mathew.';
     var feeds = [
-      { key: 'sf', lbl: 'Salesforce — Ask Zeus queue', ready: function () { return sfState.data && (sfState.data.records || []).length + ' open cases'; }, err: function () { return sfState.error; } },
-      { key: 'as', lbl: 'Asana — IT Operations board', ready: function () { return asState.data && 'board loaded'; }, err: function () { return asState.error; } },
+      { key: 'sf', lbl: 'Salesforce — Ask Zeus queue', ready: function () { return sfState.data && ((sfState.data.records || []).length + ' open cases' + (sfState.snapshot ? ' · snapshot' : '')); }, err: function () { return sfState.error; } },
+      { key: 'as', lbl: 'Asana — IT Operations board', ready: function () { return asState.data && ('board loaded' + (asState.snapshot ? ' · snapshot' : '')); }, err: function () { return asState.error; } },
       { key: 'ml', lbl: 'Outlook — inbox', ready: function () { if (!mailState.data) return null; var u = peopleMail().filter(function (m) { return !m.isRead; }).length; return u + ' unread'; }, err: function () { return mailState.error; } },
       { key: 'tm', lbl: 'Teams — chats', ready: function () { return teamsState.data && teamsChats().length + ' recent'; }, err: function () { return teamsState.error; } }
     ];
@@ -682,6 +682,46 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     return server + ' hiccup: ' + (err.message || err.code) + '.';
   }
   var AUTHZ = { needs_reauth: 1, server_not_connected: 1, blocked_by_policy: 1, approval_required: 1 };
+
+  // ---------- snapshot fallback ----------
+  // A dated copy of the queue + board is baked into this file so a device
+  // where the Salesforce/Asana bridge never answers (some mobile viewers, a
+  // saved copy) still shows the queue — read-only, clearly dated. The
+  // overnight routine regenerates the block between the markers each weekday.
+  /*SNAPSHOT-START*/
+  var SNAPSHOT = {"at":"2026-08-30T23:00:00Z","cases":[{"CaseNumber":"00133547","Subject":"File location on Sharepoint for vetted Aussie Bird Count data","Status":"Waiting Response-External","Type":"New Feature","Owner":{"Name":"Andrew Dunn"},"CreatedDate":"2026-05-29T02:21:54.000+0000","LastModifiedDate":"2026-07-29T01:23:17.000+0000","Id":"500RF00000kMyr3YAC"},{"CaseNumber":"00134670","Subject":"Request: Update Powl Program Engagements","Status":"In Progress","Type":null,"Owner":{"Name":"Keith Tsui"},"CreatedDate":"2026-06-16T04:31:43.000+0000","LastModifiedDate":"2026-08-21T03:00:56.000+0000","Id":"500RF00000mD2oNYAS"},{"CaseNumber":"00136659","Subject":"How do I change my signature block","Status":"Response Received","Type":"Troubleshooting","Owner":{"Name":"Andrew Dunn"},"CreatedDate":"2026-07-15T02:47:21.000+0000","LastModifiedDate":"2026-07-16T00:34:12.000+0000","Id":"500RF00000p82P3YAI"},{"CaseNumber":"00136890","Subject":"Request: Shorebirds Program Engagement","Status":"Response Received","Type":"New Feature","Owner":{"Name":"Keith Tsui"},"CreatedDate":"2026-07-20T04:56:04.000+0000","LastModifiedDate":"2026-08-21T03:04:13.000+0000","Id":"500RF00000pZj6gYAC"},{"CaseNumber":"00137206","Subject":"Resignation - Lynette Plenderleith","Status":"Response Received","Type":"Departing Staff","Owner":{"Name":"Andrew Dunn"},"CreatedDate":"2026-07-26T23:47:43.000+0000","LastModifiedDate":"2026-08-26T11:03:00.000+0000","Id":"500RF00000qKx4SYAS"},{"CaseNumber":"00137320","Subject":"BirdLife laptop","Status":"Waiting Response-External","Type":"Admin","Owner":{"Name":"Andrew Dunn"},"CreatedDate":"2026-07-28T07:15:25.000+0000","LastModifiedDate":"2026-08-18T03:27:59.000+0000","Id":"500RF00000qXe7GYAS"},{"CaseNumber":"00138381","Subject":"New Status reason in RD change log please","Status":"In Progress","Type":null,"Owner":{"Name":"Keith Tsui"},"CreatedDate":"2026-08-09T23:42:13.000+0000","LastModifiedDate":"2026-08-13T03:51:18.000+0000","Id":"500RF00000rrX4CYAU"},{"CaseNumber":"00138430","Subject":"Work phone number","Status":"Waiting Response-External","Type":null,"Owner":{"Name":"Andrew Dunn"},"CreatedDate":"2026-08-10T06:03:38.000+0000","LastModifiedDate":"2026-08-18T01:16:45.000+0000","Id":"500RF00000ruMPEYA2"},{"CaseNumber":"00138716","Subject":"FW: One Drive file and document transfer / Andrew Dunn, can you help, please?","Status":"Waiting Response-External","Type":"Troubleshooting","Owner":{"Name":"Andrew Dunn"},"CreatedDate":"2026-08-13T02:01:06.000+0000","LastModifiedDate":"2026-08-21T04:54:08.000+0000","Id":"500RF00000sIJbNYAW"},{"CaseNumber":"00139254","Subject":"Google Drive - Cape to Cape Bird Group (FAO Andrew Dunn)","Status":"Waiting Response-External","Type":"New User","Owner":{"Name":"Andrew Dunn"},"CreatedDate":"2026-08-20T09:56:24.000+0000","LastModifiedDate":"2026-08-21T04:53:13.000+0000","Id":"500RF00000t6z2nYAA"},{"CaseNumber":"00139530","Subject":"Queue for the Grants Inbox","Status":"New","Type":null,"Owner":{"Name":"Keith Tsui"},"CreatedDate":"2026-08-24T23:53:17.000+0000","LastModifiedDate":"2026-08-25T01:01:24.000+0000","Id":"500RF00000tXzDFYA0"},{"CaseNumber":"00139581","Subject":"SPAM?? Fwd: Yuna, KOPRI and conservation research","Status":"New","Type":null,"Owner":{"Name":"Andrew Dunn"},"CreatedDate":"2026-08-25T23:09:15.000+0000","LastModifiedDate":"2026-08-30T22:06:55.000+0000","Id":"500RF00000ti4DCYAY"},{"CaseNumber":"00139668","Subject":"BOF student","Status":"In Progress","Type":"Troubleshooting","Owner":{"Name":"Keith Tsui"},"CreatedDate":"2026-08-27T10:29:17.000+0000","LastModifiedDate":"2026-08-30T22:31:46.000+0000","Id":"500RF00000twmCjYAI"},{"CaseNumber":"00139702","Subject":"FW: $10k tied donation to bird flu","Status":"In Progress","Type":"Admin","Owner":{"Name":"Nina Lewis"},"CreatedDate":"2026-08-28T01:54:09.000+0000","LastModifiedDate":"2026-08-30T22:39:40.000+0000","Id":"500RF00000u1bTWYAY"},{"CaseNumber":"00139720","Subject":"Membership batch has not completed properly","Status":"In Progress","Type":"Troubleshooting","Owner":{"Name":"Nina Lewis"},"CreatedDate":"2026-08-28T05:24:58.000+0000","LastModifiedDate":"2026-08-30T21:50:49.000+0000","Id":"500RF00000u2ZzHYAU"}],"tasks":[{"g":"1213077883153499","n":"2026 Aussie Bird Count Registrations Open","sec":"Done","d":"2026-08-31","a":"Zoë Woodford","u":"https://app.asana.com/1/443963187362944/project/1208266971378656/task/1213077883153499"},{"g":"1217531860998148","n":"Spring Cocky Count 2026","sec":"In Development/Progress","d":null,"a":"Merryn Pryor","u":"https://app.asana.com/1/443963187362944/project/1208266971378656/task/1217531860998148"},{"g":"1217819371708361","n":"Investigate Web Order 42347 rounding flow timing","sec":"In Development/Progress","d":null,"a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217819371708361"},{"g":"1217772295787253","n":"Investigate missing Salesforce option in Gravity Forms","sec":"In Development/Progress","d":null,"a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217772295787253"},{"g":"1217671351897221","n":"Postage is missing in oversea orders","sec":"In Development/Progress","d":null,"a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217671351897221"},{"g":"1216586616666448","n":"Ortto migration","sec":"In Development/Progress","d":null,"a":"Mathew Hema","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1216586616666448"},{"g":"1217629978651771","n":"Copy for bulk and automated emails submitted","sec":"No section","d":"2026-08-20","a":"Merryn Pryor","u":"https://app.asana.com/1/443963187362944/task/1217629978651771"},{"g":"1217647012580031","n":"GAU Non-deductible Gifts field for Bequest Opps not populating","sec":"Backlog/Requests","d":null,"a":null,"u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217647012580031"},{"g":"1217635039446087","n":"Giftcard Donation product","sec":"Backlog/Requests","d":null,"a":null,"u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217635039446087"},{"g":"1217635039446092","n":"Giftcard Merchandise product","sec":"Backlog/Requests","d":null,"a":null,"u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217635039446092"},{"g":"1217531744582795","n":"Request: Shorebirds Program Engagement","sec":"In Development/Progress","d":"2026-11-02","a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217531744582795"},{"g":"1217635039446079","n":"List of members for past two years","sec":"In Development/Progress","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217635039446079"},{"g":"1217635039446095","n":"Birdlife Mornington Peninsula Humanitix account assistance","sec":"In Development/Progress","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217635039446095"},{"g":"1217216552646306","n":"Update UTM fields and layout in Saleforce","sec":"In Development/Progress","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217216552646306"},{"g":"1217528323617981","n":"AI camera trap project: cloud infrastructure and computing requirements","sec":"In Development/Progress","d":null,"a":"Mathew Hema","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217528323617981"},{"g":"1215902483159036","n":"Portal email mismatch/Preferred email - decision on responsibility","sec":"Blocked","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1215902483159036"},{"g":"1217146852564253","n":"Brandwatch Integration","sec":"In Development/Progress","d":null,"a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217146852564253"},{"g":"1217531554793604","n":"Request: Volunteer Onboarding course PE","sec":"Backlog/Requests","d":null,"a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217531554793604"},{"g":"1217184646558141","n":"Digital mags not sending during the Expired period","sec":"In Development/Progress","d":null,"a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217184646558141"},{"g":"1217493857741938","n":"Issue Registering new users on Bird Portal","sec":"In Development/Progress","d":null,"a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217493857741938"},{"g":"1211042433664205","n":"Website email sign up form Salesforce integration","sec":"Backlog/Requests","d":null,"a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1211042433664205"},{"g":"1216588941851847","n":"EPC - look into opt out rules: Ortto Migration","sec":"Backlog/Requests","d":"2026-08-31","a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1216588941851847"},{"g":"1217184739244217","n":"Shorten URLs function doesn't seem to be working","sec":"Backlog/Requests","d":null,"a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217184739244217"},{"g":"1213725670346009","n":"Gravity Forms - mobile and ipad viewing issues for multiple choice questions","sec":"Scoping/Requirements Gathering","d":null,"a":null,"u":"https://app.asana.com/1/443963187362944/project/1205615180624057/task/1213725670346009"},{"g":"1215124513511627","n":"Fluent SMTP + Gravity SMTP certificate currency (Andrew Dunn)","sec":"Awaiting Response","d":null,"a":"Andrew Dunn","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1215124513511627"},{"g":"1215902483159017","n":"RGs not coding to Salesforce GAU Wildbird","sec":"Blocked","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1215902483159017"},{"g":"1215902483159039","n":"Refreshing Membership opportunitiy name in Salesforce","sec":"Backlog/Requests","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1215902483159039"},{"g":"1215950784027870","n":"Plauti bulk merge permissions - decision on responsibility","sec":"Blocked","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1215950784027870"},{"g":"1215902470261951","n":"eCommerce Support cases for duplicate contacts","sec":"Blocked","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1215902470261951"},{"g":"1212674056764156","n":"Duplicate Management in Salesforce - decision on responsibility","sec":"Blocked","d":null,"a":"Mathew Hema","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1212674056764156"},{"g":"1216586616666479","n":"Implementing more features for eStore","sec":"Blocked","d":null,"a":"Mathew Hema","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1216586616666479"},{"g":"1216617339192732","n":"Conga Bequest Receipt","sec":"Blocked","d":null,"a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1216617339192732"},{"g":"1216617339192718","n":"ICT and AI policy","sec":"Awaiting Response","d":null,"a":"Mathew Hema","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1216617339192718"},{"g":"1216617339192738","n":"Community Fundraising webform, Salesforce integration, Case setup","sec":"In Development/Progress","d":null,"a":"Keith Tsui","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1216617339192738"},{"g":"1215902483159024","n":"Account Engagement Hard Bounce 24 Oct 2024","sec":"In Development/Progress","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1215902483159024"},{"g":"1216586616666505","n":"Corporate Partnerships","sec":"In Development/Progress","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1216586616666505"},{"g":"1211297053836289","n":"Salesforce eCommerce: Refund flows","sec":"In Development/Progress","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1211297053836289"},{"g":"1217146558976310","n":"Update Clarkesdale bank transactions for Emily Noble","sec":"In Development/Progress","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1217146558976310"},{"g":"1216586616666467","n":"2FA setup on website","sec":"In Development/Progress","d":null,"a":"Mathew Hema","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1216586616666467"},{"g":"1216586616666518","n":"Moving WA and Gluepot bank accounts to NAB","sec":"In Development/Progress","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1216586616666518"},{"g":"1211042433664202","n":"Cleaning up Microsoft 365 licences and accounts","sec":"In Development/Progress","d":null,"a":"Andrew Dunn","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1211042433664202"},{"g":"1211042433664201","n":"Review of Laptop replacement","sec":"In Development/Progress","d":"2026-12-04","a":"Andrew Dunn","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1211042433664201"},{"g":"1211042433664195","n":"Review of mobile phone accounts","sec":"In Development/Progress","d":"2026-12-04","a":"Andrew Dunn","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1211042433664195"},{"g":"1211042433664234","n":"Squares for payments branches and SIGs","sec":"Blocked","d":null,"a":"James Vilinsky","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1211042433664234"},{"g":"1212674056764190","n":"Salesforce Integration with Better Impact","sec":"Blocked","d":null,"a":"Mathew Hema","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1212674056764190"},{"g":"1216556543715298","n":"Branch donations and payments","sec":"Blocked","d":null,"a":"Nina Lewis","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1216556543715298"},{"g":"1211042433664230","n":"Branch and SIG membership lists","sec":"Blocked","d":null,"a":"James Vilinsky","u":"https://app.asana.com/1/443963187362944/project/1211042432693678/task/1211042433664230"}]};
+  /*SNAPSHOT-END*/
+  function snapCases() {
+    return { records: SNAPSHOT.cases.map(function (c) {
+      return { attributes: { url: '/services/data/sobjects/Case/' + c.Id },
+        CaseNumber: c.CaseNumber, Subject: c.Subject, Status: c.Status, Type: c.Type,
+        Owner: { Name: c.Owner && c.Owner.Name }, CreatedDate: c.CreatedDate,
+        LastModifiedDate: c.LastModifiedDate };
+    }) };
+  }
+  function snapTasks() {
+    return SNAPSHOT.tasks.map(function (t) {
+      return { gid: t.g, name: t.n, section: t.sec, due_on: t.d || null,
+        assignee: t.a || null, url: t.u };
+    });
+  }
+  function snapDateStr() {
+    return new Date(Date.parse(SNAPSHOT.at)).toLocaleDateString([], { day: 'numeric', month: 'short' });
+  }
+  function engageSnapshot() {
+    var did = false;
+    // A fixable auth error keeps its fix message — snapshot only covers silence.
+    if (!sfState.data && SNAPSHOT.cases.length && !(sfState.error && AUTHZ[sfState.error.code])) {
+      sfState.data = snapCases(); sfState.snapshot = true;
+      sfState.storedAt = Date.parse(SNAPSHOT.at); did = true;
+    }
+    if (!asState.data && SNAPSHOT.tasks.length && !(asState.error && AUTHZ[asState.error.code])) {
+      asState.data = snapTasks(); asState.snapshot = true;
+      asState.storedAt = Date.parse(SNAPSHOT.at); did = true;
+    }
+    if (did) renderQueue();
+    return did;
+  }
 
   var PLAIN_STATUS = {
     'New': 'Just arrived', 'In Progress': 'Being worked on', 'Pending': 'Parked',
@@ -1188,8 +1228,8 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       '<div class="preview">' + esc(a.prompt) + '</div>' +
       '<div class="btnrow" style="margin-top:0">' +
       '<button class="btn sm copyplan">Copy &amp; ask Claude</button>' +
-      (caseId && live.mcp ? '<button class="btn sm ghost workbtn" data-id="' + esc(caseId) + '" data-cat="' + esc(a.cat || '') + '">Respond / close…</button>' : '') +
-      (taskId && live.mcp ? '<button class="btn sm ghost taskbtn" data-id="' + esc(taskId) + '" data-cat="' + esc(a.cat || '') + '">Comment / move / complete…</button>' : '') +
+      (caseId && live.mcp && !sfState.snapshot ? '<button class="btn sm ghost workbtn" data-id="' + esc(caseId) + '" data-cat="' + esc(a.cat || '') + '">Respond / close…</button>' : '') +
+      (taskId && live.mcp && !asState.snapshot ? '<button class="btn sm ghost taskbtn" data-id="' + esc(taskId) + '" data-cat="' + esc(a.cat || '') + '">Comment / move / complete…</button>' : '') +
       (extra || '') + '</div>' +
       (linkRow || '') +
       (caseId || taskId ? '<div class="wbslot"></div>' : '') + '</div>';
@@ -1315,7 +1355,10 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       var order = Object.keys(groups).sort(function (a, b) {
         if (a === 'Zeus') return -1; if (b === 'Zeus') return 1; return a.localeCompare(b);
       });
-      sfArea.innerHTML = '<h2>The queue — who has what</h2>' +
+      var sfBanner = sfState.snapshot
+        ? '<div class="secterr">📸 Snapshot from ' + esc(snapDateStr()) + ' — live Salesforce isn’t reaching this device, so this is the queue as of the last sync. Writing is switched off here; your laptop stays fully live.</div>'
+        : '';
+      sfArea.innerHTML = sfBanner + '<h2>The queue — who has what</h2>' +
         '<p class="secbrief">' + esc(queueBrief(recs, now)) + '</p>' + (order.length ? order.map(function (o) {
         var rows = groups[o].map(function (r) {
           var id = (r.attributes && r.attributes.url || '').split('/').pop();
@@ -1332,7 +1375,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         var head = o === 'Zeus' ? 'Nobody’s yet — the intake queue (' + groups[o].length + ')' : esc(o) + ' (' + groups[o].length + ')';
         return '<div class="grp"><h3>' + head + '</h3>' + rows + '</div>';
       }).join('') : '<div class="secterr">Nothing matches this filter.</div>');
-      if (sfState.error) {
+      if (sfState.error && !sfState.snapshot) {
         sfArea.innerHTML += '<div class="secterr">Couldn’t refresh just now — this is the last good data. ' + esc(fixCopy(sfState.error, 'Salesforce')) + '</div>';
       }
       wireCopyPlans(sfArea);
@@ -1366,7 +1409,10 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
         if (SECTION_ORDER.indexOf('Past due') < 0) SECTION_ORDER.unshift('Past due');
         boardBar = '<p class="filterbar" style="margin:0 0 10px">Showing only <b>past-due</b> tasks — <button id="boardclear">show the whole board</button></p>';
       }
-      asanaArea.innerHTML = boardBar +
+      var asBanner = asState.snapshot
+        ? '<div class="secterr">📸 Snapshot from ' + esc(snapDateStr()) + ' — live Asana isn’t reaching this device, so this is the board as of the last sync. Writing is switched off here.</div>'
+        : '';
+      asanaArea.innerHTML = asBanner + boardBar +
         '<p class="secbrief">' + esc(boardBrief(bySec, todayStr, backlogN)) + '</p>';
       asanaArea.innerHTML += SECTION_ORDER.filter(function (s) { return bySec[s]; }).map(function (s) {
         var rows = bySec[s].map(function (x) {
@@ -1385,7 +1431,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       asanaArea.innerHTML += '<p class="hint">Backlog is tucked away here — ' + backlogN + ' task' + (backlogN === 1 ? '' : 's') +
         (asState.truncated ? ' · first 100 tasks shown' : '') +
         '. <a target="_blank" rel="noopener" href="https://app.asana.com/1/443963187362944/project/1211042432693678">See the full board in Asana ↗</a></p>';
-      if (asState.error) {
+      if (asState.error && !asState.snapshot) {
         asanaArea.innerHTML += '<div class="secterr">Couldn’t refresh just now — this is the last good data. ' + esc(fixCopy(asState.error, 'Asana')) + '</div>';
       }
       var bc = document.getElementById('boardclear');
@@ -1403,7 +1449,7 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
     var memMail = mailState.data ? peopleMail() : null;
     var memTeams = teamsState.data ? teamsChats() : null;
     renderDelta(recs, tasks, memMail, memTeams, now);
-    if (deltaDone) saveSnap(recs, tasks, memMail, memTeams, now);
+    if (deltaDone && !sfState.snapshot && !asState.snapshot) saveSnap(recs, tasks, memMail, memTeams, now);
 
     // ---- the always-visible briefing bar ----
     if (sfState.data || asState.data || mailState.data || teamsState.data) {
@@ -1412,13 +1458,25 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
       document.getElementById('brief-text').textContent = briefText();
     }
 
-    // ---- status line ----
+    // ---- status line: say exactly what's live, what's waiting, what's snapshot ----
     var errs = [sfState.error, asState.error].filter(Boolean);
-    if (recs || tasks) {
-      var at = sfState.storedAt || asState.storedAt;
-      liveDot.className = 'dot ' + (errs.length ? 'err' : 'live');
-      liveStatus.textContent = 'Live · ICT cases only (Ask Zeus) · updated ' +
-        (at ? new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'just now');
+    var pending = [], snapped = [];
+    if (!sfState.data) pending.push('Salesforce'); else if (sfState.snapshot) snapped.push('Salesforce');
+    if (!asState.data) pending.push('Asana'); else if (asState.snapshot) snapped.push('Asana');
+    if (recs || tasks || mailState.data || teamsState.data) {
+      if (pending.length) {
+        liveDot.className = 'dot err';
+        liveStatus.textContent = 'Partly live — still waiting on ' + pending.join(' & ');
+      } else if (snapped.length) {
+        liveDot.className = 'dot err';
+        liveStatus.textContent = '📸 ' + snapped.join(' & ') + ' from snapshot (' + snapDateStr() + ')' +
+          ((mailState.data || teamsState.data) ? ' · rest live' : '');
+      } else {
+        var at = sfState.storedAt || asState.storedAt;
+        liveDot.className = 'dot ' + (errs.length ? 'err' : 'live');
+        liveStatus.textContent = 'Live · ICT cases only (Ask Zeus) · updated ' +
+          (at ? new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'just now');
+      }
     } else if (errs.length === 2) {
       liveDot.className = 'dot err';
       liveStatus.textContent = 'Live data unavailable';
@@ -1965,10 +2023,11 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
   (function initLive() {
     if (!window.claude || typeof window.claude.use !== 'function') {
       offline('Static copy — live data runs on the claude.ai app link');
+      engageSnapshot();
       return;
     }
     window.claude.use('mcp').then(function (mcp) {
-      if (!mcp) { offline('Live data not available in this view'); return; }
+      if (!mcp) { offline('Live data not available in this view'); engageSnapshot(); return; }
       var started = false;
       function startOnce(sf, as, m3) {
         if (started) return;
@@ -2004,6 +2063,11 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
 
   function startWatches(mcp, sfServer, asanaServer, m365Server) {
       live.mcp = mcp; live.sf = sfServer; live.as = asanaServer; live.m365 = m365Server || M365_SERVER;
+
+      // If Salesforce/Asana haven't answered (data or a fixable error) after
+      // 12s, fall back to the baked-in snapshot so the queue is never blank —
+      // live data still replaces it the moment it arrives.
+      setTimeout(engageSnapshot, 12000);
 
       // estate health: small COUNT queries, slow cadence
       Object.keys(SYS_QUERIES).forEach(function (k) {
@@ -2047,12 +2111,12 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
           var p = ev.result.payload;
           if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
           if (p && p.records) {
-            sfState.data = p; sfState.error = null;
+            sfState.data = p; sfState.error = null; sfState.snapshot = false;
             sfState.storedAt = ev.result.cache ? ev.result.cache.storedAt : Date.now();
           }
         } else {
           sfState.error = ev.error;
-          if (AUTHZ[ev.error.code]) sfState.data = null;
+          if (AUTHZ[ev.error.code]) { sfState.data = null; sfState.snapshot = false; }
         }
         renderQueue();
       }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
@@ -2071,12 +2135,12 @@ WHERE Name = 'Keith Tsui' AND IsActive = true</pre><button data-copy="#soql-user
               return { gid: task.gid, name: task.name, section: section, due_on: task.due_on,
                 assignee: task.assignee && task.assignee.name, url: task.permalink_url };
             });
-            asState.error = null;
+            asState.error = null; asState.snapshot = false;
             asState.storedAt = ev.result.cache ? ev.result.cache.storedAt : Date.now();
           }
         } else {
           asState.error = ev.error;
-          if (AUTHZ[ev.error.code]) asState.data = null;
+          if (AUTHZ[ev.error.code]) { asState.data = null; asState.snapshot = false; }
         }
         renderQueue();
       }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
