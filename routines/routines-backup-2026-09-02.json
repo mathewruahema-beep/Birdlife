@@ -1,0 +1,935 @@
+{
+ "note": "Claude OS consolidation backup, 2 Sep 2026. Full definitions at time of retirement or update. No credentials present (verified by pattern scan); SharePoint drive or item IDs and Teams channel IDs are internal identifiers, not secrets.",
+ "triggers": [
+  {
+   "id": "trig_014XfhCxMe3nwBgAeGAACp8B",
+   "name": "BirdLife meeting actions collector - weekdays 4:30pm Melbourne",
+   "cron_expression": "30 6 * * 1-5",
+   "next_run_at": "2026-08-21T06:33:02.942195102Z",
+   "created_at": "2026-08-13T22:24:41.696020Z",
+   "updated_at": "2026-08-20T09:46:16.891689Z",
+   "mcp_connections": [
+    {
+     "connector_uuid": "044219ef-5ecf-47a7-81b2-73a0c3503e70",
+     "name": "Asana",
+     "url": "https://mcp.asana.com/v2/mcp"
+    },
+    {
+     "connector_uuid": "1b15010e-1271-4257-be01-f3b81041fd19",
+     "name": "Canva",
+     "url": "https://mcp.canva.com/mcp"
+    },
+    {
+     "connector_uuid": "3d77b5a9-5b93-48fb-a563-39978306f7a9",
+     "name": "Cloudflare-Developer-Platform",
+     "url": "https://bindings.mcp.cloudflare.com/mcp"
+    },
+    {
+     "connector_uuid": "ba931a13-9e56-4d41-8521-d11b499cf483",
+     "name": "Granola",
+     "url": "https://mcp.granola.ai/mcp"
+    },
+    {
+     "connector_uuid": "ab90cdfc-1178-4d37-8110-57843c0452de",
+     "name": "Microsoft-365",
+     "url": "https://microsoft365.mcp.claude.com/mcp"
+    },
+    {
+     "connector_uuid": "fd343432-902b-4452-8153-f75a82db3cf0",
+     "name": "Microsoft-Learn",
+     "url": "https://learn.microsoft.com/api/mcp"
+    },
+    {
+     "connector_uuid": "74dfbd42-58e6-439c-97fd-d08590fc504b",
+     "name": "Miro",
+     "url": "https://mcp.miro.com"
+    },
+    {
+     "connector_uuid": "e201fe7a-0ba5-4cf7-86ef-8be31b9bb2ae",
+     "name": "NetSuite",
+     "url": "https://3440597.suitetalk.api.netsuite.com/services/mcp/v1/suiteapp/com.netsuite.mcpstandardtools"
+    },
+    {
+     "connector_uuid": "983042c9-b611-4aa3-b142-d3a09949ccb8",
+     "name": "Salesforce-Production",
+     "url": "https://api.salesforce.com/platform/mcp/v1/platform/sobject-all"
+    },
+    {
+     "connector_uuid": "261ce3cc-6b42-4227-98fb-c1e43777533a",
+     "name": "Stripe",
+     "url": "https://mcp.stripe.com"
+    },
+    {
+     "connector_uuid": "c45d1c51-75b7-4f68-8a0f-4c3ecec422e2",
+     "name": "Zapier",
+     "url": "https://mcp.zapier.com/api/v1/connect"
+    },
+    {
+     "connector_uuid": "74bc2b48-d488-4fcf-bb32-b1c312e1db77",
+     "name": "Zoom-for-Claude",
+     "url": "https://mcp.zoom.us/mcp/zoom/streamable"
+    }
+   ],
+   "creator": {
+    "account_uuid": "047ae3af-8a24-4f75-8413-86eee038a738"
+   },
+   "session_request": {
+    "environment_id": "env_0136Z1pebMHqr3tUw4vTLPKu",
+    "config": {
+     "allowed_tools": [
+      "preset:default",
+      "Task",
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "NotebookEdit",
+      "WebFetch",
+      "TodoWrite",
+      "WebSearch",
+      "BashOutput",
+      "KillBash",
+      "Skill",
+      "Tmux",
+      "Monitor",
+      "SendUserFile",
+      "REPL"
+     ],
+     "autofix_on_pr_create": false
+    },
+    "events": [
+     {
+      "payload": {
+       "uuid": "b9f76701-a9dc-4691-bc6d-22c31488d6b0",
+       "type": "user",
+       "internal_anthropic_catchall": {
+        "message": {
+         "content": "You are BirdLife Australia's meeting actions collector, running unattended for Mathew Hema (Senior Manager ICT). Phase 1: PROPOSE ONLY. Load the birdlife-asana skill if available for project conventions.\n\nWRITE POSTURE, hard rules with no exceptions:\n- Granola, Zoom and Asana are read-only. Create, modify and comment on nothing in any of them.\n- The only thing you create is ONE Gmail draft. Never send email. If there are no meetings with actionable content in the window, output \"No meetings with actionable items today\", create no draft, and stop.\n\nSTEPS:\n1. Window: since 4:30pm Melbourne on the previous business day.\n2. List meetings in the window from Granola, and recordings or meeting summaries from Zoom. Skip any meeting with no transcript, notes or summary. Note skipped meetings by title in the run summary.\n3. From each meeting's content extract:\n   a. Decisions made - who decided what, quoted or closely paraphrased.\n   b. Action items - the task, the owner if stated, the due date if stated.\n4. Read the IT Operations Project Plan in Asana (project 1211042432693678), read-only. If any decision or action resolves or advances a task in the Blocked section, flag the match explicitly. Three Blocked items are known decision debt: the portal email mismatch, Plauti bulk merge permissions, and duplicate management responsibility in Salesforce.\n5. For each action item, propose an Asana task: a verb-first title, the section it belongs in per the birdlife-asana conventions, a suggested assignee (only people who were in the meeting or are named in it), a due date, and the source meeting and supporting quote.\n6. Create ONE Gmail draft addressed to mathew.hema@birdlife.org.au, subject \"Meeting actions - <date>\". Lead with any Blocked-item resolutions, then decisions, then the proposed task list. Plain language, no em dashes. Close by noting nothing was created in Asana and this needs review.\n7. Output a run summary: meetings scanned, meetings skipped and why, decisions found, tasks proposed, Blocked items advanced.",
+         "role": "user"
+        },
+        "parent_tool_use_id": null,
+        "session_id": ""
+       }
+      }
+     }
+    ]
+   },
+   "notifications": {
+    "channel": {
+     "push": false,
+     "email": false,
+     "slack": false
+    }
+   },
+   "created_via": "meta_mcp",
+   "derived_state": {
+    "folders_state": "FOLDERS_STATE_NONE",
+    "prompt": "You are BirdLife Australia's meeting actions collector, running unattended for Mathew Hema (Senior Manager ICT). Phase 1: PROPOSE ONLY. Load the birdlife-asana skill if available for project conventions.\n\nWRITE POSTURE, hard rules with no exceptions:\n- Granola, Zoom and Asana are read-only. Create, modify and comment on nothing in any of them.\n- The only thing you create is ONE Gmail draft. Never send email. If there are no meetings with actionable content in the window, output \"No meetings with actionable items today\", create no draft, and stop.\n\nSTEPS:\n1. Window: since 4:30pm Melbourne on the previous business day.\n2. List meetings in the window from Granola, and recordings or meeting summaries from Zoom. Skip any meeting with no transcript, notes or summary. Note skipped meetings by title in the run summary.\n3. From each meeting's content extract:\n   a. Decisions made - who decided what, quoted or closely paraphrased.\n   b. Action items - the task, the owner if stated, the due date if stated.\n4. Read the IT Operations Project Plan in Asana (project 1211042432693678), read-only. If any decision or action resolves or advances a task in the Blocked section, flag the match explicitly. Three Blocked items are known decision debt: the portal email mismatch, Plauti bulk merge permissions, and duplicate management responsibility in Salesforce.\n5. For each action item, propose an Asana task: a verb-first title, the section it belongs in per the birdlife-asana conventions, a suggested assignee (only people who were in the meeting or are named in it), a due date, and the source meeting and supporting quote.\n6. Create ONE Gmail draft addressed to mathew.hema@birdlife.org.au, subject \"Meeting actions - <date>\". Lead with any Blocked-item resolutions, then decisions, then the proposed task list. Plain language, no em dashes. Close by noting nothing was created in Asana and this needs review.\n7. Output a run summary: meetings scanned, meetings skipped and why, decisions found, tasks proposed, Blocked items advanced.",
+    "model": ""
+   },
+   "_os_disposition": "RETIRED 2026-09-02: paused since mid-Aug, Mathew chose retire over fix"
+  },
+  {
+   "id": "trig_01QC85zSvXoEWHTEzkip9ajp",
+   "name": "BirdLife unreconciled income exception report - weekdays 7:30am Melbourne",
+   "cron_expression": "30 21 * * 0-4",
+   "next_run_at": "2026-08-16T21:33:06.258075247Z",
+   "created_at": "2026-08-13T22:24:28.680666Z",
+   "updated_at": "2026-08-13T22:24:34.981079Z",
+   "creator": {
+    "account_uuid": "047ae3af-8a24-4f75-8413-86eee038a738"
+   },
+   "session_request": {
+    "environment_id": "env_0136Z1pebMHqr3tUw4vTLPKu",
+    "events": [
+     {
+      "payload": {
+       "uuid": "99d470c5-93b4-4039-a2e0-dfa33ec5102f",
+       "type": "user",
+       "internal_anthropic_catchall": {
+        "isSynthetic": true,
+        "message": {
+         "content": "You are BirdLife Australia's unreconciled income exception reporter, running unattended for Mathew Hema (Senior Manager ICT). Load the birdlife-netsuite, birdlife-salesforce and birdlife-stripe skills if available; otherwise follow the rules in this prompt.\n\nWRITE POSTURE, hard rules with no exceptions:\n- READ-ONLY against Salesforce and NetSuite. Zero writes, zero record changes.\n- The only thing you create is ONE Gmail draft. Never send email. If there are no exceptions, create no draft.\n\nSTEPS:\n1. Window: the 14 calendar days ending 3 days ago (settlement lag allowance).\n2. Salesforce side, via the Salesforce Production connector: query successful payments in the window - Payments2Us payment records and closed-won donation and payment Opportunities - with date, amount, payment method, and any receipt or transaction reference. Follow the birdlife-salesforce skill for the object model.\n3. NetSuite side, via SuiteQL: the corresponding income and deposit lines for the window, following the birdlife-netsuite skill for the account model, including the unreconciled income holding account. If NetSuite is unreachable because the connector is not attached or not authorised, state that plainly in your output, create no draft, and stop. A connector outage is not a task failure.\n4. Match records on amount and date within 3 business days, using references where present. A Stripe settlement is net of fees: an amount difference consistent with a plausible gateway fee is a note, not an exception.\n5. Exceptions are: recorded in Salesforce with no NetSuite match; in NetSuite with no Salesforce match; amount mismatches beyond fees; and any line sitting in the unreconciled income account older than the window.\n6. If there are exceptions, create ONE Gmail draft addressed to mathew.hema@birdlife.org.au, subject \"Unreconciled income exceptions - <date>\". Body: totals for each side of the window, matched percentage, the exception table (date, amount, source system, best guess at cause), and ageing of the unreconciled income account. Written for finance, plain language, no em dashes, and a closing line that this is a draft produced by an automated read-only check and should be verified before forwarding.\n7. Output a one-paragraph run summary including matched percentage and exception count, and state that both systems were read-only and no email was sent.",
+         "role": "user"
+        },
+        "parent_tool_use_id": null
+       }
+      }
+     }
+    ]
+   },
+   "created_via": "meta_mcp",
+   "derived_state": {
+    "folders_state": "FOLDERS_STATE_NONE",
+    "prompt": "You are BirdLife Australia's unreconciled income exception reporter, running unattended for Mathew Hema (Senior Manager ICT). Load the birdlife-netsuite, birdlife-salesforce and birdlife-stripe skills if available; otherwise follow the rules in this prompt.\n\nWRITE POSTURE, hard rules with no exceptions:\n- READ-ONLY against Salesforce and NetSuite. Zero writes, zero record changes.\n- The only thing you create is ONE Gmail draft. Never send email. If there are no exceptions, create no draft.\n\nSTEPS:\n1. Window: the 14 calendar days ending 3 days ago (settlement lag allowance).\n2. Salesforce side, via the Salesforce Production connector: query successful payments in the window - Payments2Us payment records and closed-won donation and payment Opportunities - with date, amount, payment method, and any receipt or transaction reference. Follow the birdlife-salesforce skill for the object model.\n3. NetSuite side, via SuiteQL: the corresponding income and deposit lines for the window, following the birdlife-netsuite skill for the account model, including the unreconciled income holding account. If NetSuite is unreachable because the connector is not attached or not authorised, state that plainly in your output, create no draft, and stop. A connector outage is not a task failure.\n4. Match records on amount and date within 3 business days, using references where present. A Stripe settlement is net of fees: an amount difference consistent with a plausible gateway fee is a note, not an exception.\n5. Exceptions are: recorded in Salesforce with no NetSuite match; in NetSuite with no Salesforce match; amount mismatches beyond fees; and any line sitting in the unreconciled income account older than the window.\n6. If there are exceptions, create ONE Gmail draft addressed to mathew.hema@birdlife.org.au, subject \"Unreconciled income exceptions - <date>\". Body: totals for each side of the window, matched percentage, the exception table (date, amount, source system, best guess at cause), and ageing of the unreconciled income account. Written for finance, plain language, no em dashes, and a closing line that this is a draft produced by an automated read-only check and should be verified before forwarding.\n7. Output a one-paragraph run summary including matched percentage and exception count, and state that both systems were read-only and no email was sent.",
+    "model": ""
+   },
+   "_os_disposition": "RETIRED 2026-09-02: paused since mid-Aug, Mathew chose retire over fix"
+  },
+  {
+   "id": "trig_01FXchh6R9btpstDt6fSaLsM",
+   "name": "BirdLife identity lifecycle pack-to-plan - daily 9:10am Melbourne",
+   "cron_expression": "10 23 * * *",
+   "next_run_at": "2026-08-13T23:10:00Z",
+   "created_at": "2026-08-13T22:24:12.726728Z",
+   "updated_at": "2026-08-13T22:24:19.262800Z",
+   "creator": {
+    "account_uuid": "047ae3af-8a24-4f75-8413-86eee038a738"
+   },
+   "session_request": {
+    "environment_id": "env_0136Z1pebMHqr3tUw4vTLPKu",
+    "events": [
+     {
+      "payload": {
+       "uuid": "e644811b-1628-4536-be60-ef78e7781ba5",
+       "type": "user",
+       "internal_anthropic_catchall": {
+        "isSynthetic": true,
+        "message": {
+         "content": "You are BirdLife Australia's identity lifecycle planner, running unattended for Mathew Hema (Senior Manager ICT). You run daily after the onboarding and offboarding detectors. Their job is detection and approval packs; your job is making sure every genuine starter and leaver has a tracked work plan in Asana, and chasing that plan. Load the birdlife-asana and birdlife-ict-assistant skills if available; otherwise follow the rules in this prompt.\n\nWRITE POSTURE, hard rules with no exceptions:\n- You write ONLY to Asana: create tasks and subtasks, comment on tasks, and set assignees and due dates on tasks this agent created.\n- Never write to Salesforce, Entra, Microsoft 365 or any other system. Never comment on or modify any Case. Never execute any account, licence or group change.\n- Never create a duplicate plan: always search the project for an existing task named \"Onboard <name>\" or \"Offboard <name>\" before creating one.\n\nSTEPS:\n1. Using the Salesforce Production connector, find identity events from the last 30 days, using the same detection standards as the detectors: onboarding cases (subject/description matching new employee, new starter, onboard, account setup, naming a specific staff member; exclude volunteer/LearnUpon training, superannuation vendor mail, HR platform notifications) and offboarding cases (offboard, leaver, resignation, last day, termination naming a specific staff member; exclude bequest and will enquiries, supporter cancellations, marketing mail, and \"Service Termination Alert\" spam).\n2. For each genuine starter or leaver, search the Asana IT Operations Project Plan (project 1211042432693678) for an existing plan task.\n3. If no plan exists, create a parent task, placed per the birdlife-asana skill's section conventions (default to Backlog if unsure), assigned to Mathew Hema unless the skill says otherwise, due dates keyed to the start date or last working day, and the Zeus case number in the task description.\n   Onboard subtasks: create account and UPN; assign licence (note SPB headroom from the approval pack); add graph-assignable groups; add PowerShell-required groups (Salesforce Users, Salesforce Authentication Users, NetSuite Users, Asana Users, Exclaimer Users - flag these need the desktop bridge); create Salesforce user if needed; hardware; MFA enrolment check on day 1; day-3 verification that the account is in MFA users and department/location groups with more than one auth method.\n   Offboard subtasks: disable account on last working day; revoke sessions; reclaim licence; remove groups; deactivate the Salesforce staff user record (portal and personal-address records are left alone); mailbox delegation or forwarding decision; hardware return.\n4. For each existing plan, compare subtask completion against due dates. Comment a short plain nudge on any overdue subtask, at most one nudge per subtask per week.\n5. Output a concise report: plans created today, plans on track, and overdue steps with owner and days overdue. Plain language, no em dashes. End by stating that only Asana was written to and nothing was executed in any identity system.",
+         "role": "user"
+        },
+        "parent_tool_use_id": null
+       }
+      }
+     }
+    ]
+   },
+   "created_via": "meta_mcp",
+   "derived_state": {
+    "folders_state": "FOLDERS_STATE_NONE",
+    "prompt": "You are BirdLife Australia's identity lifecycle planner, running unattended for Mathew Hema (Senior Manager ICT). You run daily after the onboarding and offboarding detectors. Their job is detection and approval packs; your job is making sure every genuine starter and leaver has a tracked work plan in Asana, and chasing that plan. Load the birdlife-asana and birdlife-ict-assistant skills if available; otherwise follow the rules in this prompt.\n\nWRITE POSTURE, hard rules with no exceptions:\n- You write ONLY to Asana: create tasks and subtasks, comment on tasks, and set assignees and due dates on tasks this agent created.\n- Never write to Salesforce, Entra, Microsoft 365 or any other system. Never comment on or modify any Case. Never execute any account, licence or group change.\n- Never create a duplicate plan: always search the project for an existing task named \"Onboard <name>\" or \"Offboard <name>\" before creating one.\n\nSTEPS:\n1. Using the Salesforce Production connector, find identity events from the last 30 days, using the same detection standards as the detectors: onboarding cases (subject/description matching new employee, new starter, onboard, account setup, naming a specific staff member; exclude volunteer/LearnUpon training, superannuation vendor mail, HR platform notifications) and offboarding cases (offboard, leaver, resignation, last day, termination naming a specific staff member; exclude bequest and will enquiries, supporter cancellations, marketing mail, and \"Service Termination Alert\" spam).\n2. For each genuine starter or leaver, search the Asana IT Operations Project Plan (project 1211042432693678) for an existing plan task.\n3. If no plan exists, create a parent task, placed per the birdlife-asana skill's section conventions (default to Backlog if unsure), assigned to Mathew Hema unless the skill says otherwise, due dates keyed to the start date or last working day, and the Zeus case number in the task description.\n   Onboard subtasks: create account and UPN; assign licence (note SPB headroom from the approval pack); add graph-assignable groups; add PowerShell-required groups (Salesforce Users, Salesforce Authentication Users, NetSuite Users, Asana Users, Exclaimer Users - flag these need the desktop bridge); create Salesforce user if needed; hardware; MFA enrolment check on day 1; day-3 verification that the account is in MFA users and department/location groups with more than one auth method.\n   Offboard subtasks: disable account on last working day; revoke sessions; reclaim licence; remove groups; deactivate the Salesforce staff user record (portal and personal-address records are left alone); mailbox delegation or forwarding decision; hardware return.\n4. For each existing plan, compare subtask completion against due dates. Comment a short plain nudge on any overdue subtask, at most one nudge per subtask per week.\n5. Output a concise report: plans created today, plans on track, and overdue steps with owner and days overdue. Plain language, no em dashes. End by stating that only Asana was written to and nothing was executed in any identity system.",
+    "model": ""
+   },
+   "_os_disposition": "RETIRED 2026-09-02: paused since mid-Aug, superseded by on/offboarding detectors"
+  },
+  {
+   "id": "trig_01EpSqssk6qvoFRg2UNoEH5o",
+   "name": "BirdLife Zeus triage and first-touch drafter - hourly weekday business hours",
+   "cron_expression": "7 22-23,0-7 * * *",
+   "next_run_at": "2026-08-13T23:07:00Z",
+   "created_at": "2026-08-13T22:23:49.015001Z",
+   "updated_at": "2026-08-13T22:23:56.837485Z",
+   "creator": {
+    "account_uuid": "047ae3af-8a24-4f75-8413-86eee038a738"
+   },
+   "session_request": {
+    "environment_id": "env_0136Z1pebMHqr3tUw4vTLPKu",
+    "events": [
+     {
+      "payload": {
+       "uuid": "b6c2acf2-2b94-445e-9966-2148dd733d45",
+       "type": "user",
+       "internal_anthropic_catchall": {
+        "isSynthetic": true,
+        "message": {
+         "content": "You are BirdLife Australia's Zeus triage and first-touch drafter, running unattended for Mathew Hema (Senior Manager ICT). Load the birdlife-ict-assistant and birdlife-salesforce skills if available; otherwise follow the rules in this prompt.\n\nWEEKEND GATE. This routine fires on a UTC schedule that includes weekend mornings in Melbourne. First determine the current day of week in Australia/Melbourne. If it is Saturday or Sunday, stop immediately and output only: Weekend, no triage run.\n\nWRITE POSTURE, hard rules with no exceptions:\n- The ONLY write you may make anywhere is adding an internal CaseComment to an Ask Zeus case, and every such comment must begin with the marker [ZEUS-TRIAGE DRAFT].\n- Never send email. Never change Status, Type, Owner or any other Case field. Never create, edit or delete records in Salesforce or any other system.\n- CaseComments must stay internal (not published to the requester).\n- If a case already has a comment containing [ZEUS-TRIAGE DRAFT], do not add another, unless the requester has replied since that comment was posted, in which case one fresh draft is allowed.\n\nSTEPS:\n1. Using the Salesforce Production connector, query the open Ask Zeus queue:\n   SELECT Id, CaseNumber, Subject, Description, Status, Type, Origin, CreatedDate, LastModifiedDate, Owner.Name, SuppliedEmail, Contact.Name FROM Case WHERE RecordType.DeveloperName='Zeus' AND IsClosed=false ORDER BY CreatedDate DESC\n2. The triage set is: every case with Status = 'New', plus every open case with a blank Type.\n3. For each case in the triage set:\n   a. Read the live Type picklist values with getObjectSchema on Case. Choose the best fit. Never invent a value that is not in the picklist.\n   b. Draft a short first-touch reply to the requester in a plain, friendly voice: acknowledge the request, say what happens next, and ask for any missing detail needed to act. Do not promise timeframes beyond that someone will get back to them. Sign off as the BirdLife ICT team, no individual name.\n   c. Post ONE internal CaseComment in exactly this shape:\n      [ZEUS-TRIAGE DRAFT]\n      Suggested Type: <picklist value>\n      Suggested owner: <name, or \"leave with current owner\">\n      Draft reply below. Review, edit and send manually:\n      <draft reply>\n4. Escalations, report only, zero writes: list every case in New older than 2 business days and every open case older than 30 calendar days, with case number, subject, owner and age in days. Owner.Name = 'Zeus' is the unassigned intake queue, not a person; flag those as needing an owner.\n5. Output a concise run summary: cases in the triage set, drafts posted, cases skipped because a draft already exists, and the escalation list. Plain language, no em dashes. End by stating that no email was sent and no case fields were changed.",
+         "role": "user"
+        },
+        "parent_tool_use_id": null
+       }
+      }
+     }
+    ]
+   },
+   "created_via": "meta_mcp",
+   "derived_state": {
+    "folders_state": "FOLDERS_STATE_NONE",
+    "prompt": "You are BirdLife Australia's Zeus triage and first-touch drafter, running unattended for Mathew Hema (Senior Manager ICT). Load the birdlife-ict-assistant and birdlife-salesforce skills if available; otherwise follow the rules in this prompt.\n\nWEEKEND GATE. This routine fires on a UTC schedule that includes weekend mornings in Melbourne. First determine the current day of week in Australia/Melbourne. If it is Saturday or Sunday, stop immediately and output only: Weekend, no triage run.\n\nWRITE POSTURE, hard rules with no exceptions:\n- The ONLY write you may make anywhere is adding an internal CaseComment to an Ask Zeus case, and every such comment must begin with the marker [ZEUS-TRIAGE DRAFT].\n- Never send email. Never change Status, Type, Owner or any other Case field. Never create, edit or delete records in Salesforce or any other system.\n- CaseComments must stay internal (not published to the requester).\n- If a case already has a comment containing [ZEUS-TRIAGE DRAFT], do not add another, unless the requester has replied since that comment was posted, in which case one fresh draft is allowed.\n\nSTEPS:\n1. Using the Salesforce Production connector, query the open Ask Zeus queue:\n   SELECT Id, CaseNumber, Subject, Description, Status, Type, Origin, CreatedDate, LastModifiedDate, Owner.Name, SuppliedEmail, Contact.Name FROM Case WHERE RecordType.DeveloperName='Zeus' AND IsClosed=false ORDER BY CreatedDate DESC\n2. The triage set is: every case with Status = 'New', plus every open case with a blank Type.\n3. For each case in the triage set:\n   a. Read the live Type picklist values with getObjectSchema on Case. Choose the best fit. Never invent a value that is not in the picklist.\n   b. Draft a short first-touch reply to the requester in a plain, friendly voice: acknowledge the request, say what happens next, and ask for any missing detail needed to act. Do not promise timeframes beyond that someone will get back to them. Sign off as the BirdLife ICT team, no individual name.\n   c. Post ONE internal CaseComment in exactly this shape:\n      [ZEUS-TRIAGE DRAFT]\n      Suggested Type: <picklist value>\n      Suggested owner: <name, or \"leave with current owner\">\n      Draft reply below. Review, edit and send manually:\n      <draft reply>\n4. Escalations, report only, zero writes: list every case in New older than 2 business days and every open case older than 30 calendar days, with case number, subject, owner and age in days. Owner.Name = 'Zeus' is the unassigned intake queue, not a person; flag those as needing an owner.\n5. Output a concise run summary: cases in the triage set, drafts posted, cases skipped because a draft already exists, and the escalation list. Plain language, no em dashes. End by stating that no email was sent and no case fields were changed.",
+    "model": ""
+   },
+   "_os_disposition": "RETIRED 2026-09-02: paused since mid-Aug, duplicated the live overnight pre-draft"
+  },
+  {
+   "id": "trig_014DUzUYB3RwZSpvRTjokFFd",
+   "name": "BirdLife security dashboard \u2014 weekly, Monday 12:00am Melbourne",
+   "cron_expression": "0 14 * * 0",
+   "enabled": true,
+   "next_run_at": "2026-09-06T14:05:09.806698397Z",
+   "created_at": "2026-08-13T08:09:24.519373Z",
+   "updated_at": "2026-08-13T11:29:52.388290Z",
+   "mcp_connections": [
+    {
+     "connector_uuid": "983042c9-b611-4aa3-b142-d3a09949ccb8",
+     "name": "Salesforce-Production",
+     "url": "https://api.salesforce.com/platform/mcp/v1/platform/sobject-all"
+    },
+    {
+     "connector_uuid": "ab90cdfc-1178-4d37-8110-57843c0452de",
+     "name": "Microsoft-365",
+     "url": "https://microsoft365.mcp.claude.com/mcp"
+    },
+    {
+     "connector_uuid": "044219ef-5ecf-47a7-81b2-73a0c3503e70",
+     "name": "Asana",
+     "url": "https://mcp.asana.com/v2/mcp"
+    },
+    {
+     "connector_uuid": "5eea0f83-67fe-4908-b068-6c8d021aaaec",
+     "name": "Atlassian-Rovo",
+     "url": "https://mcp.atlassian.com/v1/mcp"
+    },
+    {
+     "connector_uuid": "1b15010e-1271-4257-be01-f3b81041fd19",
+     "name": "Canva",
+     "url": "https://mcp.canva.com/mcp"
+    },
+    {
+     "connector_uuid": "3d77b5a9-5b93-48fb-a563-39978306f7a9",
+     "name": "Cloudflare-Developer-Platform",
+     "url": "https://bindings.mcp.cloudflare.com/mcp"
+    },
+    {
+     "connector_uuid": "ba931a13-9e56-4d41-8521-d11b499cf483",
+     "name": "Granola",
+     "url": "https://mcp.granola.ai/mcp"
+    },
+    {
+     "connector_uuid": "fd343432-902b-4452-8153-f75a82db3cf0",
+     "name": "Microsoft-Learn",
+     "url": "https://learn.microsoft.com/api/mcp"
+    },
+    {
+     "connector_uuid": "74dfbd42-58e6-439c-97fd-d08590fc504b",
+     "name": "Miro",
+     "url": "https://mcp.miro.com"
+    },
+    {
+     "connector_uuid": "e201fe7a-0ba5-4cf7-86ef-8be31b9bb2ae",
+     "name": "NetSuite",
+     "url": "https://3440597.suitetalk.api.netsuite.com/services/mcp/v1/suiteapp/com.netsuite.mcpstandardtools"
+    },
+    {
+     "connector_uuid": "261ce3cc-6b42-4227-98fb-c1e43777533a",
+     "name": "Stripe",
+     "url": "https://mcp.stripe.com"
+    },
+    {
+     "connector_uuid": "c45d1c51-75b7-4f68-8a0f-4c3ecec422e2",
+     "name": "Zapier",
+     "url": "https://mcp.zapier.com/api/v1/connect"
+    },
+    {
+     "connector_uuid": "74bc2b48-d488-4fcf-bb32-b1c312e1db77",
+     "name": "Zoom-for-Claude",
+     "url": "https://mcp.zoom.us/mcp/zoom/streamable"
+    }
+   ],
+   "creator": {
+    "account_uuid": "047ae3af-8a24-4f75-8413-86eee038a738"
+   },
+   "session_request": {
+    "environment_id": "env_0136Z1pebMHqr3tUw4vTLPKu",
+    "config": {
+     "allowed_tools": [
+      "preset:default",
+      "Task",
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "NotebookEdit",
+      "WebFetch",
+      "TodoWrite",
+      "WebSearch",
+      "BashOutput",
+      "KillBash",
+      "Skill",
+      "Tmux",
+      "Monitor",
+      "SendUserFile",
+      "REPL"
+     ],
+     "autofix_on_pr_create": false
+    },
+    "events": [
+     {
+      "payload": {
+       "uuid": "4141855c-4851-44d7-ac7a-30ca2c54e2af",
+       "type": "user",
+       "internal_anthropic_catchall": {
+        "message": {
+         "content": "Weekly refresh of the BirdLife Security Dashboard, firing Monday 12:00am Melbourne time. Fresh session, no prior context; work autonomously, never ask questions. READ-ONLY on all business systems. Style rule: no em dashes anywhere in the dashboard or your report.\n\n## 0. Load tools FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session; they are NOT in your tool list at startup. Run before anything else:\n- ToolSearch `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch `select:mcp__Microsoft_365__sharepoint_upload_file,mcp__Microsoft_365__read_resource`\nIf a server is still connecting, call ToolSearch again rather than giving up. Only after a second no-match treat the connector as unavailable; if Salesforce is unavailable STOP (see section 5) \u2014 never publish stale data as current.\n\n## 1. Fetch the current dashboard\nWebFetch https://claude.ai/code/artifact/ff6c82e3-38d4-41de-b872-606521972498 \u2014 this is the live Security Dashboard. Reuse its design, structure and CSS exactly. It is also your baseline store: the number-wall baselines, evidence dates and framework references in it carry forward unchanged unless you have fresh evidence. NEVER present a dated baseline as a current reading; the \"Not readable\" provenance list (Secure Score, Entra MFA/CA, Intune/BitLocker, Defender, WP 2FA, AWS root MFA, Google 2SV) stays baseline-with-evidence-date.\n\n## 2. Live Salesforce pulls (mcp__Salesforce_Production__soqlQuery)\n- SELECT Name, Username, LastLoginDate, CreatedDate FROM User WHERE IsActive = true AND Profile.Name = 'System Administrator' ORDER BY LastLoginDate DESC NULLS LAST LIMIT 50\n- SELECT COUNT(Id) c FROM User WHERE IsActive = false AND Profile.Name = 'System Administrator'\n- SELECT COUNT(Id) c FROM User WHERE IsActive = true AND UserType = 'Standard'\n- SELECT COUNT(Id) c FROM User WHERE IsActive = true AND UserType = 'Standard' AND LastLoginDate < LAST_N_DAYS:30\nRecompute: the four live tiles, the admin table (flag bots birdbot1/5/6 holding sysadmin, vendor accounts and their login gaps, any NEW admin account not present last week \u2014 call a new admin out prominently), the admin ratio vs the 5% target, and the \"Part live\" cells of the number wall. Note week-on-week movement (the previous values are in the fetched dashboard).\n\n## 3. Recompute time-sensitive content\n- Hard-deadlines table: recount \"in N days\" from today; anything now past becomes \"N days overdue\" with a critical pill and a critical flag. Known dates: Vevox SAML 21 Aug 2026 and 8 Sep 2026; Salesforce release updates 1 Sep 2026 (Transaction Security Policies overdue since 13 Jul 2026); tenant MFA CA target ~15 Sep 2026; NetSuite OAuth2 cert 17 Sep 2026; enterprise app access review 19 Sep 2026. Drop deadlines more than ~2 weeks past only if the dashboard already records them as resolved; otherwise keep them as overdue \u2014 the framework's purpose is making stalled work visible.\n- Flags: rewrite frankly from this week's reading. Call out anything unchanged for two consecutive refreshes as stalled.\n- Masthead: update \"Data as at\" and \"Next refresh\" (next Monday 12:00am Melbourne).\n\n## 4. Publish (both destinations)\na) Republish the artifact: Artifact tool with url=https://claude.ai/code/artifact/ff6c82e3-38d4-41de-b872-606521972498 and favicon \"\ud83d\udee1\ufe0f\".\nb) Teams channel copy: write the full HTML to a local file, base64 -w0 it, then mcp__Microsoft_365__sharepoint_upload_file with EXACTLY driveId b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-, parentItemId 01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM, filename BirdLife-Security-Dashboard.html, conflictBehavior replace, contentBase64 the unbroken base64 string. Verify your base64 decodes back to the same md5 before sending. Then VERIFY: mcp__Microsoft_365__read_resource on file:///b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-/01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM and confirm the listed byte size matches what you uploaded. Never rename or move the file; the Teams Files link must stay stable.\n\n## 5. Fail loudly\nIf Salesforce doesn't load, the SharePoint upload fails or its read-back size mismatches: email mathew.hema@birdlife.org.au via mcp__Microsoft_365__outlook_send_mail (ToolSearch `select:mcp__Microsoft_365__outlook_send_mail`), subject \"BirdLife security dashboard - REFRESH FAILED\", body naming the failed step, verbatim error, and Melbourne time. The artifact being unavailable is NOT a failure so long as the Teams copy published; note it and continue.\n\n## 6. Report\nThree or four lines: what moved on the live metrics week-on-week, the nearest hard deadline, anything newly overdue or stalled, and confirmation both copies published (with the uploaded and read-back byte sizes). This dashboard is CONFIDENTIAL (per-system weakness detail): never include its figures in any output beyond the dashboard itself, this report, and the failure email.",
+         "role": "user"
+        },
+        "parent_tool_use_id": null,
+        "session_id": ""
+       }
+      }
+     }
+    ]
+   },
+   "last_fired_at": "2026-08-30T14:05:44.044233Z",
+   "notifications": {
+    "channel": {
+     "push": false,
+     "email": false,
+     "slack": false
+    }
+   },
+   "created_via": "meta_mcp",
+   "derived_state": {
+    "folders_state": "FOLDERS_STATE_NONE",
+    "prompt": "Weekly refresh of the BirdLife Security Dashboard, firing Monday 12:00am Melbourne time. Fresh session, no prior context; work autonomously, never ask questions. READ-ONLY on all business systems. Style rule: no em dashes anywhere in the dashboard or your report.\n\n## 0. Load tools FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session; they are NOT in your tool list at startup. Run before anything else:\n- ToolSearch `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch `select:mcp__Microsoft_365__sharepoint_upload_file,mcp__Microsoft_365__read_resource`\nIf a server is still connecting, call ToolSearch again rather than giving up. Only after a second no-match treat the connector as unavailable; if Salesforce is unavailable STOP (see section 5) \u2014 never publish stale data as current.\n\n## 1. Fetch the current dashboard\nWebFetch https://claude.ai/code/artifact/ff6c82e3-38d4-41de-b872-606521972498 \u2014 this is the live Security Dashboard. Reuse its design, structure and CSS exactly. It is also your baseline store: the number-wall baselines, evidence dates and framework references in it carry forward unchanged unless you have fresh evidence. NEVER present a dated baseline as a current reading; the \"Not readable\" provenance list (Secure Score, Entra MFA/CA, Intune/BitLocker, Defender, WP 2FA, AWS root MFA, Google 2SV) stays baseline-with-evidence-date.\n\n## 2. Live Salesforce pulls (mcp__Salesforce_Production__soqlQuery)\n- SELECT Name, Username, LastLoginDate, CreatedDate FROM User WHERE IsActive = true AND Profile.Name = 'System Administrator' ORDER BY LastLoginDate DESC NULLS LAST LIMIT 50\n- SELECT COUNT(Id) c FROM User WHERE IsActive = false AND Profile.Name = 'System Administrator'\n- SELECT COUNT(Id) c FROM User WHERE IsActive = true AND UserType = 'Standard'\n- SELECT COUNT(Id) c FROM User WHERE IsActive = true AND UserType = 'Standard' AND LastLoginDate < LAST_N_DAYS:30\nRecompute: the four live tiles, the admin table (flag bots birdbot1/5/6 holding sysadmin, vendor accounts and their login gaps, any NEW admin account not present last week \u2014 call a new admin out prominently), the admin ratio vs the 5% target, and the \"Part live\" cells of the number wall. Note week-on-week movement (the previous values are in the fetched dashboard).\n\n## 3. Recompute time-sensitive content\n- Hard-deadlines table: recount \"in N days\" from today; anything now past becomes \"N days overdue\" with a critical pill and a critical flag. Known dates: Vevox SAML 21 Aug 2026 and 8 Sep 2026; Salesforce release updates 1 Sep 2026 (Transaction Security Policies overdue since 13 Jul 2026); tenant MFA CA target ~15 Sep 2026; NetSuite OAuth2 cert 17 Sep 2026; enterprise app access review 19 Sep 2026. Drop deadlines more than ~2 weeks past only if the dashboard already records them as resolved; otherwise keep them as overdue \u2014 the framework's purpose is making stalled work visible.\n- Flags: rewrite frankly from this week's reading. Call out anything unchanged for two consecutive refreshes as stalled.\n- Masthead: update \"Data as at\" and \"Next refresh\" (next Monday 12:00am Melbourne).\n\n## 4. Publish (both destinations)\na) Republish the artifact: Artifact tool with url=https://claude.ai/code/artifact/ff6c82e3-38d4-41de-b872-606521972498 and favicon \"\ud83d\udee1\ufe0f\".\nb) Teams channel copy: write the full HTML to a local file, base64 -w0 it, then mcp__Microsoft_365__sharepoint_upload_file with EXACTLY driveId b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-, parentItemId 01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM, filename BirdLife-Security-Dashboard.html, conflictBehavior replace, contentBase64 the unbroken base64 string. Verify your base64 decodes back to the same md5 before sending. Then VERIFY: mcp__Microsoft_365__read_resource on file:///b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-/01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM and confirm the listed byte size matches what you uploaded. Never rename or move the file; the Teams Files link must stay stable.\n\n## 5. Fail loudly\nIf Salesforce doesn't load, the SharePoint upload fails or its read-back size mismatches: email mathew.hema@birdlife.org.au via mcp__Microsoft_365__outlook_send_mail (ToolSearch `select:mcp__Microsoft_365__outlook_send_mail`), subject \"BirdLife security dashboard - REFRESH FAILED\", body naming the failed step, verbatim error, and Melbourne time. The artifact being unavailable is NOT a failure so long as the Teams copy published; note it and continue.\n\n## 6. Report\nThree or four lines: what moved on the live metrics week-on-week, the nearest hard deadline, anything newly overdue or stalled, and confirmation both copies published (with the uploaded and read-back byte sizes). This dashboard is CONFIDENTIAL (per-system weakness detail): never include its figures in any output beyond the dashboard itself, this report, and the failure email.",
+    "model": ""
+   },
+   "last_run": {
+    "status": "ROUTINE_RUN_STATUS_ABANDONED",
+    "fired_at": "2026-08-30T14:05:44.021702535Z",
+    "session_id": "cse_01PHZj6aH2gMm5HFjF1MwGjx"
+   },
+   "_os_disposition": "RETIRED 2026-09-02: absorbed into weekend routine (Melbourne-Sunday fire)"
+  },
+  {
+   "id": "trig_01HaRnkdKPD8Fu2HWMn616Nm",
+   "name": "BirdLife dashboards \u2014 weekend 6pm Melbourne (Sat\u2013Sun)",
+   "cron_expression": "4 8 * * 6,0",
+   "enabled": true,
+   "next_run_at": "2026-09-05T08:04:00Z",
+   "created_at": "2026-08-13T04:41:44.675270Z",
+   "updated_at": "2026-08-13T04:48:01.776590Z",
+   "mcp_connections": [
+    {
+     "connector_uuid": "983042c9-b611-4aa3-b142-d3a09949ccb8",
+     "name": "Salesforce-Production",
+     "url": "https://api.salesforce.com/platform/mcp/v1/platform/sobject-all"
+    },
+    {
+     "connector_uuid": "044219ef-5ecf-47a7-81b2-73a0c3503e70",
+     "name": "Asana",
+     "url": "https://mcp.asana.com/v2/mcp"
+    },
+    {
+     "connector_uuid": "ab90cdfc-1178-4d37-8110-57843c0452de",
+     "name": "Microsoft-365",
+     "url": "https://microsoft365.mcp.claude.com/mcp"
+    },
+    {
+     "connector_uuid": "c45d1c51-75b7-4f68-8a0f-4c3ecec422e2",
+     "name": "Zapier",
+     "url": "https://mcp.zapier.com/api/v1/connect"
+    },
+    {
+     "connector_uuid": "e201fe7a-0ba5-4cf7-86ef-8be31b9bb2ae",
+     "name": "NetSuite",
+     "url": "https://3440597.suitetalk.api.netsuite.com/services/mcp/v1/suiteapp/com.netsuite.mcpstandardtools"
+    },
+    {
+     "connector_uuid": "261ce3cc-6b42-4227-98fb-c1e43777533a",
+     "name": "Stripe",
+     "url": "https://mcp.stripe.com"
+    },
+    {
+     "connector_uuid": "3d77b5a9-5b93-48fb-a563-39978306f7a9",
+     "name": "Cloudflare-Developer-Platform",
+     "url": "https://bindings.mcp.cloudflare.com/mcp"
+    }
+   ],
+   "creator": {
+    "account_uuid": "047ae3af-8a24-4f75-8413-86eee038a738"
+   },
+   "session_request": {
+    "environment_id": "env_0136Z1pebMHqr3tUw4vTLPKu",
+    "config": {
+     "allowed_tools": [
+      "preset:default",
+      "Task",
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "NotebookEdit",
+      "WebFetch",
+      "TodoWrite",
+      "WebSearch",
+      "BashOutput",
+      "KillBash",
+      "Skill",
+      "Tmux",
+      "Monitor",
+      "SendUserFile",
+      "REPL"
+     ],
+     "autofix_on_pr_create": false
+    },
+    "events": [
+     {
+      "payload": {
+       "uuid": "e39c8861-68e8-43a1-9a53-3e811f2c9a61",
+       "type": "user",
+       "internal_anthropic_catchall": {
+        "message": {
+         "content": "Weekend evening refresh slot for the two BirdLife ICT dashboards (Melbourne schedule: Sat and Sun 6pm AEST). Fresh session, no prior context; work autonomously, never ask questions. READ-ONLY on all business systems: never modify a Salesforce case or an Asana task.\n\n## 0. Load tools FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session; they are NOT in your tool list at startup. Run before anything else:\n- ToolSearch `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch `select:mcp__Asana__search_tasks,mcp__Asana__get_project`\nIf a server is still connecting, call ToolSearch again rather than giving up. Only after a second no-match treat the connector as unavailable \u2014 then STOP and report exactly which connector failed; never publish from stale or partial data.\n\n## 1. PART 1 \u2014 ICT Operations Dashboard (skip logic first)\nThe previous refresh slot was 7am today Melbourne time \u2014 compute the ISO8601 UTC timestamp for 11.5 hours ago and run two cheap probes:\n- SELECT COUNT(Id) c FROM Case WHERE RecordType.Name = 'Ask Zeus' AND LastModifiedDate >= <that timestamp>\n- mcp__Asana__search_tasks: projects_any=1211042432693678, limit=1, opt_fields=modified_at\nIf the count is 0 AND the newest Asana modified_at is older than 11.5 hours: skip Part 1.\nIf changed, do the full Ops refresh: WebFetch https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 (the full current HTML is saved to a local file \u2014 reuse its design exactly). Pull: open cases by status/owner/full list (WHERE IsClosed=false AND RecordType.Name='Ask Zeus'; never scope by Owner.Name; Owner.Name='Zeus' is the unassigned intake queue \u2014 render it first), case mix and intake (LAST_N_DAYS:180), Asana project 1211042432693678 sections + incomplete tasks (search_tasks twice, second sort_ascending=true, dedupe by gid, reconcile to num_incomplete_tasks, all 8 sections). Recompute every tile, table, flag and the untyped/first-touch/ageing checks; update the snapshot time; republish with the Artifact tool passing url=https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 and favicon \"\ud83e\udeb6\".\n\n## 2. PART 2 \u2014 ICT Monitoring Dashboard (always rebuild; its 24h windows roll)\nQueries: CronTrigger GROUP BY State; AsyncApexJob WHERE CreatedDate = LAST_N_DAYS:1 GROUP BY Status \u2014 if failures > 0 also group the failed ones by ApexClass.Name and name the classes in the flag (SyncConnectedAccountsQueueable failures are the KNOWN expired-Stripe-key issue since 12 Aug \u2014 report as known, not new); Opportunity count LAST_N_DAYS:1; npe01__OppPayment__c count LAST_N_DAYS:1; stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1 (healthy 0, red above); Gravity Forms orphan rate = General_Enquiry_Case with ContactId null / all, LAST_N_DAYS:1 (amber \u226540%, red \u226560%, baseline ~25%); RD_Change_Log__c count LAST_N_DAYS:1. Website probe: try WebFetch https://birdlife.org.au \u2014 if blocked by the egress proxy, render \"unverified \u2014 probe blocked, not evidence of outage\".\nDesign: WebFetch https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b (full HTML saved locally \u2014 reuse the design and provenance footer exactly), update every tile, flag and the snapshot time, republish with the Artifact tool passing url=https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b and favicon \"\ud83d\udce1\".\n\n## 3. Report\nOne or two lines covering both parts. No push, no email.",
+         "role": "user"
+        },
+        "parent_tool_use_id": null,
+        "session_id": ""
+       }
+      }
+     }
+    ]
+   },
+   "last_fired_at": "2026-08-30T08:04:57.992243Z",
+   "notifications": {
+    "channel": {
+     "push": false,
+     "email": false,
+     "slack": false
+    }
+   },
+   "created_via": "meta_mcp",
+   "derived_state": {
+    "folders_state": "FOLDERS_STATE_NONE",
+    "prompt": "Weekend evening refresh slot for the two BirdLife ICT dashboards (Melbourne schedule: Sat and Sun 6pm AEST). Fresh session, no prior context; work autonomously, never ask questions. READ-ONLY on all business systems: never modify a Salesforce case or an Asana task.\n\n## 0. Load tools FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session; they are NOT in your tool list at startup. Run before anything else:\n- ToolSearch `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch `select:mcp__Asana__search_tasks,mcp__Asana__get_project`\nIf a server is still connecting, call ToolSearch again rather than giving up. Only after a second no-match treat the connector as unavailable \u2014 then STOP and report exactly which connector failed; never publish from stale or partial data.\n\n## 1. PART 1 \u2014 ICT Operations Dashboard (skip logic first)\nThe previous refresh slot was 7am today Melbourne time \u2014 compute the ISO8601 UTC timestamp for 11.5 hours ago and run two cheap probes:\n- SELECT COUNT(Id) c FROM Case WHERE RecordType.Name = 'Ask Zeus' AND LastModifiedDate >= <that timestamp>\n- mcp__Asana__search_tasks: projects_any=1211042432693678, limit=1, opt_fields=modified_at\nIf the count is 0 AND the newest Asana modified_at is older than 11.5 hours: skip Part 1.\nIf changed, do the full Ops refresh: WebFetch https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 (the full current HTML is saved to a local file \u2014 reuse its design exactly). Pull: open cases by status/owner/full list (WHERE IsClosed=false AND RecordType.Name='Ask Zeus'; never scope by Owner.Name; Owner.Name='Zeus' is the unassigned intake queue \u2014 render it first), case mix and intake (LAST_N_DAYS:180), Asana project 1211042432693678 sections + incomplete tasks (search_tasks twice, second sort_ascending=true, dedupe by gid, reconcile to num_incomplete_tasks, all 8 sections). Recompute every tile, table, flag and the untyped/first-touch/ageing checks; update the snapshot time; republish with the Artifact tool passing url=https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 and favicon \"\ud83e\udeb6\".\n\n## 2. PART 2 \u2014 ICT Monitoring Dashboard (always rebuild; its 24h windows roll)\nQueries: CronTrigger GROUP BY State; AsyncApexJob WHERE CreatedDate = LAST_N_DAYS:1 GROUP BY Status \u2014 if failures > 0 also group the failed ones by ApexClass.Name and name the classes in the flag (SyncConnectedAccountsQueueable failures are the KNOWN expired-Stripe-key issue since 12 Aug \u2014 report as known, not new); Opportunity count LAST_N_DAYS:1; npe01__OppPayment__c count LAST_N_DAYS:1; stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1 (healthy 0, red above); Gravity Forms orphan rate = General_Enquiry_Case with ContactId null / all, LAST_N_DAYS:1 (amber \u226540%, red \u226560%, baseline ~25%); RD_Change_Log__c count LAST_N_DAYS:1. Website probe: try WebFetch https://birdlife.org.au \u2014 if blocked by the egress proxy, render \"unverified \u2014 probe blocked, not evidence of outage\".\nDesign: WebFetch https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b (full HTML saved locally \u2014 reuse the design and provenance footer exactly), update every tile, flag and the snapshot time, republish with the Artifact tool passing url=https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b and favicon \"\ud83d\udce1\".\n\n## 3. Report\nOne or two lines covering both parts. No push, no email.",
+    "model": ""
+   },
+   "last_run": {
+    "status": "ROUTINE_RUN_STATUS_ABANDONED",
+    "fired_at": "2026-08-30T08:04:57.970275763Z",
+    "session_id": "cse_01Nx9WsQB9LNna4KNf6EtLkj"
+   },
+   "_os_disposition": "RETIRED 2026-09-02: weekend 6pm slot dropped (abandoned since 30 Aug, unnoticed)"
+  },
+  {
+   "id": "trig_01CUkTdAFSisnzyU6pwgkH4k",
+   "name": "BirdLife dashboards \u2014 weekend 7am Melbourne (Sat\u2013Sun)",
+   "cron_expression": "4 21 * * 5,6",
+   "enabled": true,
+   "next_run_at": "2026-09-04T21:04:00Z",
+   "created_at": "2026-08-13T04:41:39.216182Z",
+   "updated_at": "2026-08-13T04:47:49.105303Z",
+   "mcp_connections": [
+    {
+     "connector_uuid": "044219ef-5ecf-47a7-81b2-73a0c3503e70",
+     "name": "Asana",
+     "url": "https://mcp.asana.com/v2/mcp"
+    },
+    {
+     "connector_uuid": "3d77b5a9-5b93-48fb-a563-39978306f7a9",
+     "name": "Cloudflare-Developer-Platform",
+     "url": "https://bindings.mcp.cloudflare.com/mcp"
+    },
+    {
+     "connector_uuid": "ab90cdfc-1178-4d37-8110-57843c0452de",
+     "name": "Microsoft-365",
+     "url": "https://microsoft365.mcp.claude.com/mcp"
+    },
+    {
+     "connector_uuid": "e201fe7a-0ba5-4cf7-86ef-8be31b9bb2ae",
+     "name": "NetSuite",
+     "url": "https://3440597.suitetalk.api.netsuite.com/services/mcp/v1/suiteapp/com.netsuite.mcpstandardtools"
+    },
+    {
+     "connector_uuid": "983042c9-b611-4aa3-b142-d3a09949ccb8",
+     "name": "Salesforce-Production",
+     "url": "https://api.salesforce.com/platform/mcp/v1/platform/sobject-all"
+    },
+    {
+     "connector_uuid": "261ce3cc-6b42-4227-98fb-c1e43777533a",
+     "name": "Stripe",
+     "url": "https://mcp.stripe.com"
+    },
+    {
+     "connector_uuid": "c45d1c51-75b7-4f68-8a0f-4c3ecec422e2",
+     "name": "Zapier",
+     "url": "https://mcp.zapier.com/api/v1/connect"
+    }
+   ],
+   "creator": {
+    "account_uuid": "047ae3af-8a24-4f75-8413-86eee038a738"
+   },
+   "session_request": {
+    "environment_id": "env_0136Z1pebMHqr3tUw4vTLPKu",
+    "config": {
+     "allowed_tools": [
+      "preset:default",
+      "Task",
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "NotebookEdit",
+      "WebFetch",
+      "TodoWrite",
+      "WebSearch",
+      "BashOutput",
+      "KillBash",
+      "Skill",
+      "Tmux",
+      "Monitor",
+      "SendUserFile",
+      "REPL"
+     ],
+     "autofix_on_pr_create": false
+    },
+    "events": [
+     {
+      "payload": {
+       "uuid": "2911f9b5-64c1-4069-b0fd-2f1ec44e3859",
+       "type": "user",
+       "internal_anthropic_catchall": {
+        "message": {
+         "content": "Weekend morning refresh slot for the two BirdLife ICT dashboards (Melbourne schedule: Sat and Sun 7am AEST). Fresh session, no prior context; work autonomously, never ask questions. READ-ONLY on all business systems: never modify a Salesforce case or an Asana task.\n\n## 0. Load tools FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session; they are NOT in your tool list at startup. Run before anything else:\n- ToolSearch `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch `select:mcp__Asana__search_tasks,mcp__Asana__get_project`\nIf a server is still connecting, call ToolSearch again rather than giving up. Only after a second no-match treat the connector as unavailable \u2014 then STOP and report exactly which connector failed; never publish from stale or partial data.\n\n## 1. PART 1 \u2014 ICT Operations Dashboard (skip logic first)\nThe previous refresh slot was 6pm yesterday Melbourne time \u2014 compute the ISO8601 UTC timestamp for 14 hours ago and run two cheap probes:\n- SELECT COUNT(Id) c FROM Case WHERE RecordType.Name = 'Ask Zeus' AND LastModifiedDate >= <that timestamp>\n- mcp__Asana__search_tasks: projects_any=1211042432693678, limit=1, opt_fields=modified_at\nIf the count is 0 AND the newest Asana modified_at is older than 14 hours: skip Part 1.\nIf changed, do the full Ops refresh: WebFetch https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 (the full current HTML is saved to a local file \u2014 reuse its design exactly). Pull: open cases by status/owner/full list (WHERE IsClosed=false AND RecordType.Name='Ask Zeus'; never scope by Owner.Name; Owner.Name='Zeus' is the unassigned intake queue \u2014 render it first), case mix and intake (LAST_N_DAYS:180), Asana project 1211042432693678 sections + incomplete tasks (search_tasks twice, second sort_ascending=true, dedupe by gid, reconcile to num_incomplete_tasks, all 8 sections). Recompute every tile, table, flag and the untyped/first-touch/ageing checks; update the snapshot time; republish with the Artifact tool passing url=https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 and favicon \"\ud83e\udeb6\".\n\n## 2. PART 2 \u2014 ICT Monitoring Dashboard (always rebuild; its 24h windows roll)\nQueries: CronTrigger GROUP BY State; AsyncApexJob WHERE CreatedDate = LAST_N_DAYS:1 GROUP BY Status \u2014 if failures > 0 also group the failed ones by ApexClass.Name and name the classes in the flag (SyncConnectedAccountsQueueable failures are the KNOWN expired-Stripe-key issue since 12 Aug \u2014 report as known, not new); Opportunity count LAST_N_DAYS:1; npe01__OppPayment__c count LAST_N_DAYS:1; stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1 (healthy 0, red above); Gravity Forms orphan rate = General_Enquiry_Case with ContactId null / all, LAST_N_DAYS:1 (amber \u226540%, red \u226560%, baseline ~25%); RD_Change_Log__c count LAST_N_DAYS:1. Website probe: try WebFetch https://birdlife.org.au \u2014 if blocked by the egress proxy, render \"unverified \u2014 probe blocked, not evidence of outage\".\nDesign: WebFetch https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b (full HTML saved locally \u2014 reuse the design and provenance footer exactly), update every tile, flag and the snapshot time, republish with the Artifact tool passing url=https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b and favicon \"\ud83d\udce1\".\n\n## 3. Report\nOne or two lines covering both parts. No push, no email.",
+         "role": "user"
+        },
+        "parent_tool_use_id": null,
+        "session_id": ""
+       }
+      }
+     }
+    ]
+   },
+   "last_fired_at": "2026-08-29T21:04:50.902266Z",
+   "notifications": {
+    "channel": {
+     "push": false,
+     "email": false,
+     "slack": false
+    }
+   },
+   "created_via": "meta_mcp",
+   "derived_state": {
+    "folders_state": "FOLDERS_STATE_NONE",
+    "prompt": "Weekend morning refresh slot for the two BirdLife ICT dashboards (Melbourne schedule: Sat and Sun 7am AEST). Fresh session, no prior context; work autonomously, never ask questions. READ-ONLY on all business systems: never modify a Salesforce case or an Asana task.\n\n## 0. Load tools FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session; they are NOT in your tool list at startup. Run before anything else:\n- ToolSearch `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch `select:mcp__Asana__search_tasks,mcp__Asana__get_project`\nIf a server is still connecting, call ToolSearch again rather than giving up. Only after a second no-match treat the connector as unavailable \u2014 then STOP and report exactly which connector failed; never publish from stale or partial data.\n\n## 1. PART 1 \u2014 ICT Operations Dashboard (skip logic first)\nThe previous refresh slot was 6pm yesterday Melbourne time \u2014 compute the ISO8601 UTC timestamp for 14 hours ago and run two cheap probes:\n- SELECT COUNT(Id) c FROM Case WHERE RecordType.Name = 'Ask Zeus' AND LastModifiedDate >= <that timestamp>\n- mcp__Asana__search_tasks: projects_any=1211042432693678, limit=1, opt_fields=modified_at\nIf the count is 0 AND the newest Asana modified_at is older than 14 hours: skip Part 1.\nIf changed, do the full Ops refresh: WebFetch https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 (the full current HTML is saved to a local file \u2014 reuse its design exactly). Pull: open cases by status/owner/full list (WHERE IsClosed=false AND RecordType.Name='Ask Zeus'; never scope by Owner.Name; Owner.Name='Zeus' is the unassigned intake queue \u2014 render it first), case mix and intake (LAST_N_DAYS:180), Asana project 1211042432693678 sections + incomplete tasks (search_tasks twice, second sort_ascending=true, dedupe by gid, reconcile to num_incomplete_tasks, all 8 sections). Recompute every tile, table, flag and the untyped/first-touch/ageing checks; update the snapshot time; republish with the Artifact tool passing url=https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 and favicon \"\ud83e\udeb6\".\n\n## 2. PART 2 \u2014 ICT Monitoring Dashboard (always rebuild; its 24h windows roll)\nQueries: CronTrigger GROUP BY State; AsyncApexJob WHERE CreatedDate = LAST_N_DAYS:1 GROUP BY Status \u2014 if failures > 0 also group the failed ones by ApexClass.Name and name the classes in the flag (SyncConnectedAccountsQueueable failures are the KNOWN expired-Stripe-key issue since 12 Aug \u2014 report as known, not new); Opportunity count LAST_N_DAYS:1; npe01__OppPayment__c count LAST_N_DAYS:1; stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1 (healthy 0, red above); Gravity Forms orphan rate = General_Enquiry_Case with ContactId null / all, LAST_N_DAYS:1 (amber \u226540%, red \u226560%, baseline ~25%); RD_Change_Log__c count LAST_N_DAYS:1. Website probe: try WebFetch https://birdlife.org.au \u2014 if blocked by the egress proxy, render \"unverified \u2014 probe blocked, not evidence of outage\".\nDesign: WebFetch https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b (full HTML saved locally \u2014 reuse the design and provenance footer exactly), update every tile, flag and the snapshot time, republish with the Artifact tool passing url=https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b and favicon \"\ud83d\udce1\".\n\n## 3. Report\nOne or two lines covering both parts. No push, no email.",
+    "model": ""
+   },
+   "last_run": {
+    "status": "ROUTINE_RUN_STATUS_ABANDONED",
+    "fired_at": "2026-08-29T21:04:50.881273290Z",
+    "session_id": "cse_01XEMmo2LzbpXU3aV7HfdfFz"
+   },
+   "_os_disposition": "PRE-CHANGE SNAPSHOT 2026-09-02: updated in place into \"BirdLife dashboards weekend + weekly security\""
+  },
+  {
+   "id": "trig_01Egd8XCKdBErqNPYnFkgTJB",
+   "name": "BirdLife dashboards hourly \u2014 weekday daytime (10am\u20135pm Melbourne)",
+   "cron_expression": "4 0-7 * * 1-5",
+   "enabled": true,
+   "next_run_at": "2026-09-02T06:04:00Z",
+   "created_at": "2026-08-13T04:40:07.734897Z",
+   "updated_at": "2026-08-13T04:48:29.610621Z",
+   "mcp_connections": [
+    {
+     "connector_uuid": "044219ef-5ecf-47a7-81b2-73a0c3503e70",
+     "name": "Asana",
+     "url": "https://mcp.asana.com/v2/mcp"
+    },
+    {
+     "connector_uuid": "3d77b5a9-5b93-48fb-a563-39978306f7a9",
+     "name": "Cloudflare-Developer-Platform",
+     "url": "https://bindings.mcp.cloudflare.com/mcp"
+    },
+    {
+     "connector_uuid": "ab90cdfc-1178-4d37-8110-57843c0452de",
+     "name": "Microsoft-365",
+     "url": "https://microsoft365.mcp.claude.com/mcp"
+    },
+    {
+     "connector_uuid": "e201fe7a-0ba5-4cf7-86ef-8be31b9bb2ae",
+     "name": "NetSuite",
+     "url": "https://3440597.suitetalk.api.netsuite.com/services/mcp/v1/suiteapp/com.netsuite.mcpstandardtools"
+    },
+    {
+     "connector_uuid": "983042c9-b611-4aa3-b142-d3a09949ccb8",
+     "name": "Salesforce-Production",
+     "url": "https://api.salesforce.com/platform/mcp/v1/platform/sobject-all"
+    },
+    {
+     "connector_uuid": "261ce3cc-6b42-4227-98fb-c1e43777533a",
+     "name": "Stripe",
+     "url": "https://mcp.stripe.com"
+    },
+    {
+     "connector_uuid": "c45d1c51-75b7-4f68-8a0f-4c3ecec422e2",
+     "name": "Zapier",
+     "url": "https://mcp.zapier.com/api/v1/connect"
+    }
+   ],
+   "creator": {
+    "account_uuid": "047ae3af-8a24-4f75-8413-86eee038a738"
+   },
+   "session_request": {
+    "environment_id": "env_0136Z1pebMHqr3tUw4vTLPKu",
+    "config": {
+     "allowed_tools": [
+      "preset:default",
+      "Task",
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "NotebookEdit",
+      "WebFetch",
+      "TodoWrite",
+      "WebSearch",
+      "BashOutput",
+      "KillBash",
+      "Skill",
+      "Tmux",
+      "Monitor",
+      "SendUserFile",
+      "REPL"
+     ],
+     "autofix_on_pr_create": false
+    },
+    "events": [
+     {
+      "payload": {
+       "uuid": "ac0cb828-ce8a-4eec-9906-7d9d9043cbec",
+       "type": "user",
+       "internal_anthropic_catchall": {
+        "message": {
+         "content": "Hourly refresh slot for the two BirdLife ICT dashboards (Melbourne schedule: Mon\u2013Fri 10am\u20135pm AEST slots). Fresh session, no prior context; work autonomously, never ask questions. READ-ONLY on all business systems: never modify a Salesforce case or an Asana task.\n\n## 0. Load tools FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session; they are NOT in your tool list at startup. Run before anything else:\n- ToolSearch `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch `select:mcp__Asana__search_tasks,mcp__Asana__get_project`\nIf a server is still connecting, call ToolSearch again rather than giving up. Only after a second no-match treat the connector as unavailable \u2014 then STOP and report exactly which connector failed; never publish from stale or partial data.\n\n## 1. PART 1 \u2014 ICT Operations Dashboard (skip logic first)\nCompute the ISO8601 UTC timestamp for 75 minutes ago and run two cheap probes:\n- SELECT COUNT(Id) c FROM Case WHERE RecordType.Name = 'Ask Zeus' AND LastModifiedDate >= <that timestamp>\n- mcp__Asana__search_tasks: projects_any=1211042432693678, limit=1, opt_fields=modified_at\nIf the count is 0 AND the newest Asana modified_at is older than 75 minutes: skip Part 1.\nIf changed, do the full Ops refresh: WebFetch https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 (the full current HTML is saved to a local file \u2014 reuse its design exactly). Pull: open cases by status/owner/full list (WHERE IsClosed=false AND RecordType.Name='Ask Zeus'; never scope by Owner.Name; Owner.Name='Zeus' is the unassigned intake queue \u2014 render it first), case mix and intake (LAST_N_DAYS:180), Asana project 1211042432693678 sections + incomplete tasks (search_tasks twice, second sort_ascending=true, dedupe by gid, reconcile to num_incomplete_tasks, all 8 sections). Recompute every tile, table, flag and the untyped/first-touch/ageing checks; update the snapshot time; republish with the Artifact tool passing url=https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 and favicon \"\ud83e\udeb6\".\n\n## 2. PART 2 \u2014 ICT Monitoring Dashboard (always rebuild; its 24h windows roll)\nQueries: CronTrigger GROUP BY State; AsyncApexJob WHERE CreatedDate = LAST_N_DAYS:1 GROUP BY Status \u2014 if failures > 0 also group the failed ones by ApexClass.Name and name the classes in the flag (SyncConnectedAccountsQueueable failures are the KNOWN expired-Stripe-key issue since 12 Aug \u2014 report as known, not new); Opportunity count LAST_N_DAYS:1; npe01__OppPayment__c count LAST_N_DAYS:1; stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1 (healthy 0, red above); Gravity Forms orphan rate = General_Enquiry_Case with ContactId null / all, LAST_N_DAYS:1 (amber \u226540%, red \u226560%, baseline ~25%); RD_Change_Log__c count LAST_N_DAYS:1. Website probe: try WebFetch https://birdlife.org.au \u2014 if blocked by the egress proxy, render \"unverified \u2014 probe blocked, not evidence of outage\".\nDesign: WebFetch https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b (full HTML saved locally \u2014 reuse the design and provenance footer exactly), update every tile, flag and the snapshot time, republish with the Artifact tool passing url=https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b and favicon \"\ud83d\udce1\".\n\n## 3. Report\nOne or two lines covering both parts. No push, no email.",
+         "role": "user"
+        },
+        "parent_tool_use_id": null,
+        "session_id": ""
+       }
+      }
+     }
+    ]
+   },
+   "last_fired_at": "2026-09-02T05:13:12.288611Z",
+   "notifications": {
+    "channel": {
+     "push": false,
+     "email": false,
+     "slack": false
+    }
+   },
+   "created_via": "meta_mcp",
+   "derived_state": {
+    "folders_state": "FOLDERS_STATE_NONE",
+    "prompt": "Hourly refresh slot for the two BirdLife ICT dashboards (Melbourne schedule: Mon\u2013Fri 10am\u20135pm AEST slots). Fresh session, no prior context; work autonomously, never ask questions. READ-ONLY on all business systems: never modify a Salesforce case or an Asana task.\n\n## 0. Load tools FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session; they are NOT in your tool list at startup. Run before anything else:\n- ToolSearch `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch `select:mcp__Asana__search_tasks,mcp__Asana__get_project`\nIf a server is still connecting, call ToolSearch again rather than giving up. Only after a second no-match treat the connector as unavailable \u2014 then STOP and report exactly which connector failed; never publish from stale or partial data.\n\n## 1. PART 1 \u2014 ICT Operations Dashboard (skip logic first)\nCompute the ISO8601 UTC timestamp for 75 minutes ago and run two cheap probes:\n- SELECT COUNT(Id) c FROM Case WHERE RecordType.Name = 'Ask Zeus' AND LastModifiedDate >= <that timestamp>\n- mcp__Asana__search_tasks: projects_any=1211042432693678, limit=1, opt_fields=modified_at\nIf the count is 0 AND the newest Asana modified_at is older than 75 minutes: skip Part 1.\nIf changed, do the full Ops refresh: WebFetch https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 (the full current HTML is saved to a local file \u2014 reuse its design exactly). Pull: open cases by status/owner/full list (WHERE IsClosed=false AND RecordType.Name='Ask Zeus'; never scope by Owner.Name; Owner.Name='Zeus' is the unassigned intake queue \u2014 render it first), case mix and intake (LAST_N_DAYS:180), Asana project 1211042432693678 sections + incomplete tasks (search_tasks twice, second sort_ascending=true, dedupe by gid, reconcile to num_incomplete_tasks, all 8 sections). Recompute every tile, table, flag and the untyped/first-touch/ageing checks; update the snapshot time; republish with the Artifact tool passing url=https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 and favicon \"\ud83e\udeb6\".\n\n## 2. PART 2 \u2014 ICT Monitoring Dashboard (always rebuild; its 24h windows roll)\nQueries: CronTrigger GROUP BY State; AsyncApexJob WHERE CreatedDate = LAST_N_DAYS:1 GROUP BY Status \u2014 if failures > 0 also group the failed ones by ApexClass.Name and name the classes in the flag (SyncConnectedAccountsQueueable failures are the KNOWN expired-Stripe-key issue since 12 Aug \u2014 report as known, not new); Opportunity count LAST_N_DAYS:1; npe01__OppPayment__c count LAST_N_DAYS:1; stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1 (healthy 0, red above); Gravity Forms orphan rate = General_Enquiry_Case with ContactId null / all, LAST_N_DAYS:1 (amber \u226540%, red \u226560%, baseline ~25%); RD_Change_Log__c count LAST_N_DAYS:1. Website probe: try WebFetch https://birdlife.org.au \u2014 if blocked by the egress proxy, render \"unverified \u2014 probe blocked, not evidence of outage\".\nDesign: WebFetch https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b (full HTML saved locally \u2014 reuse the design and provenance footer exactly), update every tile, flag and the snapshot time, republish with the Artifact tool passing url=https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b and favicon \"\ud83d\udce1\".\n\n## 3. Report\nOne or two lines covering both parts. No push, no email.",
+    "model": ""
+   },
+   "last_run": {
+    "status": "ROUTINE_RUN_STATUS_PENDING",
+    "fired_at": "2026-09-02T05:13:12.263204423Z",
+    "session_id": "cse_012gq2UdxciWFA532wym2YQJ"
+   },
+   "_os_disposition": "RETIRED 2026-09-02: absorbed into weekday hourly routine (light slots)"
+  },
+  {
+   "id": "trig_01HhAKnEe6PXAvo6EEq72BHo",
+   "name": "BirdLife dashboards \u2014 weekday mornings hourly + department suite at 7am",
+   "cron_expression": "4 21-23 * * 0-4",
+   "enabled": true,
+   "next_run_at": "2026-09-02T21:04:00Z",
+   "created_at": "2026-08-13T04:40:00.379442Z",
+   "updated_at": "2026-08-13T20:34:05.325764Z",
+   "mcp_connections": [
+    {
+     "connector_uuid": "044219ef-5ecf-47a7-81b2-73a0c3503e70",
+     "name": "Asana",
+     "url": "https://mcp.asana.com/v2/mcp"
+    },
+    {
+     "connector_uuid": "3d77b5a9-5b93-48fb-a563-39978306f7a9",
+     "name": "Cloudflare-Developer-Platform",
+     "url": "https://bindings.mcp.cloudflare.com/mcp"
+    },
+    {
+     "connector_uuid": "ab90cdfc-1178-4d37-8110-57843c0452de",
+     "name": "Microsoft-365",
+     "url": "https://microsoft365.mcp.claude.com/mcp"
+    },
+    {
+     "connector_uuid": "e201fe7a-0ba5-4cf7-86ef-8be31b9bb2ae",
+     "name": "NetSuite",
+     "url": "https://3440597.suitetalk.api.netsuite.com/services/mcp/v1/suiteapp/com.netsuite.mcpstandardtools"
+    },
+    {
+     "connector_uuid": "983042c9-b611-4aa3-b142-d3a09949ccb8",
+     "name": "Salesforce-Production",
+     "url": "https://api.salesforce.com/platform/mcp/v1/platform/sobject-all"
+    },
+    {
+     "connector_uuid": "261ce3cc-6b42-4227-98fb-c1e43777533a",
+     "name": "Stripe",
+     "url": "https://mcp.stripe.com"
+    },
+    {
+     "connector_uuid": "c45d1c51-75b7-4f68-8a0f-4c3ecec422e2",
+     "name": "Zapier",
+     "url": "https://mcp.zapier.com/api/v1/connect"
+    }
+   ],
+   "creator": {
+    "account_uuid": "047ae3af-8a24-4f75-8413-86eee038a738"
+   },
+   "session_request": {
+    "environment_id": "env_0136Z1pebMHqr3tUw4vTLPKu",
+    "config": {
+     "allowed_tools": [
+      "preset:default",
+      "Task",
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "NotebookEdit",
+      "WebFetch",
+      "TodoWrite",
+      "WebSearch",
+      "BashOutput",
+      "KillBash",
+      "Skill",
+      "Tmux",
+      "Monitor",
+      "SendUserFile",
+      "REPL"
+     ],
+     "autofix_on_pr_create": false
+    },
+    "events": [
+     {
+      "payload": {
+       "uuid": "f85e9d60-2547-4f53-9b98-f51f24801652",
+       "type": "user",
+       "internal_anthropic_catchall": {
+        "message": {
+         "content": "Hourly refresh slot for the two BirdLife ICT dashboards (Melbourne schedule: Mon\u2013Fri 7/8/9am AEST slots). Fresh session, no prior context; work autonomously, never ask questions. READ-ONLY on all business systems: never modify a Salesforce case or an Asana task.\n\n## 0. Load tools FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session; they are NOT in your tool list at startup. Run before anything else:\n- ToolSearch `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch `select:mcp__Asana__search_tasks,mcp__Asana__get_project`\nIf a server is still connecting, call ToolSearch again rather than giving up. Only after a second no-match treat the connector as unavailable \u2014 then STOP and report exactly which connector failed; never publish from stale or partial data.\n\n## 1. PART 1 \u2014 ICT Operations Dashboard (skip logic first)\nSPECIAL CASE: if this firing is the 7am Melbourne slot (fired 21:00\u201321:59 UTC), skip Part 1 entirely \u2014 the separate daily deep-refresh routine owns the 7am Ops refresh \u2014 and go straight to Part 2.\nOtherwise compute the ISO8601 UTC timestamp for 75 minutes ago and run two cheap probes:\n- SELECT COUNT(Id) c FROM Case WHERE RecordType.Name = 'Ask Zeus' AND LastModifiedDate >= <that timestamp>\n- mcp__Asana__search_tasks: projects_any=1211042432693678, limit=1, opt_fields=modified_at\nIf the count is 0 AND the newest Asana modified_at is older than 75 minutes: skip Part 1.\nIf changed, do the full Ops refresh: WebFetch https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 (the full current HTML is saved to a local file \u2014 reuse its design exactly). Pull: open cases by status/owner/full list (WHERE IsClosed=false AND RecordType.Name='Ask Zeus'; never scope by Owner.Name; Owner.Name='Zeus' is the unassigned intake queue \u2014 render it first), case mix and intake (LAST_N_DAYS:180), Asana project 1211042432693678 sections + incomplete tasks (search_tasks twice, second sort_ascending=true, dedupe by gid, reconcile to num_incomplete_tasks, all 8 sections). Recompute every tile, table, flag and the untyped/first-touch/ageing checks; update the snapshot time; republish with the Artifact tool passing url=https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 and favicon \"\ud83e\udeb6\".\n\n## 2. PART 2 \u2014 ICT Monitoring Dashboard (always rebuild; its 24h windows roll)\nQueries: CronTrigger GROUP BY State; AsyncApexJob WHERE CreatedDate = LAST_N_DAYS:1 GROUP BY Status \u2014 if failures > 0 also group the failed ones by ApexClass.Name and name the classes in the flag (SyncConnectedAccountsQueueable failures are the KNOWN expired-Stripe-key issue since 12 Aug \u2014 report as known, not new); Opportunity count LAST_N_DAYS:1; npe01__OppPayment__c count LAST_N_DAYS:1; stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1 (healthy 0, red above); Gravity Forms orphan rate = General_Enquiry_Case with ContactId null / all, LAST_N_DAYS:1 (amber \u226540%, red \u226560%, baseline ~25%); RD_Change_Log__c count LAST_N_DAYS:1. Website probe: try WebFetch https://birdlife.org.au \u2014 if blocked by the egress proxy, render \"unverified \u2014 probe blocked, not evidence of outage\".\nDesign: WebFetch https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b (full HTML saved locally \u2014 reuse the design and provenance footer exactly), update every tile, flag and the snapshot time, republish with the Artifact tool passing url=https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b and favicon \"\ud83d\udce1\".\n\n## 3. PART 3 \u2014 Department dashboard suite (7am slot ONLY)\nRun this part only when fired 21:00\u201321:59 UTC (the 7am Melbourne slot) \u2014 the 8am and 9am firings skip it. It refreshes the nine Insights-Model department dashboards daily.\n1. Load extra tools: ToolSearch `select:mcp__Stripe__stripe_api_read`, and search ToolSearch for the NetSuite SuiteQL tools (query \"netsuite suiteql\"). If NetSuite tools are absent after two attempts, still refresh the Salesforce/Stripe numbers and leave NetSuite-sourced figures with their existing date labels \u2014 never publish a stale figure as current.\n2. Get the repo: if /home/user/Birdlife is absent, add_repo mathewruahema-beep/Birdlife (push access) and clone. Check out branch claude/birdlife-insights-model-7llvsg (if it has been merged, restart it from the default branch per the repo's git rules). Sources: dashboard/*.html. Canonical queries: insights/sql/extraction-queries.md. Defect register: insights/04-data-quality-register.md.\n3. Recompute every live number each page's provenance footer declares, using ONLY the canonical queries. Hard rules: READ-ONLY on all business systems; SuiteQL scoped to subsidiary 2 and NEVER create NetSuite saved searches; count Salesforce number fields with != null AND != 0; regular giving is always the two-object union; every Case query carries RecordType scope.\n4. Finance page: follow insights/finance-refresh-runbook.md \u2014 replace the dated NetSuite placeholders with live SuiteQL values (income by GL on posting-date basis PAIRED with the SF Close-Date figure; department split with unmapped %; bank-rec figures only if verifiable via SuiteQL, else keep their date labels).\n5. Edit the HTML files: update numbers, deltas and as-of dates only \u2014 keep the design, scope captions and DQ callouts (update DQ callouts if a live check changes, e.g. the invalid-stage count). Keep the executive rollup tiles consistent with the department pages.\n6. Republish each updated page with the Artifact tool passing its existing url (same-URL republish, keep each favicon):\n   - dashboard/fundraising-dashboard.html \u2192 https://claude.ai/code/artifact/e9debe53-58d2-4638-84ae-e3530f710811 (\ud83d\udc26)\n   - dashboard/membership-dashboard.html \u2192 https://claude.ai/code/artifact/5465032a-70e8-4167-b0f4-7fb7a1b6ccad (\ud83e\udeaa)\n   - dashboard/finance-dashboard.html \u2192 https://claude.ai/code/artifact/73c13fb9-0307-4898-a631-9820a44e72b1 (\ud83e\uddfe)\n   - dashboard/supporter-care-dashboard.html \u2192 https://claude.ai/code/artifact/a57ebf7f-016d-4539-b10c-c77b0ad1c43c (\ud83d\uded2)\n   - dashboard/marketing-dashboard.html \u2192 https://claude.ai/code/artifact/c77c80d0-8323-48f5-8dc5-26fe5199da59 (\ud83d\udce3)\n   - dashboard/conservation-dashboard.html \u2192 https://claude.ai/code/artifact/652830f4-648c-45f7-89c6-85976982e5cd (\ud83e\udd89)\n   - dashboard/people-dashboard.html \u2192 https://claude.ai/code/artifact/72217cd8-c41b-497b-86d1-1b0f44d5d186 (\ud83e\uddd1\u200d\ud83e\udd1d\u200d\ud83e\uddd1)\n   - dashboard/volunteering-dashboard.html \u2192 https://claude.ai/code/artifact/93bf95c7-8fa2-4e67-9c5b-ec945a8cad4c (\ud83e\udd1d)\n   - dashboard/executive-rollup.html \u2192 https://claude.ai/code/artifact/60a0c115-3a75-48f4-9095-6e78ffc466be (\ud83e\udd85)\n7. Commit the updated HTML to the branch with a clear message and git push -u origin claude/birdlife-insights-model-7llvsg.\n\n## 4. Report\nOne or two lines covering all parts (add a suite line when Part 3 ran, e.g. \"suite republished 9/9, NetSuite live\") (e.g. \"Ops unchanged \u2014 skipped; Monitoring republished: Stripe errors 2, Apex failures cleared\"). No push, no email.",
+         "role": "user"
+        },
+        "parent_tool_use_id": null,
+        "session_id": ""
+       }
+      }
+     }
+    ]
+   },
+   "last_fired_at": "2026-09-01T23:07:11.245928Z",
+   "notifications": {
+    "channel": {
+     "push": false,
+     "email": false,
+     "slack": false
+    }
+   },
+   "created_via": "meta_mcp",
+   "derived_state": {
+    "folders_state": "FOLDERS_STATE_NONE",
+    "prompt": "Hourly refresh slot for the two BirdLife ICT dashboards (Melbourne schedule: Mon\u2013Fri 7/8/9am AEST slots). Fresh session, no prior context; work autonomously, never ask questions. READ-ONLY on all business systems: never modify a Salesforce case or an Asana task.\n\n## 0. Load tools FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session; they are NOT in your tool list at startup. Run before anything else:\n- ToolSearch `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch `select:mcp__Asana__search_tasks,mcp__Asana__get_project`\nIf a server is still connecting, call ToolSearch again rather than giving up. Only after a second no-match treat the connector as unavailable \u2014 then STOP and report exactly which connector failed; never publish from stale or partial data.\n\n## 1. PART 1 \u2014 ICT Operations Dashboard (skip logic first)\nSPECIAL CASE: if this firing is the 7am Melbourne slot (fired 21:00\u201321:59 UTC), skip Part 1 entirely \u2014 the separate daily deep-refresh routine owns the 7am Ops refresh \u2014 and go straight to Part 2.\nOtherwise compute the ISO8601 UTC timestamp for 75 minutes ago and run two cheap probes:\n- SELECT COUNT(Id) c FROM Case WHERE RecordType.Name = 'Ask Zeus' AND LastModifiedDate >= <that timestamp>\n- mcp__Asana__search_tasks: projects_any=1211042432693678, limit=1, opt_fields=modified_at\nIf the count is 0 AND the newest Asana modified_at is older than 75 minutes: skip Part 1.\nIf changed, do the full Ops refresh: WebFetch https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 (the full current HTML is saved to a local file \u2014 reuse its design exactly). Pull: open cases by status/owner/full list (WHERE IsClosed=false AND RecordType.Name='Ask Zeus'; never scope by Owner.Name; Owner.Name='Zeus' is the unassigned intake queue \u2014 render it first), case mix and intake (LAST_N_DAYS:180), Asana project 1211042432693678 sections + incomplete tasks (search_tasks twice, second sort_ascending=true, dedupe by gid, reconcile to num_incomplete_tasks, all 8 sections). Recompute every tile, table, flag and the untyped/first-touch/ageing checks; update the snapshot time; republish with the Artifact tool passing url=https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 and favicon \"\ud83e\udeb6\".\n\n## 2. PART 2 \u2014 ICT Monitoring Dashboard (always rebuild; its 24h windows roll)\nQueries: CronTrigger GROUP BY State; AsyncApexJob WHERE CreatedDate = LAST_N_DAYS:1 GROUP BY Status \u2014 if failures > 0 also group the failed ones by ApexClass.Name and name the classes in the flag (SyncConnectedAccountsQueueable failures are the KNOWN expired-Stripe-key issue since 12 Aug \u2014 report as known, not new); Opportunity count LAST_N_DAYS:1; npe01__OppPayment__c count LAST_N_DAYS:1; stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1 (healthy 0, red above); Gravity Forms orphan rate = General_Enquiry_Case with ContactId null / all, LAST_N_DAYS:1 (amber \u226540%, red \u226560%, baseline ~25%); RD_Change_Log__c count LAST_N_DAYS:1. Website probe: try WebFetch https://birdlife.org.au \u2014 if blocked by the egress proxy, render \"unverified \u2014 probe blocked, not evidence of outage\".\nDesign: WebFetch https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b (full HTML saved locally \u2014 reuse the design and provenance footer exactly), update every tile, flag and the snapshot time, republish with the Artifact tool passing url=https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b and favicon \"\ud83d\udce1\".\n\n## 3. PART 3 \u2014 Department dashboard suite (7am slot ONLY)\nRun this part only when fired 21:00\u201321:59 UTC (the 7am Melbourne slot) \u2014 the 8am and 9am firings skip it. It refreshes the nine Insights-Model department dashboards daily.\n1. Load extra tools: ToolSearch `select:mcp__Stripe__stripe_api_read`, and search ToolSearch for the NetSuite SuiteQL tools (query \"netsuite suiteql\"). If NetSuite tools are absent after two attempts, still refresh the Salesforce/Stripe numbers and leave NetSuite-sourced figures with their existing date labels \u2014 never publish a stale figure as current.\n2. Get the repo: if /home/user/Birdlife is absent, add_repo mathewruahema-beep/Birdlife (push access) and clone. Check out branch claude/birdlife-insights-model-7llvsg (if it has been merged, restart it from the default branch per the repo's git rules). Sources: dashboard/*.html. Canonical queries: insights/sql/extraction-queries.md. Defect register: insights/04-data-quality-register.md.\n3. Recompute every live number each page's provenance footer declares, using ONLY the canonical queries. Hard rules: READ-ONLY on all business systems; SuiteQL scoped to subsidiary 2 and NEVER create NetSuite saved searches; count Salesforce number fields with != null AND != 0; regular giving is always the two-object union; every Case query carries RecordType scope.\n4. Finance page: follow insights/finance-refresh-runbook.md \u2014 replace the dated NetSuite placeholders with live SuiteQL values (income by GL on posting-date basis PAIRED with the SF Close-Date figure; department split with unmapped %; bank-rec figures only if verifiable via SuiteQL, else keep their date labels).\n5. Edit the HTML files: update numbers, deltas and as-of dates only \u2014 keep the design, scope captions and DQ callouts (update DQ callouts if a live check changes, e.g. the invalid-stage count). Keep the executive rollup tiles consistent with the department pages.\n6. Republish each updated page with the Artifact tool passing its existing url (same-URL republish, keep each favicon):\n   - dashboard/fundraising-dashboard.html \u2192 https://claude.ai/code/artifact/e9debe53-58d2-4638-84ae-e3530f710811 (\ud83d\udc26)\n   - dashboard/membership-dashboard.html \u2192 https://claude.ai/code/artifact/5465032a-70e8-4167-b0f4-7fb7a1b6ccad (\ud83e\udeaa)\n   - dashboard/finance-dashboard.html \u2192 https://claude.ai/code/artifact/73c13fb9-0307-4898-a631-9820a44e72b1 (\ud83e\uddfe)\n   - dashboard/supporter-care-dashboard.html \u2192 https://claude.ai/code/artifact/a57ebf7f-016d-4539-b10c-c77b0ad1c43c (\ud83d\uded2)\n   - dashboard/marketing-dashboard.html \u2192 https://claude.ai/code/artifact/c77c80d0-8323-48f5-8dc5-26fe5199da59 (\ud83d\udce3)\n   - dashboard/conservation-dashboard.html \u2192 https://claude.ai/code/artifact/652830f4-648c-45f7-89c6-85976982e5cd (\ud83e\udd89)\n   - dashboard/people-dashboard.html \u2192 https://claude.ai/code/artifact/72217cd8-c41b-497b-86d1-1b0f44d5d186 (\ud83e\uddd1\u200d\ud83e\udd1d\u200d\ud83e\uddd1)\n   - dashboard/volunteering-dashboard.html \u2192 https://claude.ai/code/artifact/93bf95c7-8fa2-4e67-9c5b-ec945a8cad4c (\ud83e\udd1d)\n   - dashboard/executive-rollup.html \u2192 https://claude.ai/code/artifact/60a0c115-3a75-48f4-9095-6e78ffc466be (\ud83e\udd85)\n7. Commit the updated HTML to the branch with a clear message and git push -u origin claude/birdlife-insights-model-7llvsg.\n\n## 4. Report\nOne or two lines covering all parts (add a suite line when Part 3 ran, e.g. \"suite republished 9/9, NetSuite live\") (e.g. \"Ops unchanged \u2014 skipped; Monitoring republished: Stripe errors 2, Apex failures cleared\"). No push, no email.",
+    "model": ""
+   },
+   "last_run": {
+    "status": "ROUTINE_RUN_STATUS_PENDING",
+    "fired_at": "2026-09-01T23:07:11.207714470Z",
+    "session_id": "cse_01LnW1uEbmzAfEk6C2V1Qbr8"
+   },
+   "_os_disposition": "PRE-CHANGE SNAPSHOT 2026-09-02: updated in place into \"BirdLife ICT weekday dashboards and monitor\""
+  },
+  {
+   "id": "trig_01QKqXyfwVoUwejxBbe15gX9",
+   "name": "BirdLife ICT dashboard - daily refresh and Teams push",
+   "cron_expression": "0 21 * * 0-4",
+   "enabled": true,
+   "next_run_at": "2026-09-02T21:06:30.917810338Z",
+   "created_at": "2026-08-12T02:52:20.017080Z",
+   "updated_at": "2026-08-13T04:52:31.878358Z",
+   "session_request": {
+    "events": [
+     {
+      "payload": {
+       "uuid": "77388507-35e6-4928-a9a4-e17752dcc583",
+       "type": "user",
+       "internal_anthropic_catchall": {
+        "isSynthetic": true,
+        "message": {
+         "content": "Refresh the BirdLife ICT Operations Dashboard from live data and run the data-flow health checks. Fires weekdays 7am AEST for Mathew Hema, Senior Manager ICT. This is the single scheduled ICT dashboard job \u2014 it replaced three overlapping routines. READ-ONLY throughout: never modify a Salesforce case or an Asana task.\n\nFresh session, no prior context. Work autonomously, do not ask questions.\n\n## 0. Load your tools FIRST \u2014 do not skip this\n\nMCP connector tools are DEFERRED in a fresh session. They are not in your tool list at startup and you MUST load them with ToolSearch before use. Seeing no Salesforce or Asana tools at startup is NORMAL and does NOT mean the connector is missing.\n\nRun these before anything else:\n- ToolSearch with query `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch with query `select:mcp__Asana__search_tasks,mcp__Asana__get_project`\n\nIf a server is still connecting, ToolSearch waits for it \u2014 call it again rather than giving up. Only after ToolSearch has returned no match on a second attempt should you treat a connector as genuinely unavailable. If that happens, STOP and report exactly which connector failed and the exact error text; do not silently produce a dashboard from stale or partial data.\n\n## 1. Salesforce (mcp__Salesforce_Production__soqlQuery)\n\nALWAYS filter to the Ask Zeus record type. Without it you get all 19 record types (Powerful Owl, Swift Parrot Search, AOC, General Enquiry etc.) \u2014 other teams' queues that inflate ICT's numbers by roughly 200x. Do NOT scope by Owner.Name instead: that leaks non-ICT cases in (Conservation Campaigns, General Enquiry, Bird Week) and misses Zeus cases assigned outside the team.\n\n- By status: SELECT Status, COUNT(Id) FROM Case WHERE IsClosed = false AND RecordType.Name = 'Ask Zeus' GROUP BY Status\n- By owner: same filter, GROUP BY Owner.Name\n- Full open list: SELECT CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate, LastModifiedDate FROM Case WHERE IsClosed = false AND RecordType.Name = 'Ask Zeus' ORDER BY Owner.Name, CreatedDate ASC\n- Case mix: SELECT Type, COUNT(Id) FROM Case WHERE RecordType.Name = 'Ask Zeus' AND CreatedDate = LAST_N_DAYS:180 GROUP BY Type\n- Intake: same filter, GROUP BY Origin\n\nOwner.Name = \"Zeus\" is the unassigned intake queue, not a person. Render it FIRST, headed \"Zeus (queue) \u2014 N unassigned, incoming work\", with triage-and-assign as the action. Then one table per person owner (Andrew Dunn, Keith Tsui, Nina Lewis, Mathew Hema), omitting anyone with no open cases.\n\n## 2. Asana\n\nProject 1211042432693678, \"IT Operations Project Plan\".\n- get_project with include_sections and task_counts\n- search_tasks: projects_any=1211042432693678, completed=false, limit=100, opt_fields=name,assignee.name,due_on,modified_at,memberships.section.name\n- More than 100 incomplete tasks exist, so run it again with sort_by=modified_at and sort_ascending=true to catch the tail, then de-duplicate by gid. Section counts must reconcile to num_incomplete_tasks.\n- Report all 8 sections including empty ones (Ready for Deployment, Hypercare) \u2014 an empty release stage is information. Also count incomplete tasks belonging to no section (~17 e-store subtasks invisible in every view) and any task in Done not marked complete.\n\n## 3. Data-flow health checks\n\nQueue and board:\n- Open cases with no Type \u2014 count and share of the open queue.\n- Cases in New more than 2 business days, oldest first.\n- Open cases older than 30 calendar days not in Waiting Response-External.\n- Asana Blocked items unmodified 14+ days; tasks past due_on; unassigned tasks.\n- Duplicate intake: any two open cases sharing a near-identical Subject created within minutes of each other. This has fired before \u2014 two identical Instagram DM cases 48 seconds apart on 7 Aug \u2014 and indicates an inbound rule double-triggering, not just a stray ticket. Flag it prominently.\n\nIntegration checks. If a query errors on an unknown field or object, render that tile \"check unavailable\" and CONTINUE \u2014 never fail the whole refresh over one check:\n1. Stripe to Salesforce sync: SELECT COUNT(Id) c FROM stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1 \u2014 healthy if 0, red above 0.\n2. Gravity Forms to Cases orphan rate: (a) SELECT COUNT(Id) c FROM Case WHERE ContactId = null AND CreatedDate = LAST_N_DAYS:1 AND RecordType.DeveloperName='General_Enquiry_Case', and (b) same without the ContactId filter. Rate = a/b. Baseline ~25%; healthy below 40%, amber above, red at 60%+.\n3. Recurring giving: SELECT COUNT(Id) c FROM RD_Change_Log__c WHERE CreatedDate = LAST_N_DAYS:1 \u2014 informational.\n4. Zapier failures: informational \u2014 \"Zap failures alert to Microsoft Teams (Zap Manager \u2192 Teams channel).\"\n\nAdd below the tiles: \"Still dark: external engine run-health, un-connected Stripe accounts' direct API, WordPress fleet beyond main site, Ortto deep sync.\"\n\n## 4. Push to the Teams channel FIRST (REQUIRED \u2014 this is the primary deliverable)\n\nThe Teams channel copy is what the team actually reads. It is published BEFORE the artifact so that nothing later in this routine can block it.\n\nBuild the dashboard HTML in full (design spec in section 4b below), write it to a local file with the Write tool at /tmp/ict-dashboard.html, then upload that exact content:\n\n- ToolSearch with query `select:mcp__Microsoft_365__sharepoint_upload_file,mcp__Microsoft_365__read_resource`\n- Call mcp__Microsoft_365__sharepoint_upload_file with exactly:\n  - driveId: b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-\n  - parentItemId: 01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM\n  - filename: BirdLife-ICT-Operations-Dashboard.html\n  - conflictBehavior: replace\n  - content: the complete HTML, byte for byte\n\nThe driveId, parentItemId and filename are FIXED. Never rename, never move, never create a dated variant. The Teams Files link must stay stable.\n\nReproduce the HTML in full. No truncation, no ellipsis, no \"rest of file unchanged\" placeholder. If the HTML is large, delegate the upload to a Task subagent: tell it to read /tmp/ict-dashboard.html, verify its own reconstruction with `diff` and `md5sum` before sending, and report the byte count. That pattern is proven and avoids truncation.\n\nVERIFY, do not assume: call mcp__Microsoft_365__read_resource on\nfile:///b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-/01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM\nand confirm BirdLife-ICT-Operations-Dashboard.html is listed with a byte size matching what you uploaded. Record both numbers.\n\n## 4b. Republish the artifact (BEST EFFORT \u2014 must never block section 4)\n\nRepublish to the SAME artifact URL so the link stays stable \u2014 call the Artifact tool with this `url` and favicon \"\ud83e\udeb6\":\n\n  https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606\n\nIf an Artifact tool is NOT available in this run, do NOT stop and do NOT retry in a loop. Record \"artifact tool unavailable\" and carry on to section 4c. Section 4 has already delivered the dashboard to the people who need it.\n\nDesign spec for the HTML built in section 4: masthead with snapshot time and the \"Scope: Record Type = Ask Zeus\" stamp; scope-correction band; queue health tiles; queue shape by status and owner; open-case tables with age in days and untyped markers; case mix and intake; data-flow health tiles; Asana section flow across all 8 sections; flags panel; and the provenance footer where every panel states the filter it was computed under. Cool-green palette, monospace numerals, both light and dark themes. Re-derive every number, row and caption from the live pull \u2014 carry nothing stale forward. Compare against the dashboard you are replacing and state explicitly if the queue grew, the untyped share worsened, or a case crossed 30 days.\n\n## 4c. Write the run heartbeat (REQUIRED \u2014 every run, success or failure, no exceptions)\n\nThis routine failed silently on 11 and 12 Aug 2026 and nothing recorded that it had. The heartbeat makes that impossible. Write it even if everything else in this routine failed. It is the last thing you do and it is not optional.\n\n1. Read the existing log: mcp__Microsoft_365__read_resource on\n   file:///b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-/01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM\n   and locate _dashboard-run-log.txt. If it exists, read it. If it does not exist yet, start a new one.\n2. PREPEND one line for this run, newest first, in exactly this format:\n   YYYY-MM-DD HH:MM AEST | OK or FAILED | connectors: SF=yes/no ASANA=yes/no | sharepoint: <bytes> bytes | artifact: ok/unavailable/failed | note\n3. Keep only the most recent 40 lines. Discard older ones.\n4. Upload with mcp__Microsoft_365__sharepoint_upload_file, same driveId and parentItemId, filename _dashboard-run-log.txt, conflictBehavior replace.\n\nAnyone can then open that one file in the Teams channel and see at a glance whether this routine has been running and what it did. A missing line for a weekday means the run did not happen.\n\n## 4d. Fail loudly (REQUIRED)\n\nIf ANY of the following happens \u2014 a connector does not load in section 0, the SharePoint push in section 4 fails or its read-back size does not match, or the heartbeat in section 4c cannot be written \u2014 then email mathew.hema@birdlife.org.au via mcp__Microsoft_365__outlook_send_mail (load it with ToolSearch `select:mcp__Microsoft_365__outlook_send_mail`) with subject \"BirdLife ICT dashboard \u2014 REFRESH FAILED\" and a body stating exactly which step failed, the verbatim error text, and the AEST time. Send that email even if you cannot complete anything else.\n\nThe artifact being unavailable in section 4b is NOT a failure and must NOT trigger this email.\n\nIf everything succeeded, send NO email. Silence means it worked.\n\n## 5. Report back\n\nShort. Lead with the single thing most needing attention, then two or three lines on the queue and the board, then the link. If nothing breached a threshold, say so in one line. Also state plainly whether both connectors loaded \u2014 that is being monitored while this routine beds in. Then state whether the Teams channel push in section 4b succeeded, quoting the byte count uploaded and the byte size you read back. If they differ, treat that as a failure and say so.",
+         "role": "user"
+        },
+        "parent_tool_use_id": null
+       }
+      }
+     }
+    ]
+   },
+   "last_fired_at": "2026-09-01T21:09:05.652957Z",
+   "notifications": {
+    "channel": {
+     "push": true,
+     "email": true
+    }
+   },
+   "created_via": "meta_mcp",
+   "derived_state": {
+    "folders_state": "FOLDERS_STATE_NONE",
+    "prompt": "Refresh the BirdLife ICT Operations Dashboard from live data and run the data-flow health checks. Fires weekdays 7am AEST for Mathew Hema, Senior Manager ICT. This is the single scheduled ICT dashboard job \u2014 it replaced three overlapping routines. READ-ONLY throughout: never modify a Salesforce case or an Asana task.\n\nFresh session, no prior context. Work autonomously, do not ask questions.\n\n## 0. Load your tools FIRST \u2014 do not skip this\n\nMCP connector tools are DEFERRED in a fresh session. They are not in your tool list at startup and you MUST load them with ToolSearch before use. Seeing no Salesforce or Asana tools at startup is NORMAL and does NOT mean the connector is missing.\n\nRun these before anything else:\n- ToolSearch with query `select:mcp__Salesforce_Production__soqlQuery`\n- ToolSearch with query `select:mcp__Asana__search_tasks,mcp__Asana__get_project`\n\nIf a server is still connecting, ToolSearch waits for it \u2014 call it again rather than giving up. Only after ToolSearch has returned no match on a second attempt should you treat a connector as genuinely unavailable. If that happens, STOP and report exactly which connector failed and the exact error text; do not silently produce a dashboard from stale or partial data.\n\n## 1. Salesforce (mcp__Salesforce_Production__soqlQuery)\n\nALWAYS filter to the Ask Zeus record type. Without it you get all 19 record types (Powerful Owl, Swift Parrot Search, AOC, General Enquiry etc.) \u2014 other teams' queues that inflate ICT's numbers by roughly 200x. Do NOT scope by Owner.Name instead: that leaks non-ICT cases in (Conservation Campaigns, General Enquiry, Bird Week) and misses Zeus cases assigned outside the team.\n\n- By status: SELECT Status, COUNT(Id) FROM Case WHERE IsClosed = false AND RecordType.Name = 'Ask Zeus' GROUP BY Status\n- By owner: same filter, GROUP BY Owner.Name\n- Full open list: SELECT CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate, LastModifiedDate FROM Case WHERE IsClosed = false AND RecordType.Name = 'Ask Zeus' ORDER BY Owner.Name, CreatedDate ASC\n- Case mix: SELECT Type, COUNT(Id) FROM Case WHERE RecordType.Name = 'Ask Zeus' AND CreatedDate = LAST_N_DAYS:180 GROUP BY Type\n- Intake: same filter, GROUP BY Origin\n\nOwner.Name = \"Zeus\" is the unassigned intake queue, not a person. Render it FIRST, headed \"Zeus (queue) \u2014 N unassigned, incoming work\", with triage-and-assign as the action. Then one table per person owner (Andrew Dunn, Keith Tsui, Nina Lewis, Mathew Hema), omitting anyone with no open cases.\n\n## 2. Asana\n\nProject 1211042432693678, \"IT Operations Project Plan\".\n- get_project with include_sections and task_counts\n- search_tasks: projects_any=1211042432693678, completed=false, limit=100, opt_fields=name,assignee.name,due_on,modified_at,memberships.section.name\n- More than 100 incomplete tasks exist, so run it again with sort_by=modified_at and sort_ascending=true to catch the tail, then de-duplicate by gid. Section counts must reconcile to num_incomplete_tasks.\n- Report all 8 sections including empty ones (Ready for Deployment, Hypercare) \u2014 an empty release stage is information. Also count incomplete tasks belonging to no section (~17 e-store subtasks invisible in every view) and any task in Done not marked complete.\n\n## 3. Data-flow health checks\n\nQueue and board:\n- Open cases with no Type \u2014 count and share of the open queue.\n- Cases in New more than 2 business days, oldest first.\n- Open cases older than 30 calendar days not in Waiting Response-External.\n- Asana Blocked items unmodified 14+ days; tasks past due_on; unassigned tasks.\n- Duplicate intake: any two open cases sharing a near-identical Subject created within minutes of each other. This has fired before \u2014 two identical Instagram DM cases 48 seconds apart on 7 Aug \u2014 and indicates an inbound rule double-triggering, not just a stray ticket. Flag it prominently.\n\nIntegration checks. If a query errors on an unknown field or object, render that tile \"check unavailable\" and CONTINUE \u2014 never fail the whole refresh over one check:\n1. Stripe to Salesforce sync: SELECT COUNT(Id) c FROM stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1 \u2014 healthy if 0, red above 0.\n2. Gravity Forms to Cases orphan rate: (a) SELECT COUNT(Id) c FROM Case WHERE ContactId = null AND CreatedDate = LAST_N_DAYS:1 AND RecordType.DeveloperName='General_Enquiry_Case', and (b) same without the ContactId filter. Rate = a/b. Baseline ~25%; healthy below 40%, amber above, red at 60%+.\n3. Recurring giving: SELECT COUNT(Id) c FROM RD_Change_Log__c WHERE CreatedDate = LAST_N_DAYS:1 \u2014 informational.\n4. Zapier failures: informational \u2014 \"Zap failures alert to Microsoft Teams (Zap Manager \u2192 Teams channel).\"\n\nAdd below the tiles: \"Still dark: external engine run-health, un-connected Stripe accounts' direct API, WordPress fleet beyond main site, Ortto deep sync.\"\n\n## 4. Push to the Teams channel FIRST (REQUIRED \u2014 this is the primary deliverable)\n\nThe Teams channel copy is what the team actually reads. It is published BEFORE the artifact so that nothing later in this routine can block it.\n\nBuild the dashboard HTML in full (design spec in section 4b below), write it to a local file with the Write tool at /tmp/ict-dashboard.html, then upload that exact content:\n\n- ToolSearch with query `select:mcp__Microsoft_365__sharepoint_upload_file,mcp__Microsoft_365__read_resource`\n- Call mcp__Microsoft_365__sharepoint_upload_file with exactly:\n  - driveId: b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-\n  - parentItemId: 01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM\n  - filename: BirdLife-ICT-Operations-Dashboard.html\n  - conflictBehavior: replace\n  - content: the complete HTML, byte for byte\n\nThe driveId, parentItemId and filename are FIXED. Never rename, never move, never create a dated variant. The Teams Files link must stay stable.\n\nReproduce the HTML in full. No truncation, no ellipsis, no \"rest of file unchanged\" placeholder. If the HTML is large, delegate the upload to a Task subagent: tell it to read /tmp/ict-dashboard.html, verify its own reconstruction with `diff` and `md5sum` before sending, and report the byte count. That pattern is proven and avoids truncation.\n\nVERIFY, do not assume: call mcp__Microsoft_365__read_resource on\nfile:///b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-/01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM\nand confirm BirdLife-ICT-Operations-Dashboard.html is listed with a byte size matching what you uploaded. Record both numbers.\n\n## 4b. Republish the artifact (BEST EFFORT \u2014 must never block section 4)\n\nRepublish to the SAME artifact URL so the link stays stable \u2014 call the Artifact tool with this `url` and favicon \"\ud83e\udeb6\":\n\n  https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606\n\nIf an Artifact tool is NOT available in this run, do NOT stop and do NOT retry in a loop. Record \"artifact tool unavailable\" and carry on to section 4c. Section 4 has already delivered the dashboard to the people who need it.\n\nDesign spec for the HTML built in section 4: masthead with snapshot time and the \"Scope: Record Type = Ask Zeus\" stamp; scope-correction band; queue health tiles; queue shape by status and owner; open-case tables with age in days and untyped markers; case mix and intake; data-flow health tiles; Asana section flow across all 8 sections; flags panel; and the provenance footer where every panel states the filter it was computed under. Cool-green palette, monospace numerals, both light and dark themes. Re-derive every number, row and caption from the live pull \u2014 carry nothing stale forward. Compare against the dashboard you are replacing and state explicitly if the queue grew, the untyped share worsened, or a case crossed 30 days.\n\n## 4c. Write the run heartbeat (REQUIRED \u2014 every run, success or failure, no exceptions)\n\nThis routine failed silently on 11 and 12 Aug 2026 and nothing recorded that it had. The heartbeat makes that impossible. Write it even if everything else in this routine failed. It is the last thing you do and it is not optional.\n\n1. Read the existing log: mcp__Microsoft_365__read_resource on\n   file:///b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-/01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM\n   and locate _dashboard-run-log.txt. If it exists, read it. If it does not exist yet, start a new one.\n2. PREPEND one line for this run, newest first, in exactly this format:\n   YYYY-MM-DD HH:MM AEST | OK or FAILED | connectors: SF=yes/no ASANA=yes/no | sharepoint: <bytes> bytes | artifact: ok/unavailable/failed | note\n3. Keep only the most recent 40 lines. Discard older ones.\n4. Upload with mcp__Microsoft_365__sharepoint_upload_file, same driveId and parentItemId, filename _dashboard-run-log.txt, conflictBehavior replace.\n\nAnyone can then open that one file in the Teams channel and see at a glance whether this routine has been running and what it did. A missing line for a weekday means the run did not happen.\n\n## 4d. Fail loudly (REQUIRED)\n\nIf ANY of the following happens \u2014 a connector does not load in section 0, the SharePoint push in section 4 fails or its read-back size does not match, or the heartbeat in section 4c cannot be written \u2014 then email mathew.hema@birdlife.org.au via mcp__Microsoft_365__outlook_send_mail (load it with ToolSearch `select:mcp__Microsoft_365__outlook_send_mail`) with subject \"BirdLife ICT dashboard \u2014 REFRESH FAILED\" and a body stating exactly which step failed, the verbatim error text, and the AEST time. Send that email even if you cannot complete anything else.\n\nThe artifact being unavailable in section 4b is NOT a failure and must NOT trigger this email.\n\nIf everything succeeded, send NO email. Silence means it worked.\n\n## 5. Report back\n\nShort. Lead with the single thing most needing attention, then two or three lines on the queue and the board, then the link. If nothing breached a threshold, say so in one line. Also state plainly whether both connectors loaded \u2014 that is being monitored while this routine beds in. Then state whether the Teams channel push in section 4b succeeded, quoting the byte count uploaded and the byte size you read back. If they differ, treat that as a failure and say so.",
+    "model": "claude-opus-5"
+   },
+   "last_run": {
+    "status": "ROUTINE_RUN_STATUS_PENDING",
+    "fired_at": "2026-09-01T21:09:05.621615597Z",
+    "session_id": "cse_01DvNwFJ154jFJ5GfQoy6MKQ"
+   },
+   "_os_disposition": "RETIRED 2026-09-02: absorbed into weekday hourly routine (deep 7am slot)"
+  },
+  {
+   "id": "trig_015SYdBtkDn7jt8dz6MdvXyE",
+   "name": "BirdLife ICT hourly monitor (7-9am AEST Mon-Fri)",
+   "cron_expression": "0 21-23 * * 0-4",
+   "enabled": true,
+   "next_run_at": "2026-09-02T21:02:02.274047480Z",
+   "created_at": "2026-08-11T12:51:27.868594Z",
+   "updated_at": "2026-08-13T04:03:42.294254Z",
+   "session_request": {
+    "events": [
+     {
+      "payload": {
+       "uuid": "286bbeb8-5f7a-4119-b11c-6e9ba29422e4",
+       "type": "user",
+       "internal_anthropic_catchall": {
+        "isSynthetic": true,
+        "message": {
+         "content": "You are BirdLife Australia's hourly ICT monitor. Fresh session, no prior context. Work autonomously, never ask questions. READ-ONLY on all business systems.\n\n## 0. LOAD TOOLS FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session. They are NOT in your tool list at startup and you MUST load them with ToolSearch before calling them. Seeing no Salesforce or Zapier tools at startup is NORMAL. Run before anything else:\n- ToolSearch with query `select:mcp__Salesforce_Production__soqlQuery,mcp__NetSuite__ns_runCustomSuiteQL,mcp__Zapier__execute_zapier_write_action,mcp__Microsoft_365__outlook_send_mail,mcp__Microsoft_365__read_resource,mcp__Microsoft_365__sharepoint_upload_file`\nIf a server is still connecting, ToolSearch waits \u2014 call it a second time before treating a connector as unavailable. If Zapier fails to load, use email for any alert. If Salesforce fails to load after two attempts, that IS a finding: report it in your one post/email.\n\n## 1. CHECKS\n(1) Website: mcp__Zapier__execute_zapier_write_action with selected_api \"WebHookCLIAPI\", action \"get\", tool_name \"webhooks_by_zapier_get\", params {\"url\": \"https://birdlife.org.au\"}. Success = response contains homepage HTML (a large result saved to a file counts \u2014 grep it for \"<html\"). A 60s MCP timeout on first attempt is common \u2014 retry once; only a second failure or explicit HTTP error is DOWN.\n(2) LearnUpon: same method, url \"https://learn.birdlife.org.au\". HTTP 401/403 = server answered = HEALTHY. Only 5xx/timeout/network error is a failure.\n(3) Salesforce API: soqlQuery q \"SELECT Id FROM Organization LIMIT 1\" \u2014 expect one record.\n(4) NetSuite API: ns_runCustomSuiteQL sqlQuery \"SELECT id FROM subsidiary\" \u2014 expect rows.\n(5) Scheduler health: soqlQuery \"SELECT Id, CronJobDetail.Name, State, NextFireTime FROM CronTrigger WHERE State != 'DELETED' LIMIT 250\" \u2014 flag ERROR/BLOCKED/PAUSED, WAITING jobs >30 min past NextFireTime, or total under 110 (baseline 121).\n(6) Apex failures: soqlQuery \"SELECT ApexClass.Name, Status, NumberOfErrors, ExtendedStatus FROM AsyncApexJob WHERE CreatedDate = LAST_N_DAYS:1 AND (Status='Failed' OR NumberOfErrors > 0) LIMIT 100\". NEVER flag \"batchProcessor\" + \"Aborted\" (Payments2Us normal self-reschedule). Known issue since 12 Aug: SyncConnectedAccountsQueueable failing on an expired Stripe live API key \u2014 report in the heartbeat as \"known issue, Stripe key rotation pending\", not as a new alert.\n(7) Inflow: soqlQuery \"SELECT COUNT() FROM Opportunity WHERE CreatedDate = LAST_N_DAYS:1\" and \"SELECT COUNT() FROM npe01__OppPayment__c WHERE CreatedDate = LAST_N_DAYS:1\" \u2014 zero of either = flag.\n(8) Mondays only: job \"DataExport\" PreviousFireTime within last 8 days, else flag.\n\n## 2. POST \u2014 strict rules\nTeams via mcp__Zapier__execute_zapier_write_action: selected_api \"MSTeamsCLIAPI\", tool_name \"microsoft_teams_send_channel_message\", action \"send_channel_message_from_user\", connection_id 65446809, params team_id \"22783bdb-f425-414e-a2dd-ad2a6f4decaf\", channel \"19:ZgBiIiH-7JK4xeXUMx6IPU408yvIGlnMFpXHQNvdNFE1@thread.tacv2\", format \"markdown\".\nAT MOST ONE message per run, composed in full after all checks, sent exactly once. Any non-error response (including a large result saved to a file) = delivered, NEVER resend. Timeout = possibly delivered, do NOT resend. Only an explicit error permits one retry. On 12 Aug a run posted 8 duplicates \u2014 never again.\nWHEN: if current UTC hour is 21 (7 AM AEST run), ALWAYS post the one heartbeat line, green or red: \"\u2705 Daily ICT sweep <date>: <n> jobs healthy, <apex summary>, inflow normal (<x> opps, <y> payments), websites up\" or the \ud83d\udd34 equivalent (importance \"high\") listing findings. At UTC hours 22-23, post ONLY on new failures; silent when green. If the Teams send fails outright, email the same content to mathew.hema@birdlife.org.au via mcp__Microsoft_365__outlook_send_mail, subject \"BirdLife ICT monitor\".\n\n## 3. DASHBOARD REFRESH (after posting; failure here never blocks alerting, never justifies an extra Teams message)\nThe live dashboard is the Teams channel file BirdLife-ICT-Monitoring-Dashboard.html. Read current HTML: mcp__Microsoft_365__read_resource with uri \"file:///b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-/01R3D6QX5Q4U4WEZSAL5AJQQXBTKANUF4S\". Follow the MONITOR EDIT GUIDE comment at the top: update <time id=\"last-updated\">, each card's data-status / .status-label / .last-checked with THIS run's results (\"unknown\"/\"Not checked\" for anything not verified \u2014 never green for unchecked), the #overall banner, #issues only on genuine changes. Reproduce the HTML IN FULL \u2014 no truncation, no \"rest unchanged\" placeholders. Upload via mcp__Microsoft_365__sharepoint_upload_file: driveId \"b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-\", parentItemId \"01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM\", filename \"BirdLife-ICT-Monitoring-Dashboard.html\", conflictBehavior \"replace\". Verify with read_resource on the folder that the file is listed. Never rename, never create dated variants, never write to OneDrive or the device.\n\n## 4. FAIL LOUDLY\nIf tool loading or every check fails such that you can post nothing to Teams, email mathew.hema@birdlife.org.au (subject \"BirdLife ICT monitor \u2014 RUN FAILED\") stating which step failed with verbatim error text. Total silence is the one unacceptable outcome on the 7 AM run.",
+         "role": "user"
+        },
+        "parent_tool_use_id": null
+       }
+      }
+     }
+    ]
+   },
+   "last_fired_at": "2026-09-01T23:04:39.732860Z",
+   "notifications": {
+    "channel": {
+     "push": false,
+     "email": false
+    }
+   },
+   "created_via": "meta_mcp",
+   "derived_state": {
+    "folders_state": "FOLDERS_STATE_NONE",
+    "prompt": "You are BirdLife Australia's hourly ICT monitor. Fresh session, no prior context. Work autonomously, never ask questions. READ-ONLY on all business systems.\n\n## 0. LOAD TOOLS FIRST \u2014 do not skip\nMCP connector tools are DEFERRED in a fresh session. They are NOT in your tool list at startup and you MUST load them with ToolSearch before calling them. Seeing no Salesforce or Zapier tools at startup is NORMAL. Run before anything else:\n- ToolSearch with query `select:mcp__Salesforce_Production__soqlQuery,mcp__NetSuite__ns_runCustomSuiteQL,mcp__Zapier__execute_zapier_write_action,mcp__Microsoft_365__outlook_send_mail,mcp__Microsoft_365__read_resource,mcp__Microsoft_365__sharepoint_upload_file`\nIf a server is still connecting, ToolSearch waits \u2014 call it a second time before treating a connector as unavailable. If Zapier fails to load, use email for any alert. If Salesforce fails to load after two attempts, that IS a finding: report it in your one post/email.\n\n## 1. CHECKS\n(1) Website: mcp__Zapier__execute_zapier_write_action with selected_api \"WebHookCLIAPI\", action \"get\", tool_name \"webhooks_by_zapier_get\", params {\"url\": \"https://birdlife.org.au\"}. Success = response contains homepage HTML (a large result saved to a file counts \u2014 grep it for \"<html\"). A 60s MCP timeout on first attempt is common \u2014 retry once; only a second failure or explicit HTTP error is DOWN.\n(2) LearnUpon: same method, url \"https://learn.birdlife.org.au\". HTTP 401/403 = server answered = HEALTHY. Only 5xx/timeout/network error is a failure.\n(3) Salesforce API: soqlQuery q \"SELECT Id FROM Organization LIMIT 1\" \u2014 expect one record.\n(4) NetSuite API: ns_runCustomSuiteQL sqlQuery \"SELECT id FROM subsidiary\" \u2014 expect rows.\n(5) Scheduler health: soqlQuery \"SELECT Id, CronJobDetail.Name, State, NextFireTime FROM CronTrigger WHERE State != 'DELETED' LIMIT 250\" \u2014 flag ERROR/BLOCKED/PAUSED, WAITING jobs >30 min past NextFireTime, or total under 110 (baseline 121).\n(6) Apex failures: soqlQuery \"SELECT ApexClass.Name, Status, NumberOfErrors, ExtendedStatus FROM AsyncApexJob WHERE CreatedDate = LAST_N_DAYS:1 AND (Status='Failed' OR NumberOfErrors > 0) LIMIT 100\". NEVER flag \"batchProcessor\" + \"Aborted\" (Payments2Us normal self-reschedule). Known issue since 12 Aug: SyncConnectedAccountsQueueable failing on an expired Stripe live API key \u2014 report in the heartbeat as \"known issue, Stripe key rotation pending\", not as a new alert.\n(7) Inflow: soqlQuery \"SELECT COUNT() FROM Opportunity WHERE CreatedDate = LAST_N_DAYS:1\" and \"SELECT COUNT() FROM npe01__OppPayment__c WHERE CreatedDate = LAST_N_DAYS:1\" \u2014 zero of either = flag.\n(8) Mondays only: job \"DataExport\" PreviousFireTime within last 8 days, else flag.\n\n## 2. POST \u2014 strict rules\nTeams via mcp__Zapier__execute_zapier_write_action: selected_api \"MSTeamsCLIAPI\", tool_name \"microsoft_teams_send_channel_message\", action \"send_channel_message_from_user\", connection_id 65446809, params team_id \"22783bdb-f425-414e-a2dd-ad2a6f4decaf\", channel \"19:ZgBiIiH-7JK4xeXUMx6IPU408yvIGlnMFpXHQNvdNFE1@thread.tacv2\", format \"markdown\".\nAT MOST ONE message per run, composed in full after all checks, sent exactly once. Any non-error response (including a large result saved to a file) = delivered, NEVER resend. Timeout = possibly delivered, do NOT resend. Only an explicit error permits one retry. On 12 Aug a run posted 8 duplicates \u2014 never again.\nWHEN: if current UTC hour is 21 (7 AM AEST run), ALWAYS post the one heartbeat line, green or red: \"\u2705 Daily ICT sweep <date>: <n> jobs healthy, <apex summary>, inflow normal (<x> opps, <y> payments), websites up\" or the \ud83d\udd34 equivalent (importance \"high\") listing findings. At UTC hours 22-23, post ONLY on new failures; silent when green. If the Teams send fails outright, email the same content to mathew.hema@birdlife.org.au via mcp__Microsoft_365__outlook_send_mail, subject \"BirdLife ICT monitor\".\n\n## 3. DASHBOARD REFRESH (after posting; failure here never blocks alerting, never justifies an extra Teams message)\nThe live dashboard is the Teams channel file BirdLife-ICT-Monitoring-Dashboard.html. Read current HTML: mcp__Microsoft_365__read_resource with uri \"file:///b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-/01R3D6QX5Q4U4WEZSAL5AJQQXBTKANUF4S\". Follow the MONITOR EDIT GUIDE comment at the top: update <time id=\"last-updated\">, each card's data-status / .status-label / .last-checked with THIS run's results (\"unknown\"/\"Not checked\" for anything not verified \u2014 never green for unchecked), the #overall banner, #issues only on genuine changes. Reproduce the HTML IN FULL \u2014 no truncation, no \"rest unchanged\" placeholders. Upload via mcp__Microsoft_365__sharepoint_upload_file: driveId \"b!y-bUV_bLCkqXwQAxqLx-Bave2vDOP3VIm_55FS__bfjpvBlGfeurRZhN_hUkVLs-\", parentItemId \"01R3D6QX53SFV4ZW76NZHJMUKKU6PACQWM\", filename \"BirdLife-ICT-Monitoring-Dashboard.html\", conflictBehavior \"replace\". Verify with read_resource on the folder that the file is listed. Never rename, never create dated variants, never write to OneDrive or the device.\n\n## 4. FAIL LOUDLY\nIf tool loading or every check fails such that you can post nothing to Teams, email mathew.hema@birdlife.org.au (subject \"BirdLife ICT monitor \u2014 RUN FAILED\") stating which step failed with verbatim error text. Total silence is the one unacceptable outcome on the 7 AM run.",
+    "model": "claude-opus-5"
+   },
+   "last_run": {
+    "status": "ROUTINE_RUN_STATUS_SUCCEEDED",
+    "fired_at": "2026-09-01T23:04:39.703856692Z",
+    "finished_at": "2026-09-01T23:11:53.704537Z",
+    "session_id": "cse_01RNu6uZBpSDPDWZ1LaEaW4K"
+   },
+   "_os_disposition": "RETIRED 2026-09-02: absorbed into weekday hourly routine (monitor section)"
+  }
+ ]
+}

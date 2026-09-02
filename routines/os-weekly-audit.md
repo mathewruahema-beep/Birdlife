@@ -1,17 +1,16 @@
 # Routine: Claude OS weekly audit
 
-**Status: ready to create, not yet live.** Per the OS change control, this is the
-proposed definition; Mathew approves before it goes live. To create it, tell any
-assistant session "create the OS weekly audit routine from
-routines/os-weekly-audit.md", or create it at claude.ai, Routines. Attach the
-**GitHub** connector (it commits register updates) and turn on the push
-notification.
+**Status: LIVE** as `trig_01V3i4b5zekjZuuFTF6Ymu9G`, created 2 Sep 2026 with
+Mathew's approval. This file remains the definition of record; if the live
+prompt drifts from it, reconcile and update both. No connectors are attached
+and none are needed: the repo and the list_triggers tool come from the session
+environment.
 
 | Setting | Value |
 |---|---|
 | Schedule | `0 20 * * 0` UTC (Monday 6am AEST) |
 | Session | fresh session per run |
-| Connectors | GitHub |
+| Connectors | none needed |
 | Notification | push on completion |
 
 ## Prompt
