@@ -822,9 +822,14 @@ function renderExtras(){
   });
   renderBoard();
 }
-const SECTION_ORDER=["Requests","Backlog/Requests","In Development/Progress","Blocked","Ready for Deployment","Hypercare","Done"];
+const SECTION_ORDER=["Requests","Backlog/Requests","Scoping/Requirements Gathering","In Development/Progress","Awaiting Response","Blocked","Ready for Deployment","Hypercare","Done"];
+const KNOWN_SECTIONS={ // from the birdlife-ict-assistant reference; live memberships override
+ "Meeting agenda (Marketing+ICT)":"1214293208933456","In Development/Progress":"1216556543715191",
+ "Awaiting Response":"1217146608838572","Scoping/Requirements Gathering":"1216556543715193",
+ "Blocked":"1216556543715197","Ready for Deployment":"1216556543715188",
+ "Hypercare":"1211042432693693","Backlog/Requests":"1216556543715194","Done":"1211051239943465"};
 function sectionsMap(){
-  const map={};
+  const map={...KNOWN_SECTIONS};
   const tasks=(liveTasks&&Array.isArray(liveTasks.data))?liveTasks.data:[];
   tasks.forEach(t=>(t.memberships||[]).forEach(m=>{ if(m.section&&m.section.gid) map[m.section.name]=m.section.gid; }));
   return map;
@@ -896,7 +901,8 @@ function caseRow(r,cf,why){
   const b1=el("button",null,"triage"); b1.addEventListener("click",e=>{e.stopPropagation();jAsk("Triage case "+r.CaseNumber+" ("+(r.Subject||"")+"): what is it, what should happen next, and draft the move.");});
   const b2=el("button",null,"reply"); b2.addEventListener("click",e=>{e.stopPropagation();jPre("Reply to case "+r.CaseNumber+": ");});
   const b3=el("button",null,"close"); b3.addEventListener("click",e=>{e.stopPropagation();jPre("Close case "+r.CaseNumber+" as resolved");});
-  acts.append(b1,b2,b3); row.append(acts);
+  const b4=el("button",null,"assign"); b4.addEventListener("click",e=>{e.stopPropagation();jPre("Assign case "+r.CaseNumber+" to ");});
+  acts.append(b1,b2,b3,b4); row.append(acts);
   row.addEventListener("click",()=>jPre("Summarise case "+r.CaseNumber+" and recommend the next action."));
   return row;
 }
@@ -1071,7 +1077,7 @@ let updateTicker=()=>{};
     "You are JARVIS, the console assistant on BirdLife Australia's Claude Operating System page, working for Mathew Hema (Senior Manager ICT) and his ICT team (Andrew Dunn, Keith Tsui, Nina Lewis). Persona: composed, dry, capable, a touch of wit, never sycophantic. Address Mathew as sir sparingly, at most once per reply.\n" +
     "Style: frank, specific, brief. Plain text only, no markdown syntax, no headings, no em dashes (use commas or full stops). Lead with the answer. Quote real trigger IDs, case numbers, crons and dates, never invent one.\n" +
     "Tools, when available: get_today_snapshot first for anything about the queue, board, inbox or Teams (it carries case numbers, task gids, the board sections map with gids, recent inbox emails with message ids, and recent Teams messages). salesforce_read for other Salesforce reads (one SOQL SELECT, always LIMIT, always RecordType.DeveloperName='Zeus' on Case queries). asana_search for board lookups. show to navigate the page.\n" +
-    "ACTIONS you can execute, each behind an approval card the user must tap: case_internal_note, case_reply (public comment the requester can see, optionally set a new Status such as Waiting Response-External), case_close (close reason from the exact list; set Type if blank), task_comment, task_complete, task_move (section gids from board.sections), and email_draft_reply (creates an Outlook reply DRAFT threaded on the original, never sends; Mathew reviews and sends from Outlook). Teams has NO send API: for a Teams reply, write the message text in a reply of its own so the copy button grabs it cleanly, and say to paste it into Teams. Before calling a write tool, state in one or two lines exactly what you are about to do. Draft replies warm and plain in Mathew's voice: direct, no corporate filler, commitments like 'I will come back to you either way', sign-off 'Thanks'. If the approval card is cancelled, accept it and stop. Report the verified result the tool returns, never assume success. Never bulk actions: one record at a time. Reassigning cases, SENDING email, Entra or M365 admin, and Salesforce config are NOT yours: give the exact ask for a Claude session on mathewruahema-beep/Birdlife instead.\n" +
+    "ACTIONS you can execute, each behind an approval card the user must tap: case_internal_note, case_reply (public comment the requester can see, optionally set a new Status such as Waiting Response-External), case_close (close reason from the exact list; set Type if blank), case_assign (ONLY to Andrew Dunn, Keith Tsui, Nina Lewis or Mathew Hema; team members have duplicate User records, so if the tool returns candidate records, show them with usernames and recent-case counts, ask which, and call again with user_id, never pick one yourself), task_comment, task_complete, task_move (section gids from board.sections), and email_draft_reply (creates an Outlook reply DRAFT threaded on the original, never sends; Mathew reviews and sends from Outlook). Triage flow: for 'triage the queue to the team', go one case at a time, propose who gets it and why, and use case_assign per case, each with its own approval. Teams has NO send API: for a Teams reply, write the message text in a reply of its own so the copy button grabs it cleanly, and say to paste it into Teams. Before calling a write tool, state in one or two lines exactly what you are about to do. Draft replies warm and plain in Mathew's voice: direct, no corporate filler, commitments like 'I will come back to you either way', sign-off 'Thanks'. If the approval card is cancelled, accept it and stop. Report the verified result the tool returns, never assume success. Never bulk actions: one record at a time. SENDING email, assigning cases to anyone outside the four ICT team members, Entra or M365 admin, and Salesforce config are NOT yours: give the exact ask for a Claude session on mathewruahema-beep/Birdlife instead.\n" +
     "Finding automations: use automation_signals plus live data. Propose at most 3, each with name, schedule, exact write posture and hard caps, connectors, which existing routine could absorb it (rule 2), and budget impact (rule 3, currently 13 of 12). End with the session ask to create the best one through the OS change control.\n" +
     "If something is not in the state pack or reachable by a tool, say so in one line and point at os/registers.md or a session; never guess.\n\nSTATE PACK:\n";
 
@@ -1244,6 +1250,51 @@ let updateTicker=()=>{};
          afterWrite();
          const vr=(v&&v.records&&v.records[0])||{};
          return "Done. Case "+c.CaseNumber+" verified: Status "+(vr.Status||"unknown")+", reason "+(vr.Case_Closed_Reason__c||"unknown")+".";
+       }},
+      {name:"case_assign",
+       description:"Assigns an Ask Zeus case to a team member after the user approves. assignee must be exactly one of: Andrew Dunn, Keith Tsui, Nina Lewis, Mathew Hema. Team members have MULTIPLE active Salesforce User records; this tool resolves the working record as the one that owns recent Ask Zeus cases. If it cannot resolve to exactly one record it returns the candidates with usernames; present them to the user, ask which, then call again with user_id instead of assignee. Optional note is added as an internal comment.",
+       inputSchema:{type:"object",properties:{case_number:{type:"string"},assignee:{type:"string"},user_id:{type:"string"},note:{type:"string"}},required:["case_number"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const TEAM=["Andrew Dunn","Keith Tsui","Nina Lewis","Mathew Hema"];
+         const c=await resolveCase(input.case_number);
+         let target=null;
+         if(input.user_id){
+           const uid=String(input.user_id).replace(/[^A-Za-z0-9]/g,"");
+           const p=await sfQ("SELECT Id, Name, Username FROM User WHERE Id = '"+uid+"' AND IsActive = true LIMIT 1");
+           const u=(p&&p.records&&p.records[0])||null;
+           if(!u) throw new Error("No active User with Id "+uid);
+           if(!TEAM.includes(u.Name)) throw new Error("That User record belongs to "+u.Name+", not an ICT team member. Assignment is restricted to: "+TEAM.join(", "));
+           target=u;
+         }else{
+           const name=String(input.assignee||"");
+           if(!TEAM.includes(name)) throw new Error("assignee must be exactly one of: "+TEAM.join(", "));
+           const p=await sfQ("SELECT Id, Name, Username FROM User WHERE Name = '"+name+"' AND IsActive = true LIMIT 5");
+           const actives=(p&&p.records)||[];
+           if(!actives.length) throw new Error("No active Salesforce User named "+name);
+           if(actives.length===1) target=actives[0];
+           else{
+             const ids=actives.map(u=>"'"+u.Id+"'").join(",");
+             const o=await sfQ("SELECT OwnerId, COUNT(Id) c FROM Case WHERE RecordType.DeveloperName = 'Zeus' AND OwnerId IN ("+ids+") AND CreatedDate = LAST_N_DAYS:180 GROUP BY OwnerId");
+             const owners=(o&&o.records)||[];
+             if(owners.length===1) target=actives.find(u=>u.Id===owners[0].OwnerId)||null;
+             if(!target){
+               const counts={}; owners.forEach(r=>counts[r.OwnerId]=r.c);
+               return "Cannot resolve a single User record for "+name+". Ask the user which one, then call case_assign again with that user_id. Candidates: "+
+                 actives.map(u=>u.Id+" ("+u.Username+", "+(counts[u.Id]||0)+" recent Zeus cases)").join("; ");
+             }
+           }
+         }
+         const noteTxt=input.note?String(input.note).slice(0,2000):null;
+         const ok=await requestApproval("Assign case "+c.CaseNumber+" to "+target.Name,
+           (c.Subject||"")+"\nOwner: "+((c.Owner&&c.Owner.Name)||"?")+" -> "+target.Name+"\nUser record: "+target.Username+" ("+target.Id+")"+(noteTxt?"\nInternal note: "+noteTxt:""), context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         await mcpNS.callTool(SF_SERVER,"updateSobjectRecord",{"sobject-name":"Case",id:c.Id,body:{OwnerId:target.Id}});
+         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:"[via BirdLife Claude OS console] Assigned to "+target.Name+" ("+target.Username+")"+(noteTxt?" | "+noteTxt:""),IsPublished:false}});
+         const v=await sfQ("SELECT Owner.Name FROM Case WHERE Id = '"+c.Id+"' LIMIT 1");
+         afterWrite();
+         const vn=(v&&v.records&&v.records[0]&&v.records[0].Owner&&v.records[0].Owner.Name)||"unknown";
+         return "Done. Case "+c.CaseNumber+" verified: Owner is now "+vn+".";
        }},
       {name:"task_comment",
        description:"Adds a comment to an Asana task on the IT Operations Project Plan after the user approves. Provide task_gid (from get_today_snapshot or asana_search), task_name (for the approval card), and text.",
