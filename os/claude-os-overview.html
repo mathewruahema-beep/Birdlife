@@ -4,11 +4,12 @@
 :root{
   --ground:#f2f6f3; --surface:#ffffff; --surface2:#e9efe9; --surface3:#dfe8e1;
   --ink:#1a2620; --ink2:#4c5d54; --ink3:#71837a;
-  --accent:#1e6f50; --accent-ink:#ffffff;
+  --accent:#1e6f50; --accent-ink:#ffffff; --glow:rgba(30,111,80,.10);
   --line:#d3ddd5; --line2:#bccac0;
   --warn:#9c6414; --warn-bg:#f6ead6;
   --crit:#a83a30; --crit-bg:#f4e0dd;
   --ok:#1e6f50; --ok-bg:#dfece4;
+  --dock:rgba(255,255,255,.86);
   --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   --disp:'Bricolage Grotesque','Instrument Sans',system-ui,sans-serif;
   --body:'Instrument Sans',system-ui,-apple-system,sans-serif;
@@ -17,25 +18,28 @@
   :root:not([data-theme="light"]){
     --ground:#0f1613; --surface:#171f1a; --surface2:#1e2822; --surface3:#243027;
     --ink:#e3ebe5; --ink2:#a5b5ab; --ink3:#7e8f85;
-    --accent:#57b78c; --accent-ink:#0c1410;
+    --accent:#57b78c; --accent-ink:#0c1410; --glow:rgba(87,183,140,.10);
     --line:#28332c; --line2:#374439;
     --warn:#d9a04c; --warn-bg:#2d2415;
     --crit:#e07a6e; --crit-bg:#331d1a;
     --ok:#57b78c; --ok-bg:#16281f;
+    --dock:rgba(23,31,26,.88);
   }
 }
 :root[data-theme="dark"]{
   --ground:#0f1613; --surface:#171f1a; --surface2:#1e2822; --surface3:#243027;
   --ink:#e3ebe5; --ink2:#a5b5ab; --ink3:#7e8f85;
-  --accent:#57b78c; --accent-ink:#0c1410;
+  --accent:#57b78c; --accent-ink:#0c1410; --glow:rgba(87,183,140,.10);
   --line:#28332c; --line2:#374439;
   --warn:#d9a04c; --warn-bg:#2d2415;
   --crit:#e07a6e; --crit-bg:#331d1a;
   --ok:#57b78c; --ok-bg:#16281f;
+  --dock:rgba(23,31,26,.88);
 }
 *{box-sizing:border-box}
 body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;margin:0}
-.wrap{max-width:1040px;margin:0 auto;padding:34px 22px 72px}
+::selection{background:var(--accent);color:var(--accent-ink)}
+.wrap{max-width:1040px;margin:0 auto;padding:34px 22px 170px}
 a{color:var(--accent)}
 h1,h2,h3{font-family:var(--disp);text-wrap:balance;margin:0}
 .mono{font-family:var(--mono)}
@@ -44,60 +48,85 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;tex
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 
-header{border-bottom:2px solid var(--ink);padding-bottom:20px}
+header{position:relative;border-bottom:2px solid var(--ink);padding-bottom:20px;overflow:hidden}
+header::before{content:"";position:absolute;top:-140px;right:-100px;width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,var(--glow) 0%,transparent 70%);pointer-events:none}
 header h1{font-size:clamp(30px,5vw,42px);font-weight:700;line-height:1.05;margin:6px 0 10px}
 header .sub{color:var(--ink2);max-width:64ch;margin:0}
+.livedot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:1px;animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--glow)}50%{box-shadow:0 0 0 7px var(--glow)}}
 .statebar{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-.chip{display:inline-flex;align-items:baseline;gap:7px;border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--ink2)}
+.chip{display:inline-flex;align-items:baseline;gap:7px;border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--ink2);transition:transform .15s,border-color .15s}
+.chip:hover{transform:translateY(-1px);border-color:var(--accent)}
 .chip b{font-family:var(--mono);font-size:14px;color:var(--ink);font-weight:600}
 .chip.warn{border-color:var(--warn);background:var(--warn-bg);color:var(--warn)}
 .chip.warn b{color:var(--warn)}
 
-/* tabs */
 nav.tabs{position:sticky;top:0;z-index:5;background:var(--ground);display:flex;gap:4px;padding:12px 0 10px;border-bottom:1px solid var(--line2);margin-bottom:26px;overflow-x:auto}
-nav.tabs button{font-family:var(--disp);font-weight:600;font-size:14.5px;padding:7px 15px;border-radius:8px;color:var(--ink2);white-space:nowrap}
+nav.tabs button{font-family:var(--disp);font-weight:600;font-size:14.5px;padding:7px 15px;border-radius:8px;color:var(--ink2);white-space:nowrap;transition:background .15s,color .15s}
 nav.tabs button:hover{background:var(--surface2)}
-nav.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
-.view{}
+nav.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);box-shadow:0 2px 10px var(--glow)}
 .view[hidden]{display:none}
 .lede{color:var(--ink2);max-width:70ch;margin:0 0 18px}
 h2.vt{font-size:22px;font-weight:600;margin-bottom:4px}
 
-/* stack accordion */
-.stack{border:1px solid var(--line2);border-radius:10px;overflow:hidden;background:var(--surface)}
+/* today */
+.todaybar{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.todaybar .asof{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+.refresh{font-size:13px;font-weight:600;color:var(--accent);border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:4px 13px;transition:background .15s}
+.refresh:hover{background:var(--surface2)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:16px}
+.tile{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:12px 14px;transition:transform .15s,box-shadow .15s}
+.tile:hover{transform:translateY(-2px);box-shadow:0 4px 14px var(--glow)}
+.tile .v{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile .l{font-size:12px;color:var(--ink3);margin-top:2px}
+.tile.warn .v{color:var(--warn)} .tile.crit .v{color:var(--crit)} .tile.ok .v{color:var(--ok)}
+.todaycols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.todaycols{grid-template-columns:1fr}}
+.tlist{background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden}
+.tlist h3{font-size:14px;font-weight:600;padding:10px 15px;background:var(--surface2);border-bottom:1px solid var(--line)}
+.trow{padding:9px 15px;border-top:1px solid var(--line);font-size:13.5px}
+.trow:first-of-type{border-top:none}
+.trow .t1{font-weight:600}
+.trow .t2{color:var(--ink3);font-size:12.5px;font-family:var(--mono)}
+.trow.empty{color:var(--ink3);font-style:italic}
+.degraded{background:var(--surface);border:1px dashed var(--line2);border-radius:12px;padding:16px 18px;color:var(--ink2);font-size:14px}
+.degraded b{color:var(--ink)}
+
+.stack{border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--surface);box-shadow:0 1px 3px var(--glow)}
 .layer{border-top:1px solid var(--line)}
 .layer:first-child{border-top:none}
-.layer>button{display:grid;grid-template-columns:180px 1fr auto;gap:14px;width:100%;padding:13px 18px;align-items:baseline}
+.layer>button{display:grid;grid-template-columns:180px 1fr auto;gap:14px;width:100%;padding:13px 18px;align-items:baseline;transition:background .15s}
 .layer>button:hover{background:var(--surface2)}
 .layer .role{font-family:var(--disp);font-weight:600;font-size:15px}
 .layer .role small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:400}
 .layer .what{color:var(--ink2);font-size:14px}
-.layer .caret{font-family:var(--mono);color:var(--ink3);transition:transform .15s}
+.layer .caret{font-family:var(--mono);color:var(--ink3);transition:transform .18s}
 .layer.open .caret{transform:rotate(90deg)}
 .layer .detail{padding:2px 18px 16px 212px;font-size:14px;color:var(--ink2)}
 .layer .detail .home{font-family:var(--mono);font-size:12px;color:var(--accent);display:block;margin-bottom:6px}
 .layer .detail ul{margin:6px 0 0;padding-left:18px}
 .layer .detail li{margin:4px 0}
 .layer.kernel>button{background:var(--accent)}
+.layer.kernel>button:hover{filter:brightness(1.06)}
 .layer.kernel .role,.layer.kernel .what,.layer.kernel .caret{color:var(--accent-ink)}
 .layer.kernel .role small{color:var(--accent-ink);opacity:.75}
 @media (max-width:700px){.layer>button{grid-template-columns:1fr auto}.layer .what{grid-column:1/-1}.layer .detail{padding-left:18px}}
 
-/* loop */
 .loop{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:26px}
-.loop .step{background:var(--surface);border:1px solid var(--line2);border-radius:10px;padding:13px 15px 15px}
+.loop .step{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:13px 15px 15px;transition:transform .15s,box-shadow .15s}
+.loop .step:hover{transform:translateY(-2px);box-shadow:0 4px 14px var(--glow)}
 .loop .step .n{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.1em}
 .loop .step h3{font-size:15px;font-weight:600;margin:3px 0 4px}
 .loop .step p{margin:0;font-size:13px;color:var(--ink2)}
 @media (max-width:760px){.loop{grid-template-columns:1fr 1fr}}
 @media (max-width:460px){.loop{grid-template-columns:1fr}}
 
-/* schedule */
 .days{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.days button{font-family:var(--mono);font-size:13px;font-weight:600;padding:6px 13px;border-radius:8px;border:1px solid var(--line2);background:var(--surface);color:var(--ink2)}
-.days button:hover{background:var(--surface2)}
-.days button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.sched{border:1px solid var(--line2);border-radius:10px;background:var(--surface);overflow:hidden}
+.days button{font-family:var(--mono);font-size:13px;font-weight:600;padding:6px 13px;border-radius:8px;border:1px solid var(--line2);background:var(--surface);color:var(--ink2);transition:background .15s,transform .1s}
+.days button:hover{background:var(--surface2);transform:translateY(-1px)}
+.days button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:0 2px 10px var(--glow)}
+.sched{border:1px solid var(--line2);border-radius:12px;background:var(--surface);overflow:hidden}
 .srow{display:grid;grid-template-columns:110px 1fr;border-top:1px solid var(--line)}
 .srow:first-child{border-top:none}
 .stime{font-family:var(--mono);font-size:13px;font-weight:600;padding:11px 14px;background:var(--surface2);color:var(--ink2);border-right:1px solid var(--line);font-variant-numeric:tabular-nums}
@@ -112,25 +141,26 @@ h2.vt{font-size:22px;font-weight:600;margin-bottom:4px}
 .tag.retired{background:var(--crit-bg);color:var(--crit)}
 .schednote{font-size:13px;color:var(--ink3);margin-top:10px}
 
-/* registers */
 .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.subtabs button{font-size:13.5px;font-weight:600;padding:5px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--surface);color:var(--ink2)}
+.subtabs button{font-size:13.5px;font-weight:600;padding:5px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--surface);color:var(--ink2);transition:background .15s}
+.subtabs button:hover{background:var(--surface2)}
 .subtabs button[aria-selected="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
 .rlist{display:flex;flex-direction:column;gap:8px}
-.rcard{background:var(--surface);border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.rcard{background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden;transition:border-color .15s}
+.rcard:hover{border-color:var(--accent)}
 .rcard>button{width:100%;display:flex;gap:10px;align-items:baseline;padding:11px 15px;flex-wrap:wrap}
-.rcard>button:hover{background:var(--surface2)}
 .rcard .rname{font-weight:600;font-size:14.5px}
 .rcard .rsched{font-family:var(--mono);font-size:12px;color:var(--ink3);margin-left:auto;font-variant-numeric:tabular-nums}
-.rcard .caret{font-family:var(--mono);color:var(--ink3)}
+.rcard .caret{font-family:var(--mono);color:var(--ink3);transition:transform .18s}
+.rcard.open .caret{transform:rotate(90deg)}
 .rcard .detail{border-top:1px solid var(--line);padding:12px 15px 14px;font-size:13.5px;color:var(--ink2);display:grid;grid-template-columns:150px 1fr;gap:5px 14px}
 .rcard .detail dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding-top:2px}
 .rcard .detail dd{margin:0}
 .rcard .detail dd.mono{font-size:12.5px}
 @media (max-width:560px){.rcard .detail{grid-template-columns:1fr}.rcard .detail dt{padding-top:6px}}
 .grouphead{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:20px 0 8px}
-table.reg{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line2);border-radius:10px;overflow:hidden;font-size:14px}
-.tablewrap{overflow-x:auto;border-radius:10px}
+table.reg{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden;font-size:14px}
+.tablewrap{overflow-x:auto;border-radius:12px}
 table.reg th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left;padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--line2)}
 table.reg td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
 table.reg tr:last-child td{border-bottom:none}
@@ -140,25 +170,26 @@ table.reg td.mono{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
 .pill.warn{background:var(--warn-bg);color:var(--warn)}
 .pill.crit{background:var(--crit-bg);color:var(--crit)}
 .conngrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.conn{border:1px solid var(--line2);background:var(--surface);border-radius:8px;padding:8px 13px;font-size:13.5px}
+.conn{border:1px solid var(--line2);background:var(--surface);border-radius:8px;padding:8px 13px;font-size:13.5px;transition:transform .12s,border-color .15s}
+.conn:hover{transform:translateY(-1px);border-color:var(--accent)}
 .conn b{display:block;font-size:14px}
 .conn span{color:var(--ink3);font-size:12px}
 
-/* rules */
 .rules{display:flex;flex-direction:column;gap:8px}
-.rule{background:var(--surface);border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.rule{background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden;transition:border-color .15s}
+.rule:hover{border-color:var(--accent)}
 .rule>button{width:100%;display:flex;gap:14px;align-items:baseline;padding:11px 15px}
-.rule>button:hover{background:var(--surface2)}
 .rule .n{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent);border:1px solid var(--line2);border-radius:6px;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:var(--surface2);align-self:center}
 .rule b{font-size:14.5px}
-.rule .caret{margin-left:auto;font-family:var(--mono);color:var(--ink3);align-self:center}
+.rule .caret{margin-left:auto;font-family:var(--mono);color:var(--ink3);align-self:center;transition:transform .18s}
+.rule.open .caret{transform:rotate(90deg)}
 .rule .detail{border-top:1px solid var(--line);padding:11px 15px 13px 55px;font-size:13.5px;color:var(--ink2)}
 .rule .detail .why{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--warn);display:block;margin-bottom:3px}
 @media (max-width:560px){.rule .detail{padding-left:15px}}
 
 .twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
 @media (max-width:760px){.twocol{grid-template-columns:1fr}}
-.panel{background:var(--surface);border:1px solid var(--line2);border-radius:10px;padding:15px 17px}
+.panel{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:15px 17px}
 .panel h3{font-size:16px;font-weight:600;margin-bottom:8px}
 .panel ul{margin:0;padding-left:18px}
 .panel li{margin:7px 0;font-size:14px;color:var(--ink2)}
@@ -168,13 +199,48 @@ table.reg td.mono{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
 
 footer{margin-top:48px;border-top:1px solid var(--line2);padding-top:14px;font-size:12.5px;color:var(--ink3)}
 footer .mono{font-size:11.5px}
+
+/* ---------- Jarvis dock ---------- */
+#jarvis{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;width:min(760px,calc(100vw - 24px));z-index:20}
+.jpanel{background:var(--dock);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line2);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.14);overflow:hidden}
+.jhead{display:flex;align-items:center;gap:9px;padding:9px 15px 0}
+.jorb{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:none;animation:pulse 2.8s ease-in-out infinite}
+.jorb.busy{animation:orbthink .9s ease-in-out infinite alternate}
+@keyframes orbthink{from{transform:scale(.75);opacity:.55}to{transform:scale(1.25);opacity:1}}
+.jtitle{font-family:var(--disp);font-weight:700;font-size:13.5px;letter-spacing:.02em}
+.jsub{font-size:11.5px;color:var(--ink3);margin-left:auto;text-align:right}
+.jlog{max-height:46vh;overflow-y:auto;padding:10px 15px 2px;display:none;flex-direction:column;gap:8px}
+.jlog.on{display:flex}
+.jmsg{position:relative;max-width:88%;padding:8px 12px;border-radius:12px;font-size:14px;white-space:pre-wrap;overflow-wrap:break-word}
+.jmsg.you{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:4px}
+.jmsg.jarvis{align-self:flex-start;background:var(--surface2);color:var(--ink);border-bottom-left-radius:4px}
+.jmsg.err{align-self:flex-start;background:var(--crit-bg);color:var(--crit)}
+.jmsg .copy{position:absolute;top:4px;right:6px;font-size:11px;color:var(--ink3);opacity:0;transition:opacity .15s;background:var(--surface);border:1px solid var(--line2);border-radius:5px;padding:1px 6px}
+.jmsg:hover .copy{opacity:1}
+.jtool{align-self:flex-start;font-family:var(--mono);font-size:11px;color:var(--ink3)}
+.jchips{display:flex;gap:6px;overflow-x:auto;padding:8px 15px 0;scrollbar-width:none}
+.jchips::-webkit-scrollbar{display:none}
+.jchips button{flex:none;font-size:12.5px;color:var(--ink2);border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:4px 12px;transition:background .15s,border-color .15s}
+.jchips button:hover{border-color:var(--accent);color:var(--accent)}
+.jbar{display:flex;align-items:center;gap:8px;padding:10px 12px 12px}
+.jbar input{flex:1;font:inherit;font-size:14.5px;color:var(--ink);background:var(--surface);border:1px solid var(--line2);border-radius:10px;padding:9px 13px;outline:none;min-width:0}
+.jbar input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+.jbar input::placeholder{color:var(--ink3)}
+.jbtn{flex:none;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line2);background:var(--surface);color:var(--ink2);font-size:16px;transition:background .15s,transform .1s}
+.jbtn:hover{background:var(--surface2);transform:translateY(-1px)}
+.jbtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.jbtn.send{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.jbtn.send:disabled{opacity:.45;cursor:default;transform:none}
+.jbtn.listening{background:var(--crit);color:#fff;border-color:var(--crit);animation:orbthink .7s ease-in-out infinite alternate}
+.jnote{font-size:11.5px;color:var(--ink3);padding:0 15px 10px;display:none}
+.jnote.on{display:block}
 </style>
 
 <div class="wrap">
 <header>
-  <div class="eyebrow">BirdLife Australia ICT · mathewruahema-beep/Birdlife</div>
+  <div class="eyebrow"><span class="livedot"></span>BirdLife Australia ICT · mathewruahema-beep/Birdlife</div>
   <h1>The Claude Operating System</h1>
-  <p class="sub">Claude is a production system here: it holds credentials to eight platforms, works unattended on schedules, and publishes pages people rely on. This OS manages it like any other ICT system: a charter, versioned knowledge, a governed scheduler, and registers that must always match reality. Everything below is live state as at 2 Sep 2026; click anything to drill in.</p>
+  <p class="sub">Your daily console over the Claude estate. Today shows the live Ask Zeus queue and Asana board through your own connectors; the other tabs are the governed system underneath. Jarvis, at the bottom, answers questions, pulls live data, drafts the exact asks to hand a Claude session, and hunts for automation candidates.</p>
   <div class="statebar">
     <span class="chip"><b>13</b> recurring routines</span>
     <span class="chip"><b>2</b> one-shots</span>
@@ -185,14 +251,35 @@ footer .mono{font-size:11.5px}
 </header>
 
 <nav class="tabs" role="tablist" aria-label="Sections">
-  <button role="tab" data-view="system" aria-selected="true">The system</button>
+  <button role="tab" data-view="today" aria-selected="true">Today</button>
+  <button role="tab" data-view="system" aria-selected="false">The system</button>
   <button role="tab" data-view="schedule" aria-selected="false">Schedule</button>
   <button role="tab" data-view="registers" aria-selected="false">Registers</button>
   <button role="tab" data-view="rules" aria-selected="false">Rules &amp; decisions</button>
 </nav>
 
+<!-- ============ TODAY ============ -->
+<div class="view" id="view-today">
+  <div class="todaybar">
+    <h2 class="vt" style="margin:0">Right now</h2>
+    <span class="asof" id="asof">connecting to your connectors...</span>
+    <button class="refresh" id="refreshbtn" hidden>Refresh</button>
+  </div>
+  <div id="today-live">
+    <div class="degraded" id="today-degraded"><b>Live data loads inside the Claude viewer.</b> Open this page at its claude.ai link and allow the Salesforce-Production and Asana connectors when asked. Everything else on this page works without them.</div>
+    <div id="today-content" hidden>
+      <div class="tiles" id="tiles"></div>
+      <div class="todaycols">
+        <div class="tlist"><h3>Queue: needs action first</h3><div id="qlist"></div></div>
+        <div class="tlist"><h3>Board: needs attention</h3><div id="blist"></div></div>
+      </div>
+      <p class="schednote">Scope: Record Type = Ask Zeus only, project = IT Operations Project Plan only. Owner "Zeus" is the unassigned intake queue, not a person. To work a case (reply, close, reassign), use the ICT Console or ask Jarvis for the exact session prompt; this page reads, it never writes.</p>
+    </div>
+  </div>
+</div>
+
 <!-- ============ SYSTEM ============ -->
-<div class="view" id="view-system">
+<div class="view" id="view-system" hidden>
   <h2 class="vt">The stack</h2>
   <p class="lede">Seven layers, each with one home and one owner. Click a layer for what lives in it and who may change it.</p>
   <div class="stack" id="stack"></div>
@@ -288,6 +375,26 @@ footer .mono{font-size:11.5px}
 </footer>
 </div>
 
+<!-- ============ JARVIS ============ -->
+<div id="jarvis">
+  <div class="jpanel">
+    <div class="jhead">
+      <span class="jorb" id="jorb"></span>
+      <span class="jtitle">JARVIS</span>
+      <span class="jsub" id="jsub">live via your connectors · asks Claude on your account</span>
+    </div>
+    <div class="jlog" id="jlog" aria-live="polite"></div>
+    <div class="jchips" id="jchips"></div>
+    <div class="jbar">
+      <input id="jin" type="text" placeholder="Ask, or say it: triage my queue, find automations, draft the ask..." autocomplete="off" aria-label="Ask Jarvis">
+      <button class="jbtn" id="jmic" title="Speak your question" aria-label="Voice input" hidden>🎙</button>
+      <button class="jbtn" id="jspk" title="Read answers aloud" aria-label="Speak answers" aria-pressed="false">🔊</button>
+      <button class="jbtn send" id="jsend" title="Ask" aria-label="Ask">↑</button>
+    </div>
+    <div class="jnote" id="jnote"></div>
+  </div>
+</div>
+
 <script>
 // ---------- data ----------
 const LAYERS = [
@@ -301,7 +408,7 @@ const LAYERS = [
   points:["Attached and detached by Mathew only, in the UI. Sessions never touch connector configuration.","Routines carry their own per-routine grants; a routine created without them fires but reads nothing, the most common silent failure.","Salesforce Staging for anything experimental; Production writes follow the charter."]},
  {role:"Sessions", sub:"processes", what:"Interactive (phone, browser, desktop, GitHub issue) or routine-fired. Ephemeral by design.", home:"claude.ai/code",
   points:["Any session on this repo becomes the ICT assistant automatically via the charter.","Anything worth keeping is committed or registered before the session ends; the container is reclaimed after.","Routine-fired sessions are fresh each run and must load their connector tools via ToolSearch first, which every prompt now says explicitly."]},
- {role:"Artefacts", sub:"outputs", what:"The pages people actually read: three ICT dashboards, the nine-page department suite, the ICT Console.", home:"artifact URLs + SharePoint Teams files",
+ {role:"Artefacts", sub:"outputs", what:"The pages people actually read: three ICT dashboards, the nine-page department suite, the ICT Console, this console.", home:"artifact URLs + SharePoint Teams files",
   points:["Stable private artifact URLs, republished in place so links never change.","Teams channel copies use fixed SharePoint filenames, never renamed, never dated variants.","The _dashboard-run-log.txt heartbeat makes silent failure impossible: a missing weekday line means the run did not happen."]},
  {role:"Registers", sub:"state of record", what:"Routine, skill, connector, artefact and credential registers. The layer that keeps every other layer honest.", home:"os/registers.md",
   points:["Updated in the same commit as any estate change. No 'will document later'.","The Monday audit diffs the registers against live state and reports drift as findings.","This page mirrors them; the markdown in the repo is authoritative."]}
@@ -384,7 +491,7 @@ const ARTS = [
  ["ICT Monitoring dashboard","Weekday job (every slot), weekend job","https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b"],
  ["Security dashboard (confidential)","Weekend job, Sunday fire","https://claude.ai/code/artifact/ff6c82e3-38d4-41de-b872-606521972498"],
  ["Department suite, 9 pages","Weekday job, deep slot","(IDs in the weekday job's prompt, section 6)"],
- ["ICT Console","Sessions, on request: 'update the console'","https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e"]
+ ["ICT Console (case workbench)","Sessions, on request: 'update the console'","https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e"]
 ];
 const CREDS = [
  ["WooCommerce API keys exposed in deleted routine prompts (Aug 2026)","warn|Rotation not verified done","Confirm rotation; until confirmed, treat as open"],
@@ -401,6 +508,14 @@ const RULES = [
  ["Retire with a backup","Definition exported to routines/ before deletion, credentials redacted. Always reversible.","All nine 2 Sep retirements are in routines-backup-2026-09-02.json and can be recreated verbatim."],
  ["Propose, then write","The charter rule applies to the estate itself, not just to Salesforce.","This consolidation ran exactly this way: proposed 2 Sep, approved by Mathew, executed, recorded."]
 ];
+const AUTOMATION_SIGNALS = [
+ "Identity lifecycle (IAM + onboarding + offboarding) was 87 of the last 425 cases, about 20 percent of everything ICT handles",
+ "96.5 percent of Ask Zeus cases arrive by email; zero web, phone or portal; no self-service request form exists",
+ "ICT Priorities.xlsx joins Asana tasks to Zeus cases by hand and at least four divergent copies exist",
+ "Three Blocked Asana items are decision debt needing a meeting call, not developer time",
+ "Retired but recreatable from backup: meeting actions collector (Granola/Zoom to Asana proposals), unreconciled income exception report (or its Zapier-side version per the birdlife-zapier skill)",
+ "Tier 2 Entra and Exchange admin work is prepared-not-executed today; the promotion plan is docs/entra-admin-connector.md"
+];
 
 // ---------- helpers ----------
 const $ = s => document.querySelector(s);
@@ -411,10 +526,12 @@ function recall(k){try{return localStorage.getItem("claude-os."+k)}catch(e){retu
 function tagFor(t){return t==="write"?'<span class="tag write">writes, capped</span>':t==="gov"?'<span class="tag gov">governance</span>':'<span class="tag read">read-only</span>'}
 
 // ---------- tabs ----------
+const VIEWS=["today","system","schedule","registers","rules"];
 const tabs=[...document.querySelectorAll('nav.tabs button')];
 function showView(v){
+  if(!VIEWS.includes(v)) return;
   tabs.forEach(b=>b.setAttribute('aria-selected', String(b.dataset.view===v)));
-  ["system","schedule","registers","rules"].forEach(id=>{$("#view-"+id).hidden = id!==v;});
+  VIEWS.forEach(id=>{$("#view-"+id).hidden = id!==v;});
   remember("tab",v);
 }
 tabs.forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
@@ -464,17 +581,19 @@ function dl(obj){
   const keys=Object.keys(obj); if(!keys.length) return "";
   return keys.map(k=>`<dt>${esc(k)}</dt><dd>${obj[k]}</dd>`).join("");
 }
+function expandable(card,btn,det){
+  det.hidden=true; btn.setAttribute("aria-expanded","false");
+  btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; card.classList.toggle("open",open); btn.setAttribute("aria-expanded",String(open));});
+}
 function rcard(r){
   const card=el("div","rcard");
   const btn=el("button",null,
     `<span class="caret">›</span><span class="rname">${esc(r.n)}</span>${tagFor(r.type)}<span class="rsched">${esc(r.sched)}</span>`);
-  btn.setAttribute("aria-expanded","false");
   const det=el("div","detail",
     `<dt>Trigger</dt><dd class="mono">${r.t}</dd>
      <dt>Cron (UTC)</dt><dd class="mono">${esc(r.cron)}</dd>
      <dt>Does</dt><dd>${r.what}</dd>${dl(r.detail)}`);
-  det.hidden=true;
-  btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; btn.setAttribute("aria-expanded",String(open));});
+  expandable(card,btn,det);
   card.append(btn,det); return card;
 }
 (function(){
@@ -487,9 +606,7 @@ function rcard(r){
     const card=el("div","rcard");
     const btn=el("button",null,`<span class="caret">›</span><span class="rname">${esc(o.n)}</span><span class="rsched">${esc(o.sched)}</span>`);
     const det=el("div","detail",`<dt>Trigger</dt><dd class="mono">${o.t}</dd><dt>Does</dt><dd>${o.what}</dd>`);
-    det.hidden=true; btn.setAttribute("aria-expanded","false");
-    btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; btn.setAttribute("aria-expanded",String(open));});
-    card.append(btn,det); l2.append(card);
+    expandable(card,btn,det); card.append(btn,det); l2.append(card);
   });
   host.append(l2);
   host.append(el("div","grouphead","Retired 2 Sep 2026 · definitions in routines/routines-backup-2026-09-02.json"));
@@ -498,9 +615,7 @@ function rcard(r){
     const card=el("div","rcard");
     const btn=el("button",null,`<span class="caret">›</span><span class="rname" style="color:var(--ink2)">${esc(n)}</span><span class="tag retired">retired</span>`);
     const det=el("div","detail",`<dt>Trigger</dt><dd class="mono">${t}</dd><dt>Disposition</dt><dd>${d}</dd>`);
-    det.hidden=true; btn.setAttribute("aria-expanded","false");
-    btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; btn.setAttribute("aria-expanded",String(open));});
-    card.append(btn,det); l3.append(card);
+    expandable(card,btn,det); card.append(btn,det); l3.append(card);
   });
   host.append(l3);
 })();
@@ -529,18 +644,15 @@ const rulesHost=$("#rules");
 RULES.forEach(([title,body,why],i)=>{
   const d=el("div","rule");
   const btn=el("button",null,`<span class="n">${i+1}</span><b>${esc(title)}</b><span class="caret">›</span>`);
-  btn.setAttribute("aria-expanded","false");
   const det=el("div","detail",`${esc(body)}<div style="margin-top:7px"><span class="why">Why it exists</span>${esc(why)}</div>`);
-  det.hidden=true;
-  btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; btn.setAttribute("aria-expanded",String(open));});
+  expandable(d,btn,det);
   d.append(btn,det); rulesHost.append(d);
 });
 
 // ---------- restore state ----------
 (function(){
-  const v=recall("tab"); if(v && ["system","schedule","registers","rules"].includes(v)) showView(v);
+  const v=recall("tab"); if(v) showView(v);
   const reg=recall("reg"); if(reg){const b=subtabs.find(x=>x.dataset.reg===reg); if(b) b.click();}
-  // default day: today in Melbourne, else Monday
   let day=0;
   try{
     const wd=new Intl.DateTimeFormat("en-AU",{weekday:"short",timeZone:"Australia/Melbourne"}).format(new Date());
@@ -548,5 +660,380 @@ RULES.forEach(([title,body,why],i)=>{
   }catch(e){}
   const saved=recall("day"); if(saved!==null && saved!=="" && !isNaN(+saved)) day=+saved;
   renderDay(day);
+})();
+
+// ================= LIVE (mcp) =================
+const SF_SERVER="Salesforce-Production", AS_SERVER="Asana", PROJECT="1211042432693678";
+const Q_OPEN="SELECT CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE IsClosed = false AND RecordType.DeveloperName = 'Zeus' ORDER BY CreatedDate ASC LIMIT 200";
+const AS_INPUT={projects_any:PROJECT, completed:false, limit:100, opt_fields:"name,assignee.name,due_on,memberships.section.name,modified_at"};
+let mcpNS=null, liveCases=null, liveTasks=null, liveErr={sf:null,as:null}, liveAt=null;
+
+function melbTodayISO(){
+  try{return new Intl.DateTimeFormat("en-CA",{timeZone:"Australia/Melbourne"}).format(new Date());}
+  catch(e){return new Date().toISOString().slice(0,10);}
+}
+function bizDaysSince(iso){
+  const from=new Date(iso), now=new Date(); let d=0;
+  const cur=new Date(from);
+  while(cur<now){ cur.setDate(cur.getDate()+1); const w=cur.getDay(); if(w!==0&&w!==6) d++; if(d>60)break; }
+  return d;
+}
+function ageDays(iso){ return Math.floor((Date.now()-new Date(iso).getTime())/864e5); }
+function mcpErrCopy(e,server){
+  switch(e&&e.code){
+    case "needs_reauth": return "Reconnect "+server+" in claude.ai Settings, Connectors.";
+    case "server_not_connected": return "Add "+server+" in claude.ai Settings, Connectors.";
+    case "selection_required": return "Choose which "+server+" connector to use when claude.ai asks.";
+    case "approval_required": return server+" needs per-call approval under your org policy.";
+    case "blocked_by_policy": return server+" is blocked by org policy for this page.";
+    case "server_unavailable": return server+" is briefly unreachable. It retries on the next refresh.";
+    case "tool_error": return server+" answered with an error: "+String(e.message||"").slice(0,140);
+    default: return server+": "+String((e&&e.message)||"connector unavailable").slice(0,140);
+  }
+}
+function caseFacts(){
+  const recs=(liveCases&&Array.isArray(liveCases.records))?liveCases.records:[];
+  const owner=r=>(r.Owner&&r.Owner.Name)||"";
+  const unassigned=recs.filter(r=>owner(r)==="Zeus");
+  const newOld=recs.filter(r=>r.Status==="New"&&bizDaysSince(r.CreatedDate)>2);
+  const aged=recs.filter(r=>ageDays(r.CreatedDate)>30&&r.Status!=="Waiting Response-External");
+  const untyped=recs.filter(r=>!r.Type);
+  const byStatus={}; recs.forEach(r=>{byStatus[r.Status]=(byStatus[r.Status]||0)+1;});
+  return {recs,unassigned,newOld,aged,untyped,byStatus,owner};
+}
+function taskFacts(){
+  const tasks=(liveTasks&&Array.isArray(liveTasks.data))?liveTasks.data:[];
+  const today=melbTodayISO();
+  const secOf=t=>((t.memberships||[]).map(m=>m.section&&m.section.name).filter(Boolean).join(", "))||"(no section)";
+  const overdue=tasks.filter(t=>t.due_on&&t.due_on<today);
+  const blocked=tasks.filter(t=>/blocked/i.test(secOf(t)));
+  const unassigned=tasks.filter(t=>!t.assignee);
+  return {tasks,overdue,blocked,unassigned,secOf};
+}
+function renderToday(){
+  const deg=$("#today-degraded"), content=$("#today-content");
+  if(!mcpNS){ deg.hidden=false; content.hidden=true; $("#asof").textContent="live data unavailable in this view"; return; }
+  deg.hidden=true; content.hidden=false;
+  const cf=caseFacts(), tf=taskFacts();
+  const tiles=$("#tiles"); tiles.innerHTML="";
+  const tile=(v,l,cls)=>tiles.append(el("div","tile"+(cls?" "+cls:""),`<div class="v">${v}</div><div class="l">${esc(l)}</div>`));
+  if(liveErr.sf){ tiles.append(el("div","tile crit",`<div class="v">!</div><div class="l">${esc(mcpErrCopy(liveErr.sf,SF_SERVER))}</div>`)); }
+  else if(liveCases){
+    tile(cf.recs.length,"open cases", cf.recs.length>25?"warn":"");
+    tile(cf.unassigned.length,"unassigned (Zeus queue)", cf.unassigned.length?"warn":"ok");
+    tile(cf.newOld.length,"New past 2 bus. days", cf.newOld.length?"crit":"ok");
+    tile(cf.aged.length,"open 30+ days", cf.aged.length?"warn":"ok");
+    tile(cf.untyped.length,"untyped", cf.untyped.length?"warn":"ok");
+  } else tile("...","queue loading");
+  if(liveErr.as){ tiles.append(el("div","tile crit",`<div class="v">!</div><div class="l">${esc(mcpErrCopy(liveErr.as,AS_SERVER))}</div>`)); }
+  else if(liveTasks){
+    tile(tf.overdue.length,"board overdue", tf.overdue.length?"warn":"ok");
+    tile(tf.blocked.length,"in Blocked", tf.blocked.length?"warn":"ok");
+  } else tile("...","board loading");
+
+  const q=$("#qlist"); q.innerHTML="";
+  if(liveCases){
+    const picks=[...cf.unassigned, ...cf.newOld.filter(r=>cf.owner(r)!=="Zeus"), ...cf.aged.filter(r=>cf.owner(r)!=="Zeus"&&!(r.Status==="New"))].slice(0,8);
+    if(!picks.length) q.append(el("div","trow empty","Nothing demanding action. Queue is in shape."));
+    picks.forEach(r=>{
+      const why=cf.owner(r)==="Zeus"?"unassigned":(r.Status==="New"?bizDaysSince(r.CreatedDate)+" bus. days in New":ageDays(r.CreatedDate)+" days old");
+      q.append(el("div","trow",`<div class="t1">${esc(r.CaseNumber)} · ${esc(r.Subject||"(no subject)")}</div><div class="t2">${esc(r.Status)}${r.Type?" · "+esc(r.Type):" · no type"} · ${esc(cf.owner(r)||"?")} · ${esc(why)}</div>`));
+    });
+  } else q.append(el("div","trow empty","Waiting on Salesforce..."));
+
+  const b=$("#blist"); b.innerHTML="";
+  if(liveTasks){
+    const picks=[...tf.overdue, ...tf.blocked.filter(t=>!tf.overdue.includes(t))].slice(0,8);
+    if(!picks.length) b.append(el("div","trow empty","No overdue or blocked items surfaced."));
+    picks.forEach(t=>{
+      b.append(el("div","trow",`<div class="t1">${esc(t.name)}</div><div class="t2">${esc(t.assignee?t.assignee.name:"unassigned")}${t.due_on?" · due "+esc(t.due_on):""} · ${esc(tf.secOf(t))}</div>`));
+    });
+  } else b.append(el("div","trow empty","Waiting on Asana..."));
+
+  $("#asof").textContent = liveAt ? ("as at "+new Date(liveAt).toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"})) : "loading...";
+}
+renderToday();
+
+(async function(){
+  try{ mcpNS = await claude.use("mcp"); }catch(e){ mcpNS=null; }
+  renderToday();
+  if(!mcpNS) return;
+  $("#refreshbtn").hidden=false;
+  $("#refreshbtn").addEventListener("click", async ()=>{
+    try{ await mcpNS.invalidate(); }catch(e){}
+  });
+  const opts={cache:{staleTime:60000, gcTime:900000}, refetchInterval:300000};
+  mcpNS.watchTool(SF_SERVER,"soqlQuery",{q:Q_OPEN},(ev)=>{
+    if(ev.type==="data"){
+      liveErr.sf=null;
+      const p=ev.result.payload;
+      liveCases=(p&&typeof p==="object")?p:null;
+      liveAt=(ev.result.cache&&ev.result.cache.storedAt)||Date.now();
+    }else{
+      const code=ev.error&&ev.error.code;
+      liveErr.sf=ev.error;
+      if(["needs_reauth","server_not_connected","blocked_by_policy","approval_required"].includes(code)) liveCases=null;
+    }
+    renderToday();
+  },opts);
+  mcpNS.watchTool(AS_SERVER,"search_tasks",AS_INPUT,(ev)=>{
+    if(ev.type==="data"){
+      liveErr.as=null;
+      const p=ev.result.payload;
+      liveTasks=(p&&typeof p==="object")?p:null;
+      liveAt=(ev.result.cache&&ev.result.cache.storedAt)||Date.now();
+    }else{
+      const code=ev.error&&ev.error.code;
+      liveErr.as=ev.error;
+      if(["needs_reauth","server_not_connected","blocked_by_policy","approval_required"].includes(code)) liveTasks=null;
+    }
+    renderToday();
+  },opts);
+})();
+
+// ================= JARVIS =================
+(async function(){
+  const log=$("#jlog"), input=$("#jin"), sendBtn=$("#jsend"),
+        micBtn=$("#jmic"), spkBtn=$("#jspk"), orb=$("#jorb"), note=$("#jnote"), chips=$("#jchips");
+
+  const KNOWLEDGE = JSON.stringify({
+    as_at:"2 Sep 2026", timezone:"AEST (UTC+10), DST one-shot adjusts crons 5 Oct 2026",
+    stack: LAYERS.map(L=>({layer:L.role, is:L.sub, home:L.home, what:L.what, detail:L.points})),
+    routines_active: R.map(r=>({name:r.n, trigger:r.t, cron_utc:r.cron, schedule_aest:r.sched, posture:r.type, does:r.what, ...r.detail})),
+    one_shots: ONESHOTS, retired_2sep: RETIRED.map(([n,t,d])=>({name:n,trigger:t,disposition:d})),
+    skills: SKILLS.map(([n,c,rp,a])=>({skill:n,covers:c,repo:rp,account:a})),
+    connectors:{core:CONN_CORE.map(([n,d])=>n+" ("+d+")"), extra:CONN_EXTRA,
+      rules:"Attached by Mathew only in the claude.ai UI; routines carry per-routine grants; Staging for experiments"},
+    artefacts: ARTS.map(([n,by,u])=>({name:n,rebuilt_by:by,url:u})),
+    credentials_watchlist: CREDS.map(([n,s,a])=>({item:n,status:s.split("|")[1],action:a})),
+    rules: RULES.map(([t,b,w],i)=>({n:i+1,rule:t,detail:b,why:w})),
+    open_decisions:[
+      "Budget 13 recurring active vs budget of 12: merge the two Friday status drafts, fold Top 10 draft into the pre-draft, or raise the budget to 13. Mathew to decide.",
+      "WooCommerce key rotation from the August exposure still not verified done."],
+    watching:["Thu 3 Sep 7:04am first deep slot of merged weekday job","Weekend 5-7 Sep first run of merged weekend job incl Sunday security refresh","Mon 8 Sep 6am first weekly audit self-run"],
+    governance_loop:["Propose exact change","Mathew approves","Execute and verify","Record in os/registers.md, same commit"],
+    automation_signals: AUTOMATION_SIGNALS,
+    case_model:"Cases live on RecordType.DeveloperName='Zeus' (ALWAYS scope Case queries with it; without it 19 record types inflate counts ~200x). Owner.Name='Zeus' is the unassigned intake queue, not a person. Closing a Case needs Status='Closed' AND Case_Closed_Reason__c. Statuses include New, In Progress, Waiting Response-External, Response Received, Closed. Asana project gid is 1211042432693678 (IT Operations Project Plan, 8 sections incl Backlog/Requests, In Development/Progress, Blocked, Done).",
+    sources:"Authoritative: os/README.md (rules), os/registers.md (state of record), .claude/skills/claude-os (operator skill), routines/ (backups) in mathewruahema-beep/Birdlife"
+  });
+
+  const INSTRUCTIONS =
+    "You are JARVIS, the daily console assistant on the BirdLife Claude Operating System page, working for Mathew Hema (Senior Manager ICT, BirdLife Australia) and his ICT team (Andrew Dunn, Keith Tsui, Nina Lewis). " +
+    "Style: frank, specific, brief. Plain text only, no markdown syntax, no headings, no em dashes (use commas or full stops). Lead with the answer. Quote real trigger IDs, case numbers, crons and dates, never invent one.\n" +
+    "You may have page tools. When the question is about the current queue or board, call get_today_snapshot first. For other Salesforce questions write one precise SOQL SELECT and call salesforce_read (SELECT only, always add LIMIT, and ALWAYS scope Case queries with RecordType.DeveloperName='Zeus'). For board lookups call asana_search. Call show to move the page to a tab or day when the user asks to see something. If a tool errors, relay its message plainly.\n" +
+    "Doing work: you cannot write to any system from this page. When Mathew wants something done (reply to a case, close a case, create or change a routine, fix something), produce the exact ask to paste into a Claude session on mathewruahema-beep/Birdlife, complete with the specific case numbers or trigger IDs, and remind him case replies can also be worked in the ICT Console artefact. Follow the governance loop for estate changes.\n" +
+    "Finding automations: when asked, use automation_signals plus live data from your tools. Propose at most 3 candidates, each with: name, schedule, exact write posture and hard caps, connectors needed, which existing routine could absorb it (rule 2, one job per outcome), and the budget impact (rule 3, currently 13 of 12). End with the exact session ask to create the best one through the OS change control.\n" +
+    "If something is not in the state pack or reachable by a tool, say so in one line and point at os/registers.md or a session; never guess.\n\nSTATE PACK:\n";
+
+  const turns = [];
+  let sample = null, sampleLimits = null, busy = false, ctl = null;
+
+  function bubble(cls, text){
+    const b = el("div","jmsg "+cls); b.textContent = text;
+    log.append(b); log.classList.add("on"); log.scrollTop = log.scrollHeight;
+    return b;
+  }
+  function toolNote(t){ const n=el("div","jtool","· "+t); log.append(n); log.scrollTop=log.scrollHeight; return n; }
+  function addCopy(b){
+    const c=el("button","copy","copy");
+    c.addEventListener("click",async ev=>{ev.stopPropagation();
+      try{await navigator.clipboard.writeText(b.textContent.replace(/copy$/,""));c.textContent="copied";setTimeout(()=>c.textContent="copy",1200);}catch(e){}});
+    b.append(c);
+  }
+  function setBusy(v){
+    busy = v; orb.classList.toggle("busy", v);
+    sendBtn.textContent = v ? "■" : "↑"; sendBtn.title = v ? "Stop" : "Ask";
+  }
+  const ERRCOPY = {
+    rate_limited:"Rate limited. Give it a minute and try again.",
+    session_expired:"Your Claude session expired. Sign in again and retry.",
+    refused:"Claude declined that one. Rephrase and try again.",
+    empty_completion:"No answer came back. Try asking more simply.",
+    prompt_too_large:"That conversation got too long. Refresh the page to start fresh.",
+    upstream_error:"Transient hiccup on the Claude side. Try again.",
+  };
+  const HIDE_CODES = ["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"];
+
+  function clip(v,max){ let s; try{s=typeof v==="string"?v:JSON.stringify(v);}catch(e){s=String(v);} return s.length>max? s.slice(0,max)+"...[trimmed]" : s; }
+  function buildTools(){
+    if(!sampleLimits || !sampleLimits.tools) return undefined;
+    return [
+      {name:"get_today_snapshot",
+       description:"Returns the live Ask Zeus queue and Asana board snapshot the page is already displaying: counts, unassigned cases, aged and untyped cases, overdue and blocked tasks, with case numbers and task names. Use first for any question about the current queue, board, or today's workload.",
+       execute(){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const cf=caseFacts(), tf=taskFacts();
+         if(!liveCases && !liveTasks) return "Live data has not loaded yet"+(liveErr.sf?"; Salesforce: "+mcpErrCopy(liveErr.sf,SF_SERVER):"")+(liveErr.as?"; Asana: "+mcpErrCopy(liveErr.as,AS_SERVER):"");
+         return clip({
+           cases:{ total:cf.recs.length, by_status:cf.byStatus,
+             unassigned:cf.unassigned.map(r=>({n:r.CaseNumber,s:r.Subject,status:r.Status,age_days:ageDays(r.CreatedDate)})),
+             new_past_2bd:cf.newOld.map(r=>({n:r.CaseNumber,s:r.Subject,owner:cf.owner(r),bus_days:bizDaysSince(r.CreatedDate)})),
+             open_30d_plus:cf.aged.map(r=>({n:r.CaseNumber,s:r.Subject,owner:cf.owner(r),age_days:ageDays(r.CreatedDate)})),
+             untyped_count:cf.untyped.length },
+           board:{ total:tf.tasks.length,
+             overdue:tf.overdue.map(t=>({name:t.name,assignee:t.assignee?t.assignee.name:null,due:t.due_on,section:tf.secOf(t)})),
+             blocked:tf.blocked.map(t=>({name:t.name,assignee:t.assignee?t.assignee.name:null,section:tf.secOf(t)})),
+             unassigned_count:tf.unassigned.length },
+           errors:{salesforce:liveErr.sf?mcpErrCopy(liveErr.sf,SF_SERVER):null, asana:liveErr.as?mcpErrCopy(liveErr.as,AS_SERVER):null}
+         },12000);
+       }},
+      {name:"salesforce_read",
+       description:"Runs one read-only SOQL SELECT against Salesforce Production with the viewer's own access and returns the JSON result. Use for Salesforce questions beyond the snapshot (history, counts, other objects). SELECT statements only; always include LIMIT; always scope Case queries with RecordType.DeveloperName='Zeus'.",
+       inputSchema:{type:"object",properties:{q:{type:"string",description:"One SOQL SELECT statement"}},required:["q"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const q=String(input.q||"").trim();
+         if(!/^select\s/i.test(q) || q.includes(";")) throw new Error("Only a single SOQL SELECT is allowed");
+         const tn=toolNote("Jarvis is querying Salesforce...");
+         try{
+           const res=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q},{signal:context.signal,cache:{staleTime:30000}});
+           return clip(res.payload,12000);
+         }catch(e){ throw new Error(mcpErrCopy(e,SF_SERVER)); }
+         finally{ tn.remove(); }
+       }},
+      {name:"asana_search",
+       description:"Searches the IT Operations Project Plan in Asana (read-only, viewer's access). Returns tasks with name, assignee, due date and section. Provide text to search names and descriptions, or omit it to list incomplete tasks.",
+       inputSchema:{type:"object",properties:{text:{type:"string",description:"Search text, optional"},completed:{type:"boolean",description:"true to include only completed tasks; default false"}}},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const args={projects_any:PROJECT, completed:!!input.completed, limit:25, opt_fields:"name,assignee.name,due_on,memberships.section.name,modified_at"};
+         if(input.text) args.text=String(input.text).slice(0,200);
+         const tn=toolNote("Jarvis is searching Asana...");
+         try{
+           const res=await mcpNS.callTool(AS_SERVER,"search_tasks",args,{signal:context.signal,cache:{staleTime:30000}});
+           return clip(res.payload,12000);
+         }catch(e){ throw new Error(mcpErrCopy(e,AS_SERVER)); }
+         finally{ tn.remove(); }
+       }},
+      {name:"show",
+       description:"Navigates this page for the user. tab is one of today, system, schedule, registers, rules. day (0=Mon..6=Sun) optionally selects a schedule day. Returns confirmation.",
+       inputSchema:{type:"object",properties:{tab:{type:"string"},day:{type:"number"}},required:["tab"]},
+       execute(input){
+         const tab=String(input.tab||"").toLowerCase();
+         if(!VIEWS.includes(tab)) throw new Error("Unknown tab");
+         showView(tab);
+         if(tab==="schedule" && input.day!==undefined){ const d=Math.max(0,Math.min(6,Number(input.day)||0)); renderDay(d); }
+         return "Shown: "+tab;
+       }}
+    ];
+  }
+
+  async function ask(q){
+    if(!sample || busy) return;
+    const question = (q ?? input.value).trim();
+    if(!question) return;
+    input.value = "";
+    bubble("you", question);
+    turns.push({role:"user", content:question});
+    while(turns.length > 14) turns.splice(0,2);
+    const out = bubble("jarvis","Thinking...");
+    setBusy(true);
+    ctl = new AbortController();
+    try{
+      const {text, truncated} = await sample(
+        [{role:"user", content: INSTRUCTIONS + KNOWLEDGE}, ...turns],
+        {cache:false, modelTier:"quick", signal:ctl.signal, tools:buildTools(),
+         onText:({text})=>{out.textContent = text; log.scrollTop = log.scrollHeight;}});
+      out.textContent = text + (truncated ? "\n\n[cut short, ask for less at a time]" : "");
+      addCopy(out);
+      turns.push({role:"assistant", content:text});
+      speak(text);
+    }catch(e){
+      if(e && e.code === "cancelled"){
+        out.textContent = (e.text || "Stopped.");
+        if(e.text){ addCopy(out); turns.push({role:"assistant", content:e.text}); } else turns.pop();
+      }else if(e && HIDE_CODES.includes(e.code)){
+        out.remove(); turns.pop(); disableJarvis("Jarvis is not available for this account.");
+      }else if(e && e.code==="tools_unavailable"){
+        sampleLimits = {maxPromptBytes:65536}; // drop tools, retry is manual
+        out.className="jmsg err"; out.textContent="This viewer cannot run live tools; asking again will answer from the registers only.";
+        turns.pop();
+      }else{
+        out.className = "jmsg err";
+        out.textContent = (e && e.text) ? e.text + "\n\n" + (ERRCOPY[e.code]||ERRCOPY.upstream_error)
+                                        : (ERRCOPY[e && e.code] || ERRCOPY.upstream_error);
+        turns.pop();
+      }
+    }finally{
+      setBusy(false); ctl = null; log.scrollTop = log.scrollHeight;
+    }
+  }
+
+  sendBtn.addEventListener("click", ()=>{ if(busy){ ctl?.abort(); } else ask(); });
+  input.addEventListener("keydown", e=>{ if(e.key==="Enter" && !busy) ask(); });
+
+  [["Triage my queue","Triage my queue: what needs action right now and in what order? Use the live snapshot."],
+   ["Find automations","Find automation candidates for us, using the automation signals and the live queue and board."],
+   ["Draft the ask","I want to work the most urgent case. Give me the exact ask to paste into a Claude session, with the case number."],
+   ["What runs tomorrow?","What runs tomorrow morning, in order?"],
+   ["Why 13 routines?","Why are there 13 routines against a budget of 12, and what are my options?"],
+   ["What changed 2 Sep?","Summarise what changed in the consolidation on 2 Sep."]
+  ].forEach(([label,q])=>{
+    const c = el("button",null,esc(label));
+    c.addEventListener("click",()=>ask(q));
+    chips.append(c);
+  });
+
+  // voice output
+  let speakOn = recall("speak")==="1";
+  spkBtn.setAttribute("aria-pressed", String(speakOn));
+  function speak(text){
+    if(!speakOn || !("speechSynthesis" in window)) return;
+    try{
+      speechSynthesis.cancel();
+      const clean = text.replace(/trig_[A-Za-z0-9]+/g,"").replace(/https?:\S+/g,"a link").replace(/[·|]/g,",");
+      const u = new SpeechSynthesisUtterance(clean.slice(0,1200));
+      u.lang = "en-AU"; u.rate = 1.04;
+      speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  spkBtn.addEventListener("click",()=>{
+    speakOn = !speakOn;
+    spkBtn.setAttribute("aria-pressed", String(speakOn));
+    remember("speak", speakOn?"1":"0");
+    if(!speakOn){ try{speechSynthesis.cancel();}catch(e){} }
+    else speak("Voice on.");
+  });
+  if(!("speechSynthesis" in window)) spkBtn.hidden = true;
+
+  // voice input
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(SR){
+    micBtn.hidden = false;
+    let rec = null, listening = false;
+    const PH = input.placeholder;
+    micBtn.addEventListener("click",()=>{
+      if(listening){ try{rec.stop();}catch(e){} return; }
+      try{
+        rec = new SR(); rec.lang = "en-AU"; rec.interimResults = true; rec.maxAlternatives = 1;
+        listening = true; micBtn.classList.add("listening"); input.placeholder = "Listening...";
+        rec.onresult = ev=>{
+          let s = "";
+          for(const r of ev.results) s += r[0].transcript;
+          input.value = s;
+          if(ev.results[ev.results.length-1].isFinal){ try{rec.stop();}catch(e){} ask(s); }
+        };
+        rec.onend = ()=>{ listening = false; micBtn.classList.remove("listening"); input.placeholder = PH; };
+        rec.onerror = rec.onend;
+        rec.start();
+      }catch(e){ listening = false; micBtn.classList.remove("listening"); }
+    });
+  }
+
+  function disableJarvis(msg){
+    input.disabled = true; sendBtn.disabled = true; micBtn.hidden = true;
+    note.textContent = msg; note.classList.add("on");
+    $("#jsub").textContent = "unavailable in this view";
+  }
+
+  try{ sample = await claude.use("sample"); }catch(e){ sample = null; }
+  if(!sample){
+    disableJarvis("Jarvis needs the Claude viewer to answer. Open this page at its claude.ai link.");
+    return;
+  }
+  try{ sampleLimits = await sample.limits(); }catch(e){ sampleLimits = {maxPromptBytes:65536}; }
+  note.textContent = "First question asks your permission; answers spend your own Claude usage, and live lookups use your connectors, read-only. For writes, Jarvis hands you the exact session ask.";
+  note.classList.add("on");
+  setTimeout(()=>note.classList.remove("on"), 14000);
 })();
 </script>
