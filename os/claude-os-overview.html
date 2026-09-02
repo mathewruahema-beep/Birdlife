@@ -1,15 +1,15 @@
-<title>BirdLife Claude OS</title>
+<title>BirdLife Australia</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{
   --ground:#f2f6f3; --surface:#ffffff; --surface2:#e9efe9; --surface3:#dfe8e1;
   --ink:#1a2620; --ink2:#4c5d54; --ink3:#71837a;
-  --accent:#1e6f50; --accent-ink:#ffffff; --glow:rgba(30,111,80,.10);
+  --accent:#1e6f50; --accent-ink:#ffffff; --glow:rgba(30,111,80,.10); --glow2:rgba(30,111,80,.25);
   --line:#d3ddd5; --line2:#bccac0;
   --warn:#9c6414; --warn-bg:#f6ead6;
   --crit:#a83a30; --crit-bg:#f4e0dd;
   --ok:#1e6f50; --ok-bg:#dfece4;
-  --dock:rgba(255,255,255,.86);
+  --dock:rgba(255,255,255,.88);
   --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   --disp:'Bricolage Grotesque','Instrument Sans',system-ui,sans-serif;
   --body:'Instrument Sans',system-ui,-apple-system,sans-serif;
@@ -18,28 +18,28 @@
   :root:not([data-theme="light"]){
     --ground:#0f1613; --surface:#171f1a; --surface2:#1e2822; --surface3:#243027;
     --ink:#e3ebe5; --ink2:#a5b5ab; --ink3:#7e8f85;
-    --accent:#57b78c; --accent-ink:#0c1410; --glow:rgba(87,183,140,.10);
+    --accent:#57b78c; --accent-ink:#0c1410; --glow:rgba(87,183,140,.12); --glow2:rgba(87,183,140,.3);
     --line:#28332c; --line2:#374439;
     --warn:#d9a04c; --warn-bg:#2d2415;
     --crit:#e07a6e; --crit-bg:#331d1a;
     --ok:#57b78c; --ok-bg:#16281f;
-    --dock:rgba(23,31,26,.88);
+    --dock:rgba(23,31,26,.9);
   }
 }
 :root[data-theme="dark"]{
   --ground:#0f1613; --surface:#171f1a; --surface2:#1e2822; --surface3:#243027;
   --ink:#e3ebe5; --ink2:#a5b5ab; --ink3:#7e8f85;
-  --accent:#57b78c; --accent-ink:#0c1410; --glow:rgba(87,183,140,.10);
+  --accent:#57b78c; --accent-ink:#0c1410; --glow:rgba(87,183,140,.12); --glow2:rgba(87,183,140,.3);
   --line:#28332c; --line2:#374439;
   --warn:#d9a04c; --warn-bg:#2d2415;
   --crit:#e07a6e; --crit-bg:#331d1a;
   --ok:#57b78c; --ok-bg:#16281f;
-  --dock:rgba(23,31,26,.88);
+  --dock:rgba(23,31,26,.9);
 }
 *{box-sizing:border-box}
 body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;margin:0}
 ::selection{background:var(--accent);color:var(--accent-ink)}
-.wrap{max-width:1040px;margin:0 auto;padding:34px 22px 170px}
+.wrap{max-width:1040px;margin:0 auto;padding:34px 22px 190px}
 a{color:var(--accent)}
 h1,h2,h3{font-family:var(--disp);text-wrap:balance;margin:0}
 .mono{font-family:var(--mono)}
@@ -54,13 +54,14 @@ header::before{content:"";position:absolute;top:-140px;right:-100px;width:420px;
 header h1{font-size:clamp(30px,5vw,42px);font-weight:700;line-height:1.05;margin:6px 0 10px}
 header .sub{color:var(--ink2);max-width:64ch;margin:0}
 .livedot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:1px;animation:pulse 2.4s ease-in-out infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--glow)}50%{box-shadow:0 0 0 7px var(--glow)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--glow2)}50%{box-shadow:0 0 0 7px transparent}}
 .statebar{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-.chip{display:inline-flex;align-items:baseline;gap:7px;border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--ink2);transition:transform .15s,border-color .15s}
+.chip{display:inline-flex;align-items:baseline;gap:7px;border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--ink2);transition:transform .15s,border-color .15s;cursor:pointer}
 .chip:hover{transform:translateY(-1px);border-color:var(--accent)}
 .chip b{font-family:var(--mono);font-size:14px;color:var(--ink);font-weight:600}
 .chip.warn{border-color:var(--warn);background:var(--warn-bg);color:var(--warn)}
 .chip.warn b{color:var(--warn)}
+.hint{font-size:12px;color:var(--ink3);margin:10px 0 0}
 
 nav.tabs{position:sticky;top:0;z-index:5;background:var(--ground);display:flex;gap:4px;padding:12px 0 10px;border-bottom:1px solid var(--line2);margin-bottom:26px;overflow-x:auto}
 nav.tabs button{font-family:var(--disp);font-weight:600;font-size:14.5px;padding:7px 15px;border-radius:8px;color:var(--ink2);white-space:nowrap;transition:background .15s,color .15s}
@@ -76,8 +77,10 @@ h2.vt{font-size:22px;font-weight:600;margin-bottom:4px}
 .refresh{font-size:13px;font-weight:600;color:var(--accent);border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:4px 13px;transition:background .15s}
 .refresh:hover{background:var(--surface2)}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:16px}
-.tile{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:12px 14px;transition:transform .15s,box-shadow .15s}
+.tile{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:12px 14px;transition:transform .15s,box-shadow .15s,border-color .15s}
+.tile[data-filter]{cursor:pointer}
 .tile:hover{transform:translateY(-2px);box-shadow:0 4px 14px var(--glow)}
+.tile.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--glow2)}
 .tile .v{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
 .tile .l{font-size:12px;color:var(--ink3);margin-top:2px}
 .tile.warn .v{color:var(--warn)} .tile.crit .v{color:var(--crit)} .tile.ok .v{color:var(--ok)}
@@ -90,6 +93,9 @@ h2.vt{font-size:22px;font-weight:600;margin-bottom:4px}
 .trow .t1{font-weight:600}
 .trow .t2{color:var(--ink3);font-size:12.5px;font-family:var(--mono)}
 .trow.empty{color:var(--ink3);font-style:italic}
+.rowacts{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.rowacts button{font-size:11.5px;font-family:var(--mono);color:var(--accent);border:1px solid var(--line2);border-radius:6px;padding:2px 9px;background:var(--surface);transition:background .12s}
+.rowacts button:hover{background:var(--surface2)}
 .degraded{background:var(--surface);border:1px dashed var(--line2);border-radius:12px;padding:16px 18px;color:var(--ink2);font-size:14px}
 .degraded b{color:var(--ink)}
 
@@ -114,11 +120,13 @@ h2.vt{font-size:22px;font-weight:600;margin-bottom:4px}
 @media (max-width:700px){.layer>button{grid-template-columns:1fr auto}.layer .what{grid-column:1/-1}.layer .detail{padding-left:18px}}
 
 .loop{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:26px}
-.loop .step{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:13px 15px 15px;transition:transform .15s,box-shadow .15s}
+.loop .step{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:13px 15px 15px;transition:transform .15s,box-shadow .15s;cursor:pointer}
 .loop .step:hover{transform:translateY(-2px);box-shadow:0 4px 14px var(--glow)}
 .loop .step .n{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.1em}
 .loop .step h3{font-size:15px;font-weight:600;margin:3px 0 4px}
 .loop .step p{margin:0;font-size:13px;color:var(--ink2)}
+.loop .step .more{display:none;margin-top:7px;font-size:12.5px;color:var(--ink3);border-top:1px dashed var(--line);padding-top:6px}
+.loop .step.open .more{display:block}
 @media (max-width:760px){.loop{grid-template-columns:1fr 1fr}}
 @media (max-width:460px){.loop{grid-template-columns:1fr}}
 
@@ -127,10 +135,11 @@ h2.vt{font-size:22px;font-weight:600;margin-bottom:4px}
 .days button:hover{background:var(--surface2);transform:translateY(-1px)}
 .days button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:0 2px 10px var(--glow)}
 .sched{border:1px solid var(--line2);border-radius:12px;background:var(--surface);overflow:hidden}
-.srow{display:grid;grid-template-columns:110px 1fr;border-top:1px solid var(--line)}
+.srow{display:grid;grid-template-columns:110px 1fr;border-top:1px solid var(--line);cursor:pointer}
 .srow:first-child{border-top:none}
+.srow:hover .sbody{background:var(--surface2)}
 .stime{font-family:var(--mono);font-size:13px;font-weight:600;padding:11px 14px;background:var(--surface2);color:var(--ink2);border-right:1px solid var(--line);font-variant-numeric:tabular-nums}
-.sbody{padding:11px 16px 12px}
+.sbody{padding:11px 16px 12px;transition:background .12s}
 .sbody .rname{font-weight:600;font-size:14.5px}
 .sbody .rwhat{color:var(--ink2);font-size:13.5px}
 .sbody .rid{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:3px}
@@ -157,6 +166,7 @@ h2.vt{font-size:22px;font-weight:600;margin-bottom:4px}
 .rcard .detail dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding-top:2px}
 .rcard .detail dd{margin:0}
 .rcard .detail dd.mono{font-size:12.5px}
+.rcard .detail .rowacts{grid-column:1/-1}
 @media (max-width:560px){.rcard .detail{grid-template-columns:1fr}.rcard .detail dt{padding-top:6px}}
 .grouphead{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:20px 0 8px}
 table.reg{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden;font-size:14px}
@@ -165,12 +175,14 @@ table.reg th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-tr
 table.reg td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
 table.reg tr:last-child td{border-bottom:none}
 table.reg td.mono{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
+table.reg tbody tr.clicky{cursor:pointer;transition:background .12s}
+table.reg tbody tr.clicky:hover td{background:var(--surface2)}
 .pill{display:inline-block;font-family:var(--mono);font-size:10.5px;border-radius:4px;padding:1.5px 7px}
 .pill.ok{background:var(--ok-bg);color:var(--ok)}
 .pill.warn{background:var(--warn-bg);color:var(--warn)}
 .pill.crit{background:var(--crit-bg);color:var(--crit)}
 .conngrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.conn{border:1px solid var(--line2);background:var(--surface);border-radius:8px;padding:8px 13px;font-size:13.5px;transition:transform .12s,border-color .15s}
+.conn{border:1px solid var(--line2);background:var(--surface);border-radius:8px;padding:8px 13px;font-size:13.5px;transition:transform .12s,border-color .15s;cursor:pointer}
 .conn:hover{transform:translateY(-1px);border-color:var(--accent)}
 .conn b{display:block;font-size:14px}
 .conn span{color:var(--ink3);font-size:12px}
@@ -193,6 +205,8 @@ table.reg td.mono{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
 .panel h3{font-size:16px;font-weight:600;margin-bottom:8px}
 .panel ul{margin:0;padding-left:18px}
 .panel li{margin:7px 0;font-size:14px;color:var(--ink2)}
+.panel li.clicky{cursor:pointer;transition:color .12s}
+.panel li.clicky:hover{color:var(--ink)}
 .panel li b{color:var(--ink)}
 .panel.warnp{border-left:4px solid var(--warn)}
 .panel.watchp{border-left:4px solid var(--accent)}
@@ -200,54 +214,71 @@ table.reg td.mono{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
 footer{margin-top:48px;border-top:1px solid var(--line2);padding-top:14px;font-size:12.5px;color:var(--ink3)}
 footer .mono{font-size:11.5px}
 
-/* ---------- Jarvis dock ---------- */
-#jarvis{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;width:min(760px,calc(100vw - 24px));z-index:20}
-.jpanel{background:var(--dock);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line2);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.14);overflow:hidden}
-.jhead{display:flex;align-items:center;gap:9px;padding:9px 15px 0}
-.jorb{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:none;animation:pulse 2.8s ease-in-out infinite}
-.jorb.busy{animation:orbthink .9s ease-in-out infinite alternate}
-@keyframes orbthink{from{transform:scale(.75);opacity:.55}to{transform:scale(1.25);opacity:1}}
-.jtitle{font-family:var(--disp);font-weight:700;font-size:13.5px;letter-spacing:.02em}
-.jsub{font-size:11.5px;color:var(--ink3);margin-left:auto;text-align:right}
-.jlog{max-height:46vh;overflow-y:auto;padding:10px 15px 2px;display:none;flex-direction:column;gap:8px}
+/* ---------- Jarvis HUD dock (committed single look: deep glass, arc cyan, gold controls) ---------- */
+#jarvis{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;width:min(760px,calc(100vw - 24px));z-index:20;
+  --j-bg:rgba(7,15,21,.93); --j-panel:#0d1c26; --j-panel2:#122430; --j-line:#1e3947;
+  --j-cyan:#54d7f2; --j-cyan-dim:#8bb7c4; --j-cyan-glow:rgba(84,215,242,.28); --j-ink:#dff2f9; --j-ink2:#9dbcc8;
+  --j-gold:#f0b429; --j-gold-ink:#1c1502; --j-red:#e0685c}
+.jpanel{position:relative;background:var(--j-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--j-line);border-radius:16px;box-shadow:0 10px 34px rgba(0,0,0,.45),0 0 0 1px var(--j-cyan-glow),0 0 24px var(--j-cyan-glow);overflow:hidden;color:var(--j-ink)}
+.jscan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--j-cyan),transparent);background-size:200% 100%;animation:scan 3.2s linear infinite;opacity:.85}
+@keyframes scan{from{background-position:200% 0}to{background-position:-200% 0}}
+.jhead{display:flex;align-items:center;gap:10px;padding:11px 15px 0}
+.jorb{position:relative;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#bdeffb,var(--j-cyan) 55%,#1b7f99);flex:none;box-shadow:0 0 10px var(--j-cyan-glow),0 0 22px var(--j-cyan-glow)}
+.jorb::before{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--j-cyan);opacity:.7}
+.jorb::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:1px dashed var(--j-cyan);opacity:.45;animation:reticle 6s linear infinite}
+@keyframes reticle{to{transform:rotate(360deg)}}
+.jorb.busy{animation:orbthink .8s ease-in-out infinite alternate}
+@keyframes orbthink{from{transform:scale(.75);filter:brightness(.7)}to{transform:scale(1.25);filter:brightness(1.3)}}
+.jtitle{font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.34em;color:var(--j-cyan);text-shadow:0 0 12px var(--j-cyan-glow)}
+.jsub{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--j-cyan-dim);margin-left:auto;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
+.jlog{max-height:48vh;overflow-y:auto;padding:10px 15px 2px;display:none;flex-direction:column;gap:8px}
 .jlog.on{display:flex}
 .jmsg{position:relative;max-width:88%;padding:8px 12px;border-radius:12px;font-size:14px;white-space:pre-wrap;overflow-wrap:break-word}
-.jmsg.you{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:4px}
-.jmsg.jarvis{align-self:flex-start;background:var(--surface2);color:var(--ink);border-bottom-left-radius:4px}
-.jmsg.err{align-self:flex-start;background:var(--crit-bg);color:var(--crit)}
-.jmsg .copy{position:absolute;top:4px;right:6px;font-size:11px;color:var(--ink3);opacity:0;transition:opacity .15s;background:var(--surface);border:1px solid var(--line2);border-radius:5px;padding:1px 6px}
+.jmsg.you{align-self:flex-end;background:var(--j-cyan);color:#06222c;border-bottom-right-radius:4px}
+.jmsg.jarvis{align-self:flex-start;background:var(--j-panel2);color:var(--j-ink);border:1px solid var(--j-line);border-bottom-left-radius:4px}
+.jmsg.err{align-self:flex-start;background:#2e1512;color:#f0a79e;border:1px solid #55251f}
+.jmsg .copy{position:absolute;top:4px;right:6px;font-size:11px;color:var(--j-cyan-dim);opacity:0;transition:opacity .15s;background:var(--j-panel);border:1px solid var(--j-line);border-radius:5px;padding:1px 6px}
 .jmsg:hover .copy{opacity:1}
-.jtool{align-self:flex-start;font-family:var(--mono);font-size:11px;color:var(--ink3)}
+.jtool{align-self:flex-start;font-family:var(--mono);font-size:11px;color:var(--j-cyan-dim)}
+.japprove{align-self:stretch;background:var(--j-panel);border:1px solid var(--j-gold);border-left-width:4px;border-radius:12px;padding:11px 14px;font-size:13.5px;box-shadow:0 0 16px rgba(240,180,41,.15)}
+.japprove .at{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--j-gold);margin-bottom:4px}
+.japprove .ad{white-space:pre-wrap;color:var(--j-ink2);margin-bottom:9px}
+.japprove .ad b{color:var(--j-ink)}
+.japprove .ab{display:flex;gap:8px}
+.japprove .ab button{font-weight:700;font-size:13px;border-radius:8px;padding:6px 16px;border:1px solid var(--j-line)}
+.japprove .approve{background:var(--j-gold);color:var(--j-gold-ink);border-color:var(--j-gold)}
+.japprove .cancel{background:var(--j-panel2);color:var(--j-ink2)}
 .jchips{display:flex;gap:6px;overflow-x:auto;padding:8px 15px 0;scrollbar-width:none}
 .jchips::-webkit-scrollbar{display:none}
-.jchips button{flex:none;font-size:12.5px;color:var(--ink2);border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:4px 12px;transition:background .15s,border-color .15s}
-.jchips button:hover{border-color:var(--accent);color:var(--accent)}
+.jchips button{flex:none;font-family:var(--mono);font-size:12px;color:var(--j-cyan-dim);border:1px solid var(--j-line);background:var(--j-panel);border-radius:999px;padding:4px 12px;transition:color .15s,border-color .15s,box-shadow .15s}
+.jchips button:hover{border-color:var(--j-cyan);color:var(--j-cyan);box-shadow:0 0 10px var(--j-cyan-glow)}
 .jbar{display:flex;align-items:center;gap:8px;padding:10px 12px 12px}
-.jbar input{flex:1;font:inherit;font-size:14.5px;color:var(--ink);background:var(--surface);border:1px solid var(--line2);border-radius:10px;padding:9px 13px;outline:none;min-width:0}
-.jbar input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
-.jbar input::placeholder{color:var(--ink3)}
-.jbtn{flex:none;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line2);background:var(--surface);color:var(--ink2);font-size:16px;transition:background .15s,transform .1s}
-.jbtn:hover{background:var(--surface2);transform:translateY(-1px)}
-.jbtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.jbtn.send{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.jbar input{flex:1;font:inherit;font-size:14.5px;color:var(--j-ink);background:var(--j-panel);border:1px solid var(--j-line);border-radius:10px;padding:9px 13px;outline:none;min-width:0}
+.jbar input:focus{border-color:var(--j-cyan);box-shadow:0 0 0 3px var(--j-cyan-glow)}
+.jbar input::placeholder{color:var(--j-ink2)}
+.jbtn{flex:none;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--j-line);background:var(--j-panel);color:var(--j-cyan-dim);font-size:16px;transition:background .15s,transform .1s,box-shadow .15s}
+.jbtn:hover{background:var(--j-panel2);transform:translateY(-1px);box-shadow:0 0 10px var(--j-cyan-glow)}
+.jbtn[aria-pressed="true"]{background:var(--j-cyan);color:#06222c;border-color:var(--j-cyan)}
+.jbtn.send{background:var(--j-cyan);color:#06222c;border-color:var(--j-cyan);font-weight:700;box-shadow:0 0 14px var(--j-cyan-glow)}
 .jbtn.send:disabled{opacity:.45;cursor:default;transform:none}
-.jbtn.listening{background:var(--crit);color:#fff;border-color:var(--crit);animation:orbthink .7s ease-in-out infinite alternate}
-.jnote{font-size:11.5px;color:var(--ink3);padding:0 15px 10px;display:none}
+.jbtn.listening{background:var(--j-red);color:#fff;border-color:var(--j-red);animation:orbthink .7s ease-in-out infinite alternate}
+.jnote{font-size:11.5px;color:var(--j-ink2);padding:0 15px 10px;display:none}
 .jnote.on{display:block}
 </style>
 
 <div class="wrap">
 <header>
   <div class="eyebrow"><span class="livedot"></span>BirdLife Australia ICT · mathewruahema-beep/Birdlife</div>
-  <h1>The Claude Operating System</h1>
-  <p class="sub">Your daily console over the Claude estate. Today shows the live Ask Zeus queue and Asana board through your own connectors; the other tabs are the governed system underneath. Jarvis, at the bottom, answers questions, pulls live data, drafts the exact asks to hand a Claude session, and hunts for automation candidates.</p>
+  <h1>BirdLife Australia</h1>
+  <p class="sub">Your daily console over the Claude estate. Today shows the live Ask Zeus queue and Asana board through your own connectors; the other tabs are the governed system underneath. Jarvis answers, pulls live data, and executes approved actions: every write shows you the exact change first and nothing happens until you tap Approve.</p>
   <div class="statebar">
-    <span class="chip"><b>13</b> recurring routines</span>
-    <span class="chip"><b>2</b> one-shots</span>
-    <span class="chip"><b>9</b> retired 2 Sep, backed up</span>
-    <span class="chip"><b>12</b> skills in repo</span>
-    <span class="chip warn"><b>2</b> decisions open</span>
+    <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>13</b> recurring routines</span>
+    <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>2</b> one-shots</span>
+    <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>9</b> retired 2 Sep, backed up</span>
+    <span class="chip" role="button" tabindex="0" data-goto="registers:skills"><b>12</b> skills in repo</span>
+    <span class="chip warn" role="button" tabindex="0" data-goto="rules"><b>2</b> decisions open</span>
   </div>
+  <p class="hint">Everything is tappable: chips navigate, tiles filter, rows load Jarvis with a ready question, and reply/close/complete buttons start an approved action.</p>
 </header>
 
 <nav class="tabs" role="tablist" aria-label="Sections">
@@ -266,14 +297,14 @@ footer .mono{font-size:11.5px}
     <button class="refresh" id="refreshbtn" hidden>Refresh</button>
   </div>
   <div id="today-live">
-    <div class="degraded" id="today-degraded"><b>Live data loads inside the Claude viewer.</b> Open this page at its claude.ai link and allow the Salesforce-Production and Asana connectors when asked. Everything else on this page works without them.</div>
+    <div class="degraded" id="today-degraded"><b>Live data loads inside the Claude viewer.</b> Open this page at its claude.ai link and allow the Salesforce Production and Asana connectors when asked. Everything else on this page works without them.</div>
     <div id="today-content" hidden>
       <div class="tiles" id="tiles"></div>
       <div class="todaycols">
-        <div class="tlist"><h3>Queue: needs action first</h3><div id="qlist"></div></div>
-        <div class="tlist"><h3>Board: needs attention</h3><div id="blist"></div></div>
+        <div class="tlist"><h3 id="qtitle">Queue: needs action first</h3><div id="qlist"></div></div>
+        <div class="tlist"><h3 id="btitle">Board: needs attention</h3><div id="blist"></div></div>
       </div>
-      <p class="schednote">Scope: Record Type = Ask Zeus only, project = IT Operations Project Plan only. Owner "Zeus" is the unassigned intake queue, not a person. To work a case (reply, close, reassign), use the ICT Console or ask Jarvis for the exact session prompt; this page reads, it never writes.</p>
+      <p class="schednote">Scope: Record Type = Ask Zeus only, project = IT Operations Project Plan only. Owner "Zeus" is the unassigned intake queue, not a person. Reply, close, comment and complete run through Jarvis with your explicit approval on each write, and every change is verified by re-reading the record.</p>
     </div>
   </div>
 </div>
@@ -285,19 +316,14 @@ footer .mono{font-size:11.5px}
   <div class="stack" id="stack"></div>
 
   <h2 class="vt" style="margin-top:34px">The governance loop</h2>
-  <p class="lede">Every change to the estate, from creating a routine to teaching a skill a new gotcha, moves through the same four steps.</p>
-  <div class="loop">
-    <div class="step"><div class="n">STEP 1</div><h3>Propose</h3><p>The exact change: name, cron in UTC and AEST, prompt, connectors, and which existing job absorbs or is absorbed.</p></div>
-    <div class="step"><div class="n">STEP 2</div><h3>Approve</h3><p>Mathew gives the go-ahead. Per-session relaxations honoured, same as the charter.</p></div>
-    <div class="step"><div class="n">STEP 3</div><h3>Execute + verify</h3><p>Make the change, then prove it took: next fire time sane, connectors attached, a paused routine actually stopped.</p></div>
-    <div class="step"><div class="n">STEP 4</div><h3>Record</h3><p>Register updated, retired definitions backed up to routines/, committed and pushed in the same session.</p></div>
-  </div>
+  <p class="lede">Every change to the estate, from creating a routine to closing a case, moves through the same four steps. Click a step for a worked example.</p>
+  <div class="loop" id="loop"></div>
 </div>
 
 <!-- ============ SCHEDULE ============ -->
 <div class="view" id="view-schedule" hidden>
   <h2 class="vt">What runs, and when</h2>
-  <p class="lede">Pick a day to see every unattended fire in Melbourne time. Read-only unless tagged; the one write-capable routine is capped inside its own prompt.</p>
+  <p class="lede">Pick a day to see every unattended fire in Melbourne time. Tap a routine to load Jarvis with its story.</p>
   <div class="days" role="tablist" aria-label="Day of week" id="days"></div>
   <div class="sched" id="sched"></div>
   <p class="schednote" id="schednote"></p>
@@ -320,10 +346,10 @@ footer .mono{font-size:11.5px}
       <thead><tr><th>Skill</th><th>Covers</th><th>Repo</th><th>Account</th></tr></thead>
       <tbody id="skillrows"></tbody>
     </table></div>
-    <p class="schednote">Repo copies are the source of truth. When they diverge, re-sync the account from the repo, unless the account copy is deliberately newer, in which case commit it back first.</p>
+    <p class="schednote">Tap a skill to ask Jarvis about it. Repo copies are the source of truth; when they diverge, re-sync the account from the repo unless the account copy is deliberately newer.</p>
   </div>
   <div id="reg-connectors" hidden>
-    <p class="lede" style="margin-bottom:8px">Attached at account level by Mathew only, in the UI. Routines additionally carry per-routine grants; the two merged dashboard jobs kept theirs through the consolidation, so no re-attachment was needed.</p>
+    <p class="lede" style="margin-bottom:8px">Attached at account level by Mathew only, in the UI. Tap a connector to ask Jarvis what runs through it.</p>
     <div class="grouphead">Operational core</div>
     <div class="conngrid" id="conncore"></div>
     <div class="grouphead">Also available to sessions</div>
@@ -352,25 +378,28 @@ footer .mono{font-size:11.5px}
 
   <div class="twocol">
     <div class="panel warnp">
-      <h3>Open decisions</h3>
+      <h3>Open decisions (tap to work one)</h3>
       <ul>
-        <li><b>Budget: 13 vs 12.</b> The audit routine took the thirteenth slot. Merge the two Friday status drafts, fold the Top 10 draft into the pre-draft, or raise the budget to 13.</li>
-        <li><b>WooCommerce key rotation.</b> Flagged in August after keys sat in routine prompts; still not verified done. Stays on the credential watchlist until confirmed.</li>
+        <li class="clicky" data-ask="Walk me through the routine budget decision: 13 active against a budget of 12. Lay out the three options with the trade-offs and recommend one."><b>Budget: 13 vs 12.</b> The audit routine took the thirteenth slot. Merge the two Friday status drafts, fold the Top 10 draft into the pre-draft, or raise the budget to 13.</li>
+        <li class="clicky" data-ask="What exactly do I need to do to verify the WooCommerce key rotation from the August exposure, and how do I close it off the watchlist?"><b>WooCommerce key rotation.</b> Flagged in August after keys sat in routine prompts; still not verified done. Stays on the credential watchlist until confirmed.</li>
       </ul>
     </div>
     <div class="panel watchp">
-      <h3>Watching this week</h3>
+      <h3>Watching this week (tap to check)</h3>
       <ul>
-        <li><b>Thu 3 Sep, 7:04am.</b> First deep slot for the merged weekday job. Look for the heartbeat line and the Teams file update.</li>
-        <li><b>Sat 5 to Sun 7 Sep.</b> First weekend for the merged job; it inherits duties from three routines that failed silently since 30 Aug. The Sunday security refresh is the key test.</li>
-        <li><b>Mon 8 Sep, 6am.</b> First self-run of the weekly audit.</li>
+        <li class="clicky" data-ask="Check whether the merged weekday dashboards job ran its 7:04am deep slot properly: query Salesforce for evidence of the morning refresh if you can, and tell me what to look for in the Teams heartbeat."><b>Thu 3 Sep, 7:04am.</b> First deep slot for the merged weekday job. Look for the heartbeat line and the Teams file update.</li>
+        <li class="clicky" data-ask="What should I verify after the first merged weekend run on 5 to 7 Sep, including the Sunday security refresh, and what does failure look like?"><b>Sat 5 to Sun 7 Sep.</b> First weekend for the merged job; it inherits duties from three routines that failed silently since 30 Aug.</li>
+        <li class="clicky" data-ask="What will the first Claude OS weekly audit on Monday 8 Sep check, and what should I expect in its report?"><b>Mon 8 Sep, 6am.</b> First self-run of the weekly audit.</li>
       </ul>
     </div>
   </div>
 </div>
 
 <footer>
-  Rules: <span class="mono">os/README.md</span> · State of record: <span class="mono">os/registers.md</span> · Operator skill: <span class="mono">.claude/skills/claude-os/</span> · Backups: <span class="mono">routines/</span><br>
+  <a href="https://github.com/mathewruahema-beep/Birdlife/blob/claude/os-for-claude-y12d5q/os/README.md">os/README.md</a> (rules) ·
+  <a href="https://github.com/mathewruahema-beep/Birdlife/blob/claude/os-for-claude-y12d5q/os/registers.md">os/registers.md</a> (state of record) ·
+  <a href="https://github.com/mathewruahema-beep/Birdlife/tree/claude/os-for-claude-y12d5q/.claude/skills/claude-os">claude-os skill</a> ·
+  <a href="https://github.com/mathewruahema-beep/Birdlife/tree/claude/os-for-claude-y12d5q/routines">routine backups</a><br>
   Consolidation executed 2 Sep 2026. Times AEST (UTC+10); the standing DST one-shot adjusts crons on 5 Oct 2026. This page names internal systems: keep the link private.
 </footer>
 </div>
@@ -378,16 +407,17 @@ footer .mono{font-size:11.5px}
 <!-- ============ JARVIS ============ -->
 <div id="jarvis">
   <div class="jpanel">
+    <div class="jscan"></div>
     <div class="jhead">
       <span class="jorb" id="jorb"></span>
-      <span class="jtitle">JARVIS</span>
-      <span class="jsub" id="jsub">live via your connectors · asks Claude on your account</span>
+      <span class="jtitle">J A R V I S</span>
+      <span class="jsub" id="jsub">initialising...</span>
     </div>
     <div class="jlog" id="jlog" aria-live="polite"></div>
     <div class="jchips" id="jchips"></div>
     <div class="jbar">
-      <input id="jin" type="text" placeholder="Ask, or say it: triage my queue, find automations, draft the ask..." autocomplete="off" aria-label="Ask Jarvis">
-      <button class="jbtn" id="jmic" title="Speak your question" aria-label="Voice input" hidden>🎙</button>
+      <input id="jin" type="text" placeholder="Ask or command: triage my queue, close case 0013..., find automations" autocomplete="off" aria-label="Ask Jarvis">
+      <button class="jbtn" id="jmic" title="Speak" aria-label="Voice input" hidden>🎙</button>
       <button class="jbtn" id="jspk" title="Read answers aloud" aria-label="Speak answers" aria-pressed="false">🔊</button>
       <button class="jbtn send" id="jsend" title="Ask" aria-label="Ask">↑</button>
     </div>
@@ -412,6 +442,12 @@ const LAYERS = [
   points:["Stable private artifact URLs, republished in place so links never change.","Teams channel copies use fixed SharePoint filenames, never renamed, never dated variants.","The _dashboard-run-log.txt heartbeat makes silent failure impossible: a missing weekday line means the run did not happen."]},
  {role:"Registers", sub:"state of record", what:"Routine, skill, connector, artefact and credential registers. The layer that keeps every other layer honest.", home:"os/registers.md",
   points:["Updated in the same commit as any estate change. No 'will document later'.","The Monday audit diffs the registers against live state and reports drift as findings.","This page mirrors them; the markdown in the repo is authoritative."]}
+];
+const LOOPSTEPS=[
+ ["STEP 1","Propose","The exact change: name, cron in UTC and AEST, prompt, connectors, and which existing job absorbs or is absorbed.","Example: closing a case through Jarvis. It states the case number, the new Status, the close reason and the note, in full, before anything moves."],
+ ["STEP 2","Approve","Mathew gives the go-ahead. Per-session relaxations honoured, same as the charter.","Example: the amber Approve card in the Jarvis dock. No tap, no write. A cancelled card changes nothing and Jarvis says so."],
+ ["STEP 3","Execute + verify","Make the change, then prove it took: next fire time sane, connectors attached, a paused routine actually stopped.","Example: after a close, the page re-reads the case and reports the verified Status and reason, never assumes success."],
+ ["STEP 4","Record","Register updated, retired definitions backed up to routines/, committed and pushed in the same session.","Example: every case write leaves an internal audit comment on the case, and estate changes land in os/registers.md in the same commit."]
 ];
 
 const R = [ // routines. days: 0=Mon..6=Sun
@@ -516,6 +552,8 @@ const AUTOMATION_SIGNALS = [
  "Retired but recreatable from backup: meeting actions collector (Granola/Zoom to Asana proposals), unreconciled income exception report (or its Zapier-side version per the birdlife-zapier skill)",
  "Tier 2 Entra and Exchange admin work is prepared-not-executed today; the promotion plan is docs/entra-admin-connector.md"
 ];
+const CLOSE_REASONS=["Closed - Resolved","Closed - Resolved First Call","Closed - Email Sent","Closed - Email Edited & Sent","Closed - Phone Call","Closed - No Action Required","Closed - Internal Follow up","Closed - Duplicate","Closed - Spam","Closed - Abandoned","Closed - Autoreply","Closed - Returned Letter"];
+const STATUSES=["New","In Progress","Pending","On Hold-Internal","Waiting Response-External","Response Received","Closed"];
 
 // ---------- helpers ----------
 const $ = s => document.querySelector(s);
@@ -524,6 +562,10 @@ const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 function remember(k,v){try{localStorage.setItem("claude-os."+k,v)}catch(e){}}
 function recall(k){try{return localStorage.getItem("claude-os."+k)}catch(e){return null}}
 function tagFor(t){return t==="write"?'<span class="tag write">writes, capped</span>':t==="gov"?'<span class="tag gov">governance</span>':'<span class="tag read">read-only</span>'}
+async function copyText(t,btn){try{await navigator.clipboard.writeText(t); if(btn){const o=btn.textContent;btn.textContent="copied";setTimeout(()=>btn.textContent=o,1200);}}catch(e){}}
+const JarvisBus={ask:null,prefill:null};
+function jAsk(q){ if(JarvisBus.ask) JarvisBus.ask(q); else if(JarvisBus.prefill) JarvisBus.prefill(q); }
+function jPre(q){ if(JarvisBus.prefill) JarvisBus.prefill(q); }
 
 // ---------- tabs ----------
 const VIEWS=["today","system","schedule","registers","rules"];
@@ -535,6 +577,14 @@ function showView(v){
   remember("tab",v);
 }
 tabs.forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+
+// header chips navigate
+document.querySelectorAll('.chip[data-goto]').forEach(ch=>{
+  const go=()=>{const [v,reg]=ch.dataset.goto.split(":"); showView(v);
+    if(reg){const b=[...document.querySelectorAll('#subtabs button')].find(x=>x.dataset.reg===reg); if(b) b.click();}};
+  ch.addEventListener("click",go);
+  ch.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});
+});
 
 // ---------- stack ----------
 const stack=$("#stack");
@@ -548,6 +598,13 @@ LAYERS.forEach((L)=>{
   det.hidden=true;
   btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; d.classList.toggle("open",open); btn.setAttribute("aria-expanded",String(open));});
   d.append(btn,det); stack.append(d);
+});
+// loop with worked examples
+const loopHost=$("#loop");
+LOOPSTEPS.forEach(([n,h,p,more])=>{
+  const s=el("div","step",`<div class="n">${n}</div><h3>${h}</h3><p>${p}</p><div class="more">${esc(more)}</div>`);
+  s.addEventListener("click",()=>s.classList.toggle("open"));
+  loopHost.append(s);
 });
 
 // ---------- schedule ----------
@@ -568,6 +625,7 @@ function renderDay(day){
     if(day===5 && r.t==="trig_01CUkTdAFSisnzyU6pwgkH4k") what="Saturday run: probe-gated refresh of both ICT dashboards. Security waits for Sunday.";
     const row=el("div","srow",
       `<div class="stime">${r.time}</div><div class="sbody"><span class="rname">${esc(r.n)}</span>${tagFor(r.type)}<div class="rwhat">${what}</div><div class="rid">${r.t} · cron ${esc(r.cron)} UTC</div></div>`);
+    row.addEventListener("click",()=>jPre("Tell me about the routine \""+r.n+"\": what it does, when it fires, its write posture, and how I would know if it failed."));
     sched.append(row);
   });
   $("#schednote").textContent = (day<5)
@@ -593,6 +651,10 @@ function rcard(r){
     `<dt>Trigger</dt><dd class="mono">${r.t}</dd>
      <dt>Cron (UTC)</dt><dd class="mono">${esc(r.cron)}</dd>
      <dt>Does</dt><dd>${r.what}</dd>${dl(r.detail)}`);
+  const acts=el("div","rowacts");
+  const a1=el("button",null,"ask jarvis"); a1.addEventListener("click",e=>{e.stopPropagation();jAsk("Tell me about the routine \""+r.n+"\" ("+r.t+"): what it does, its schedule, write posture, and failure modes.");});
+  const a2=el("button",null,"copy change ask"); a2.addEventListener("click",e=>{e.stopPropagation();copyText("Per the Claude OS change control (os/README.md), propose a change to routine \""+r.n+"\" ("+r.t+"): <describe the change>. Show me the passport before writing anything, then update os/registers.md in the same session.",a2);});
+  acts.append(a1,a2); det.append(acts);
   expandable(card,btn,det);
   card.append(btn,det); return card;
 }
@@ -615,6 +677,10 @@ function rcard(r){
     const card=el("div","rcard");
     const btn=el("button",null,`<span class="caret">›</span><span class="rname" style="color:var(--ink2)">${esc(n)}</span><span class="tag retired">retired</span>`);
     const det=el("div","detail",`<dt>Trigger</dt><dd class="mono">${t}</dd><dt>Disposition</dt><dd>${d}</dd>`);
+    const acts=el("div","rowacts");
+    const a=el("button",null,"copy recreate ask");
+    a.addEventListener("click",e=>{e.stopPropagation();copyText("Recreate the retired routine \""+n+"\" from routines/routines-backup-2026-09-02.json per the Claude OS change control: show me the passport first, check the budget (rule 3) and overlap (rule 2), and update os/registers.md in the same session.",a);});
+    acts.append(a); det.append(acts);
     expandable(card,btn,det); card.append(btn,det); l3.append(card);
   });
   host.append(l3);
@@ -630,14 +696,19 @@ subtabs.forEach(b=>b.addEventListener('click',()=>{
 
 // ---------- skills / connectors / artefacts / credentials ----------
 $("#skillrows").innerHTML = SKILLS.map(([n,c,r,a])=>
-  `<tr><td class="mono">${esc(n)}</td><td>${esc(c)}</td><td>${r.startsWith("yes")?`<span class="pill ok">${esc(r)}</span>`:r==="account only"?`<span class="pill crit">${esc(r)}</span>`:`<span class="pill warn">${esc(r)}</span>`}</td><td><span class="pill ok">${esc(a)}</span></td></tr>`).join("");
-$("#conncore").innerHTML = CONN_CORE.map(([n,d])=>`<div class="conn"><b>${esc(n)}</b><span>${esc(d)}</span></div>`).join("");
-$("#connextra").innerHTML = CONN_EXTRA.map(n=>`<div class="conn"><b>${esc(n)}</b></div>`).join("");
+  `<tr class="clicky" data-skill="${esc(n)}"><td class="mono">${esc(n)}</td><td>${esc(c)}</td><td>${r.startsWith("yes")?`<span class="pill ok">${esc(r)}</span>`:r==="account only"?`<span class="pill crit">${esc(r)}</span>`:`<span class="pill warn">${esc(r)}</span>`}</td><td><span class="pill ok">${esc(a)}</span></td></tr>`).join("");
+document.querySelectorAll('#skillrows tr').forEach(tr=>tr.addEventListener("click",()=>jPre("Tell me about the "+tr.dataset.skill+" skill: what it covers, when it triggers, and one thing in it I probably do not know.")));
+$("#conncore").innerHTML = CONN_CORE.map(([n,d])=>`<div class="conn" data-conn="${esc(n)}"><b>${esc(n)}</b><span>${esc(d)}</span></div>`).join("");
+$("#connextra").innerHTML = CONN_EXTRA.map(n=>`<div class="conn" data-conn="${esc(n)}"><b>${esc(n)}</b></div>`).join("");
+document.querySelectorAll('.conn').forEach(c=>c.addEventListener("click",()=>jPre("What runs through the "+c.dataset.conn+" connector, which routines depend on it, and what breaks if it lapses?")));
 $("#artrows").innerHTML = ARTS.map(([n,by,u])=>
   `<tr><td>${esc(n)}</td><td>${esc(by)}</td><td class="mono">${u.startsWith("http")?`<a href="${u}" target="_blank" rel="noopener">open</a>`:esc(u)}</td></tr>`).join("");
-$("#credrows").innerHTML = CREDS.map(([n,s,a])=>{
+$("#credrows").innerHTML = CREDS.map(([n,s,a],i)=>{
   const [cls,txt]=s.split("|");
-  return `<tr><td>${esc(n)}</td><td><span class="pill ${cls}">${esc(txt)}</span></td><td>${esc(a)}</td></tr>`;}).join("");
+  return `<tr class="clicky" data-cred="${i}"><td>${esc(n)}</td><td><span class="pill ${cls}">${esc(txt)}</span></td><td>${esc(a)}</td></tr>`;}).join("");
+document.querySelectorAll('#credrows tr').forEach(tr=>tr.addEventListener("click",()=>{
+  const c=CREDS[+tr.dataset.cred]; jPre("On the credential watchlist item \""+c[0]+"\": what is its current status, and what exactly do I do next?");
+}));
 
 // ---------- rules ----------
 const rulesHost=$("#rules");
@@ -648,6 +719,7 @@ RULES.forEach(([title,body,why],i)=>{
   expandable(d,btn,det);
   d.append(btn,det); rulesHost.append(d);
 });
+document.querySelectorAll('.panel li[data-ask]').forEach(li=>li.addEventListener("click",()=>jAsk(li.dataset.ask)));
 
 // ---------- restore state ----------
 (function(){
@@ -664,9 +736,9 @@ RULES.forEach(([title,body,why],i)=>{
 
 // ================= LIVE (mcp) =================
 const SF_SERVER="Salesforce Production", AS_SERVER="Asana", PROJECT="1211042432693678";
-const Q_OPEN="SELECT CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE IsClosed = false AND RecordType.DeveloperName = 'Zeus' ORDER BY CreatedDate ASC LIMIT 200";
+const Q_OPEN="SELECT Id, CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE IsClosed = false AND RecordType.DeveloperName = 'Zeus' ORDER BY CreatedDate ASC LIMIT 200";
 const AS_INPUT={projects_any:PROJECT, completed:false, limit:100, opt_fields:"name,assignee.name,due_on,memberships.section.name,modified_at"};
-let mcpNS=null, liveCases=null, liveTasks=null, liveErr={sf:null,as:null}, liveAt=null;
+let mcpNS=null, liveCases=null, liveTasks=null, liveErr={sf:null,as:null}, liveAt=null, todayFilter=null;
 
 function melbTodayISO(){
   try{return new Intl.DateTimeFormat("en-CA",{timeZone:"Australia/Melbourne"}).format(new Date());}
@@ -710,47 +782,83 @@ function taskFacts(){
   const unassigned=tasks.filter(t=>!t.assignee);
   return {tasks,overdue,blocked,unassigned,secOf};
 }
+function caseRow(r,cf,why){
+  const row=el("div","trow actionable",
+    `<div class="t1">${esc(r.CaseNumber)} · ${esc(r.Subject||"(no subject)")}</div><div class="t2">${esc(r.Status)}${r.Type?" · "+esc(r.Type):" · no type"} · ${esc(cf.owner(r)||"?")} · ${esc(why)}</div>`);
+  const acts=el("div","rowacts");
+  const b1=el("button",null,"triage"); b1.addEventListener("click",e=>{e.stopPropagation();jAsk("Triage case "+r.CaseNumber+" ("+(r.Subject||"")+"): what is it, what should happen next, and draft the move.");});
+  const b2=el("button",null,"reply"); b2.addEventListener("click",e=>{e.stopPropagation();jPre("Reply to case "+r.CaseNumber+": ");});
+  const b3=el("button",null,"close"); b3.addEventListener("click",e=>{e.stopPropagation();jPre("Close case "+r.CaseNumber+" as resolved");});
+  acts.append(b1,b2,b3); row.append(acts);
+  row.addEventListener("click",()=>jPre("Summarise case "+r.CaseNumber+" and recommend the next action."));
+  return row;
+}
+function taskRow(t,tf){
+  const row=el("div","trow actionable",
+    `<div class="t1">${esc(t.name)}</div><div class="t2">${esc(t.assignee?t.assignee.name:"unassigned")}${t.due_on?" · due "+esc(t.due_on):""} · ${esc(tf.secOf(t))}</div>`);
+  const acts=el("div","rowacts");
+  const b1=el("button",null,"ask"); b1.addEventListener("click",e=>{e.stopPropagation();jAsk("On the board task \""+t.name+"\": what is its state and what should happen next?");});
+  const b2=el("button",null,"comment"); b2.addEventListener("click",e=>{e.stopPropagation();jPre("Comment on the task \""+t.name+"\": ");});
+  const b3=el("button",null,"complete"); b3.addEventListener("click",e=>{e.stopPropagation();jPre("Complete the task \""+t.name+"\"");});
+  acts.append(b1,b2,b3); row.append(acts);
+  return row;
+}
 function renderToday(){
   const deg=$("#today-degraded"), content=$("#today-content");
   if(!mcpNS){ deg.hidden=false; content.hidden=true; $("#asof").textContent="live data unavailable in this view"; return; }
   deg.hidden=true; content.hidden=false;
   const cf=caseFacts(), tf=taskFacts();
   const tiles=$("#tiles"); tiles.innerHTML="";
-  const tile=(v,l,cls)=>tiles.append(el("div","tile"+(cls?" "+cls:""),`<div class="v">${v}</div><div class="l">${esc(l)}</div>`));
+  const tile=(v,l,cls,filter)=>{
+    const t=el("div","tile"+(cls?" "+cls:"")+(todayFilter===filter&&filter?" active":""),`<div class="v">${v}</div><div class="l">${esc(l)}</div>`);
+    if(filter){ t.dataset.filter=filter; t.addEventListener("click",()=>{todayFilter=(todayFilter===filter?null:filter); renderToday();}); }
+    tiles.append(t);
+  };
   if(liveErr.sf){ tiles.append(el("div","tile crit",`<div class="v">!</div><div class="l">${esc(mcpErrCopy(liveErr.sf,SF_SERVER))}</div>`)); }
   else if(liveCases){
-    tile(cf.recs.length,"open cases", cf.recs.length>25?"warn":"");
-    tile(cf.unassigned.length,"unassigned (Zeus queue)", cf.unassigned.length?"warn":"ok");
-    tile(cf.newOld.length,"New past 2 bus. days", cf.newOld.length?"crit":"ok");
-    tile(cf.aged.length,"open 30+ days", cf.aged.length?"warn":"ok");
-    tile(cf.untyped.length,"untyped", cf.untyped.length?"warn":"ok");
+    tile(cf.recs.length,"open cases", cf.recs.length>25?"warn":"", "all");
+    tile(cf.unassigned.length,"unassigned (Zeus queue)", cf.unassigned.length?"warn":"ok", "unassigned");
+    tile(cf.newOld.length,"New past 2 bus. days", cf.newOld.length?"crit":"ok", "new");
+    tile(cf.aged.length,"open 30+ days", cf.aged.length?"warn":"ok", "aged");
+    tile(cf.untyped.length,"untyped", cf.untyped.length?"warn":"ok", "untyped");
   } else tile("...","queue loading");
   if(liveErr.as){ tiles.append(el("div","tile crit",`<div class="v">!</div><div class="l">${esc(mcpErrCopy(liveErr.as,AS_SERVER))}</div>`)); }
   else if(liveTasks){
-    tile(tf.overdue.length,"board overdue", tf.overdue.length?"warn":"ok");
-    tile(tf.blocked.length,"in Blocked", tf.blocked.length?"warn":"ok");
+    tile(tf.overdue.length,"board overdue", tf.overdue.length?"warn":"ok", "overdue");
+    tile(tf.blocked.length,"in Blocked", tf.blocked.length?"warn":"ok", "blocked");
   } else tile("...","board loading");
 
   const q=$("#qlist"); q.innerHTML="";
+  const qtitles={all:"Queue: all open (oldest first)",unassigned:"Queue: unassigned",new:"Queue: New past 2 business days",aged:"Queue: open 30+ days",untyped:"Queue: untyped"};
+  $("#qtitle").textContent = qtitles[todayFilter] || "Queue: needs action first";
   if(liveCases){
-    const picks=[...cf.unassigned, ...cf.newOld.filter(r=>cf.owner(r)!=="Zeus"), ...cf.aged.filter(r=>cf.owner(r)!=="Zeus"&&!(r.Status==="New"))].slice(0,8);
-    if(!picks.length) q.append(el("div","trow empty","Nothing demanding action. Queue is in shape."));
+    let picks;
+    if(todayFilter==="all") picks=cf.recs.slice(0,15);
+    else if(todayFilter==="unassigned") picks=cf.unassigned;
+    else if(todayFilter==="new") picks=cf.newOld;
+    else if(todayFilter==="aged") picks=cf.aged;
+    else if(todayFilter==="untyped") picks=cf.untyped.slice(0,15);
+    else picks=[...cf.unassigned, ...cf.newOld.filter(r=>cf.owner(r)!=="Zeus"), ...cf.aged.filter(r=>cf.owner(r)!=="Zeus"&&r.Status!=="New")].slice(0,8);
+    if(!picks.length) q.append(el("div","trow empty","Nothing here. Queue is in shape."));
     picks.forEach(r=>{
       const why=cf.owner(r)==="Zeus"?"unassigned":(r.Status==="New"?bizDaysSince(r.CreatedDate)+" bus. days in New":ageDays(r.CreatedDate)+" days old");
-      q.append(el("div","trow",`<div class="t1">${esc(r.CaseNumber)} · ${esc(r.Subject||"(no subject)")}</div><div class="t2">${esc(r.Status)}${r.Type?" · "+esc(r.Type):" · no type"} · ${esc(cf.owner(r)||"?")} · ${esc(why)}</div>`));
+      q.append(caseRow(r,cf,why));
     });
   } else q.append(el("div","trow empty","Waiting on Salesforce..."));
 
   const b=$("#blist"); b.innerHTML="";
+  $("#btitle").textContent = todayFilter==="overdue"?"Board: overdue":todayFilter==="blocked"?"Board: Blocked":"Board: needs attention";
   if(liveTasks){
-    const picks=[...tf.overdue, ...tf.blocked.filter(t=>!tf.overdue.includes(t))].slice(0,8);
+    let picks;
+    if(todayFilter==="overdue") picks=tf.overdue;
+    else if(todayFilter==="blocked") picks=tf.blocked;
+    else picks=[...tf.overdue, ...tf.blocked.filter(t=>!tf.overdue.includes(t))].slice(0,8);
     if(!picks.length) b.append(el("div","trow empty","No overdue or blocked items surfaced."));
-    picks.forEach(t=>{
-      b.append(el("div","trow",`<div class="t1">${esc(t.name)}</div><div class="t2">${esc(t.assignee?t.assignee.name:"unassigned")}${t.due_on?" · due "+esc(t.due_on):""} · ${esc(tf.secOf(t))}</div>`));
-    });
+    picks.forEach(t=>b.append(taskRow(t,tf)));
   } else b.append(el("div","trow empty","Waiting on Asana..."));
 
   $("#asof").textContent = liveAt ? ("as at "+new Date(liveAt).toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"})) : "loading...";
+  updateTicker();
 }
 renderToday();
 
@@ -792,9 +900,24 @@ renderToday();
 })();
 
 // ================= JARVIS =================
+let updateTicker=()=>{};
 (async function(){
   const log=$("#jlog"), input=$("#jin"), sendBtn=$("#jsend"),
-        micBtn=$("#jmic"), spkBtn=$("#jspk"), orb=$("#jorb"), note=$("#jnote"), chips=$("#jchips");
+        micBtn=$("#jmic"), spkBtn=$("#jspk"), orb=$("#jorb"), note=$("#jnote"), chips=$("#jchips"), sub=$("#jsub");
+
+  // status ticker
+  let tickerFacts=["systems nominal"], tickerI=0;
+  updateTicker=function(){
+    const f=[];
+    if(liveCases){const cf=caseFacts(); f.push(cf.recs.length+" open cases");
+      if(cf.unassigned.length) f.push(cf.unassigned.length+" unassigned in the Zeus queue");
+      if(cf.newOld.length) f.push(cf.newOld.length+" in New past 2 business days");}
+    if(liveTasks){const tf=taskFacts(); if(tf.overdue.length) f.push(tf.overdue.length+" board items overdue");}
+    f.push("13 routines on watch");
+    tickerFacts=f.length?f:["systems nominal"];
+  };
+  setInterval(()=>{ sub.textContent=tickerFacts[tickerI++%tickerFacts.length]; },5000);
+  sub.textContent="online";
 
   const KNOWLEDGE = JSON.stringify({
     as_at:"2 Sep 2026", timezone:"AEST (UTC+10), DST one-shot adjusts crons 5 Oct 2026",
@@ -813,16 +936,18 @@ renderToday();
     watching:["Thu 3 Sep 7:04am first deep slot of merged weekday job","Weekend 5-7 Sep first run of merged weekend job incl Sunday security refresh","Mon 8 Sep 6am first weekly audit self-run"],
     governance_loop:["Propose exact change","Mathew approves","Execute and verify","Record in os/registers.md, same commit"],
     automation_signals: AUTOMATION_SIGNALS,
-    case_model:"Cases live on RecordType.DeveloperName='Zeus' (ALWAYS scope Case queries with it; without it 19 record types inflate counts ~200x). Owner.Name='Zeus' is the unassigned intake queue, not a person. Closing a Case needs Status='Closed' AND Case_Closed_Reason__c. Statuses include New, In Progress, Waiting Response-External, Response Received, Closed. Asana project gid is 1211042432693678 (IT Operations Project Plan, 8 sections incl Backlog/Requests, In Development/Progress, Blocked, Done).",
+    case_model:{scope:"Cases live on RecordType.DeveloperName='Zeus' (ALWAYS scope Case queries with it). Owner.Name='Zeus' is the unassigned intake queue, not a person. Asana project gid 1211042432693678.",
+      statuses:STATUSES, close_reasons:CLOSE_REASONS,
+      closing:"Closing needs Status='Closed' AND Case_Closed_Reason__c from the list. Set Type too if blank (Admin, Troubleshooting, IAM, New User, Departing Staff, New Feature, Purchase/Renew, Spam)."},
     sources:"Authoritative: os/README.md (rules), os/registers.md (state of record), .claude/skills/claude-os (operator skill), routines/ (backups) in mathewruahema-beep/Birdlife"
   });
 
   const INSTRUCTIONS =
-    "You are JARVIS, the daily console assistant on the BirdLife Claude Operating System page, working for Mathew Hema (Senior Manager ICT, BirdLife Australia) and his ICT team (Andrew Dunn, Keith Tsui, Nina Lewis). " +
+    "You are JARVIS, the console assistant on BirdLife Australia's Claude Operating System page, working for Mathew Hema (Senior Manager ICT) and his ICT team (Andrew Dunn, Keith Tsui, Nina Lewis). Persona: composed, dry, capable, a touch of wit, never sycophantic. Address Mathew as sir sparingly, at most once per reply.\n" +
     "Style: frank, specific, brief. Plain text only, no markdown syntax, no headings, no em dashes (use commas or full stops). Lead with the answer. Quote real trigger IDs, case numbers, crons and dates, never invent one.\n" +
-    "You may have page tools. When the question is about the current queue or board, call get_today_snapshot first. For other Salesforce questions write one precise SOQL SELECT and call salesforce_read (SELECT only, always add LIMIT, and ALWAYS scope Case queries with RecordType.DeveloperName='Zeus'). For board lookups call asana_search. Call show to move the page to a tab or day when the user asks to see something. If a tool errors, relay its message plainly.\n" +
-    "Doing work: you cannot write to any system from this page. When Mathew wants something done (reply to a case, close a case, create or change a routine, fix something), produce the exact ask to paste into a Claude session on mathewruahema-beep/Birdlife, complete with the specific case numbers or trigger IDs, and remind him case replies can also be worked in the ICT Console artefact. Follow the governance loop for estate changes.\n" +
-    "Finding automations: when asked, use automation_signals plus live data from your tools. Propose at most 3 candidates, each with: name, schedule, exact write posture and hard caps, connectors needed, which existing routine could absorb it (rule 2, one job per outcome), and the budget impact (rule 3, currently 13 of 12). End with the exact session ask to create the best one through the OS change control.\n" +
+    "Tools, when available: get_today_snapshot first for queue or board questions. salesforce_read for other Salesforce reads (one SOQL SELECT, always LIMIT, always RecordType.DeveloperName='Zeus' on Case queries). asana_search for board lookups. show to navigate the page.\n" +
+    "ACTIONS you can execute, each behind an approval card the user must tap: case_internal_note, case_reply (public comment the requester can see, optionally set a new Status such as Waiting Response-External), case_close (needs a close reason from the exact list; set Type if blank), task_comment and task_complete (need the task gid, get it from get_today_snapshot or asana_search). Before calling a write tool, state in one or two lines exactly what you are about to do. Draft replies warm and plain in Mathew's voice: direct, no corporate filler, commitments like 'I will come back to you either way', sign-off 'Thanks'. If the approval card is cancelled, accept it and stop. Report the verified result the tool returns, never assume success. Never bulk actions: one record at a time. Reassigning cases, sending email, Entra or M365 admin, and Salesforce config are NOT yours: give the exact ask for a Claude session on mathewruahema-beep/Birdlife instead.\n" +
+    "Finding automations: use automation_signals plus live data. Propose at most 3, each with name, schedule, exact write posture and hard caps, connectors, which existing routine could absorb it (rule 2), and budget impact (rule 3, currently 13 of 12). End with the session ask to create the best one through the OS change control.\n" +
     "If something is not in the state pack or reachable by a tool, say so in one line and point at os/registers.md or a session; never guess.\n\nSTATE PACK:\n";
 
   const turns = [];
@@ -844,6 +969,22 @@ renderToday();
     busy = v; orb.classList.toggle("busy", v);
     sendBtn.textContent = v ? "■" : "↑"; sendBtn.title = v ? "Stop" : "Ask";
   }
+  function requestApproval(title, detail, signal){
+    return new Promise(res=>{
+      const card=el("div","japprove",
+        `<div class="at">Approval required</div><div class="ad"><b>${esc(title)}</b>\n${esc(detail)}</div>`);
+      const bar=el("div","ab");
+      const ok=el("button","approve","Approve"), no=el("button","cancel","Cancel");
+      let done=false;
+      const finish=v=>{ if(done)return; done=true; card.remove(); res(v); };
+      ok.addEventListener("click",()=>finish(true));
+      no.addEventListener("click",()=>finish(false));
+      if(signal) signal.addEventListener("abort",()=>finish(false));
+      setTimeout(()=>finish(false),120000);
+      bar.append(ok,no); card.append(bar);
+      log.append(card); log.classList.add("on"); log.scrollTop=log.scrollHeight;
+    });
+  }
   const ERRCOPY = {
     rate_limited:"Rate limited. Give it a minute and try again.",
     session_expired:"Your Claude session expired. Sign in again and retry.",
@@ -855,11 +996,22 @@ renderToday();
   const HIDE_CODES = ["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"];
 
   function clip(v,max){ let s; try{s=typeof v==="string"?v:JSON.stringify(v);}catch(e){s=String(v);} return s.length>max? s.slice(0,max)+"...[trimmed]" : s; }
+  async function sfQ(q,signal){ const r=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q},{signal,cache:false}); return r.payload; }
+  async function resolveCase(caseNumber){
+    const cn=String(caseNumber||"").replace(/[^0-9]/g,"");
+    if(!cn) throw new Error("No case number given");
+    const p=await sfQ("SELECT Id, CaseNumber, Subject, Status, Type, Owner.Name FROM Case WHERE CaseNumber = '"+cn+"' LIMIT 2");
+    const recs=(p&&p.records)||[];
+    if(recs.length!==1) throw new Error(recs.length?"More than one case matches "+cn:"No case found with number "+cn);
+    return recs[0];
+  }
+  function afterWrite(){ try{mcpNS.invalidate(SF_SERVER);}catch(e){} try{mcpNS.invalidate(AS_SERVER);}catch(e){} }
+
   function buildTools(){
     if(!sampleLimits || !sampleLimits.tools) return undefined;
-    return [
+    const tools=[
       {name:"get_today_snapshot",
-       description:"Returns the live Ask Zeus queue and Asana board snapshot the page is already displaying: counts, unassigned cases, aged and untyped cases, overdue and blocked tasks, with case numbers and task names. Use first for any question about the current queue, board, or today's workload.",
+       description:"Returns the live Ask Zeus queue and Asana board snapshot: counts, unassigned, aged and untyped cases with case numbers, overdue and blocked tasks with their gids. Use first for any question about the current queue, board, or today's workload.",
        execute(){
          if(!mcpNS) throw new Error("Live connectors are not available in this view");
          const cf=caseFacts(), tf=taskFacts();
@@ -869,44 +1021,40 @@ renderToday();
              unassigned:cf.unassigned.map(r=>({n:r.CaseNumber,s:r.Subject,status:r.Status,age_days:ageDays(r.CreatedDate)})),
              new_past_2bd:cf.newOld.map(r=>({n:r.CaseNumber,s:r.Subject,owner:cf.owner(r),bus_days:bizDaysSince(r.CreatedDate)})),
              open_30d_plus:cf.aged.map(r=>({n:r.CaseNumber,s:r.Subject,owner:cf.owner(r),age_days:ageDays(r.CreatedDate)})),
-             untyped_count:cf.untyped.length },
+             untyped:cf.untyped.slice(0,20).map(r=>({n:r.CaseNumber,s:r.Subject})) },
            board:{ total:tf.tasks.length,
-             overdue:tf.overdue.map(t=>({name:t.name,assignee:t.assignee?t.assignee.name:null,due:t.due_on,section:tf.secOf(t)})),
-             blocked:tf.blocked.map(t=>({name:t.name,assignee:t.assignee?t.assignee.name:null,section:tf.secOf(t)})),
+             overdue:tf.overdue.map(t=>({gid:t.gid,name:t.name,assignee:t.assignee?t.assignee.name:null,due:t.due_on,section:tf.secOf(t)})),
+             blocked:tf.blocked.map(t=>({gid:t.gid,name:t.name,assignee:t.assignee?t.assignee.name:null,section:tf.secOf(t)})),
              unassigned_count:tf.unassigned.length },
            errors:{salesforce:liveErr.sf?mcpErrCopy(liveErr.sf,SF_SERVER):null, asana:liveErr.as?mcpErrCopy(liveErr.as,AS_SERVER):null}
          },12000);
        }},
       {name:"salesforce_read",
-       description:"Runs one read-only SOQL SELECT against Salesforce Production with the viewer's own access and returns the JSON result. Use for Salesforce questions beyond the snapshot (history, counts, other objects). SELECT statements only; always include LIMIT; always scope Case queries with RecordType.DeveloperName='Zeus'.",
+       description:"Runs one read-only SOQL SELECT against Salesforce Production with the viewer's own access and returns the JSON result. SELECT statements only; always include LIMIT; always scope Case queries with RecordType.DeveloperName='Zeus'.",
        inputSchema:{type:"object",properties:{q:{type:"string",description:"One SOQL SELECT statement"}},required:["q"]},
        async execute(input,context){
          if(!mcpNS) throw new Error("Live connectors are not available in this view");
          const q=String(input.q||"").trim();
          if(!/^select\s/i.test(q) || q.includes(";")) throw new Error("Only a single SOQL SELECT is allowed");
-         const tn=toolNote("Jarvis is querying Salesforce...");
-         try{
-           const res=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q},{signal:context.signal,cache:{staleTime:30000}});
-           return clip(res.payload,12000);
-         }catch(e){ throw new Error(mcpErrCopy(e,SF_SERVER)); }
+         const tn=toolNote("querying Salesforce...");
+         try{ return clip((await mcpNS.callTool(SF_SERVER,"soqlQuery",{q},{signal:context.signal,cache:{staleTime:30000}})).payload,12000); }
+         catch(e){ throw new Error(mcpErrCopy(e,SF_SERVER)); }
          finally{ tn.remove(); }
        }},
       {name:"asana_search",
-       description:"Searches the IT Operations Project Plan in Asana (read-only, viewer's access). Returns tasks with name, assignee, due date and section. Provide text to search names and descriptions, or omit it to list incomplete tasks.",
-       inputSchema:{type:"object",properties:{text:{type:"string",description:"Search text, optional"},completed:{type:"boolean",description:"true to include only completed tasks; default false"}}},
+       description:"Searches the IT Operations Project Plan in Asana (read-only). Returns tasks with gid, name, assignee, due date and section. Provide text to search, or omit to list incomplete tasks.",
+       inputSchema:{type:"object",properties:{text:{type:"string"},completed:{type:"boolean"}}},
        async execute(input,context){
          if(!mcpNS) throw new Error("Live connectors are not available in this view");
          const args={projects_any:PROJECT, completed:!!input.completed, limit:25, opt_fields:"name,assignee.name,due_on,memberships.section.name,modified_at"};
          if(input.text) args.text=String(input.text).slice(0,200);
-         const tn=toolNote("Jarvis is searching Asana...");
-         try{
-           const res=await mcpNS.callTool(AS_SERVER,"search_tasks",args,{signal:context.signal,cache:{staleTime:30000}});
-           return clip(res.payload,12000);
-         }catch(e){ throw new Error(mcpErrCopy(e,AS_SERVER)); }
+         const tn=toolNote("searching Asana...");
+         try{ return clip((await mcpNS.callTool(AS_SERVER,"search_tasks",args,{signal:context.signal,cache:{staleTime:30000}})).payload,12000); }
+         catch(e){ throw new Error(mcpErrCopy(e,AS_SERVER)); }
          finally{ tn.remove(); }
        }},
       {name:"show",
-       description:"Navigates this page for the user. tab is one of today, system, schedule, registers, rules. day (0=Mon..6=Sun) optionally selects a schedule day. Returns confirmation.",
+       description:"Navigates this page. tab is one of today, system, schedule, registers, rules; day (0=Mon..6=Sun) optionally selects a schedule day.",
        inputSchema:{type:"object",properties:{tab:{type:"string"},day:{type:"number"}},required:["tab"]},
        execute(input){
          const tab=String(input.tab||"").toLowerCase();
@@ -914,8 +1062,89 @@ renderToday();
          showView(tab);
          if(tab==="schedule" && input.day!==undefined){ const d=Math.max(0,Math.min(6,Number(input.day)||0)); renderDay(d); }
          return "Shown: "+tab;
+       }},
+      // ---- write actions, each behind an approval card ----
+      {name:"case_internal_note",
+       description:"Adds an INTERNAL comment to an Ask Zeus case (not visible to the requester) after the user approves. Provide case_number and note. Returns the verified result.",
+       inputSchema:{type:"object",properties:{case_number:{type:"string"},note:{type:"string"}},required:["case_number","note"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const c=await resolveCase(input.case_number);
+         const note=String(input.note||"").slice(0,4000);
+         const ok=await requestApproval("Internal note on case "+c.CaseNumber, (c.Subject||"")+"\n\n"+note+"\n\n(Internal only, requester cannot see it.)", context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:note,IsPublished:false}});
+         afterWrite();
+         return "Done. Internal note added to case "+c.CaseNumber+".";
+       }},
+      {name:"case_reply",
+       description:"Posts a PUBLIC comment on an Ask Zeus case (visible to the requester) after the user approves, and optionally sets a new Status (exact values: New, In Progress, Pending, On Hold-Internal, Waiting Response-External, Response Received). Provide case_number, reply, optional set_status. Verified by re-read.",
+       inputSchema:{type:"object",properties:{case_number:{type:"string"},reply:{type:"string"},set_status:{type:"string"}},required:["case_number","reply"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const c=await resolveCase(input.case_number);
+         const reply=String(input.reply||"").slice(0,4000);
+         const st=input.set_status?String(input.set_status):null;
+         if(st && !STATUSES.includes(st)) throw new Error("Unknown status '"+st+"'. Exact values: "+STATUSES.join(", "));
+         const ok=await requestApproval("Public reply on case "+c.CaseNumber, (c.Subject||"")+"\n\n"+reply+(st?"\n\nThen set Status: "+c.Status+" -> "+st:"")+"\n\n(Public, the requester can see this.)", context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:reply,IsPublished:true}});
+         if(st) await mcpNS.callTool(SF_SERVER,"updateSobjectRecord",{"sobject-name":"Case",id:c.Id,body:{Status:st}});
+         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:"[via BirdLife Claude OS console] Reply posted"+(st?", Status set to "+st:"")+".",IsPublished:false}});
+         const v=await sfQ("SELECT Status FROM Case WHERE Id = '"+c.Id+"' LIMIT 1");
+         afterWrite();
+         const vs=v&&v.records&&v.records[0]?v.records[0].Status:"unknown";
+         return "Done. Reply posted on case "+c.CaseNumber+"; verified Status is now "+vs+".";
+       }},
+      {name:"case_close",
+       description:"Closes an Ask Zeus case after the user approves. Provide case_number, reason (EXACTLY one of the close reasons in the state pack), optional type (set when the case has no Type), optional closing_note (internal). Verified by re-read.",
+       inputSchema:{type:"object",properties:{case_number:{type:"string"},reason:{type:"string"},type:{type:"string"},closing_note:{type:"string"}},required:["case_number","reason"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const reason=String(input.reason||"");
+         if(!CLOSE_REASONS.includes(reason)) throw new Error("Unknown close reason '"+reason+"'. Exact values: "+CLOSE_REASONS.join(" | "));
+         const c=await resolveCase(input.case_number);
+         const type=input.type?String(input.type):null;
+         const noteTxt=input.closing_note?String(input.closing_note).slice(0,2000):null;
+         const ok=await requestApproval("Close case "+c.CaseNumber, (c.Subject||"")+"\nStatus: "+c.Status+" -> Closed\nReason: "+reason+(type?"\nType: "+(c.Type||"(blank)")+" -> "+type:"")+(noteTxt?"\nInternal note: "+noteTxt:""), context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         const body={Status:"Closed",Case_Closed_Reason__c:reason}; if(type) body.Type=type;
+         await mcpNS.callTool(SF_SERVER,"updateSobjectRecord",{"sobject-name":"Case",id:c.Id,body});
+         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:"[via BirdLife Claude OS console] Closed: "+reason+(noteTxt?" | "+noteTxt:""),IsPublished:false}});
+         const v=await sfQ("SELECT Status, Case_Closed_Reason__c FROM Case WHERE Id = '"+c.Id+"' LIMIT 1");
+         afterWrite();
+         const vr=(v&&v.records&&v.records[0])||{};
+         return "Done. Case "+c.CaseNumber+" verified: Status "+(vr.Status||"unknown")+", reason "+(vr.Case_Closed_Reason__c||"unknown")+".";
+       }},
+      {name:"task_comment",
+       description:"Adds a comment to an Asana task on the IT Operations Project Plan after the user approves. Provide task_gid (from get_today_snapshot or asana_search), task_name (for the approval card), and text.",
+       inputSchema:{type:"object",properties:{task_gid:{type:"string"},task_name:{type:"string"},text:{type:"string"}},required:["task_gid","task_name","text"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const gid=String(input.task_gid||"").replace(/[^0-9]/g,"");
+         if(!gid) throw new Error("No task gid given");
+         const text=String(input.text||"").slice(0,3000);
+         const ok=await requestApproval("Comment on task: "+String(input.task_name||gid), text, context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         await mcpNS.callTool(AS_SERVER,"add_comment",{task_id:gid,text});
+         afterWrite();
+         return "Done. Comment added to \""+String(input.task_name||gid)+"\".";
+       }},
+      {name:"task_complete",
+       description:"Marks an Asana task complete on the IT Operations Project Plan after the user approves. Provide task_gid and task_name. Reports Asana's succeeded or failed result.",
+       inputSchema:{type:"object",properties:{task_gid:{type:"string"},task_name:{type:"string"}},required:["task_gid","task_name"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const gid=String(input.task_gid||"").replace(/[^0-9]/g,"");
+         if(!gid) throw new Error("No task gid given");
+         const ok=await requestApproval("Complete task: "+String(input.task_name||gid), "Marks the task complete on the IT Operations Project Plan.", context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         const r=await mcpNS.callTool(AS_SERVER,"update_tasks",{tasks:[{task:gid,completed:true}]});
+         afterWrite();
+         return "Asana result: "+clip(r.payload,1500);
        }}
     ];
+    return tools;
   }
 
   async function ask(q){
@@ -945,7 +1174,7 @@ renderToday();
       }else if(e && HIDE_CODES.includes(e.code)){
         out.remove(); turns.pop(); disableJarvis("Jarvis is not available for this account.");
       }else if(e && e.code==="tools_unavailable"){
-        sampleLimits = {maxPromptBytes:65536}; // drop tools, retry is manual
+        sampleLimits = {maxPromptBytes:65536};
         out.className="jmsg err"; out.textContent="This viewer cannot run live tools; asking again will answer from the registers only.";
         turns.pop();
       }else{
@@ -958,16 +1187,17 @@ renderToday();
       setBusy(false); ctl = null; log.scrollTop = log.scrollHeight;
     }
   }
+  JarvisBus.ask = q=>ask(q);
+  JarvisBus.prefill = q=>{ input.value=q; try{input.focus();}catch(e){} };
 
   sendBtn.addEventListener("click", ()=>{ if(busy){ ctl?.abort(); } else ask(); });
   input.addEventListener("keydown", e=>{ if(e.key==="Enter" && !busy) ask(); });
 
   [["Triage my queue","Triage my queue: what needs action right now and in what order? Use the live snapshot."],
    ["Find automations","Find automation candidates for us, using the automation signals and the live queue and board."],
-   ["Draft the ask","I want to work the most urgent case. Give me the exact ask to paste into a Claude session, with the case number."],
+   ["Work the worst case","Look at the live queue, pick the case most needing action, summarise it, and propose the move. If it warrants a reply or close, draft it and I will approve."],
    ["What runs tomorrow?","What runs tomorrow morning, in order?"],
-   ["Why 13 routines?","Why are there 13 routines against a budget of 12, and what are my options?"],
-   ["What changed 2 Sep?","Summarise what changed in the consolidation on 2 Sep."]
+   ["Why 13 routines?","Why are there 13 routines against a budget of 12, and what are my options?"]
   ].forEach(([label,q])=>{
     const c = el("button",null,esc(label));
     c.addEventListener("click",()=>ask(q));
@@ -983,7 +1213,12 @@ renderToday();
       speechSynthesis.cancel();
       const clean = text.replace(/trig_[A-Za-z0-9]+/g,"").replace(/https?:\S+/g,"a link").replace(/[·|]/g,",");
       const u = new SpeechSynthesisUtterance(clean.slice(0,1200));
-      u.lang = "en-AU"; u.rate = 1.04;
+      u.lang = "en-AU"; u.rate = 1.05;
+      try{
+        const vs=speechSynthesis.getVoices();
+        const v=vs.find(x=>/en-GB/i.test(x.lang)&&/male|daniel|arthur/i.test(x.name))||vs.find(x=>/en-AU/i.test(x.lang));
+        if(v) u.voice=v;
+      }catch(e){}
       speechSynthesis.speak(u);
     }catch(e){}
   }
@@ -992,7 +1227,7 @@ renderToday();
     spkBtn.setAttribute("aria-pressed", String(speakOn));
     remember("speak", speakOn?"1":"0");
     if(!speakOn){ try{speechSynthesis.cancel();}catch(e){} }
-    else speak("Voice on.");
+    else speak("Voice on, sir.");
   });
   if(!("speechSynthesis" in window)) spkBtn.hidden = true;
 
@@ -1023,7 +1258,8 @@ renderToday();
   function disableJarvis(msg){
     input.disabled = true; sendBtn.disabled = true; micBtn.hidden = true;
     note.textContent = msg; note.classList.add("on");
-    $("#jsub").textContent = "unavailable in this view";
+    sub.textContent = "unavailable in this view";
+    JarvisBus.ask = null; JarvisBus.prefill = null;
   }
 
   try{ sample = await claude.use("sample"); }catch(e){ sample = null; }
@@ -1032,7 +1268,16 @@ renderToday();
     return;
   }
   try{ sampleLimits = await sample.limits(); }catch(e){ sampleLimits = {maxPromptBytes:65536}; }
-  note.textContent = "First question asks your permission; answers spend your own Claude usage, and live lookups use your connectors, read-only. For writes, Jarvis hands you the exact session ask.";
+
+  // boot greeting, typed, no usage spent
+  (function(){
+    const hour=(()=>{try{return +new Intl.DateTimeFormat("en-AU",{hour:"numeric",hour12:false,timeZone:"Australia/Melbourne"}).format(new Date());}catch(e){return new Date().getHours();}})();
+    const greet=hour<12?"Good morning":hour<17?"Good afternoon":"Good evening";
+    const msg=greet+", Mathew. JARVIS online. All estate registers loaded; live queue and board connecting. Ask, or tap anything on the page.";
+    const b=bubble("jarvis","");
+    let i=0; const iv=setInterval(()=>{ b.textContent=msg.slice(0,++i); if(i>=msg.length){clearInterval(iv);} },12);
+  })();
+  note.textContent = "First question asks your permission; answers spend your Claude usage, live lookups use your connectors. Writes always show an Approve card first and are verified by re-read.";
   note.classList.add("on");
   setTimeout(()=>note.classList.remove("on"), 14000);
 })();
