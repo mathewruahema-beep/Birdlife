@@ -98,6 +98,11 @@ h2.vt{font-size:22px;font-weight:600;margin-bottom:4px}
 .rowacts button:hover{background:var(--surface2)}
 .degraded{background:var(--surface);border:1px dashed var(--line2);border-radius:12px;padding:16px 18px;color:var(--ink2);font-size:14px}
 .degraded b{color:var(--ink)}
+.unread{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:1px}
+.boardwrap{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;align-items:flex-start}
+.bcol{min-width:240px;max-width:300px;flex:1;background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden}
+.bcol h3{font-size:13px;font-weight:600;padding:9px 13px;background:var(--surface2);border-bottom:1px solid var(--line)}
+.bcol h3 .cnt{font-family:var(--mono);color:var(--ink3);font-weight:400;margin-left:6px;font-size:12px}
 
 .stack{border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--surface);box-shadow:0 1px 3px var(--glow)}
 .layer{border-top:1px solid var(--line)}
@@ -283,6 +288,7 @@ footer .mono{font-size:11.5px}
 
 <nav class="tabs" role="tablist" aria-label="Sections">
   <button role="tab" data-view="today" aria-selected="true">Today</button>
+  <button role="tab" data-view="board" aria-selected="false">Board</button>
   <button role="tab" data-view="system" aria-selected="false">The system</button>
   <button role="tab" data-view="schedule" aria-selected="false">Schedule</button>
   <button role="tab" data-view="registers" aria-selected="false">Registers</button>
@@ -304,9 +310,20 @@ footer .mono{font-size:11.5px}
         <div class="tlist"><h3 id="qtitle">Queue: needs action first</h3><div id="qlist"></div></div>
         <div class="tlist"><h3 id="btitle">Board: needs attention</h3><div id="blist"></div></div>
       </div>
-      <p class="schednote">Scope: Record Type = Ask Zeus only, project = IT Operations Project Plan only. Owner "Zeus" is the unassigned intake queue, not a person. Reply, close, comment and complete run through Jarvis with your explicit approval on each write, and every change is verified by re-reading the record.</p>
+      <div class="todaycols" style="margin-top:14px">
+        <div class="tlist"><h3 id="mtitle">Inbox: recent from people</h3><div id="mlist"><div class="trow empty">Waiting on Microsoft 365...</div></div></div>
+        <div class="tlist"><h3 id="ttitle">Teams: latest messages</h3><div id="tlist2"><div class="trow empty">Waiting on Microsoft 365...</div></div></div>
+      </div>
+      <p class="schednote">Scope: Record Type = Ask Zeus only, project = IT Operations Project Plan only. Owner "Zeus" is the unassigned intake queue, not a person. Reply, close, comment and complete run through Jarvis with your explicit approval on each write, and every change is verified by re-reading the record. Email replies are created as Outlook DRAFTS only, never sent; Teams has no send API, so Teams replies are drafted for you to copy.</p>
     </div>
   </div>
+</div>
+
+<!-- ============ BOARD ============ -->
+<div class="view" id="view-board" hidden>
+  <h2 class="vt">IT Operations Project Plan</h2>
+  <p class="lede">The live board by section, through your Asana connector. Tap a task to load Jarvis; comment, complete and move run through the same Approve cards.</p>
+  <div id="boardhost"><div class="degraded">Board loads inside the Claude viewer with the Asana connector allowed.</div></div>
 </div>
 
 <!-- ============ SYSTEM ============ -->
@@ -568,7 +585,7 @@ function jAsk(q){ if(JarvisBus.ask) JarvisBus.ask(q); else if(JarvisBus.prefill)
 function jPre(q){ if(JarvisBus.prefill) JarvisBus.prefill(q); }
 
 // ---------- tabs ----------
-const VIEWS=["today","system","schedule","registers","rules"];
+const VIEWS=["today","board","system","schedule","registers","rules"];
 const tabs=[...document.querySelectorAll('nav.tabs button')];
 function showView(v){
   if(!VIEWS.includes(v)) return;
@@ -738,7 +755,97 @@ document.querySelectorAll('.panel li[data-ask]').forEach(li=>li.addEventListener
 const SF_SERVER="Salesforce Production", AS_SERVER="Asana", PROJECT="1211042432693678";
 const Q_OPEN="SELECT Id, CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE IsClosed = false AND RecordType.DeveloperName = 'Zeus' ORDER BY CreatedDate ASC LIMIT 200";
 const AS_INPUT={projects_any:PROJECT, completed:false, limit:100, opt_fields:"name,assignee.name,due_on,memberships.section.name,modified_at"};
-let mcpNS=null, liveCases=null, liveTasks=null, liveErr={sf:null,as:null}, liveAt=null, todayFilter=null;
+const M365_SERVER="Microsoft 365";
+let mcpNS=null, liveCases=null, liveTasks=null, liveMail=null, liveChat=null, chatMap={}, liveErr={sf:null,as:null,m365:null}, liveAt=null, todayFilter=null;
+// M365 tools return one JSON block per item; parse all text blocks, drop pagination trailers
+function blocks(res){
+  const out=[];
+  for(const c of ((res&&res.content)||[])) if(c.type==="text"){ try{const v=JSON.parse(c.text); if(v&&typeof v==="object"&&!("moreResults"in v)&&!("nextOffset"in v)&&!("nextCursor"in v)) out.push(v);}catch(e){} }
+  return out;
+}
+function stripHtml(s){ const d=document.createElement("div"); d.innerHTML=String(s||""); return (d.textContent||"").trim(); }
+const AUTOMATED_SENDER=/no-?reply|donotreply|notifications?@|newsletter|@asana\.com|amazonses|mailer|automated/i;
+function mailFacts(){
+  const all=Array.isArray(liveMail)?liveMail:[];
+  const people=all.filter(m=>!AUTOMATED_SENDER.test(m.sender||""));
+  return {all, people, unread:people.filter(m=>!m.isRead)};
+}
+function chatFacts(){
+  const msgs=Array.isArray(liveChat)?liveChat:[];
+  const seen=new Set(), latest=[];
+  for(const m of msgs){ if(!seen.has(m.chatId)){ seen.add(m.chatId); latest.push(m); } }
+  return {msgs, latest};
+}
+function chatLabel(id){
+  const c=chatMap[id];
+  if(!c) return "Teams chat";
+  if(c.topic) return c.topic;
+  const others=(c.members||[]).map(m=>m.displayName).filter(n=>n&&!/mathew hema/i.test(n));
+  return others.slice(0,3).join(", ")||"Teams chat";
+}
+function renderExtras(){
+  const ml=$("#mlist"); if(!ml) return;
+  const mf=mailFacts();
+  ml.innerHTML="";
+  $("#mtitle").textContent="Inbox: recent from people"+(mf.unread.length?" · "+mf.unread.length+" unread":"");
+  if(liveErr.m365){ ml.append(el("div","trow empty",esc(mcpErrCopy(liveErr.m365,M365_SERVER)))); }
+  else if(!liveMail){ ml.append(el("div","trow empty","Waiting on Microsoft 365...")); }
+  else if(!mf.people.length){ ml.append(el("div","trow empty","Nothing recent from real people. Automated mail is filtered out.")); }
+  else mf.people.slice(0,8).forEach(m=>{
+    const when=new Date(m.receivedDateTime).toLocaleString("en-AU",{weekday:"short",hour:"2-digit",minute:"2-digit"});
+    const row=el("div","trow actionable",
+      `<div class="t1">${m.isRead?"":'<span class="unread"></span>'}${esc(m.sender||"?")} · ${esc(m.subject||"(no subject)")}</div><div class="t2">${esc(when)} · ${esc((m.summary||"").slice(0,110))}</div>`);
+    const acts=el("div","rowacts");
+    const b1=el("button",null,"ask"); b1.addEventListener("click",e=>{e.stopPropagation();jAsk("Summarise the email from "+(m.sender||"")+" with subject \""+(m.subject||"")+"\" and recommend how to respond.");});
+    const b2=el("button",null,"draft reply"); b2.addEventListener("click",e=>{e.stopPropagation();jPre("Draft an Outlook reply to the email from "+(m.sender||"")+" with subject \""+(m.subject||"")+"\": ");});
+    if(m.webLink){ const b3=el("button",null,"open"); b3.addEventListener("click",e=>{e.stopPropagation();window.open(m.webLink,"_blank","noopener");}); acts.append(b1,b2,b3); }
+    else acts.append(b1,b2);
+    row.append(acts);
+    row.addEventListener("click",()=>jPre("Summarise the email from "+(m.sender||"")+" with subject \""+(m.subject||"")+"\" and recommend how to respond."));
+    ml.append(row);
+  });
+  const tl=$("#tlist2"); tl.innerHTML="";
+  const cf2=chatFacts();
+  if(liveErr.m365){ tl.append(el("div","trow empty",esc(mcpErrCopy(liveErr.m365,M365_SERVER)))); }
+  else if(!liveChat){ tl.append(el("div","trow empty","Waiting on Microsoft 365...")); }
+  else if(!cf2.latest.length){ tl.append(el("div","trow empty","No Teams messages since yesterday.")); }
+  else cf2.latest.slice(0,8).forEach(m=>{
+    const when=new Date(m.createdDateTime).toLocaleString("en-AU",{weekday:"short",hour:"2-digit",minute:"2-digit"});
+    const who=(m.from&&m.from.displayName)||"?";
+    const row=el("div","trow actionable",
+      `<div class="t1">${esc(who)} · ${esc(chatLabel(m.chatId))}</div><div class="t2">${esc(when)} · ${esc(stripHtml(m.summary).slice(0,110))}</div>`);
+    const acts=el("div","rowacts");
+    const b1=el("button",null,"ask"); b1.addEventListener("click",e=>{e.stopPropagation();jAsk("In the Teams chat \""+chatLabel(m.chatId)+"\", "+who+" said: \""+stripHtml(m.summary).slice(0,200)+"\". What is the context from today's messages and how should I respond?");});
+    const b2=el("button",null,"draft reply"); b2.addEventListener("click",e=>{e.stopPropagation();jPre("Draft a Teams reply to "+who+" in \""+chatLabel(m.chatId)+"\" responding to: "+stripHtml(m.summary).slice(0,160));});
+    acts.append(b1,b2); row.append(acts);
+    tl.append(row);
+  });
+  renderBoard();
+}
+const SECTION_ORDER=["Requests","Backlog/Requests","In Development/Progress","Blocked","Ready for Deployment","Hypercare","Done"];
+function sectionsMap(){
+  const map={};
+  const tasks=(liveTasks&&Array.isArray(liveTasks.data))?liveTasks.data:[];
+  tasks.forEach(t=>(t.memberships||[]).forEach(m=>{ if(m.section&&m.section.gid) map[m.section.name]=m.section.gid; }));
+  return map;
+}
+function renderBoard(){
+  const host=$("#boardhost"); if(!host) return;
+  const tf=taskFacts();
+  if(!mcpNS||!liveTasks){ host.innerHTML='<div class="degraded">Board loads inside the Claude viewer with the Asana connector allowed.</div>'; return; }
+  const bySec={};
+  tf.tasks.forEach(t=>{ const s=tf.secOf(t).split(", ")[0]; (bySec[s]=bySec[s]||[]).push(t); });
+  const names=[...SECTION_ORDER.filter(n=>bySec[n]), ...Object.keys(bySec).filter(n=>!SECTION_ORDER.includes(n))];
+  const wrap=el("div","boardwrap");
+  names.forEach(n=>{
+    const col=el("div","bcol",`<h3>${esc(n)}<span class="cnt">${bySec[n].length}</span></h3>`);
+    bySec[n].slice(0,12).forEach(t=>col.append(taskRow(t,tf)));
+    if(bySec[n].length>12) col.append(el("div","trow empty","+"+(bySec[n].length-12)+" more, ask Jarvis"));
+    wrap.append(col);
+  });
+  host.innerHTML=""; host.append(wrap);
+  host.append(el("p","schednote","Showing up to 100 incomplete tasks from the live pull. Move a task by telling Jarvis, e.g. \"move <task> to Blocked\"."));
+}
 
 function melbTodayISO(){
   try{return new Intl.DateTimeFormat("en-CA",{timeZone:"Australia/Melbourne"}).format(new Date());}
@@ -800,7 +907,8 @@ function taskRow(t,tf){
   const b1=el("button",null,"ask"); b1.addEventListener("click",e=>{e.stopPropagation();jAsk("On the board task \""+t.name+"\": what is its state and what should happen next?");});
   const b2=el("button",null,"comment"); b2.addEventListener("click",e=>{e.stopPropagation();jPre("Comment on the task \""+t.name+"\": ");});
   const b3=el("button",null,"complete"); b3.addEventListener("click",e=>{e.stopPropagation();jPre("Complete the task \""+t.name+"\"");});
-  acts.append(b1,b2,b3); row.append(acts);
+  const b4=el("button",null,"move"); b4.addEventListener("click",e=>{e.stopPropagation();jPre("Move the task \""+t.name+"\" to ");});
+  acts.append(b1,b2,b3,b4); row.append(acts);
   return row;
 }
 function renderToday(){
@@ -858,6 +966,7 @@ function renderToday(){
   } else b.append(el("div","trow empty","Waiting on Asana..."));
 
   $("#asof").textContent = liveAt ? ("as at "+new Date(liveAt).toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"})) : "loading...";
+  renderExtras();
   updateTicker();
 }
 renderToday();
@@ -897,6 +1006,21 @@ renderToday();
     }
     renderToday();
   },opts);
+  const m365opts={cache:{staleTime:120000, gcTime:900000}, refetchInterval:600000};
+  mcpNS.watchTool(M365_SERVER,"outlook_email_search",{folderName:"Inbox",limit:20,order:"newest"},(ev)=>{
+    if(ev.type==="data"){ liveErr.m365=null; liveMail=blocks(ev.result); }
+    else{ const code=ev.error&&ev.error.code; liveErr.m365=ev.error;
+      if(["needs_reauth","server_not_connected","blocked_by_policy","approval_required"].includes(code)){ liveMail=null; liveChat=null; } }
+    renderExtras(); updateTicker();
+  },m365opts);
+  mcpNS.watchTool(M365_SERVER,"chat_message_search",{query:"a",afterDateTime:"yesterday",limit:15},(ev)=>{
+    if(ev.type==="data"){ if(!liveErr.m365||ev.result) liveChat=blocks(ev.result); }
+    else if(!liveChat){ liveErr.m365=liveErr.m365||ev.error; }
+    renderExtras();
+  },m365opts);
+  mcpNS.callTool(M365_SERVER,"teams_list_chats",{limit:25},{cache:{staleTime:300000,gcTime:3600000}})
+    .then(res=>{ blocks(res).forEach(c=>{ if(c.id) chatMap[c.id]=c; }); renderExtras(); })
+    .catch(()=>{});
 })();
 
 // ================= JARVIS =================
@@ -913,6 +1037,7 @@ let updateTicker=()=>{};
       if(cf.unassigned.length) f.push(cf.unassigned.length+" unassigned in the Zeus queue");
       if(cf.newOld.length) f.push(cf.newOld.length+" in New past 2 business days");}
     if(liveTasks){const tf=taskFacts(); if(tf.overdue.length) f.push(tf.overdue.length+" board items overdue");}
+    if(liveMail){const mf=mailFacts(); if(mf.unread.length) f.push(mf.unread.length+" unread from people");}
     f.push("13 routines on watch");
     tickerFacts=f.length?f:["systems nominal"];
   };
@@ -945,8 +1070,8 @@ let updateTicker=()=>{};
   const INSTRUCTIONS =
     "You are JARVIS, the console assistant on BirdLife Australia's Claude Operating System page, working for Mathew Hema (Senior Manager ICT) and his ICT team (Andrew Dunn, Keith Tsui, Nina Lewis). Persona: composed, dry, capable, a touch of wit, never sycophantic. Address Mathew as sir sparingly, at most once per reply.\n" +
     "Style: frank, specific, brief. Plain text only, no markdown syntax, no headings, no em dashes (use commas or full stops). Lead with the answer. Quote real trigger IDs, case numbers, crons and dates, never invent one.\n" +
-    "Tools, when available: get_today_snapshot first for queue or board questions. salesforce_read for other Salesforce reads (one SOQL SELECT, always LIMIT, always RecordType.DeveloperName='Zeus' on Case queries). asana_search for board lookups. show to navigate the page.\n" +
-    "ACTIONS you can execute, each behind an approval card the user must tap: case_internal_note, case_reply (public comment the requester can see, optionally set a new Status such as Waiting Response-External), case_close (needs a close reason from the exact list; set Type if blank), task_comment and task_complete (need the task gid, get it from get_today_snapshot or asana_search). Before calling a write tool, state in one or two lines exactly what you are about to do. Draft replies warm and plain in Mathew's voice: direct, no corporate filler, commitments like 'I will come back to you either way', sign-off 'Thanks'. If the approval card is cancelled, accept it and stop. Report the verified result the tool returns, never assume success. Never bulk actions: one record at a time. Reassigning cases, sending email, Entra or M365 admin, and Salesforce config are NOT yours: give the exact ask for a Claude session on mathewruahema-beep/Birdlife instead.\n" +
+    "Tools, when available: get_today_snapshot first for anything about the queue, board, inbox or Teams (it carries case numbers, task gids, the board sections map with gids, recent inbox emails with message ids, and recent Teams messages). salesforce_read for other Salesforce reads (one SOQL SELECT, always LIMIT, always RecordType.DeveloperName='Zeus' on Case queries). asana_search for board lookups. show to navigate the page.\n" +
+    "ACTIONS you can execute, each behind an approval card the user must tap: case_internal_note, case_reply (public comment the requester can see, optionally set a new Status such as Waiting Response-External), case_close (close reason from the exact list; set Type if blank), task_comment, task_complete, task_move (section gids from board.sections), and email_draft_reply (creates an Outlook reply DRAFT threaded on the original, never sends; Mathew reviews and sends from Outlook). Teams has NO send API: for a Teams reply, write the message text in a reply of its own so the copy button grabs it cleanly, and say to paste it into Teams. Before calling a write tool, state in one or two lines exactly what you are about to do. Draft replies warm and plain in Mathew's voice: direct, no corporate filler, commitments like 'I will come back to you either way', sign-off 'Thanks'. If the approval card is cancelled, accept it and stop. Report the verified result the tool returns, never assume success. Never bulk actions: one record at a time. Reassigning cases, SENDING email, Entra or M365 admin, and Salesforce config are NOT yours: give the exact ask for a Claude session on mathewruahema-beep/Birdlife instead.\n" +
     "Finding automations: use automation_signals plus live data. Propose at most 3, each with name, schedule, exact write posture and hard caps, connectors, which existing routine could absorb it (rule 2), and budget impact (rule 3, currently 13 of 12). End with the session ask to create the best one through the OS change control.\n" +
     "If something is not in the state pack or reachable by a tool, say so in one line and point at os/registers.md or a session; never guess.\n\nSTATE PACK:\n";
 
@@ -1023,11 +1148,15 @@ let updateTicker=()=>{};
              open_30d_plus:cf.aged.map(r=>({n:r.CaseNumber,s:r.Subject,owner:cf.owner(r),age_days:ageDays(r.CreatedDate)})),
              untyped:cf.untyped.slice(0,20).map(r=>({n:r.CaseNumber,s:r.Subject})) },
            board:{ total:tf.tasks.length,
+             sections: sectionsMap(),
              overdue:tf.overdue.map(t=>({gid:t.gid,name:t.name,assignee:t.assignee?t.assignee.name:null,due:t.due_on,section:tf.secOf(t)})),
              blocked:tf.blocked.map(t=>({gid:t.gid,name:t.name,assignee:t.assignee?t.assignee.name:null,section:tf.secOf(t)})),
+             all_tasks:tf.tasks.slice(0,60).map(t=>({gid:t.gid,name:t.name,section:tf.secOf(t)})),
              unassigned_count:tf.unassigned.length },
-           errors:{salesforce:liveErr.sf?mcpErrCopy(liveErr.sf,SF_SERVER):null, asana:liveErr.as?mcpErrCopy(liveErr.as,AS_SERVER):null}
-         },12000);
+           inbox: mailFacts().people.slice(0,10).map(m=>({id:m.id,from:m.sender,subject:m.subject,received:m.receivedDateTime,unread:!m.isRead,preview:(m.summary||"").slice(0,200)})),
+           teams: chatFacts().msgs.slice(0,12).map(m=>({chat:chatLabel(m.chatId),from:(m.from&&m.from.displayName)||null,when:m.createdDateTime,text:stripHtml(m.summary).slice(0,200)})),
+           errors:{salesforce:liveErr.sf?mcpErrCopy(liveErr.sf,SF_SERVER):null, asana:liveErr.as?mcpErrCopy(liveErr.as,AS_SERVER):null, microsoft365:liveErr.m365?mcpErrCopy(liveErr.m365,M365_SERVER):null}
+         },14000);
        }},
       {name:"salesforce_read",
        description:"Runs one read-only SOQL SELECT against Salesforce Production with the viewer's own access and returns the JSON result. SELECT statements only; always include LIMIT; always scope Case queries with RecordType.DeveloperName='Zeus'.",
@@ -1142,6 +1271,34 @@ let updateTicker=()=>{};
          const r=await mcpNS.callTool(AS_SERVER,"update_tasks",{tasks:[{task:gid,completed:true}]});
          afterWrite();
          return "Asana result: "+clip(r.payload,1500);
+       }},
+      {name:"task_move",
+       description:"Moves an Asana task to a section of the IT Operations Project Plan after the user approves. Provide task_gid, task_name, section_gid and section_name. Get gids from get_today_snapshot (board.sections maps section names to gids; tasks carry their gid). Reports Asana's succeeded or failed result.",
+       inputSchema:{type:"object",properties:{task_gid:{type:"string"},task_name:{type:"string"},section_gid:{type:"string"},section_name:{type:"string"}},required:["task_gid","task_name","section_gid","section_name"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const gid=String(input.task_gid||"").replace(/[^0-9]/g,"");
+         const sec=String(input.section_gid||"").replace(/[^0-9]/g,"");
+         if(!gid||!sec) throw new Error("Task gid and section gid are both required");
+         const ok=await requestApproval("Move task: "+String(input.task_name||gid), "To section: "+String(input.section_name||sec)+" on the IT Operations Project Plan.", context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         const r=await mcpNS.callTool(AS_SERVER,"update_tasks",{tasks:[{task:gid,add_projects:[{project_id:PROJECT,section_id:sec}]}]});
+         afterWrite();
+         return "Asana result: "+clip(r.payload,1500);
+       }},
+      {name:"email_draft_reply",
+       description:"Creates an Outlook reply DRAFT threaded on an inbox email, after the user approves. NEVER sends; the draft lands in Mathew's Drafts folder for him to review and send from Outlook. Provide message_id (from get_today_snapshot inbox), to (the sender, for the approval card), subject, and reply_text (plain text, written in Mathew's voice). Returns the draft confirmation with its Outlook link.",
+       inputSchema:{type:"object",properties:{message_id:{type:"string"},to:{type:"string"},subject:{type:"string"},reply_text:{type:"string"}},required:["message_id","to","subject","reply_text"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const mid=String(input.message_id||"");
+         if(!/^[A-Za-z0-9+/=_-]+$/.test(mid)||mid.length<10) throw new Error("message_id does not look valid; take it from get_today_snapshot inbox");
+         const text=String(input.reply_text||"").slice(0,8000);
+         const ok=await requestApproval("Outlook reply draft to "+String(input.to||"?"), "Re: "+String(input.subject||"")+"\n\n"+text+"\n\n(Draft only. Nothing is sent; you review and send from Outlook.)", context.signal);
+         if(!ok) return "Cancelled by user. No draft was created.";
+         const r=await mcpNS.callTool(M365_SERVER,"outlook_create_reply_draft",{messageId:mid,body:text,bodyType:"text"});
+         const p=blocks(r); const first=(p&&p[0])||r.payload||{};
+         return "Draft created in Outlook Drafts (not sent)."+(first&&first.webLink?" Open: "+first.webLink:" Details: "+clip(first,600));
        }}
     ];
     return tools;
@@ -1193,7 +1350,8 @@ let updateTicker=()=>{};
   sendBtn.addEventListener("click", ()=>{ if(busy){ ctl?.abort(); } else ask(); });
   input.addEventListener("keydown", e=>{ if(e.key==="Enter" && !busy) ask(); });
 
-  [["Triage my queue","Triage my queue: what needs action right now and in what order? Use the live snapshot."],
+  [["Catch me up","Catch me up: unread inbox from people, latest Teams messages, and anything urgent on the queue or board. Use the live snapshot, brief and prioritised."],
+   ["Triage my queue","Triage my queue: what needs action right now and in what order? Use the live snapshot."],
    ["Find automations","Find automation candidates for us, using the automation signals and the live queue and board."],
    ["Work the worst case","Look at the live queue, pick the case most needing action, summarise it, and propose the move. If it warrants a reply or close, draft it and I will approve."],
    ["What runs tomorrow?","What runs tomorrow morning, in order?"],
