@@ -125,6 +125,7 @@ the charter (propose, then write). The Entra admin promotion plan is
 | Security dashboard (CONFIDENTIAL) | https://claude.ai/code/artifact/ff6c82e3-38d4-41de-b872-606521972498 | Weekend job, Sunday fire |
 | Department suite (9 pages: fundraising, membership, finance, supporter care, marketing, conservation, people, volunteering, executive rollup) | artifact IDs listed in the weekday job's prompt, section 6 | Weekday job, deep slot |
 | ICT Console | https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e | Sessions, on request ("update the console") |
+| Claude OS overview (interactive) | https://claude.ai/code/artifact/2a9b7e57-dbc5-49e3-a4d7-c0a36bd236b2 | Sessions, on request; source at `os/claude-os-overview.html`. Mirrors these registers; update it when the registers change materially |
 
 Teams channel copies (SharePoint files, fixed names, never renamed):
 BirdLife-ICT-Operations-Dashboard.html, BirdLife-ICT-Monitoring-Dashboard.html,

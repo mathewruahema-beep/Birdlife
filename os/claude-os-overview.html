@@ -1,0 +1,552 @@
+<title>BirdLife Claude OS</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#f2f6f3; --surface:#ffffff; --surface2:#e9efe9; --surface3:#dfe8e1;
+  --ink:#1a2620; --ink2:#4c5d54; --ink3:#71837a;
+  --accent:#1e6f50; --accent-ink:#ffffff;
+  --line:#d3ddd5; --line2:#bccac0;
+  --warn:#9c6414; --warn-bg:#f6ead6;
+  --crit:#a83a30; --crit-bg:#f4e0dd;
+  --ok:#1e6f50; --ok-bg:#dfece4;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --disp:'Bricolage Grotesque','Instrument Sans',system-ui,sans-serif;
+  --body:'Instrument Sans',system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0f1613; --surface:#171f1a; --surface2:#1e2822; --surface3:#243027;
+    --ink:#e3ebe5; --ink2:#a5b5ab; --ink3:#7e8f85;
+    --accent:#57b78c; --accent-ink:#0c1410;
+    --line:#28332c; --line2:#374439;
+    --warn:#d9a04c; --warn-bg:#2d2415;
+    --crit:#e07a6e; --crit-bg:#331d1a;
+    --ok:#57b78c; --ok-bg:#16281f;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0f1613; --surface:#171f1a; --surface2:#1e2822; --surface3:#243027;
+  --ink:#e3ebe5; --ink2:#a5b5ab; --ink3:#7e8f85;
+  --accent:#57b78c; --accent-ink:#0c1410;
+  --line:#28332c; --line2:#374439;
+  --warn:#d9a04c; --warn-bg:#2d2415;
+  --crit:#e07a6e; --crit-bg:#331d1a;
+  --ok:#57b78c; --ok-bg:#16281f;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding:34px 22px 72px}
+a{color:var(--accent)}
+h1,h2,h3{font-family:var(--disp);text-wrap:balance;margin:0}
+.mono{font-family:var(--mono)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;text-align:left;padding:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+header{border-bottom:2px solid var(--ink);padding-bottom:20px}
+header h1{font-size:clamp(30px,5vw,42px);font-weight:700;line-height:1.05;margin:6px 0 10px}
+header .sub{color:var(--ink2);max-width:64ch;margin:0}
+.statebar{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{display:inline-flex;align-items:baseline;gap:7px;border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--ink2)}
+.chip b{font-family:var(--mono);font-size:14px;color:var(--ink);font-weight:600}
+.chip.warn{border-color:var(--warn);background:var(--warn-bg);color:var(--warn)}
+.chip.warn b{color:var(--warn)}
+
+/* tabs */
+nav.tabs{position:sticky;top:0;z-index:5;background:var(--ground);display:flex;gap:4px;padding:12px 0 10px;border-bottom:1px solid var(--line2);margin-bottom:26px;overflow-x:auto}
+nav.tabs button{font-family:var(--disp);font-weight:600;font-size:14.5px;padding:7px 15px;border-radius:8px;color:var(--ink2);white-space:nowrap}
+nav.tabs button:hover{background:var(--surface2)}
+nav.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.view{}
+.view[hidden]{display:none}
+.lede{color:var(--ink2);max-width:70ch;margin:0 0 18px}
+h2.vt{font-size:22px;font-weight:600;margin-bottom:4px}
+
+/* stack accordion */
+.stack{border:1px solid var(--line2);border-radius:10px;overflow:hidden;background:var(--surface)}
+.layer{border-top:1px solid var(--line)}
+.layer:first-child{border-top:none}
+.layer>button{display:grid;grid-template-columns:180px 1fr auto;gap:14px;width:100%;padding:13px 18px;align-items:baseline}
+.layer>button:hover{background:var(--surface2)}
+.layer .role{font-family:var(--disp);font-weight:600;font-size:15px}
+.layer .role small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:400}
+.layer .what{color:var(--ink2);font-size:14px}
+.layer .caret{font-family:var(--mono);color:var(--ink3);transition:transform .15s}
+.layer.open .caret{transform:rotate(90deg)}
+.layer .detail{padding:2px 18px 16px 212px;font-size:14px;color:var(--ink2)}
+.layer .detail .home{font-family:var(--mono);font-size:12px;color:var(--accent);display:block;margin-bottom:6px}
+.layer .detail ul{margin:6px 0 0;padding-left:18px}
+.layer .detail li{margin:4px 0}
+.layer.kernel>button{background:var(--accent)}
+.layer.kernel .role,.layer.kernel .what,.layer.kernel .caret{color:var(--accent-ink)}
+.layer.kernel .role small{color:var(--accent-ink);opacity:.75}
+@media (max-width:700px){.layer>button{grid-template-columns:1fr auto}.layer .what{grid-column:1/-1}.layer .detail{padding-left:18px}}
+
+/* loop */
+.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:26px}
+.loop .step{background:var(--surface);border:1px solid var(--line2);border-radius:10px;padding:13px 15px 15px}
+.loop .step .n{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.1em}
+.loop .step h3{font-size:15px;font-weight:600;margin:3px 0 4px}
+.loop .step p{margin:0;font-size:13px;color:var(--ink2)}
+@media (max-width:760px){.loop{grid-template-columns:1fr 1fr}}
+@media (max-width:460px){.loop{grid-template-columns:1fr}}
+
+/* schedule */
+.days{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.days button{font-family:var(--mono);font-size:13px;font-weight:600;padding:6px 13px;border-radius:8px;border:1px solid var(--line2);background:var(--surface);color:var(--ink2)}
+.days button:hover{background:var(--surface2)}
+.days button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.sched{border:1px solid var(--line2);border-radius:10px;background:var(--surface);overflow:hidden}
+.srow{display:grid;grid-template-columns:110px 1fr;border-top:1px solid var(--line)}
+.srow:first-child{border-top:none}
+.stime{font-family:var(--mono);font-size:13px;font-weight:600;padding:11px 14px;background:var(--surface2);color:var(--ink2);border-right:1px solid var(--line);font-variant-numeric:tabular-nums}
+.sbody{padding:11px 16px 12px}
+.sbody .rname{font-weight:600;font-size:14.5px}
+.sbody .rwhat{color:var(--ink2);font-size:13.5px}
+.sbody .rid{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:3px}
+.tag{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;border-radius:4px;padding:1.5px 7px;margin-left:8px;vertical-align:1px}
+.tag.write{background:var(--warn-bg);color:var(--warn)}
+.tag.read{background:var(--ok-bg);color:var(--ok)}
+.tag.gov{background:var(--surface2);color:var(--ink2);border:1px solid var(--line2)}
+.tag.retired{background:var(--crit-bg);color:var(--crit)}
+.schednote{font-size:13px;color:var(--ink3);margin-top:10px}
+
+/* registers */
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.subtabs button{font-size:13.5px;font-weight:600;padding:5px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--surface);color:var(--ink2)}
+.subtabs button[aria-selected="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.rlist{display:flex;flex-direction:column;gap:8px}
+.rcard{background:var(--surface);border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.rcard>button{width:100%;display:flex;gap:10px;align-items:baseline;padding:11px 15px;flex-wrap:wrap}
+.rcard>button:hover{background:var(--surface2)}
+.rcard .rname{font-weight:600;font-size:14.5px}
+.rcard .rsched{font-family:var(--mono);font-size:12px;color:var(--ink3);margin-left:auto;font-variant-numeric:tabular-nums}
+.rcard .caret{font-family:var(--mono);color:var(--ink3)}
+.rcard .detail{border-top:1px solid var(--line);padding:12px 15px 14px;font-size:13.5px;color:var(--ink2);display:grid;grid-template-columns:150px 1fr;gap:5px 14px}
+.rcard .detail dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding-top:2px}
+.rcard .detail dd{margin:0}
+.rcard .detail dd.mono{font-size:12.5px}
+@media (max-width:560px){.rcard .detail{grid-template-columns:1fr}.rcard .detail dt{padding-top:6px}}
+.grouphead{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:20px 0 8px}
+table.reg{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line2);border-radius:10px;overflow:hidden;font-size:14px}
+.tablewrap{overflow-x:auto;border-radius:10px}
+table.reg th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left;padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--line2)}
+table.reg td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+table.reg tr:last-child td{border-bottom:none}
+table.reg td.mono{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
+.pill{display:inline-block;font-family:var(--mono);font-size:10.5px;border-radius:4px;padding:1.5px 7px}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.crit{background:var(--crit-bg);color:var(--crit)}
+.conngrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.conn{border:1px solid var(--line2);background:var(--surface);border-radius:8px;padding:8px 13px;font-size:13.5px}
+.conn b{display:block;font-size:14px}
+.conn span{color:var(--ink3);font-size:12px}
+
+/* rules */
+.rules{display:flex;flex-direction:column;gap:8px}
+.rule{background:var(--surface);border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.rule>button{width:100%;display:flex;gap:14px;align-items:baseline;padding:11px 15px}
+.rule>button:hover{background:var(--surface2)}
+.rule .n{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent);border:1px solid var(--line2);border-radius:6px;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:var(--surface2);align-self:center}
+.rule b{font-size:14.5px}
+.rule .caret{margin-left:auto;font-family:var(--mono);color:var(--ink3);align-self:center}
+.rule .detail{border-top:1px solid var(--line);padding:11px 15px 13px 55px;font-size:13.5px;color:var(--ink2)}
+.rule .detail .why{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--warn);display:block;margin-bottom:3px}
+@media (max-width:560px){.rule .detail{padding-left:15px}}
+
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+@media (max-width:760px){.twocol{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line2);border-radius:10px;padding:15px 17px}
+.panel h3{font-size:16px;font-weight:600;margin-bottom:8px}
+.panel ul{margin:0;padding-left:18px}
+.panel li{margin:7px 0;font-size:14px;color:var(--ink2)}
+.panel li b{color:var(--ink)}
+.panel.warnp{border-left:4px solid var(--warn)}
+.panel.watchp{border-left:4px solid var(--accent)}
+
+footer{margin-top:48px;border-top:1px solid var(--line2);padding-top:14px;font-size:12.5px;color:var(--ink3)}
+footer .mono{font-size:11.5px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">BirdLife Australia ICT · mathewruahema-beep/Birdlife</div>
+  <h1>The Claude Operating System</h1>
+  <p class="sub">Claude is a production system here: it holds credentials to eight platforms, works unattended on schedules, and publishes pages people rely on. This OS manages it like any other ICT system: a charter, versioned knowledge, a governed scheduler, and registers that must always match reality. Everything below is live state as at 2 Sep 2026; click anything to drill in.</p>
+  <div class="statebar">
+    <span class="chip"><b>13</b> recurring routines</span>
+    <span class="chip"><b>2</b> one-shots</span>
+    <span class="chip"><b>9</b> retired 2 Sep, backed up</span>
+    <span class="chip"><b>12</b> skills in repo</span>
+    <span class="chip warn"><b>2</b> decisions open</span>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button role="tab" data-view="system" aria-selected="true">The system</button>
+  <button role="tab" data-view="schedule" aria-selected="false">Schedule</button>
+  <button role="tab" data-view="registers" aria-selected="false">Registers</button>
+  <button role="tab" data-view="rules" aria-selected="false">Rules &amp; decisions</button>
+</nav>
+
+<!-- ============ SYSTEM ============ -->
+<div class="view" id="view-system">
+  <h2 class="vt">The stack</h2>
+  <p class="lede">Seven layers, each with one home and one owner. Click a layer for what lives in it and who may change it.</p>
+  <div class="stack" id="stack"></div>
+
+  <h2 class="vt" style="margin-top:34px">The governance loop</h2>
+  <p class="lede">Every change to the estate, from creating a routine to teaching a skill a new gotcha, moves through the same four steps.</p>
+  <div class="loop">
+    <div class="step"><div class="n">STEP 1</div><h3>Propose</h3><p>The exact change: name, cron in UTC and AEST, prompt, connectors, and which existing job absorbs or is absorbed.</p></div>
+    <div class="step"><div class="n">STEP 2</div><h3>Approve</h3><p>Mathew gives the go-ahead. Per-session relaxations honoured, same as the charter.</p></div>
+    <div class="step"><div class="n">STEP 3</div><h3>Execute + verify</h3><p>Make the change, then prove it took: next fire time sane, connectors attached, a paused routine actually stopped.</p></div>
+    <div class="step"><div class="n">STEP 4</div><h3>Record</h3><p>Register updated, retired definitions backed up to routines/, committed and pushed in the same session.</p></div>
+  </div>
+</div>
+
+<!-- ============ SCHEDULE ============ -->
+<div class="view" id="view-schedule" hidden>
+  <h2 class="vt">What runs, and when</h2>
+  <p class="lede">Pick a day to see every unattended fire in Melbourne time. Read-only unless tagged; the one write-capable routine is capped inside its own prompt.</p>
+  <div class="days" role="tablist" aria-label="Day of week" id="days"></div>
+  <div class="sched" id="sched"></div>
+  <p class="schednote" id="schednote"></p>
+</div>
+
+<!-- ============ REGISTERS ============ -->
+<div class="view" id="view-registers" hidden>
+  <h2 class="vt">The registers</h2>
+  <p class="lede">The state of record, mirrored from <span class="mono">os/registers.md</span>. Anything live that is not here is drift, and drift is a finding.</p>
+  <div class="subtabs" role="tablist" aria-label="Register" id="subtabs">
+    <button role="tab" data-reg="routines" aria-selected="true">Routines</button>
+    <button role="tab" data-reg="skills" aria-selected="false">Skills</button>
+    <button role="tab" data-reg="connectors" aria-selected="false">Connectors</button>
+    <button role="tab" data-reg="artefacts" aria-selected="false">Artefacts</button>
+    <button role="tab" data-reg="credentials" aria-selected="false">Credentials</button>
+  </div>
+  <div id="reg-routines"></div>
+  <div id="reg-skills" hidden>
+    <div class="tablewrap"><table class="reg">
+      <thead><tr><th>Skill</th><th>Covers</th><th>Repo</th><th>Account</th></tr></thead>
+      <tbody id="skillrows"></tbody>
+    </table></div>
+    <p class="schednote">Repo copies are the source of truth. When they diverge, re-sync the account from the repo, unless the account copy is deliberately newer, in which case commit it back first.</p>
+  </div>
+  <div id="reg-connectors" hidden>
+    <p class="lede" style="margin-bottom:8px">Attached at account level by Mathew only, in the UI. Routines additionally carry per-routine grants; the two merged dashboard jobs kept theirs through the consolidation, so no re-attachment was needed.</p>
+    <div class="grouphead">Operational core</div>
+    <div class="conngrid" id="conncore"></div>
+    <div class="grouphead">Also available to sessions</div>
+    <div class="conngrid" id="connextra"></div>
+  </div>
+  <div id="reg-artefacts" hidden>
+    <div class="tablewrap"><table class="reg">
+      <thead><tr><th>Artefact</th><th>Rebuilt by</th><th>Link</th></tr></thead>
+      <tbody id="artrows"></tbody>
+    </table></div>
+    <p class="schednote">Teams channel copies (SharePoint, fixed names, never renamed): BirdLife-ICT-Operations-Dashboard.html, BirdLife-ICT-Monitoring-Dashboard.html, BirdLife-Security-Dashboard.html, plus the _dashboard-run-log.txt heartbeat. All artifact URLs are private; never publish via GitHub Pages or any public host.</p>
+  </div>
+  <div id="reg-credentials" hidden>
+    <div class="tablewrap"><table class="reg">
+      <thead><tr><th>Item</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody id="credrows"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ============ RULES ============ -->
+<div class="view" id="view-rules" hidden>
+  <h2 class="vt">The eight operating rules</h2>
+  <p class="lede">Each written from something that actually went wrong here. Click a rule for the incident behind it.</p>
+  <div class="rules" id="rules"></div>
+
+  <div class="twocol">
+    <div class="panel warnp">
+      <h3>Open decisions</h3>
+      <ul>
+        <li><b>Budget: 13 vs 12.</b> The audit routine took the thirteenth slot. Merge the two Friday status drafts, fold the Top 10 draft into the pre-draft, or raise the budget to 13.</li>
+        <li><b>WooCommerce key rotation.</b> Flagged in August after keys sat in routine prompts; still not verified done. Stays on the credential watchlist until confirmed.</li>
+      </ul>
+    </div>
+    <div class="panel watchp">
+      <h3>Watching this week</h3>
+      <ul>
+        <li><b>Thu 3 Sep, 7:04am.</b> First deep slot for the merged weekday job. Look for the heartbeat line and the Teams file update.</li>
+        <li><b>Sat 5 to Sun 7 Sep.</b> First weekend for the merged job; it inherits duties from three routines that failed silently since 30 Aug. The Sunday security refresh is the key test.</li>
+        <li><b>Mon 8 Sep, 6am.</b> First self-run of the weekly audit.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Rules: <span class="mono">os/README.md</span> · State of record: <span class="mono">os/registers.md</span> · Operator skill: <span class="mono">.claude/skills/claude-os/</span> · Backups: <span class="mono">routines/</span><br>
+  Consolidation executed 2 Sep 2026. Times AEST (UTC+10); the standing DST one-shot adjusts crons on 5 Oct 2026. This page names internal systems: keep the link private.
+</footer>
+</div>
+
+<script>
+// ---------- data ----------
+const LAYERS = [
+ {role:"Charter", sub:"kernel", kernel:true, what:"Loads into every session on this repo and sets who the assistant is and what it may never do.", home:"CLAUDE.md",
+  points:["Three honesty tiers: T1 executes with approval (Salesforce data, Asana, user-level M365), T2 prepares exact fixes for an admin (Entra/Exchange), T3 designs only (Salesforce config).","Hard guardrails: propose then write, no external email without showing the draft, no bulk updates or deletes, confirm identity before reassigning, log every write.","Changed only by a commit Mathew approves."]},
+ {role:"Skills", sub:"memory", what:"Versioned operator knowledge. This is how the assistant learns: change the file, commit, and every future session on any device knows it.", home:".claude/skills/  (mirrored to the claude.ai account)",
+  points:["Nine birdlife-* system skills: ict-assistant, salesforce, microsoft365, asana, netsuite, wordpress, stripe, zapier, cloudflare.","email-voice: Mathew's three email registers, committed to the repo 2 Sep 2026 after living account-only.","claude-os: the operator skill for this OS. Any session told to run the audit follows the same playbook."]},
+ {role:"Routines", sub:"scheduler", what:"Unattended work on cron. 13 recurring plus 2 one-shots, governed by a budget of 12 and one-job-per-outcome.", home:"claude.ai Routines",
+  points:["Every routine carries a passport: name that says what and when, UTC cron with the AEST translation, prompt with goal and hard rules, connectors, notification, register row.","Write-capable routines name their exact write surface and hard caps in the prompt. Model: the overnight pre-draft, internal comments only, max 8.","Retirement always exports the definition to routines/ first. Nothing is deleted unrecoverably."]},
+ {role:"Connectors", sub:"drivers", what:"Access to the real systems: Salesforce, Asana, Microsoft 365, NetSuite, Stripe, Zapier, Cloudflare, GitHub and more.", home:"claude.ai Settings, Connectors",
+  points:["Attached and detached by Mathew only, in the UI. Sessions never touch connector configuration.","Routines carry their own per-routine grants; a routine created without them fires but reads nothing, the most common silent failure.","Salesforce Staging for anything experimental; Production writes follow the charter."]},
+ {role:"Sessions", sub:"processes", what:"Interactive (phone, browser, desktop, GitHub issue) or routine-fired. Ephemeral by design.", home:"claude.ai/code",
+  points:["Any session on this repo becomes the ICT assistant automatically via the charter.","Anything worth keeping is committed or registered before the session ends; the container is reclaimed after.","Routine-fired sessions are fresh each run and must load their connector tools via ToolSearch first, which every prompt now says explicitly."]},
+ {role:"Artefacts", sub:"outputs", what:"The pages people actually read: three ICT dashboards, the nine-page department suite, the ICT Console.", home:"artifact URLs + SharePoint Teams files",
+  points:["Stable private artifact URLs, republished in place so links never change.","Teams channel copies use fixed SharePoint filenames, never renamed, never dated variants.","The _dashboard-run-log.txt heartbeat makes silent failure impossible: a missing weekday line means the run did not happen."]},
+ {role:"Registers", sub:"state of record", what:"Routine, skill, connector, artefact and credential registers. The layer that keeps every other layer honest.", home:"os/registers.md",
+  points:["Updated in the same commit as any estate change. No 'will document later'.","The Monday audit diffs the registers against live state and reports drift as findings.","This page mirrors them; the markdown in the repo is authoritative."]}
+];
+
+const R = [ // routines. days: 0=Mon..6=Sun
+ {n:"ICT overnight pre-draft (approve-first)", t:"trig_01EbMkfD4UcGUKLkUB1mNQ8V", cron:"30 19 * * 0-4", sched:"weekdays 5:30am", days:[0,1,2,3,4], time:"5:30am", sort:530, type:"write",
+  what:"Drafts requester replies as internal case comments so every case has a response waiting by morning. You approve and post; it never contacts requesters.",
+  detail:{Writes:"Internal CaseComments only (IsPublished=false), max 8 per night, marked [ASSISTANT DRAFT]. Never touches Status, Owner, Type or email.", Connectors:"Salesforce Production", Definition:"routines/overnight-pre-draft.md"}},
+ {n:"Top 10 morning email draft", t:"trig_016BES4jwEodCfNdSTBYfSow", cron:"0 20 * * 0-4", sched:"weekdays 6am", days:[0,1,2,3,4], time:"6:00am", sort:600, type:"read",
+  what:"The morning priorities draft, waiting in the inbox before the day starts.",
+  detail:{Writes:"One email draft only", Note:"Named as a candidate to absorb the pre-draft's reporting in the open budget decision"}},
+ {n:"Claude OS weekly audit", t:"trig_01V3i4b5zekjZuuFTF6Ymu9G", cron:"0 20 * * 0", sched:"Mon 6am", days:[0], time:"6:00am", sort:600, type:"gov",
+  what:"The OS auditing itself: verdicts every trigger, checks the budget and skill drift, hunts stale references, commits the register update, and reports the decisions you need to make.",
+  detail:{Writes:"os/registers.md only (commit + push)", Connectors:"None needed: repo and trigger list come from the environment", Created:"2 Sep 2026", Definition:"routines/os-weekly-audit.md"}},
+ {n:"ICT weekday dashboards and monitor (single job)", t:"trig_01HhAKnEe6PXAvo6EEq72BHo", cron:"4 21-23,0-7 * * *", sched:"hourly 7:04am-5:04pm", days:[0,1,2,3,4], time:"7:04am +", sort:704, type:"read",
+  what:"The single weekday job. Deep 7:04am slot: Ops dashboard rebuilt and pushed to Teams, heartbeat logged, monitor sweep posted, Monitoring dashboard refreshed, nine department pages republished. Every other hour: probe-gated light refresh, Teams post only on a new failure.",
+  detail:{Merged:"Absorbed five routines on 2 Sep: daily 7am + Teams push, hourly monitor, daytime hourly, and the morning hourly it grew from", Quirk:"Cron cannot span the UTC midnight boundary, so it also fires on Melbourne weekends and exits via a weekend gate; those no-ops are expected", "Fail loudly":"Connector, SharePoint or heartbeat failure emails Mathew; silence means it worked", Connectors:"Salesforce, Asana, M365, NetSuite, Stripe, Zapier, Cloudflare"}},
+ {n:"Membership boards date sync (Build to Model)", t:"trig_01K4kh1m8foc2oYAv9Gs8xqo", cron:"30 21 * * *", sched:"daily 7:30am", days:[0,1,2,3,4,5,6], time:"7:30am", sort:730, type:"read",
+  what:"Keeps the membership Build and Model boards' dates aligned.", detail:{}},
+ {n:"Offboarding detector, daily scan and approval pack", t:"trig_016nQBEZNDReT1DyrEbbqeSU", cron:"0 22 * * *", sched:"daily 8am", days:[0,1,2,3,4,5,6], time:"8:00am", sort:800, type:"read",
+  what:"Scans for genuine leavers and prepares the approval pack: nothing executes until a human says so.", detail:{}},
+ {n:"Refund fix watch, daily blast radius scan", t:"trig_01VdzVKqN12nyemiu976mNca", cron:"15 22 * * *", sched:"daily 8:15am", days:[0,1,2,3,4,5,6], time:"8:15am", sort:815, type:"read",
+  what:"Watches the blast radius of the refund traceability fix.", detail:{}},
+ {n:"Onboarding detector, daily scan and approval pack", t:"trig_01HiCsJkKpSUqPxq2xUpAbEo", cron:"30 22 * * *", sched:"daily 8:30am", days:[0,1,2,3,4,5,6], time:"8:30am", sort:830, type:"read",
+  what:"Scans for genuine starters and prepares the approval pack.", detail:{}},
+ {n:"Stale case chaser (report-only)", t:"trig_01S3ShSb7KSBA32LxFWaLaNa", cron:"30 22 * * 0", sched:"Mon 8:30am", days:[0], time:"8:30am", sort:831, type:"read",
+  what:"Flags cases going quiet before requesters have to chase.", detail:{}},
+ {n:"Data feed and expiry monitor", t:"trig_01Q6X1Xr1syjg7U5QGNwDSUg", cron:"0 23 * * *", sched:"daily 9am", days:[0,1,2,3,4,5,6], time:"9:00am", sort:900, type:"read",
+  what:"Watches data feeds and upcoming expiries (certificates, licences, integrations).", detail:{}},
+ {n:"Membership Build: Friday status update draft", t:"trig_01F7wy1pGcauqCsgUxVU4b47", cron:"0 21 * * 4", sched:"Fri 7am", days:[4], time:"7:00am", sort:700, type:"read",
+  what:"Drafts the Friday membership build status update.", detail:{Note:"Consolidation candidate in the open budget decision"}},
+ {n:"ICT Weekly Status Update", t:"trig_01AsdSGs9WiwRUrmbRmSxtAZ", cron:"0 4 * * 5", sched:"Fri 2pm", days:[4], time:"2:00pm", sort:1400, type:"read",
+  what:"The Friday ICT rollup, delivered into its persistent session.",
+  detail:{Session:"Persistent (fires into the same conversation each week)", Note:"Consolidation candidate in the open budget decision"}},
+ {n:"Dashboards weekend + weekly security (single job)", t:"trig_01CUkTdAFSisnzyU6pwgkH4k", cron:"4 21 * * 5,6", sched:"Sat + Sun 7:04am", days:[5,6], time:"7:04am", sort:704, type:"read",
+  what:"Weekend refresh of both ICT dashboards. The Sunday fire also rebuilds the confidential Security dashboard, moved from Monday midnight.",
+  detail:{Merged:"Absorbed the weekend 6pm slot (dropped) and the Monday 12am security weekly on 2 Sep", Confidential:"Security dashboard figures never leave the dashboard, the run report and the failure email", Connectors:"Salesforce, Asana, M365, NetSuite, Stripe, Zapier, Cloudflare"}}
+];
+const ONESHOTS = [
+ {n:"DST fix for dashboards and Morning brief", t:"trig_01YY3yjtTASm7MvUCh8ceW11", sched:"5 Oct 2026",
+  what:"Adjusts every cron for Sydney daylight saving. Scope changed by the consolidation: it must now adjust the merged weekday and weekend jobs and the audit routine, not the retired triggers."},
+ {n:"Renew entra-admin-mcp certificate", t:"trig_01Vp14cTKJCLnC7psjiRZnUC", sched:"25 Jul 2027",
+  what:"Fires a month before the certificate expires on 26 Aug 2027, into its bound session."}
+];
+const RETIRED = [
+ ["ICT dashboard, daily refresh and Teams push","trig_01QKqXyfwVoUwejxBbe15gX9","Absorbed into the weekday job's deep slot: Teams push, heartbeat, fail-loudly email"],
+ ["ICT hourly monitor 7-9am","trig_015SYdBtkDn7jt8dz6MdvXyE","Absorbed into the weekday job: monitor checks, Teams post rules, monitoring Teams file"],
+ ["Dashboards hourly, weekday daytime","trig_01Egd8XCKdBErqNPYnFkgTJB","Absorbed into the weekday job's light slots"],
+ ["Dashboards, weekend 6pm","trig_01HaRnkdKPD8Fu2HWMn616Nm","Dropped. Abandoned since 30 Aug and nobody noticed, which is the evidence it was not needed"],
+ ["Security dashboard, weekly Monday 12am","trig_014DUzUYB3RwZSpvRTjokFFd","Absorbed into the weekend job's Sunday fire"],
+ ["Zeus triage and first-touch drafter, hourly","trig_01EpSqssk6qvoFRg2UNoEH5o","Duplicated the live overnight pre-draft"],
+ ["Meeting actions collector","trig_014XfhCxMe3nwBgAeGAACp8B","Retired on Mathew's call after a month paused. Recreate from the backup if wanted"],
+ ["Unreconciled income exception report","trig_01QC85zSvXoEWHTEzkip9ajp","Retired on Mathew's call. The Zapier-side version remains the candidate path"],
+ ["Identity lifecycle pack-to-plan","trig_01FXchh6R9btpstDt6fSaLsM","Superseded by the onboarding and offboarding detectors"]
+];
+const SKILLS = [
+ ["birdlife-ict-assistant","Core workflow, tiers, guardrails, close-reason trap","yes","yes"],
+ ["birdlife-salesforce","The Zeus org: NPSP, Payments2Us, Case model, SOQL","yes","yes"],
+ ["birdlife-microsoft365","Entra, Conditional Access, MFA, on/offboarding","yes","yes"],
+ ["birdlife-asana","IT Operations Project Plan, sections, governance","yes","yes"],
+ ["birdlife-netsuite","ERP, chart of accounts, SuiteQL, reconciliation","yes","yes"],
+ ["birdlife-wordpress","WP Engine estate, WooCommerce, plugins","yes","yes"],
+ ["birdlife-stripe","Payments, refunds, BECS, payment flow","yes","yes"],
+ ["birdlife-zapier","The 17 connected apps, when Zapier vs native","yes","yes"],
+ ["birdlife-cloudflare","DNS, SPF/DKIM, WAF, the two accounts","yes","yes"],
+ ["claude-os","This operating system","yes","sync it"],
+ ["email-voice","Mathew's email voice, three registers","yes (2 Sep)","yes"],
+ ["morning","Morning brief","account only","yes"]
+];
+const CONN_CORE = [
+ ["Salesforce Production","the Zeus org, read/write data"],["Salesforce Staging","experiments go here first"],
+ ["Asana","IT Operations Project Plan"],["Microsoft 365","mail, Teams, SharePoint"],
+ ["NetSuite","ERP, SuiteQL"],["Stripe","payments"],["Zapier","17 connected apps"],
+ ["Cloudflare","two accounts: Domain.admin, Mathew.hema"],["GitHub","this repo"],["BirdLife UAT WordPress","staging site"]
+];
+const CONN_EXTRA = ["Gmail","Google Calendar","Google Drive","Canva","Miro","Zoom","Granola","Atlassian Rovo","Microsoft Learn"];
+const ARTS = [
+ ["ICT Operations dashboard","Weekday job (deep + light slots), weekend job","https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606"],
+ ["ICT Monitoring dashboard","Weekday job (every slot), weekend job","https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b"],
+ ["Security dashboard (confidential)","Weekend job, Sunday fire","https://claude.ai/code/artifact/ff6c82e3-38d4-41de-b872-606521972498"],
+ ["Department suite, 9 pages","Weekday job, deep slot","(IDs in the weekday job's prompt, section 6)"],
+ ["ICT Console","Sessions, on request: 'update the console'","https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e"]
+];
+const CREDS = [
+ ["WooCommerce API keys exposed in deleted routine prompts (Aug 2026)","warn|Rotation not verified done","Confirm rotation; until confirmed, treat as open"],
+ ["entra-admin-mcp certificate","ok|Expires 26 Aug 2027","Renewal reminder one-shot live (trig_01Vp14cTKJCLnC7psjiRZnUC)"],
+ ["Zapier connected app credentials (17 apps)","ok|In Zapier vault","Reviewed in the monthly OS review"]
+];
+const RULES = [
+ ["The register is truth","Live but unregistered is drift; registered but dead is a ghost. Both are findings the audit reports.","The docs pointed at a deleted dashboard trigger for weeks; every session that read them was misled."],
+ ["One job per outcome","No two routines rebuild the same artefact or cover the same window.","By 2 Sep three jobs rebuilt the ICT dashboard inside five minutes every weekday 7am, with hourly rebuilds behind them."],
+ ["Budget: 12 recurring routines","Over budget means consolidate or retire before anything new goes live. One-shots exempt.","The estate went 10 routines, then 4 after consolidation, then 23 within a month. Unlimited slots means unlimited sprawl."],
+ ["Every routine carries its passport","Name, UTC cron with AEST shown, prompt with goal and hard rules, connectors, notification, register row.","Two August routines fired on schedule for weeks with completely empty prompts, doing nothing, 'successfully'."],
+ ["Report-only by default","A writing routine names its exact write surface and hard caps in its own prompt.","The pre-draft's caps (internal comments only, max 8, never touch Status) are why it can run unattended at 5:30am."],
+ ["No credentials in prompts. Ever","Found one: pause the routine, rotate the credential, in that order.","August's dashboard routines embedded live WooCommerce API keys in plaintext prompt text."],
+ ["Retire with a backup","Definition exported to routines/ before deletion, credentials redacted. Always reversible.","All nine 2 Sep retirements are in routines-backup-2026-09-02.json and can be recreated verbatim."],
+ ["Propose, then write","The charter rule applies to the estate itself, not just to Salesforce.","This consolidation ran exactly this way: proposed 2 Sep, approved by Mathew, executed, recorded."]
+];
+
+// ---------- helpers ----------
+const $ = s => document.querySelector(s);
+const el = (t,c,h) => {const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e;};
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function remember(k,v){try{localStorage.setItem("claude-os."+k,v)}catch(e){}}
+function recall(k){try{return localStorage.getItem("claude-os."+k)}catch(e){return null}}
+function tagFor(t){return t==="write"?'<span class="tag write">writes, capped</span>':t==="gov"?'<span class="tag gov">governance</span>':'<span class="tag read">read-only</span>'}
+
+// ---------- tabs ----------
+const tabs=[...document.querySelectorAll('nav.tabs button')];
+function showView(v){
+  tabs.forEach(b=>b.setAttribute('aria-selected', String(b.dataset.view===v)));
+  ["system","schedule","registers","rules"].forEach(id=>{$("#view-"+id).hidden = id!==v;});
+  remember("tab",v);
+}
+tabs.forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+
+// ---------- stack ----------
+const stack=$("#stack");
+LAYERS.forEach((L)=>{
+  const d=el("div","layer"+(L.kernel?" kernel":""));
+  const btn=el("button",null,
+    `<span class="role">${L.role}<small>${L.sub}</small></span><span class="what">${L.what}</span><span class="caret">›</span>`);
+  btn.setAttribute("aria-expanded","false");
+  const det=el("div","detail",
+    `<span class="home">${esc(L.home)}</span><ul>${L.points.map(p=>`<li>${p}</li>`).join("")}</ul>`);
+  det.hidden=true;
+  btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; d.classList.toggle("open",open); btn.setAttribute("aria-expanded",String(open));});
+  d.append(btn,det); stack.append(d);
+});
+
+// ---------- schedule ----------
+const DAYNAMES=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const daysBar=$("#days");
+DAYNAMES.forEach((dn,i)=>{
+  const b=el("button",null,dn); b.setAttribute("role","tab"); b.dataset.day=i;
+  b.addEventListener("click",()=>renderDay(i));
+  daysBar.append(b);
+});
+function renderDay(day){
+  [...daysBar.children].forEach(b=>b.setAttribute("aria-selected",String(+b.dataset.day===day)));
+  const rows=R.filter(r=>r.days.includes(day)).sort((a,b)=>a.sort-b.sort);
+  const sched=$("#sched"); sched.innerHTML="";
+  rows.forEach(r=>{
+    let what=r.what;
+    if(day===6 && r.t==="trig_01CUkTdAFSisnzyU6pwgkH4k") what="Sunday run: both ICT dashboards plus the full weekly Security dashboard rebuild and Teams copy.";
+    if(day===5 && r.t==="trig_01CUkTdAFSisnzyU6pwgkH4k") what="Saturday run: probe-gated refresh of both ICT dashboards. Security waits for Sunday.";
+    const row=el("div","srow",
+      `<div class="stime">${r.time}</div><div class="sbody"><span class="rname">${esc(r.n)}</span>${tagFor(r.type)}<div class="rwhat">${what}</div><div class="rid">${r.t} · cron ${esc(r.cron)} UTC</div></div>`);
+    sched.append(row);
+  });
+  $("#schednote").textContent = (day<5)
+    ? "Weekday note: the weekday dashboards job fires hourly 7:04am to 5:04pm; only the 7:04am fire is the deep run. The overnight pre-draft is the sole write-capable routine, and its caps live in its own prompt."
+    : "Weekend note: the weekday job's cron also fires on weekends (UTC boundary quirk) and exits immediately through its weekend gate. Those no-op fires are expected and not listed here.";
+  remember("day",day);
+}
+
+// ---------- routine register ----------
+function dl(obj){
+  const keys=Object.keys(obj); if(!keys.length) return "";
+  return keys.map(k=>`<dt>${esc(k)}</dt><dd>${obj[k]}</dd>`).join("");
+}
+function rcard(r){
+  const card=el("div","rcard");
+  const btn=el("button",null,
+    `<span class="caret">›</span><span class="rname">${esc(r.n)}</span>${tagFor(r.type)}<span class="rsched">${esc(r.sched)}</span>`);
+  btn.setAttribute("aria-expanded","false");
+  const det=el("div","detail",
+    `<dt>Trigger</dt><dd class="mono">${r.t}</dd>
+     <dt>Cron (UTC)</dt><dd class="mono">${esc(r.cron)}</dd>
+     <dt>Does</dt><dd>${r.what}</dd>${dl(r.detail)}`);
+  det.hidden=true;
+  btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; btn.setAttribute("aria-expanded",String(open));});
+  card.append(btn,det); return card;
+}
+(function(){
+  const host=$("#reg-routines");
+  host.append(el("div","grouphead","Active recurring · 13 of a budget of 12 · decision open"));
+  const list=el("div","rlist"); R.forEach(r=>list.append(rcard(r))); host.append(list);
+  host.append(el("div","grouphead","One-shots · exempt from the budget"));
+  const l2=el("div","rlist");
+  ONESHOTS.forEach(o=>{
+    const card=el("div","rcard");
+    const btn=el("button",null,`<span class="caret">›</span><span class="rname">${esc(o.n)}</span><span class="rsched">${esc(o.sched)}</span>`);
+    const det=el("div","detail",`<dt>Trigger</dt><dd class="mono">${o.t}</dd><dt>Does</dt><dd>${o.what}</dd>`);
+    det.hidden=true; btn.setAttribute("aria-expanded","false");
+    btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; btn.setAttribute("aria-expanded",String(open));});
+    card.append(btn,det); l2.append(card);
+  });
+  host.append(l2);
+  host.append(el("div","grouphead","Retired 2 Sep 2026 · definitions in routines/routines-backup-2026-09-02.json"));
+  const l3=el("div","rlist");
+  RETIRED.forEach(([n,t,d])=>{
+    const card=el("div","rcard");
+    const btn=el("button",null,`<span class="caret">›</span><span class="rname" style="color:var(--ink2)">${esc(n)}</span><span class="tag retired">retired</span>`);
+    const det=el("div","detail",`<dt>Trigger</dt><dd class="mono">${t}</dd><dt>Disposition</dt><dd>${d}</dd>`);
+    det.hidden=true; btn.setAttribute("aria-expanded","false");
+    btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; btn.setAttribute("aria-expanded",String(open));});
+    card.append(btn,det); l3.append(card);
+  });
+  host.append(l3);
+})();
+
+// ---------- register subtabs ----------
+const subtabs=[...document.querySelectorAll('#subtabs button')];
+subtabs.forEach(b=>b.addEventListener('click',()=>{
+  subtabs.forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+  ["routines","skills","connectors","artefacts","credentials"].forEach(id=>{$("#reg-"+id).hidden = id!==b.dataset.reg;});
+  remember("reg",b.dataset.reg);
+}));
+
+// ---------- skills / connectors / artefacts / credentials ----------
+$("#skillrows").innerHTML = SKILLS.map(([n,c,r,a])=>
+  `<tr><td class="mono">${esc(n)}</td><td>${esc(c)}</td><td>${r.startsWith("yes")?`<span class="pill ok">${esc(r)}</span>`:r==="account only"?`<span class="pill crit">${esc(r)}</span>`:`<span class="pill warn">${esc(r)}</span>`}</td><td><span class="pill ok">${esc(a)}</span></td></tr>`).join("");
+$("#conncore").innerHTML = CONN_CORE.map(([n,d])=>`<div class="conn"><b>${esc(n)}</b><span>${esc(d)}</span></div>`).join("");
+$("#connextra").innerHTML = CONN_EXTRA.map(n=>`<div class="conn"><b>${esc(n)}</b></div>`).join("");
+$("#artrows").innerHTML = ARTS.map(([n,by,u])=>
+  `<tr><td>${esc(n)}</td><td>${esc(by)}</td><td class="mono">${u.startsWith("http")?`<a href="${u}" target="_blank" rel="noopener">open</a>`:esc(u)}</td></tr>`).join("");
+$("#credrows").innerHTML = CREDS.map(([n,s,a])=>{
+  const [cls,txt]=s.split("|");
+  return `<tr><td>${esc(n)}</td><td><span class="pill ${cls}">${esc(txt)}</span></td><td>${esc(a)}</td></tr>`;}).join("");
+
+// ---------- rules ----------
+const rulesHost=$("#rules");
+RULES.forEach(([title,body,why],i)=>{
+  const d=el("div","rule");
+  const btn=el("button",null,`<span class="n">${i+1}</span><b>${esc(title)}</b><span class="caret">›</span>`);
+  btn.setAttribute("aria-expanded","false");
+  const det=el("div","detail",`${esc(body)}<div style="margin-top:7px"><span class="why">Why it exists</span>${esc(why)}</div>`);
+  det.hidden=true;
+  btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; btn.setAttribute("aria-expanded",String(open));});
+  d.append(btn,det); rulesHost.append(d);
+});
+
+// ---------- restore state ----------
+(function(){
+  const v=recall("tab"); if(v && ["system","schedule","registers","rules"].includes(v)) showView(v);
+  const reg=recall("reg"); if(reg){const b=subtabs.find(x=>x.dataset.reg===reg); if(b) b.click();}
+  // default day: today in Melbourne, else Monday
+  let day=0;
+  try{
+    const wd=new Intl.DateTimeFormat("en-AU",{weekday:"short",timeZone:"Australia/Melbourne"}).format(new Date());
+    const i=DAYNAMES.indexOf(wd.slice(0,3)); if(i>=0) day=i;
+  }catch(e){}
+  const saved=recall("day"); if(saved!==null && saved!=="" && !isNaN(+saved)) day=+saved;
+  renderDay(day);
+})();
+</script>
