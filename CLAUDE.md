@@ -24,6 +24,7 @@ the real IDs, picklist values, gotchas, and playbooks:
 | `birdlife-stripe` | Payments, refunds, BECS, WooCommerce→Salesforce flow |
 | `birdlife-zapier` | The 17 connected apps, when Zapier vs native connector |
 | `birdlife-cloudflare` | DNS, SPF/DKIM, WAF, caching, the two accounts |
+| `claude-os` | Managing Claude itself: routine/skill/connector/artefact governance, the weekly OS audit, the registers |
 
 If the account-synced versions of these skills are also present, they take
 precedence when newer; otherwise these repo copies are the source of truth. When
@@ -58,6 +59,10 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
 
 ## What else is in this repo
 
+- `os/` — the Claude Operating System: the rules for managing the Claude estate
+  itself (`os/README.md`) and the state-of-record registers for routines,
+  skills, connectors, artefacts and credentials (`os/registers.md`). Any session
+  that changes the estate updates the registers in the same piece of work.
 - `README.md` — how to use the assistant remotely, dashboard findings, Salesforce
   admin runbook, routine consolidation history.
 - `docs/using-the-assistant.md` — remote access channels and the prompt playbook.

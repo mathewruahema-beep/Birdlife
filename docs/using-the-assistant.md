@@ -43,14 +43,14 @@ synced to your account, so in any Claude conversation the assistant triggers
 automatically on ticket-shaped requests, or explicitly with
 `/birdlife-ict-assistant`.
 
-**3. Scheduled routines (it works while you sleep).** Already live on the account:
-- *ICT Dashboard — weekday refresh & data-flow check* (`trig_0126KYAM3TAaZpBQKN8UeVdk`),
-  weekdays 7am AEST — republishes the dashboard from live data and runs the health
-  checks. Connectors must be attached to the routine in claude.ai → Routines.
-- *BirdLife ICT stale case chaser (report-only)* — Mondays, flags stale cases.
-- *Morning brief + ICT* — weekdays 5am AEST.
-- *BirdLife security dashboard monthly refresh* — 1st of the month.
-Definitions and backups live in `routines/`.
+**3. Scheduled routines (it works while you sleep).** The live routine estate
+changes often enough that listing it here went stale twice; the state of record
+is now [`os/registers.md`](../os/registers.md), refreshed by the weekly OS
+audit. Highlights as of 2 Sep 2026: overnight pre-draft (weekdays 5:30am AEST),
+Top 10 morning email draft (6am), onboarding/offboarding detectors (daily),
+dashboard refresh (7am), stale case chaser (Mondays). Connectors must be
+attached to each routine in claude.ai → Routines, one time each. Definitions
+and backups live in `routines/`; the management rules are `os/README.md`.
 
 **4. GitHub.** Open an issue on this repo describing the problem and start a Claude
 session from it (or mention the issue in a new claude.ai/code session). Useful for
