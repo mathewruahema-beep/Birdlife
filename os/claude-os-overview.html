@@ -663,7 +663,7 @@ RULES.forEach(([title,body,why],i)=>{
 })();
 
 // ================= LIVE (mcp) =================
-const SF_SERVER="Salesforce-Production", AS_SERVER="Asana", PROJECT="1211042432693678";
+const SF_SERVER="Salesforce Production", AS_SERVER="Asana", PROJECT="1211042432693678";
 const Q_OPEN="SELECT CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE IsClosed = false AND RecordType.DeveloperName = 'Zeus' ORDER BY CreatedDate ASC LIMIT 200";
 const AS_INPUT={projects_any:PROJECT, completed:false, limit:100, opt_fields:"name,assignee.name,due_on,memberships.section.name,modified_at"};
 let mcpNS=null, liveCases=null, liveTasks=null, liveErr={sf:null,as:null}, liveAt=null;
