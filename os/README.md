@@ -11,7 +11,7 @@ with overlapping dashboard rebuilds and silently failing jobs. See
 
 This directory is the operating system: the model, the rules, the registers, and
 the cadence that keep the Claude estate under control. The executable half is the
-**`claude-os` skill** (`.claude/skills/claude-os/`), which any session runs to
+**`birdlife-os` skill** (`.claude/skills/birdlife-os/`), which any session runs to
 audit the estate and apply these rules.
 
 ## The estate model
@@ -60,7 +60,7 @@ audit the estate and apply these rules.
 
 ## Cadence
 
-- **Weekly audit (Monday).** Run the `claude-os` skill audit: pull the live
+- **Weekly audit (Monday).** Run the `birdlife-os` skill audit: pull the live
   routine list, compare against the register, verdict every row (healthy,
   failing, paused, overlapping, unregistered), check skill drift between repo
   and account copies, verify artefact URLs still resolve, and report the

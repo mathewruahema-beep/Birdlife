@@ -92,7 +92,7 @@ in which case commit it back first.
 | birdlife-stripe | Payments | yes | yes |
 | birdlife-zapier | Automation | yes | yes |
 | birdlife-cloudflare | DNS, edge | yes | yes |
-| claude-os | This operating system | yes | sync it |
+| birdlife-os | This operating system | yes | sync it |
 | email-voice | Mathew's email voice | yes (committed 2 Sep 2026) | yes |
 | morning | Morning brief | no, account only | yes |
 

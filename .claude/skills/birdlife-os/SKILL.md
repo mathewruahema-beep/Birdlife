@@ -1,5 +1,5 @@
 ---
-name: claude-os
+name: birdlife-os
 description: >-
   The operating system for managing the Claude estate at BirdLife Australia:
   routines, skills, connectors, sessions and artefacts, governed by the rules in
