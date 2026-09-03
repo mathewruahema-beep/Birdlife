@@ -154,7 +154,32 @@ the documents an auditor, the Board or the OAIC would measure you against:
 
 ---
 
-## 7. Five questions every Friday
+## 7. The daily loop
+
+Reading this once changes nothing. The loop is what compounds:
+
+1. **Morning:** say `today's rep` in any session, on the phone or the desktop.
+   The coach picks the next rep from
+   [`ai-practice/curriculum.md`](ai-practice/curriculum.md) and ties it to a
+   live case or task. Thirty reps, one per weekday, under thirty minutes each.
+2. **During the day:** bring any decision with `think with me`. The coach runs
+   a fixed frame: the decision in one line, facts versus assumptions versus
+   unknowns, three options with who each lands on, the strongest case against,
+   a recommendation with reversibility, and what evidence would change it.
+3. **End of session:** say `coach me`. It quotes the prompts you actually wrote,
+   shows the stronger version, names your weakest habit that day, and logs it.
+4. **Friday:** say `weekly AI review`. Reps done, average score, streak, weakest
+   habit, one proposed change.
+
+Everything is recorded in [`ai-practice/log.md`](ai-practice/log.md) with a date,
+a score and evidence. That log is the number the Board will ask for. The push
+version, one sentence on the 7am Teams heartbeat, is proposed in
+[`../routines/ai-daily-rep-passport.md`](../routines/ai-daily-rep-passport.md)
+and waits on your go-ahead.
+
+---
+
+## 8. Five questions every Friday
 
 1. What did I correct this week that is not yet written into a skill?
 2. Which routine ran, and did I check its output, or just assume?
@@ -164,7 +189,7 @@ the documents an auditor, the Board or the OAIC would measure you against:
 
 ---
 
-## 8. Stop doing these
+## 9. Stop doing these
 
 - Re-explaining context every session. If it is not in a skill, that is the fix.
 - Accepting a summary when you needed a decision. Ask for the recommendation.
