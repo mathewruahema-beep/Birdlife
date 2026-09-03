@@ -1,0 +1,734 @@
+<title>Field Notes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #F4F6F2;
+    --surface: #FFFFFF;
+    --surface-2: #EBEFE9;
+    --ink: #1C221E;
+    --muted: #5D6A61;
+    --line: #DDE3DC;
+    --accent: #146B54;
+    --accent-soft: #E2EEE8;
+    --on-accent: #FFFFFF;
+    --rec: #C4402F;
+    --rec-soft: #F7E3DF;
+    --shadow: 0 8px 28px rgba(28, 34, 30, 0.12);
+    --sans: "Albert Sans", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    --mono: "Spline Sans Mono", "SF Mono", "Consolas", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101410;
+      --surface: #1A201B;
+      --surface-2: #232B25;
+      --ink: #E8ECE7;
+      --muted: #93A096;
+      --line: #2A322C;
+      --accent: #4FC49F;
+      --accent-soft: #1D3229;
+      --on-accent: #0D1511;
+      --rec: #E06552;
+      --rec-soft: #3A231E;
+      --shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #101410;
+    --surface: #1A201B;
+    --surface-2: #232B25;
+    --ink: #E8ECE7;
+    --muted: #93A096;
+    --line: #2A322C;
+    --accent: #4FC49F;
+    --accent-soft: #1D3229;
+    --on-accent: #0D1511;
+    --rec: #E06552;
+    --rec-soft: #3A231E;
+    --shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; padding: 0; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+  input, textarea, select { font: inherit; color: var(--ink); }
+
+  #app { max-width: 640px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
+
+  header.appbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px 10px;
+  }
+  .wordmark { font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
+  .wordmark .dot { color: var(--accent); }
+  #storageBadge {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em;
+    color: var(--muted); border: 1px solid var(--line); border-radius: 999px;
+    padding: 3px 10px; background: var(--surface);
+  }
+
+  main { flex: 1; padding: 0 16px 96px; }
+  section.view[hidden] { display: none !important; }
+
+  /* ---------- Notes list ---------- */
+  .searchwrap { position: relative; margin: 6px 0 14px; }
+  .searchwrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  #search {
+    width: 100%; border: 1px solid var(--line); background: var(--surface);
+    border-radius: 12px; padding: 10px 12px 10px 38px; font-size: 15px;
+  }
+  #search::placeholder { color: var(--muted); }
+
+  .notecard {
+    width: 100%; text-align: left; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;
+  }
+  .notecard:active { background: var(--surface-2); }
+  .notecard .row1 { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .notecard h3 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .notecard .when { font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .notecard .snippet { color: var(--muted); font-size: 14px; margin: 0;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 12px; padding: 2px 9px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent); font-weight: 600;
+  }
+  .chip.meta { background: var(--surface-2); color: var(--muted); font-family: var(--mono); font-weight: 400; }
+  .chip.example { background: var(--rec-soft); color: var(--rec); }
+
+  .emptynote { text-align: center; color: var(--muted); padding: 28px 20px 8px; font-size: 14px; }
+  .newtyped { display: block; margin: 4px auto 0; color: var(--accent); font-weight: 600; padding: 8px; }
+
+  /* ---------- Record ---------- */
+  #view-record { display: flex; flex-direction: column; align-items: center; }
+  .rec-top { width: 100%; display: flex; justify-content: flex-end; padding: 4px 0 8px; }
+  #lang { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 6px 10px; font-size: 13px; color: var(--muted); }
+  #bigmic {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: var(--accent); color: var(--on-accent);
+    display: grid; place-items: center; margin-top: 28px;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+  #bigmic:active { transform: scale(0.95); }
+  #bigmic.recording { background: var(--rec); animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 var(--rec-soft), var(--shadow); } 50% { box-shadow: 0 0 0 16px var(--rec-soft), var(--shadow); } }
+  @media (prefers-reduced-motion: reduce) { #bigmic.recording { animation: none; } }
+  #timer { font-family: var(--mono); font-size: 22px; margin-top: 16px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  #recHint { color: var(--muted); font-size: 14px; margin-top: 6px; text-align: center; max-width: 420px; }
+  #live {
+    width: 100%; min-height: 120px; max-height: 38dvh; overflow-y: auto;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 16px; margin-top: 22px; font-size: 15px; color: var(--ink);
+    white-space: pre-wrap;
+  }
+  #live:empty::before { content: "Live transcript appears here…"; color: var(--muted); }
+
+  /* ---------- Review ---------- */
+  #review { width: 100%; display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+  #review[hidden] { display: none !important; }
+  #rvTitle {
+    width: 100%; border: 1px solid var(--line); background: var(--surface);
+    border-radius: 12px; padding: 10px 14px; font-size: 17px; font-weight: 700;
+  }
+  #rvTranscript {
+    width: 100%; min-height: 140px; border: 1px solid var(--line); background: var(--surface);
+    border-radius: 12px; padding: 12px 14px; font-size: 15px; line-height: 1.5; resize: vertical;
+  }
+  .aiblock { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .aiblock h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .aiblock p { margin: 0; font-size: 14px; }
+  .aiblock ul { margin: 6px 0 0; padding-left: 20px; font-size: 14px; }
+  .btnrow { display: flex; gap: 10px; }
+  .btn {
+    flex: 1; text-align: center; padding: 12px 16px; border-radius: 12px; font-weight: 700; font-size: 15px;
+    border: 1px solid var(--line); background: var(--surface);
+  }
+  .btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  .btn.quiet { color: var(--muted); }
+  .btn[disabled] { opacity: 0.5; cursor: default; }
+  .ainote { font-size: 13px; color: var(--muted); }
+
+  /* ---------- Ask ---------- */
+  #chatlog { display: flex; flex-direction: column; gap: 10px; padding: 8px 0 12px; }
+  .bubble { max-width: 88%; padding: 10px 14px; border-radius: 14px; font-size: 15px; white-space: pre-wrap; overflow-wrap: break-word; }
+  .bubble.user { align-self: flex-end; background: var(--accent); color: var(--on-accent); border-bottom-right-radius: 4px; }
+  .bubble.ai { align-self: flex-start; background: var(--surface); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+  .askbar { display: flex; gap: 8px; }
+  #askInput {
+    flex: 1; border: 1px solid var(--line); background: var(--surface);
+    border-radius: 12px; padding: 11px 14px; font-size: 15px;
+  }
+  #askSend, #askStop {
+    width: 46px; border-radius: 12px; display: grid; place-items: center;
+    background: var(--accent); color: var(--on-accent);
+  }
+  #askStop { background: var(--rec); }
+  .askempty { color: var(--muted); font-size: 14px; text-align: center; padding: 30px 20px; }
+
+  /* ---------- Bottom nav ---------- */
+  nav.tabs {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; justify-content: center;
+    background: var(--surface); border-top: 1px solid var(--line);
+    padding: 6px 0 max(10px, env(safe-area-inset-bottom));
+  }
+  nav.tabs .inner { display: flex; width: 100%; max-width: 640px; }
+  nav.tabs button {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    color: var(--muted); font-size: 11px; font-weight: 600; padding: 6px 0;
+  }
+  nav.tabs button.active { color: var(--accent); }
+
+  /* ---------- Detail sheet ---------- */
+  #sheet {
+    position: fixed; inset: 0; background: var(--bg); z-index: 50;
+    overflow-y: auto; padding: 0 16px 40px;
+  }
+  #sheet[hidden] { display: none !important; }
+  .sheetbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 4px 6px; position: sticky; top: 0; background: var(--bg); }
+  .sheetbar button { color: var(--muted); font-weight: 600; padding: 6px 8px; }
+  .sheetbar #dDelete { color: var(--rec); }
+  #sheet h2 { margin: 6px 4px 2px; font-size: 24px; font-weight: 800; letter-spacing: -0.02em; text-wrap: balance; }
+  #dMeta { font-family: var(--mono); font-size: 12px; color: var(--muted); margin: 0 4px 16px; }
+  .dsec { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+  .dsec h4 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .dsec p { margin: 0; font-size: 15px; }
+  .action { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; font-size: 15px; }
+  .action input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); }
+  .action.done label { color: var(--muted); text-decoration: line-through; }
+  details.transcript summary { cursor: pointer; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+  details.transcript div { margin-top: 10px; font-size: 15px; white-space: pre-wrap; }
+
+  #toast {
+    position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: var(--bg); padding: 9px 18px; border-radius: 999px;
+    font-size: 14px; font-weight: 600; z-index: 100; box-shadow: var(--shadow);
+  }
+  #toast[hidden] { display: none !important; }
+</style>
+
+<div id="app">
+  <header class="appbar">
+    <div class="wordmark">Field Notes<span class="dot">.</span></div>
+    <span id="storageBadge">starting…</span>
+  </header>
+
+  <main>
+    <!-- NOTES -->
+    <section class="view" id="view-notes" hidden>
+      <div class="searchwrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search" type="search" placeholder="Search notes, tags, transcripts" autocomplete="off">
+      </div>
+      <div id="notelist"></div>
+    </section>
+
+    <!-- RECORD -->
+    <section class="view" id="view-record">
+      <div id="capture">
+        <div class="rec-top">
+          <select id="lang" aria-label="Transcription language">
+            <option value="en-AU">English (AU)</option>
+            <option value="en-GB">English (UK)</option>
+            <option value="en-US">English (US)</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;">
+          <button id="bigmic" aria-label="Start recording">
+            <svg id="micIcon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg>
+            <svg id="stopIcon" width="30" height="30" viewBox="0 0 24 24" fill="currentColor" hidden><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+          </button>
+          <div id="timer">00:00</div>
+          <p id="recHint">Tap to capture a conversation or a thought. It's transcribed live on your phone.</p>
+          <div id="live" style="width:100%"></div>
+        </div>
+      </div>
+
+      <div id="review" hidden>
+        <input id="rvTitle" placeholder="Untitled note">
+        <textarea id="rvTranscript" placeholder="Transcript (you can edit or type here)"></textarea>
+        <div class="aiblock" id="aiPreview" hidden>
+          <h4>AI summary</h4>
+          <p id="aiSummary"></p>
+          <ul id="aiActions"></ul>
+          <div class="chips" id="aiTags" style="margin-top:8px"></div>
+        </div>
+        <p class="ainote" id="aiMsg" hidden></p>
+        <div class="btnrow">
+          <button class="btn" id="btnAI">✦ AI notes</button>
+          <button class="btn primary" id="btnSave">Save</button>
+        </div>
+        <div class="btnrow">
+          <button class="btn quiet" id="btnDiscard">Discard</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ASK -->
+    <section class="view" id="view-ask" hidden>
+      <div id="chatlog"></div>
+      <p class="askempty" id="askEmpty">Ask anything about your saved notes.<br>"What did I agree to yesterday?" · "List all my open action items."</p>
+      <div class="askbar">
+        <input id="askInput" placeholder="Ask your notes…" autocomplete="off">
+        <button id="askSend" aria-label="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 14-7-4 14-3.5-5.5L5 12Z"/></svg></button>
+        <button id="askStop" aria-label="Stop" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabs">
+    <div class="inner">
+      <button data-tab="notes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>Notes</button>
+      <button data-tab="record" class="active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg>Record</button>
+      <button data-tab="ask"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5Z"/><path d="M9 11h6M9 14h3"/></svg>Ask</button>
+    </div>
+  </nav>
+</div>
+
+<!-- NOTE DETAIL -->
+<div id="sheet" hidden>
+  <div class="sheetbar">
+    <button id="dBack">‹ Back</button>
+    <button id="dDelete">Delete</button>
+  </div>
+  <h2 id="dTitle"></h2>
+  <p id="dMeta"></p>
+  <div id="dBody"></div>
+</div>
+
+<div id="toast" hidden></div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  // ---------- state ----------
+  let notes = [];
+  let sampleFn = null;      // claude sample capability, or null
+  let dbRef = null;         // claude db capability, or null
+  let storageMode = "loading";
+  let currentTab = "record";
+  let openNoteId = null;
+
+  const LS_KEY = "fieldnotes.v1";
+  const lsGet = () => { try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch { return []; } };
+  const lsSet = (v) => { try { localStorage.setItem(LS_KEY, JSON.stringify(v)); } catch {} };
+
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : "n" + Date.now() + Math.random().toString(36).slice(2, 8));
+  const fmtDate = (iso) => {
+    const d = new Date(iso);
+    if (isNaN(d)) return "";
+    return d.toLocaleString(undefined, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+  };
+  const fmtDur = (s) => { s = Math.max(0, Math.round(s || 0)); const m = Math.floor(s / 60); return `${String(m).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; };
+
+  let toastTimer = null;
+  function toast(msg) {
+    const t = $("toast"); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
+  }
+
+  function copyFor(code) {
+    switch (code) {
+      case "rate_limited": return "Claude is busy or you've hit a usage limit. Try again shortly.";
+      case "refused": return "Claude declined this request. Rephrase and try again.";
+      case "invalid_json": return "Couldn't read the AI response. Try again.";
+      case "session_expired": return "Your Claude session expired. Sign in again and retry.";
+      case "upstream_error": return "Connection hiccup. Try again.";
+      case "prompt_too_large": return "Too much text for one request. Trim the transcript and retry.";
+      case "cancelled": return "";
+      default: return "AI isn't available right now.";
+    }
+  }
+  const AI_GONE = new Set(["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"]);
+
+  // ---------- storage ----------
+  function updateBadge() {
+    $("storageBadge").textContent =
+      storageMode === "cloud" ? "synced" :
+      storageMode === "local" ? "on this device" : "starting…";
+  }
+
+  async function initStorage() {
+    // show local notes immediately; upgrade to cloud when the capability resolves
+    notes = lsGet(); renderNotes();
+    let db = null;
+    try { db = window.claude?.use ? await claude.use("db") : null; } catch { db = null; }
+    if (db) {
+      dbRef = db; storageMode = "cloud";
+      db.collection("notes").orderBy("createdAt", "desc").limit(500).onSnapshot(
+        (snap) => { notes = snap.docs.filter((d) => d.exists).map((d) => ({ id: d.id, ...d.data() })); renderNotes(); if (openNoteId) renderSheet(); },
+        () => { storageMode = "local"; dbRef = null; notes = lsGet(); renderNotes(); updateBadge(); }
+      );
+    } else {
+      storageMode = "local";
+    }
+    updateBadge();
+  }
+
+  async function saveNote(note) {
+    if (dbRef) {
+      try { await dbRef.collection("notes").doc(note.id).set(note); return true; }
+      catch (e) { toast(e && e.code === "quota_exceeded" ? "Note limit reached. Delete old notes first." : "Couldn't save. Try again."); return false; }
+    }
+    notes = [note, ...notes.filter((n) => n.id !== note.id)];
+    lsSet(notes); renderNotes(); return true;
+  }
+  async function patchNote(id, patch) {
+    const i = notes.findIndex((n) => n.id === id);
+    if (i >= 0) { notes[i] = { ...notes[i], ...patch }; renderNotes(); if (openNoteId === id) renderSheet(); }
+    if (dbRef) { try { await dbRef.collection("notes").doc(id).update(patch); } catch {} }
+    else lsSet(notes);
+  }
+  async function deleteNote(id) {
+    notes = notes.filter((n) => n.id !== id);
+    renderNotes();
+    if (dbRef) { try { await dbRef.collection("notes").doc(id).delete(); } catch {} }
+    else lsSet(notes);
+  }
+
+  // ---------- tabs ----------
+  document.querySelectorAll("nav.tabs button").forEach((b) => {
+    b.addEventListener("click", () => setTab(b.dataset.tab));
+  });
+  function setTab(tab) {
+    currentTab = tab;
+    ["notes", "record", "ask"].forEach((t) => {
+      $("view-" + t).hidden = t !== tab;
+      document.querySelector(`nav.tabs button[data-tab="${t}"]`).classList.toggle("active", t === tab);
+    });
+  }
+
+  // ---------- notes list ----------
+  const EXAMPLE = {
+    id: "__example__", example: true,
+    title: "Team stand-up debrief",
+    createdAt: new Date().toISOString(), durationSec: 154, source: "voice",
+    summary: "This is an example so you can see how a saved note looks. Record your first note and this card disappears.",
+    transcript: "Quick sync on the helpdesk queue. Two cases need vendor follow-up before Friday, and the licence renewal quote is still outstanding.",
+    actions: [{ text: "Chase vendor on the two open cases", done: false }, { text: "Get the licence renewal quote", done: true }],
+    tags: ["example"],
+  };
+
+  function visibleNotes() {
+    const q = $("search").value.trim().toLowerCase();
+    let list = notes;
+    if (!q) return list;
+    return list.filter((n) =>
+      [n.title, n.summary, n.transcript, (n.tags || []).join(" ")].join(" ").toLowerCase().includes(q)
+    );
+  }
+
+  function renderNotes() {
+    const wrap = $("notelist");
+    const list = visibleNotes();
+    const showExample = notes.length === 0 && !$("search").value.trim();
+    let html = "";
+    if (showExample) {
+      html += `<p class="emptynote">No notes yet. Hit <strong>Record</strong> and just talk — you'll get a transcript, a summary and action items.</p>`;
+      html += noteCardHTML(EXAMPLE);
+    } else if (list.length === 0) {
+      html += `<p class="emptynote">Nothing matches that search.</p>`;
+    } else {
+      html += list.map(noteCardHTML).join("");
+    }
+    html += `<button class="newtyped" id="btnTyped">+ New typed note</button>`;
+    wrap.innerHTML = html;
+    wrap.querySelectorAll(".notecard").forEach((el) => el.addEventListener("click", () => openSheet(el.dataset.id)));
+    $("btnTyped").addEventListener("click", () => { startReview("", 0, "typed"); setTab("record"); });
+  }
+
+  function noteCardHTML(n) {
+    const tags = (n.tags || []).slice(0, 4).map((t) => `<span class="chip${t === "example" ? " example" : ""}">${esc(t)}</span>`).join("");
+    const dur = n.durationSec ? `<span class="chip meta">${fmtDur(n.durationSec)}</span>` : "";
+    return `<button class="notecard" data-id="${esc(n.id)}">
+      <div class="row1"><h3>${esc(n.title || "Untitled note")}</h3><span class="when">${esc(fmtDate(n.createdAt))}</span></div>
+      <p class="snippet">${esc(n.summary || n.transcript || "")}</p>
+      <div class="chips">${dur}${tags}</div>
+    </button>`;
+  }
+
+  $("search").addEventListener("input", renderNotes);
+
+  // ---------- detail sheet ----------
+  function findNote(id) { return id === "__example__" ? EXAMPLE : notes.find((n) => n.id === id); }
+  function openSheet(id) { openNoteId = id; renderSheet(); $("sheet").hidden = false; window.scrollTo(0, 0); }
+  function closeSheet() { openNoteId = null; $("sheet").hidden = true; }
+  $("dBack").addEventListener("click", closeSheet);
+  $("dDelete").addEventListener("click", async () => {
+    const n = findNote(openNoteId);
+    if (!n || n.example) { closeSheet(); return; }
+    if (!confirm("Delete this note? This can't be undone.")) return;
+    await deleteNote(n.id); closeSheet(); toast("Note deleted");
+  });
+
+  function renderSheet() {
+    const n = findNote(openNoteId);
+    if (!n) { closeSheet(); return; }
+    $("dDelete").hidden = !!n.example;
+    $("dTitle").textContent = n.title || "Untitled note";
+    $("dMeta").textContent = `${fmtDate(n.createdAt)}${n.durationSec ? " · " + fmtDur(n.durationSec) : ""}${n.example ? " · example" : ""}`;
+    let html = "";
+    if (n.summary) html += `<div class="dsec"><h4>Summary</h4><p>${esc(n.summary)}</p></div>`;
+    if (n.actions && n.actions.length) {
+      html += `<div class="dsec"><h4>Action items</h4>` + n.actions.map((a, i) =>
+        `<div class="action${a.done ? " done" : ""}"><input type="checkbox" id="act${i}" data-i="${i}" ${a.done ? "checked" : ""} ${n.example ? "disabled" : ""}><label for="act${i}">${esc(a.text)}</label></div>`
+      ).join("") + `</div>`;
+    }
+    if (n.tags && n.tags.length) html += `<div class="chips" style="margin:2px 4px 14px">${n.tags.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>`;
+    if (n.transcript) html += `<div class="dsec"><details class="transcript" ${n.summary ? "" : "open"}><summary>Transcript</summary><div>${esc(n.transcript)}</div></details></div>`;
+    $("dBody").innerHTML = html;
+    $("dBody").querySelectorAll(".action input").forEach((cb) => {
+      cb.addEventListener("change", () => {
+        const i = Number(cb.dataset.i);
+        const actions = n.actions.map((a, j) => (j === i ? { ...a, done: cb.checked } : a));
+        patchNote(n.id, { actions });
+      });
+    });
+  }
+
+  // ---------- recording ----------
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  let rec = null, recording = false, finalText = "", recStart = 0, timerIv = null;
+
+  try { const saved = localStorage.getItem("fieldnotes.lang"); if (saved) $("lang").value = saved; } catch {}
+  $("lang").addEventListener("change", () => { try { localStorage.setItem("fieldnotes.lang", $("lang").value); } catch {} });
+
+  if (!SR) {
+    $("recHint").textContent = "Live transcription isn't supported in this browser. Tap the button, then use your keyboard's dictation key, or type the note.";
+  }
+
+  $("bigmic").addEventListener("click", () => {
+    if (recording) stopRecording();
+    else if (SR) startRecording();
+    else startReview("", 0, "typed"); // no speech API: jump straight to a typed note
+  });
+
+  function startRecording() {
+    finalText = ""; $("live").textContent = "";
+    recording = true; recStart = Date.now();
+    $("bigmic").classList.add("recording");
+    $("micIcon").hidden = true; $("stopIcon").hidden = false;
+    $("bigmic").setAttribute("aria-label", "Stop recording");
+    $("recHint").textContent = "Recording. Keep the screen on — transcription pauses if the phone locks.";
+    timerIv = setInterval(() => { $("timer").textContent = fmtDur((Date.now() - recStart) / 1000); }, 400);
+    spinUpRecognizer();
+  }
+
+  function spinUpRecognizer() {
+    rec = new SR();
+    rec.lang = $("lang").value;
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.onresult = (e) => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) { const t = r[0].transcript.trim(); if (t) finalText += t + " "; }
+        else interim += r[0].transcript;
+      }
+      const el = $("live");
+      el.textContent = finalText + interim;
+      el.scrollTop = el.scrollHeight;
+    };
+    rec.onerror = (e) => {
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+        stopRecording();
+        toast("Microphone access was blocked. Allow it in your browser settings.");
+      }
+    };
+    rec.onend = () => { if (recording) { try { spinUpRecognizer(); } catch {} } };
+    try { rec.start(); } catch {}
+  }
+
+  function stopRecording() {
+    recording = false;
+    clearInterval(timerIv);
+    if (rec) { try { rec.onend = null; rec.stop(); } catch {} rec = null; }
+    $("bigmic").classList.remove("recording");
+    $("micIcon").hidden = false; $("stopIcon").hidden = true;
+    $("bigmic").setAttribute("aria-label", "Start recording");
+    const dur = (Date.now() - recStart) / 1000;
+    $("timer").textContent = "00:00";
+    startReview(finalText.trim(), dur, "voice");
+  }
+
+  // ---------- review & AI notes ----------
+  let reviewData = null;
+
+  function startReview(transcript, durationSec, source) {
+    reviewData = { transcript, durationSec, source, ai: null };
+    $("capture").hidden = true;
+    $("review").hidden = false;
+    $("rvTitle").value = "";
+    $("rvTranscript").value = transcript;
+    $("aiPreview").hidden = true; $("aiMsg").hidden = true;
+    $("aiSummary").textContent = ""; $("aiActions").innerHTML = ""; $("aiTags").innerHTML = "";
+    $("btnAI").hidden = !sampleFn;
+    $("btnAI").disabled = false; $("btnAI").textContent = "✦ AI notes";
+    if (source === "typed") $("rvTranscript").focus();
+  }
+  function endReview() {
+    reviewData = null;
+    $("review").hidden = true;
+    $("capture").hidden = false;
+    $("live").textContent = "";
+    $("recHint").textContent = SR
+      ? "Tap to capture a conversation or a thought. It's transcribed live on your phone."
+      : "Live transcription isn't supported in this browser. Tap the button, then use your keyboard's dictation key, or type the note.";
+  }
+
+  $("btnDiscard").addEventListener("click", () => {
+    const txt = $("rvTranscript").value.trim();
+    if (txt && !confirm("Discard this note?")) return;
+    endReview();
+  });
+
+  $("btnAI").addEventListener("click", async () => {
+    if (!sampleFn) return;
+    const transcript = $("rvTranscript").value.trim();
+    if (!transcript) { toast("Nothing to summarize yet."); return; }
+    const btn = $("btnAI");
+    btn.disabled = true; btn.textContent = "Thinking…";
+    $("aiMsg").hidden = true;
+    try {
+      const j = await sampleFn.json(
+        `From the note transcript below, reply with ONLY this JSON object:\n` +
+        `{"title": string (max 8 words, plain, no quotes inside), "summary": string (2-4 sentences), ` +
+        `"action_items": string[] (imperative phrasing; empty array if none), "tags": string[] (1-4 short lowercase topic words)}\n\n` +
+        `Transcript:\n"""\n${transcript.slice(0, 20000)}\n"""`
+      );
+      const ai = {
+        title: String(j?.title || "").slice(0, 120),
+        summary: String(j?.summary || ""),
+        actions: Array.isArray(j?.action_items) ? j.action_items.map((t) => ({ text: String(t), done: false })) : [],
+        tags: Array.isArray(j?.tags) ? j.tags.map((t) => String(t).toLowerCase()).slice(0, 4) : [],
+      };
+      reviewData.ai = ai;
+      if (ai.title && !$("rvTitle").value.trim()) $("rvTitle").value = ai.title;
+      $("aiSummary").textContent = ai.summary;
+      $("aiActions").innerHTML = ai.actions.map((a) => `<li>${esc(a.text)}</li>`).join("");
+      $("aiTags").innerHTML = ai.tags.map((t) => `<span class="chip">${esc(t)}</span>`).join("");
+      $("aiPreview").hidden = false;
+      btn.textContent = "↻ Regenerate";
+    } catch (e) {
+      if (e && AI_GONE.has(e.code)) { sampleFn = null; btn.hidden = true; }
+      const msg = copyFor(e && e.code);
+      if (msg) { $("aiMsg").textContent = msg; $("aiMsg").hidden = false; }
+      btn.textContent = "✦ AI notes";
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  $("btnSave").addEventListener("click", async () => {
+    const transcript = $("rvTranscript").value.trim();
+    if (!transcript) { toast("Nothing to save yet — record or type something first."); return; }
+    const ai = reviewData?.ai;
+    const note = {
+      id: uid(),
+      title: $("rvTitle").value.trim() || (ai && ai.title) || transcript.split(/\s+/).slice(0, 6).join(" "),
+      transcript,
+      summary: (ai && ai.summary) || "",
+      actions: (ai && ai.actions) || [],
+      tags: (ai && ai.tags) || [],
+      createdAt: new Date().toISOString(),
+      durationSec: Math.round(reviewData?.durationSec || 0),
+      source: reviewData?.source || "voice",
+    };
+    $("btnSave").disabled = true;
+    const ok = await saveNote(note);
+    $("btnSave").disabled = false;
+    if (ok) { endReview(); setTab("notes"); toast("Note saved"); }
+  });
+
+  // ---------- Ask ----------
+  const turns = [];
+  let askCtl = null;
+
+  function notesContext() {
+    let budget = 26000;
+    const parts = [];
+    for (const n of notes) {
+      const actions = (n.actions || []).map((a) => `- ${a.done ? "[done] " : "[open] "}${a.text}`).join("\n");
+      const chunk = `### ${n.title || "Untitled"} (${fmtDate(n.createdAt)})\n${n.summary ? n.summary + "\n" : ""}${actions ? actions + "\n" : ""}Transcript: ${String(n.transcript || "").slice(0, 1500)}\n`;
+      if (budget - chunk.length < 0) break;
+      budget -= chunk.length;
+      parts.push(chunk);
+    }
+    return parts.join("\n") || "(no notes saved yet)";
+  }
+
+  function addBubble(cls, text) {
+    const div = document.createElement("div");
+    div.className = "bubble " + cls;
+    div.textContent = text;
+    $("chatlog").appendChild(div);
+    div.scrollIntoView({ block: "end" });
+    return div;
+  }
+
+  async function sendAsk() {
+    const q = $("askInput").value.trim();
+    if (!q) return;
+    if (!sampleFn) { toast("Ask needs Claude — open this app from claude.ai."); return; }
+    $("askInput").value = "";
+    $("askEmpty").hidden = true;
+    addBubble("user", q);
+    turns.push({ role: "user", content: q });
+    const bubble = addBubble("ai", "Thinking…");
+    $("askSend").hidden = true; $("askStop").hidden = false;
+    askCtl = new AbortController();
+    const RULES = `You are the "Ask" feature of a personal voice-notes app. Answer the user's question using ONLY their saved notes below. Be concise and specific; cite note titles when useful. Today is ${new Date().toDateString()}. If the notes don't contain the answer, say so plainly.\n\nSAVED NOTES:\n${notesContext()}`;
+    try {
+      const { text } = await sampleFn([{ role: "user", content: RULES }, ...turns.slice(-12)], {
+        cache: false,
+        signal: askCtl.signal,
+        onText: ({ text }) => { bubble.textContent = text; bubble.scrollIntoView({ block: "end" }); },
+      });
+      turns.push({ role: "assistant", content: text });
+    } catch (e) {
+      if (e && AI_GONE.has(e.code)) sampleFn = null;
+      if (e && e.text) { bubble.textContent = e.text; turns.push({ role: "assistant", content: e.text }); }
+      else if (e && e.code === "cancelled") bubble.remove();
+      else bubble.textContent = copyFor(e && e.code) || "Something went wrong.";
+    } finally {
+      $("askSend").hidden = false; $("askStop").hidden = true;
+      askCtl = null;
+    }
+  }
+  $("askSend").addEventListener("click", sendAsk);
+  $("askInput").addEventListener("keydown", (e) => { if (e.key === "Enter") sendAsk(); });
+  $("askStop").addEventListener("click", () => askCtl?.abort());
+
+  // ---------- boot ----------
+  async function initSample() {
+    try { sampleFn = window.claude?.use ? await claude.use("sample") : null; } catch { sampleFn = null; }
+    if (!sampleFn) {
+      $("askEmpty").innerHTML = "Ask and AI summaries need Claude.<br>Open this app from its claude.ai link to enable them.";
+    }
+    if (reviewData) $("btnAI").hidden = !sampleFn;
+  }
+
+  setTab("record");
+  renderNotes();
+  updateBadge();
+  initStorage();
+  initSample();
+})();
+</script>
