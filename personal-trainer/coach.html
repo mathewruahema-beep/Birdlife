@@ -322,6 +322,10 @@
         <button class="btn ghost small" id="btnVoice"></button>
         <button class="btn ghost small" id="btnVoiceTest">Test voice</button>
       </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn ghost small" id="btnPersona"></button>
+      </div>
+      <p class="note">Deadpan Kiwi picks a New Zealand English voice on the phone if one is installed, and talks like a dry, self-aware mate who still counts your missed sessions. Straight coach is the plain version.</p>
       <p class="note">Uses your phone's built-in speech. On Samsung, an Australian English voice is picked automatically if installed (Settings → General management → Text-to-speech).</p>
     </div>
     <div class="card">
@@ -409,6 +413,7 @@ function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)) }catch(e){} }
 let S = load() || { profile:null, weights:[], waists:[], workouts:[], cardio:[], habits:{}, checks:{}, voice:true };
 ['weights','waists','workouts','cardio'].forEach(k=>{ if(!Array.isArray(S[k])) S[k]=[] });
 S.habits=S.habits||{}; S.checks=S.checks||{};
+S.persona=S.persona||'kiwi';
 S.health=S.health||{}; ['steps','sleep','hr','imported'].forEach(k=>{ S.health[k]=S.health[k]||{} });
 
 const dayKey = d => { const x=new Date(d); x.setMinutes(x.getMinutes()-x.getTimezoneOffset()); return x.toISOString().slice(0,10) };
@@ -422,7 +427,8 @@ let voiceReady=null;
 function pickVoice(){
   try{
     const vs=speechSynthesis.getVoices();
-    voiceReady = vs.find(v=>v.lang==='en-AU') || vs.find(v=>v.lang==='en-NZ') || vs.find(v=>v.lang&&v.lang.indexOf('en-GB')===0) || vs.find(v=>v.lang&&v.lang.indexOf('en')===0) || null;
+    const pref = S.persona==='kiwi' ? ['en-NZ','en-AU'] : ['en-AU','en-NZ'];
+    voiceReady = vs.find(v=>v.lang===pref[0]) || vs.find(v=>v.lang===pref[1]) || vs.find(v=>v.lang&&v.lang.indexOf('en-GB')===0) || vs.find(v=>v.lang&&v.lang.indexOf('en')===0) || null;
   }catch(e){}
 }
 try{ speechSynthesis.onvoiceschanged=pickVoice; pickVoice(); }catch(e){}
@@ -431,7 +437,7 @@ function speak(text, force){
   try{
     speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(text);
-    u.rate=1.03; u.pitch=1;
+    u.rate=S.persona==='kiwi'?0.98:1.03; u.pitch=1;
     if(voiceReady) u.voice=voiceReady;
     speechSynthesis.speak(u);
   }catch(e){}
@@ -653,6 +659,73 @@ const RULES=[
  'Sugary drinks and beer are the two biggest gout triggers on the menu. Water, soda water, or nothing.'
 ];
 
+
+/* ============ coach personas ============ */
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const PERSONAS={
+ straight:{
+  label:'Straight coach',
+  allWalls:n=>'All four walls standing, '+n+'. Ka pai. That is what a good day looks like.',
+  cardio:(m,t)=> t==='hiit' ? 'Intervals logged. That is the VO2 max session done. Good.' : m+' minutes of zone 2 logged. Every minute counts toward the 150.',
+  weight:(v,n)=>'Logged. '+v+' kilos. The trend is what matters, not the day.',
+  waist:(v,b)=>'Waist logged at '+v+' centimetres. '+(b==='ok'?'On target. Keep it there.':b==='warn'?'That is in the raised-risk band. Under 94 is the goal, and the plan gets you there.':'That is the high-risk band. This number is the one we are attacking first.'),
+  check:()=>'Logged. That is a check most men your age avoid. Good.',
+  voiceOn:()=>'Voice coach on. Let’s get to work.',
+  voiceTest:n=>'Kia ora '+n+'. I’m your pocket coach. When you train, I call the exercises, count the sets and run the rest clock. When you slack off, I will say so.',
+  built:(n,d)=>'Program built, '+n+'. '+d+' strength sessions a week, 150 minutes of zone 2, four walls every day. I will hold you to all of it.',
+  start:(n,s,ex)=>'Alright, '+n+'. '+s+'. Warm up first, five minutes, properly. Then '+ex+'.',
+  next:(why,e)=>(why==='warm'?'Warm. ':why==='skip'?'Moving on. ':'Done. ')+'Next: '+e.n+'. '+e.s+' sets of '+cleanReps(e.r)+'. '+e.cue,
+  rest:s=>'Rest '+s+' seconds.',
+  ten:()=>'Ten seconds. Get set.',
+  go:()=>'Go!',
+  finish:(n,sets,mins,hit,left)=>'Session done, '+n+'. '+sets+' sets in '+mins+' minutes. '+(hit?'That is the week’s strength target. Ka pai.':left+' to go this week.')+' Protein and water within the hour.',
+  early:()=>'Session ended early. It does not count. We go again tomorrow.',
+  hrOn:()=>'Heart rate connected. I can see you now.',
+  importOk:()=>'Watch data is in. Now I can see what you actually did, not what you remember doing.',
+  importNone:()=>'No Samsung Health files found in that. Pick the zip from Download personal data.',
+  pep:[
+   'Right, {n}. Shoes on, water bottle filled. We are doing this properly today, no negotiating.',
+   '{n}, you are 56, not 86. The body you have at 70 is being built this week. Act like it.',
+   'One session at a time, {n}. Today is the only one that matters, and you are already behind if you are still thinking about it.',
+   'You have finished every workout you ever started, {n}. Start this one.',
+   'The hardest set today is the first one. Everything after that is momentum.',
+   'Kia kaha, {n}. Stand strong. Your mokopuna are going to need a grandfather who can get on the floor and back up again.',
+   'Nobody is coming to do it for you, {n}. Good news: you have never needed them to.'],
+  pepStatus:(ws)=> ws.missed>0 ? ' You are '+ws.missed+' session'+(ws.missed>1?'s':'')+' down this week. Fix it today.' : ws.sessions>=ws.target ? ' Week’s strength target is done. Do not coast.' : ' '+(ws.target-ws.sessions)+' sessions left this week.'
+ },
+ kiwi:{
+  label:'Deadpan Kiwi',
+  allWalls:n=>'All four walls up, '+n+'. Look at that. That’s a whare. Bit smug about it, are we? Good. Be smug.',
+  cardio:(m,t)=> t==='hiit' ? 'Intervals done. Your heart just found out what it’s for. Sweet as.' : m+' minutes of zone two, logged. Not a marathon. But marathons are mostly walking with better marketing anyway.',
+  weight:(v,n)=>v+' kilos. Logged. It’s one day, '+n+'. One day is not a story. Fifty days is a story. We’re writing the fifty.',
+  waist:(v,b)=>v+' centimetres. '+(b==='ok'?'On target. I’m not going to make a big thing of it. It is a big thing though.':b==='warn'?'That’s the raised-risk band, which is a polite way of saying the doctors have a name for it. Under ninety-four. That’s the number. We’re going there.':'Right. That’s the high-risk band. Not a lecture, just a fact, and facts are what we attack. This one’s first.'),
+  check:()=>'Logged. A health check. Most blokes would rather wrestle a possum. You did the check. Good man.',
+  voiceOn:()=>'Voice on. Hello. It’s me, the voice in your phone. Let’s go and do something about your body, eh.',
+  voiceTest:n=>'Kia ora '+n+'. I’m your pocket coach. I call the exercises, count your sets, and run the rest clock. I’ll also notice when you don’t turn up. I’m very good at noticing. It’s basically my whole thing.',
+  built:(n,d)=>'Program’s built, '+n+'. '+d+' strength sessions a week, a hundred and fifty minutes of zone two, and four walls every day. I’ll hold you to it. Gently. Like a large friendly dog holding a stick.',
+  start:(n,s,ex)=>'Right, '+n+'. '+s+'. Warm-up first. Five minutes, properly. Not that thing where you swing one arm and call it a warm-up. Then '+ex+'.',
+  next:(why,e)=>(why==='warm'?'You’re warm. Lovely. ':why==='skip'?'Skipping that one. Interesting choice. Moving on. ':pick(['Done. Beautiful. ','That’s one. Majestic, honestly. ','Done. Nobody saw that but me, and I was impressed. ','Good. Solid. Very solid. Like a fridge. ']))+'Next: '+e.n+'. '+e.s+' sets of '+cleanReps(e.r)+'. '+e.cue,
+  rest:s=>pick(['Rest, '+s+' seconds. Breathe. Look at the ceiling. Contemplate your choices.','Rest, '+s+' seconds. Have a little stand there. You’ve earned a stand.','Rest, '+s+' seconds. Don’t look at your phone. Well, this is your phone. Look at it, but only at me.']),
+  ten:()=>pick(['Ten seconds. Get set. The ceiling’s had enough of you.','Ten seconds. Right. Back to it. Pretend someone’s watching. Someone is. It’s me.']),
+  go:()=>pick(['Go!','Go. Go go go.','And, go.']),
+  finish:(n,sets,mins,hit,left)=>'Done, '+n+'. '+sets+' sets in '+mins+' minutes. '+(hit?'That’s the week’s strength target. Ka pai. Have a little sit down. You’ve earned a sit down.':left+' to go this week. That’s not a suggestion, it’s more of a fact.')+' Protein and water within the hour. Then be smug at somebody.',
+  early:()=>'Ended early. It doesn’t count, and I say that with love. Tomorrow, then. I’ll be here. I’m always here. It’s a bit sad, really.',
+  hrOn:()=>'Heart rate’s connected. I can see your actual heart now. Bit intimate. Let’s go.',
+  importOk:()=>'Watch data’s in. Now I can see what you actually did, as opposed to the version you told yourself. The two are usually different.',
+  importNone:()=>'No Samsung Health files in that one, mate. Pick the zip from Download personal data.',
+  pep:[
+   'Right, {n}. Shoes on. Water bottle. We’re doing this properly today, and by properly I mean actually doing it.',
+   '{n}. You’re fifty-six. That’s not old, that’s experienced. Now go and be experienced at squats.',
+   'Nobody’s coming to do it for you, {n}. Which sounds bleak. But think about it: nobody can stop you either. Freedom. Terrifying, sweaty freedom.',
+   'The hardest set is the first one. After that it’s just momentum and mild regret, and you’re already good at both.',
+   'Kia kaha, {n}. Your mokopuna are going to need a koro who can get down on the floor and, crucially, get back up. That second bit’s the training.',
+   'You’ve finished every workout you’ve ever started, {n}. That’s a hundred percent record. Don’t ruin a hundred percent record. Start.',
+   'Look, I’m not going to yell. Yelling’s for people who don’t have a plan. We have a plan. It’s on the Train tab. Go and look at it with your legs.'],
+  pepStatus:(ws)=> ws.missed>0 ? ' You’re '+ws.missed+' down this week, by the way. I noticed. I notice everything. Fix it today.' : ws.sessions>=ws.target ? ' Week’s strength target is done. Don’t get weird about it. Go for a walk.' : ' '+(ws.target-ws.sessions)+' left this week. That’s a fact, not a vibe.'
+ }
+};
+function P(){ return PERSONAS[S.persona]||PERSONAS.kiwi; }
+
 /* ============ quotes & pep ============ */
 const QUOTES=[
  ['The workout you skip never gets easier. The one you do always does.','Your coach'],
@@ -668,15 +741,6 @@ const QUOTES=[
  ['You will never regret a workout. You will only regret the ones you skipped.','Your coach'],
  ['Fall in love with boring consistency and the results become exciting.','Your coach'],
  ['Nobody is coming to do it for you. Good news: you have never needed them to.','Your coach']
-];
-const PEP=[
- 'Right, {n}. Shoes on, water bottle filled. We are doing this properly today, no negotiating.',
- '{n}, you are 56, not 86. The body you have at 70 is being built this week. Act like it.',
- 'One session at a time, {n}. Today is the only one that matters, and you are already behind if you are still thinking about it.',
- 'You have finished every workout you ever started, {n}. Start this one.',
- 'The hardest set today is the first one. Everything after that is momentum.',
- 'Kia kaha, {n}. Stand strong. Your mokopuna are going to need a grandfather who can get on the floor and back up again.',
- 'Nobody is coming to do it for you, {n}. Good news: you have never needed them to.'
 ];
 function dayQuote(){
   const doy=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5);
@@ -810,7 +874,7 @@ function renderToday(){
       const k2=todayKey(); S.habits[k2]=S.habits[k2]||{};
       S.habits[k2][el.dataset.h]=!S.habits[k2][el.dataset.h]; save();
       const n=Object.keys(S.habits[k2]).filter(x=>S.habits[k2][x]).length;
-      if(n===HABIT_COUNT) speak('All four walls standing, '+S.profile.name+'. Ka pai. That is what a good day looks like.');
+      if(n===HABIT_COUNT) speak(P().allWalls(S.profile.name));
       renderToday();
     };
     el.onclick=tog; el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();tog();} };
@@ -823,7 +887,7 @@ $('btnC').onclick=()=>{
   const type=$('cType').value;
   S.cardio.push({d:todayKey(), mins:m, type:type});
   $('cIn').value=''; save(); renderToday();
-  speak(type==='hiit' ? 'Intervals logged. That is the VO2 max session done. Good.' : m+' minutes of zone 2 logged. Every minute counts toward the 150.');
+  speak(P().cardio(m,type));
 };
 
 /* ============ render: train ============ */
@@ -912,7 +976,7 @@ $('btnW').onclick=()=>{
   if(S.profile) S.profile.w=v;
   $('wIn').value='';
   save(); renderProgress();
-  speak('Logged. '+v.toFixed(1)+' kilos. The trend is what matters, not the day.');
+  speak(P().weight(v.toFixed(1),S.profile.name));
 };
 $('btnWa').onclick=()=>{
   const v=parseFloat($('waIn').value);
@@ -924,7 +988,7 @@ $('btnWa').onclick=()=>{
   $('waIn').value='';
   save(); renderProgress();
   const b=waistBand(v);
-  speak('Waist logged at '+v+' centimetres. '+(b[0]==='ok'?'On target. Keep it there.':b[0]==='warn'?'That is in the raised-risk band. Under 94 is the goal, and the plan gets you there.':'That is the high-risk band. This number is the one we are attacking first.'));
+  speak(P().waist(v,b[0]));
 };
 function drawWeightChart(){
   const box=$('wChart'), data=S.weights.slice(-20);
@@ -964,6 +1028,7 @@ const CHECKS=[
 function renderCoach(){
   renderHdr();
   $('btnVoice').textContent = S.voice ? '🔊 Voice: ON' : '🔇 Voice: OFF';
+  $('btnPersona').textContent = '🎭 Style: '+P().label;
   const p=S.profile, t=calcTargets();
   $('profSummary').innerHTML =
     '<span class="pill">'+p.name+'</span><span class="pill">'+p.age+' yrs</span><span class="pill">'+p.h+' cm</span><span class="pill">'+p.w+' kg</span>'+
@@ -986,21 +1051,20 @@ function renderCoach(){
       const id=el.dataset.c;
       if(S.checks[id] && !confirm('Mark this as done again today?')) return;
       S.checks[id]=todayKey(); save(); renderCoach();
-      speak('Logged. That is a check most men your age avoid. Good.');
+      speak(P().check());
     };
   });
   $('exportBox').value=JSON.stringify(S);
 }
-$('btnVoice').onclick=()=>{ S.voice=!S.voice; save(); renderCoach(); if(S.voice) speak('Voice coach on. Let’s get to work.'); };
-$('btnVoiceTest').onclick=()=>speak('Kia ora '+(S.profile?S.profile.name:'')+'. I’m your pocket coach. When you train, I call the exercises, count the sets and run the rest clock. When you slack off, I will say so.', true);
+$('btnPersona').onclick=()=>{ S.persona = S.persona==='kiwi' ? 'straight' : 'kiwi'; save(); pickVoice(); renderCoach(); speak(P().voiceOn(), true); };
+$('btnVoice').onclick=()=>{ S.voice=!S.voice; save(); renderCoach(); if(S.voice) speak(P().voiceOn()); };
+$('btnVoiceTest').onclick=()=>speak(P().voiceTest(S.profile?S.profile.name:''), true);
 $('btnCopy').onclick=()=>{ try{ $('exportBox').select(); document.execCommand('copy'); if(navigator.clipboard) navigator.clipboard.writeText($('exportBox').value); $('btnCopy').textContent='Copied ✓'; setTimeout(()=>$('btnCopy').textContent='Copy backup',1500);}catch(e){} };
 $('btnReset').onclick=()=>{ if(confirm('Delete your profile, logs and history from this phone? This cannot be undone.')){ localStorage.removeItem(KEY); location.reload(); } };
 $('btnEditProfile').onclick=()=>{ fillSetup(); show('setup'); };
 $('btnPep').onclick=()=>{
-  const p=PEP[Math.floor(Math.random()*PEP.length)].replace(/\{n\}/g,S.profile.name);
-  const ws=weekStats();
-  const status = ws.missed>0 ? ' You are '+ws.missed+' session'+(ws.missed>1?'s':'')+' down this week. Fix it today.' : ws.sessions>=ws.target ? ' Week’s strength target is done. Do not coast.' : ' '+(ws.target-ws.sessions)+' sessions left this week.';
-  speak(p+status, true);
+  const p=pick(P().pep).replace(/\{n\}/g,S.profile.name);
+  speak(p+P().pepStatus(weekStats()), true);
 };
 
 /* ============ setup ============ */
@@ -1020,7 +1084,7 @@ $('btnSetup').onclick=()=>{
   S.profile=p;
   if(first && !S.weights.length) S.weights.push({d:todayKey(), kg:p.w});
   save(); show('today');
-  speak('Program built, '+p.name+'. '+p.days+' strength sessions a week, 150 minutes of zone 2, four walls every day. I will hold you to all of it.');
+  speak(P().built(p.name,p.days));
 };
 
 /* ============ session engine ============ */
@@ -1034,7 +1098,7 @@ function startSession(idx){
   window.scrollTo(0,0);
   renderHR();
   renderSess();
-  speak('Alright, '+S.profile.name+'. '+s.name+'. Warm up first, five minutes, properly. Then '+s.ex[0].n+'.');
+  speak(P().start(S.profile.name,s.name,s.ex[0].n));
 }
 function cleanReps(r){ return String(r).replace('–',' to ').replace('−',' minus ').replace('×',' by '); }
 function renderSess(){
@@ -1063,7 +1127,7 @@ function nextExercise(skipped){
     const e=sess.ex[sess.ei];
     renderSess();
     if(!prevWarm) startRest(e.rest, e.n);
-    speak((prevWarm?'Warm. ':skipped?'Moving on. ':'Done. ')+'Next: '+e.n+'. '+e.s+' sets of '+cleanReps(e.r)+'. '+e.cue);
+    speak(P().next(prevWarm?'warm':skipped?'skip':'done', e));
   } else finishSession();
 }
 function startRest(secs, nextLabel){
@@ -1073,14 +1137,14 @@ function startRest(secs, nextLabel){
   $('rest').classList.add('on');
   $('restClock').textContent=t;
   $('restNext').textContent='Next: '+nextLabel;
-  try{ if(!speechSynthesis.speaking) speak('Rest '+secs+' seconds.'); }catch(e){}
+  try{ if(!speechSynthesis.speaking) speak(P().rest(secs)); }catch(e){}
   clearInterval(restTimer);
   restTimer=setInterval(()=>{
     t--;
     $('restClock').textContent=t;
-    if(t===10) speak('Ten seconds. Get set.');
+    if(t===10) speak(P().ten());
     if(t<=3&&t>0) beep(700,120);
-    if(t<=0){ endRest(); speak('Go!'); beep(1000,250); }
+    if(t<=0){ endRest(); speak(P().go()); beep(1000,250); }
   },1000);
 }
 function endRest(){ clearInterval(restTimer); $('rest').classList.remove('on'); }
@@ -1098,9 +1162,9 @@ function finishSession(abandoned){
     S.workouts.push({d:todayKey(), name:sess.name, mins:mins, sets:sess.done-1});
     save();
     const ws=weekStats();
-    speak('Session done, '+S.profile.name+'. '+(sess.done-1)+' sets in '+mins+' minutes. '+(ws.sessions>=ws.target?'That is the week’s strength target. Ka pai.':(ws.target-ws.sessions)+' to go this week.')+' Protein and water within the hour.');
+    speak(P().finish(S.profile.name, sess.done-1, mins, ws.sessions>=ws.target, ws.target-ws.sessions));
   } else {
-    speak('Session ended early. It does not count. We go again tomorrow.');
+    speak(P().early());
   }
   sess=null;
   show('today');
@@ -1125,7 +1189,7 @@ async function connectHR(){
       renderHR();
     });
     hrDev.addEventListener('gattserverdisconnected',()=>{ hrBpm=0; hrDev=null; renderHR(); });
-    speak('Heart rate connected. I can see you now.');
+    speak(P().hrOn());
   }catch(e){ hrDev=null; renderHR(); }
 }
 function renderHR(){
@@ -1245,7 +1309,7 @@ async function handleHealthFiles(files){
   renderProgress(); renderHdr();
   const msg='Imported from '+csvs+' files: '+totals.steps+' days of steps, '+totals.sleep+' nights of sleep, '+totals.hr+' days of heart rate, '+totals.weight+' weigh-ins, '+totals.ex+' workouts.';
   $('healthSummary').insertAdjacentHTML('afterbegin','<p class="sub" style="color:var(--good)">'+msg+'</p>');
-  speak(csvs ? 'Watch data is in. Now I can see what you actually did, not what you remember doing.' : 'No Samsung Health files found in that. Pick the zip from Download personal data.');
+  speak(csvs ? P().importOk() : P().importNone());
 }
 $('btnImport').onclick=()=>$('healthFile').click();
 $('healthFile').onchange=e=>{ const fs=Array.from(e.target.files||[]); if(fs.length) handleHealthFiles(fs); e.target.value=''; };
