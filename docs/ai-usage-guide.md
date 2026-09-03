@@ -137,6 +137,7 @@ the documents an auditor, the Board or the OAIC would measure you against:
 | 2 | Read [best practices](https://code.claude.com/docs/en/best-practices) and [memory](https://code.claude.com/docs/en/memory). Pick the skill you correct most often and rewrite it. Re-sync the account copies. | 2 hrs |
 | 3 | Build one reporting routine with an owner, a check and a kill switch. Candidate: the weekly ICT status draft in your voice. | 2 hrs |
 | 4 | Read the OAIC checklists and write a one-page BirdLife AI use policy using the NIST four functions as headings. Put it to the CEO. | 3 hrs |
+| Beyond | The ranked [learning ladder](ai-practice/learning-ladder.md): free courses this week, Copilot admin and agent skills this month, AI-900 this quarter, and the ISACA AAISM path for a security manager over twelve months. | see ladder |
 | Ongoing | [One Useful Thing](https://www.oneusefulthing.org/) weekly. [Anthropic engineering blog](https://www.anthropic.com/engineering) monthly. The [Microsoft 365 Copilot administration path](https://learn.microsoft.com/en-us/training/paths/explore-microsoft-365-copilot-agent-administration/) before staff ask you for Copilot, because they will. | 30 min a week |
 
 ---
