@@ -1,0 +1,93 @@
+Mathew Hema
+Head of IT | CIO | Technology Strategy, Security and Transformation
+mathew.rua.hema@gmail.com |
+Melbourne, Australia. Remote. AEST/AEDT with daily overlap to APAC, US Pacific mornings and UK afternoons. Fourteen years leading distributed teams across Australia, the USA, the UK and India.
+
+PROFILE
+Senior technology leader with 25 years across ICT management, cyber security and digital transformation, including CIO and Head of Technology appointments. Operates at board and executive level while staying hands-on with delivery. Sector experience across not-for-profit, financial services, education, healthcare and aged care, insurance, communications and manufacturing, in in-house, outsourced, cloud and hybrid environments.
+Inherit a fragmented or under-invested ICT function, establish governance and a security baseline, rebuild the team and the vendor model, then reduce cost while lifting service levels and productivity.
+
+SELECTED RESULTS
+- Scaled ICT for a global insurance services business through growth from 165 to more than 1,000 employees and revenue from $20M to $80M per annum, delivering approximately 10% cost reduction and 10% productivity improvement year on year.
+- Built and launched an automated end-to-end online lending platform from inception to live operations as CIO, then reused the learnings to rebuild the No Interest Loans Scheme platform.
+- Implemented Essential Eight Maturity Level 3 in two separate regulated organisations, and ISO 27001 security processes across Asia Pacific.
+- Rebuilt ICT teams and vendor models three times over, each time reducing cost while maintaining or improving SLA performance.
+
+CAPABILITIES
+Strategy and Governance: Multi-year ICT strategy and roadmaps, technology governance frameworks, board and executive reporting, IT policy development, ICT budget ownership and cost reduction.
+Security and Risk: ACSC Essential Eight (to Maturity Level 3), ISO 27001, PCI DSS, risk identification and mitigation, compliance and audit, data loss prevention, disaster recovery and business continuity.
+Delivery and Operations: SDLC ownership, Agile, PRINCE2, PMBOK and ITIL service management, project and programme delivery, SLA and continuous improvement.
+People and Vendors: Team building from one to thirty people, mentoring, performance management, MSP and SaaS vendor selection, contract negotiation.
+Platforms and Data: Cloud strategy and migration across greenfield, hybrid and on-premises, systems integration and APIs, data consolidation, business analytics and centralised reporting.
+
+TECHNICAL ENVIRONMENT
+Cloud and Identity: Microsoft Azure, Microsoft 365, Entra ID, Intune, Conditional Access, Microsoft Defender, IaaS, PaaS and SaaS
+Business Systems: Salesforce (including NPSP), NetSuite ERP, Microsoft Dynamics AX, WordPress and WooCommerce, Asana, Jira
+Integration and Automation: REST APIs, Microsoft Graph, PowerShell, Azure Logic Apps, Zapier, ETL and reporting pipelines
+Security Tooling: Endpoint and email security, MDM including MobileIron, DLP, disk and removable media encryption, vulnerability and patch management
+
+EXPERIENCE
+Senior ICT Manager, BirdLife Australia (May 2025 - Present)
+- Full accountability for ICT strategy, operations, security and budget for a national not-for-profit, reporting to the Executive Director, Finance and Business Improvement. Team of four.
+- Delivered a new e-commerce capability consolidating product sales, one-off and recurring donations and memberships into a single supporter transaction channel.
+- Leading an Essential Eight aligned security uplift with a SaaS and identity overlay, with a gap assessment and prioritised remediation roadmap for board reporting.
+- Integrating Salesforce, Microsoft 365, NetSuite and Asana to remove manual handoffs, and automating identity onboarding and offboarding through Microsoft Graph.
+- Rebuilding the membership model across WooCommerce and Salesforce to replace fragmented legacy processes.
+- Mapping all revenue streams end to end into NetSuite to close reconciliation gaps.
+
+Head of Data, Digital and Technology, Independent Schools Victoria (Nov 2023 - May 2025)
+- Led a team of eight across software development, security, infrastructure, research and relationship management.
+- Set and executed the data, digital and technology strategy underpinning advocacy, professional learning, school improvement and compliance across the independent schools sector.
+- Delivered systems for tracking and reporting school funding, accountability and compliance, improving accuracy and removing manual effort.
+- Modernised communications and media platforms and delivered hybrid event and audiovisual capability.
+
+IT Service Delivery Manager (Contract), Medical Indemnity Protection Society (Jul 2023 - Nov 2023)
+- Established a service delivery framework and lifted service management maturity.
+- Operationalised Essential Eight Maturity Level 3 controls into business as usual processes.
+- Scoped the infrastructure uplift to cloud as part of a wider transformation programme.
+
+Project Manager, Technical Operations (Contract), 9 Yards (Apr 2023 - Jul 2023)
+- Consolidated 32 years of accumulated technology across service delivery, infrastructure and security into an aligned enterprise operating model.
+
+IT Manager, Partners Wealth Group (Oct 2020 - Apr 2023)
+- Sole and then small-team accountability for ICT across a financial services business, engaging directly with C-level and the board.
+- Built and delivered a three-year technology plan aligned to the business strategy.
+- Implemented Essential Eight Maturity Level 3 security processes in a regulated financial services environment.
+- Matured the Salesforce platform from minimum viable product into the core business process system.
+- Managed the managed service provider and the multi-vendor SaaS ecosystem, consolidating and renegotiating where duplication existed.
+
+IT Infrastructure Manager, Cheetham Salt (Sep 2019 - Oct 2020)
+- Led strategy, transformation and migration into Microsoft Azure for a manufacturing and supply chain business.
+- Managed the Microsoft Dynamics AX ERP platform and supporting infrastructure.
+- Transitioned to new IT vendors including the managed service provider and reduced communications cost across contracts, LAN, WAN, telephony and mobile fleet.
+
+Chief Information Officer, Good Shepherd Microfinance (Jun 2016 - May 2019)
+- Owned ICT strategy, delivery and service through a cloud-based business transformation.
+- Built and launched an automated end-to-end online lending platform from inception to operations across PaaS, IaaS and SaaS in multiple cloud environments.
+- Redesigned and rebuilt the No Interest Loans Scheme platform in a separate cloud environment.
+- Rebuilt the ICT team to fit the new operating model, reduced ICT cost every quarter while maintaining SLAs, and owned all vendor sourcing and contract management.
+- Centralised data and reporting, delivering business analytics across multiple source systems.
+
+IT Operations Manager, Asia Pacific, Crawford & Company Australia (Jul 2002 - Mar 2016)
+- Accountable for ICT across Asia Pacific for a global insurance services business, reporting to the Global CIO and working with teams in the USA, UK and India.
+- Supported growth from 165 to more than 1,000 employees and revenue from $20M to $80M per annum.
+- Managed a regional ICT budget of $5M or more per annum, delivering approximately 10% cost reduction and 10% productivity improvement year on year.
+- Implemented ISO 27001 security processes and led the Asia Pacific data loss prevention programme.
+- Introduced ITIL, PMBOK, PRINCE2 and Agile methodologies and led mobility and cloud adoption.
+
+Senior Systems Engineer, TrademarkDM (Jan 2000 - Aug 2002)
+- Managed infrastructure and database programming for a direct marketing firm serving Telstra and Ernst & Young; mentored junior engineers.
+
+BOARD APPOINTMENT
+Board Member, Dandenong Community and Learning Centre (Nov 2024 - Present)
+- Board lead for information technology, security and compliance.
+
+EDUCATION AND PROFESSIONAL DEVELOPMENT
+- Associate Diploma in Computer Programming
+- PRINCE2 Practitioner
+- ITIL v3 Foundation
+- Agile Foundation
+- Salesforce Administrator (platform training)
+- Microsoft Entra ID (platform training)
+- Microsoft Azure (platform training)
+- Board Member, Dandenong Community and Learning Centre (Nov 2024 - Present), board lead for IT, security and compliance

@@ -20,6 +20,9 @@ repository before it grows. See "Things to decide" at the bottom.
 | `data/jobs.json` | The pipeline. Every role seen, its score, status, notes and next action. |
 | `data/jobs.csv`, `data/board-export.json` | Produced by `export`. |
 | `applications/<id>-<slug>/` | Application packs. Ignored by git by default because they contain tailored personal letters. |
+| `PLAYBOOK.md` | The remote application playbook: positioning, the five lanes, channels and yields, cadence, LinkedIn, interviews, pay and structure, weekly rhythm, decision rules. Published as an artifact too. |
+| `templates/` | `outreach.md`, `follow-up.md`, `interview-bank.md`, `negotiation.md`. Embedded in the board and used by the Outreach and Interview prep tabs. |
+| `resume/` | `build_resume.js` generates `Mathew_Hema_Remote_Master_Resume.docx` and an ATS plain-text twin from `profile.json`. Remote statement in the header, distributed-leadership evidence moved to the top, one column. |
 
 ## Setup
 
@@ -171,10 +174,33 @@ location policy and scoring as the command line, so roles you add on the phone g
    same without opening the link.
 5. The checklist (eligibility confirmed, letter reviewed, resume tailored, answers ready,
    submitted, follow-up set) is saved per role and shown on the card as `pack n/6`.
+6. **Outreach** tab: pick the message (hiring manager note, LinkedIn connection note, recruiter
+   first contact, day 7 and day 14 follow-ups, thank you, withdrawal), fill it from the
+   template with the role's details, or have Claude write it, then draft it into Gmail. A
+   follow-up draft moves the card's due date forward a week.
+7. **Interview prep** tab: shows the interview bank, or asks Claude for the ten questions this
+   panel is most likely to ask with STAR answers from your record, five questions to ask
+   them, and the two fit risks to address.
+
+The header now shows applications this week against the target of five, and the screen
+rate (roles that reached Interviewing or Offer, over roles applied).
 
 Claude writing and Gmail drafting spend your own claude.ai usage and use your own Gmail
 connector; the page asks for consent on first use. The header dots show which of the three
 abilities (shared database, Claude writing, Gmail drafts) are live in the copy you have open.
+
+## The resume
+
+```
+cd resume && npm install docx && node build_resume.js
+```
+
+Produces the remote master resume as DOCX and plain text from `profile.json`. It differs
+from your current resume in four ways the playbook explains: the remote statement is in the
+header, the Crawford distributed-leadership evidence is in the first five lines, the
+interests line and the LinkedIn placeholder are gone, and it is one column with no tables so
+applicant tracking systems parse it. Fill in the LinkedIn URL in `profile.json` and rebuild.
+Tailor per role using the board's tailoring notes and save as PDF named for the employer.
 
 ## Things to decide
 

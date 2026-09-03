@@ -1166,6 +1166,11 @@ def write_board(store: dict) -> None:
                               ensure_ascii=False).replace("</", "<\\/")
     new = re.sub(r'(<script id="profile" type="application/json">).*?(</script>)', lambda m: m.group(1) + prof_payload + m.group(2),
                  new, flags=re.S)
+    tdir = HERE / "templates"
+    templates = {f.stem: f.read_text(encoding="utf-8") for f in sorted(tdir.glob("*.md"))} if tdir.exists() else {}
+    t_payload = json.dumps(templates, ensure_ascii=False).replace("</", "<\\/")
+    new = re.sub(r'(<script id="templates" type="application/json">).*?(</script>)', lambda m: m.group(1) + t_payload + m.group(2),
+                 new, flags=re.S)
     BOARD_PATH.write_text(new, encoding="utf-8")
 
 
