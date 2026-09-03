@@ -5,7 +5,34 @@ description: Expert operator knowledge for BirdLife Australia's WordPress estate
 
 # BirdLife Australia — WordPress
 
-**There is no WordPress MCP connector in this session.** Everything here is operator knowledge, not executable capability. Work through WP Engine, the WP admin, or the browser tools — and say which you are using.
+## Connector reality (verified live 3 Sep 2026)
+
+A **"BirdLife UAT WordPress"** MCP connector is attached to the account. It is
+the WordPress MCP Adapter exposing eleven abilities, discovered live:
+
+| Ability | Kind |
+|---|---|
+| `woocommerce/orders-query`, `woocommerce/products-query` | read |
+| `woocommerce-gift-cards/gift-cards-query`, `woocommerce-product-bundles/query-bundles` | read |
+| `yoast-seo/get-seo-scores`, `yoast-seo/get-readability-scores` | read |
+| `woocommerce/order-add-note`, `woocommerce/order-update-status` | **write** |
+| `woocommerce/product-create`, `woocommerce/product-update`, `woocommerce/product-delete` | **write** |
+
+Three things follow. First, it is **UAT**, so its data is not production and
+nothing read from it describes live members or orders; say "UAT" in every
+answer that uses it. Second, its write abilities exist, so the charter's
+propose-then-write rule applies even on UAT (a wrong product delete on the
+environment Blitzm tests against costs the project days). Third, **there is
+still no production WordPress connector**: production questions are answered
+from WP Engine, the WP admin, or Salesforce's view of the synced orders, and
+you say which. Use `mcp-adapter-discover-abilities` at the start of a session
+in case the ability list has grown; `mcp-adapter-get-ability-info` gives the
+schema before any call.
+
+An earlier read-only WooCommerce REST key also existed; WooCommerce "Read" keys
+were found able to WRITE (permission-enforcement gap), and those keys were
+exposed in deleted Claude routine prompts in Aug 2026 with rotation **not
+verified**. Treat any key you meet as write-capable and possibly compromised.
 
 ## Environments
 

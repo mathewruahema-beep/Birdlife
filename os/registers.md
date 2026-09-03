@@ -92,9 +92,21 @@ in which case commit it back first.
 | birdlife-stripe | Payments | yes | yes |
 | birdlife-zapier | Automation | yes | yes |
 | birdlife-cloudflare | DNS, edge | yes | yes |
-| birdlife-os | This operating system | yes | sync it |
-| email-voice | Mathew's email voice | yes (committed 2 Sep 2026) | yes |
+| birdlife-os | This operating system and the console | yes | re-upload (3 Sep) |
+| birdlife-security | Posture, deadlines, incidents (CONFIDENTIAL) | yes (created 3 Sep 2026) | upload |
+| birdlife-people-lifecycle | Joiner/mover/leaver | yes (created 3 Sep 2026) | upload |
+| birdlife-reporting | Report library and data discipline | yes (created 3 Sep 2026) | upload |
+| email-voice | Mathew's email voice | yes (committed 2 Sep 2026) | re-upload (3 Sep) |
 | morning | Morning brief | no, account only | yes |
+
+**Expert pass, 3 Sep 2026:** every repo skill was extended with observed
+connector behaviour and runbooks (Salesforce query set and Staging connector;
+Asana section semantics and API shapes; M365 connector facts; NetSuite SuiteQL
+cookbook; Stripe five-account map and reconciliation playbook; Cloudflare
+SPF/DMARC runbook; Zapier exception-report publish runbook; WordPress UAT
+connector, which has write abilities; email-voice report register). All
+account copies are therefore stale until re-uploaded from the zips sent on
+3 Sep; until then the repo copies are the only expert versions.
 
 Account-only skills are unversioned: if the account loses them, they are gone.
 `email-voice` was account-only and load-bearing (the overnight pre-draft depends
@@ -152,3 +164,10 @@ grants) and fold the missing checks in. Security dashboard kept (governance).
 | WooCommerce API keys exposed in deleted routine prompts (Aug 2026) | Rotation was flagged, **not verified done** | Confirm rotation with Mathew; until confirmed, treat as open |
 | entra-admin-mcp certificate | Expires 26 Aug 2027 | Renewal reminder routine live (`trig_01Vp14cTKJCLnC7psjiRZnUC`) |
 | Zapier connected app credentials (17 apps) | In Zapier vault | Reviewed in monthly OS review |
+| miniOrange SF→WP webhook access keys (prod `7cf2…`, staging `8d8f…`) | Leaked in plaintext in three documents; rotation **not verified** | Regenerate Access Key in both envs, scrub the documents, confirm here |
+| LearnUpon → Zapier catch-hook URL | In plaintext in documentation; owned by Keith's Zapier account | Confirm purpose with Keith, rotate, scrub, re-own |
+| Raisely access token in `Contact.Raisely_Access_Token__c` formula URL | By design, sensitive | Field-level security review; never export in reports |
+| NetSuite OAuth2 certificate `7SCEnbQf…` (linked to departed staff) | Expires 17 Sep 2026, zero activity | Revoke, monitor, delete (CFO briefed 20 Jul, no action yet) |
+| Vevox SAML certificates | Dashboard 21 Aug 2026 (passed), Vevox 8 Sep 2026 | Verify SSO still works; renew before 8 Sep |
+| Employment Hero sync Graph secret | Expires 5 Jan 2027 | Rotate when the Logic App is unblocked; add a reminder routine |
+| Salesforce test accounts `test101`, `test123` | Active with real credentials | Disable |

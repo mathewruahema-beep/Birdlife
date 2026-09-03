@@ -43,6 +43,39 @@ That means: when someone asks you to "add a DNS record", "check the WAF", or "pu
 
 Paired change: enable Enhanced Domains and DKIM signing in Salesforce Setup → Email → Deliverability.
 
+## Email authentication: the full picture and the runbook
+
+Two findings, one domain, both live:
+1. **SPF** does not include `include:_spf.salesforce.com` (breaks Case→Asana
+   email and any Salesforce-sent mail hitting a strict receiver).
+2. **DMARC is `p=reject` with `pct=10`.** Only 10% of failing mail is
+   rejected; the other 90% is delivered as if the policy were `none`. The
+   organisation believes it is protected against spoofing and is 10% protected.
+
+Runbook for any change to SPF/DKIM/DMARC (these are reviewed changes, not
+DNS edits):
+1. **Inventory every legitimate sender**: Exchange Online, Salesforce (zeus@
+   and receipting), Exclaimer, Campaign Monitor, Ortto, Raisely, Employment
+   Hero, WordPress/WP Engine transactional, Payments2Us, Conga, Zapier email
+   steps, NetSuite notifications. Pull DMARC aggregate reports for 2 weeks
+   if any exist; if none are being collected, add `rua=` first and wait.
+2. **Count SPF lookups**: the 10-DNS-lookup limit is the usual reason an
+   `include:` breaks everything. Flatten or drop dead includes before adding.
+3. **Propose the exact record** (old and new TXT values side by side), the
+   rollback (the old TXT value, who applies it, within minutes), the test
+   plan (send from each sender to a Gmail and an Outlook mailbox and read the
+   Authentication-Results header), and the owner.
+4. **Apply outside business hours**, monitor bounces and the Zeus queue for
+   "email not received" cases for 48 hours.
+5. **DMARC ramp**: `pct=10` to `pct=50` to `pct=100`, one to two weeks each,
+   only once SPF and DKIM pass for every sender in the inventory.
+6. Pair with Salesforce: Enhanced Domains and DKIM signing in Setup, Email,
+   Deliverability, so Salesforce mail aligns on DKIM as well as SPF.
+
+The connected MCP cannot read or write DNS. The change is applied in the
+Cloudflare dashboard by whoever holds the zone (confirm which of the two
+accounts) and the session's deliverable is the proposal above, written up.
+
 ## The cart-flood incident — mitigated at WP Engine, NOT Cloudflare
 
 This gets misattributed constantly. Get it right.

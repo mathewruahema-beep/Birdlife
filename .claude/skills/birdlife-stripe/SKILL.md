@@ -1,6 +1,6 @@
 ---
 name: birdlife-stripe
-description: Operator knowledge for BirdLife Australia's Stripe account — the eCommerce live account, how payments flow through WooCommerce into Salesforce and NetSuite, the refund traceability gap, BECS direct debit constraints for the membership migration, and safe use of the Stripe MCP. Use for any task about payments, charges, refunds, payouts, disputes, subscriptions, webhooks or payment reconciliation. Trigger on "Stripe", "charge", "refund", "payout", "webhook", "BECS", "direct debit", "card token", or a payment discrepancy.
+description: Operator knowledge for BirdLife Australia's five livemode Stripe accounts (eCommerce, Memberships, Ausbirdfund, BLP, eStore/AOC), how payments flow through WooCommerce into Salesforce and NetSuite, the refund traceability gap, BECS direct debit constraints for the membership migration, the reconciliation playbook, and safe read-only use of the Stripe MCP. Use for any task about payments, charges, refunds, payouts, disputes, subscriptions, webhooks or payment reconciliation. Trigger on "Stripe", "charge", "refund", "payout", "webhook", "BECS", "direct debit", "card token", or a payment discrepancy.
 ---
 
 # BirdLife Australia — Stripe
@@ -64,9 +64,55 @@ WooCommerce volume for context: ~6,466 orders as at Jul 2026 — 6,331 completed
 
 A Stripe support thread on the **payout webhook** was sitting in "they owe you" state as at Aug 2026. If payout data looks incomplete, that thread is the first place to look.
 
+## Which account answers which question
+
+| Question is about | Start in | Salesforce counterpart |
+|---|---|---|
+| Website shop orders, merchandise, donations via WooCommerce | eCommerce | miniOrange-synced Opportunities, `stripeGC` objects |
+| Membership payments and renewals | Memberships (and the Payments2Us "BirdLife MEMBERSHIP Facility" gateway until decommissioned) | `AAkPay__*` Recurring Payments, `Subscription__c` (Keith's) |
+| Australian Bird Fund appeals | Ausbirdfund | NPSP Opportunities with the ABF GAU |
+| BLP | BLP | Confirm scope with Mathew before asserting; not yet mapped in this skill |
+| eStore / Aussie Outdoor Club merchandise | eStore/AOC | Confirm scope; separate WooCommerce or third-party store |
+
+Two of the five (BLP, eStore/AOC) have no verified mapping to a Salesforce
+flow yet. Say "unmapped" rather than guess, and add the mapping here when it
+is learned.
+
 ## Available tooling
 
 `mcp__Stripe__*` provides `stripe_api_read`, `stripe_api_search`, `stripe_api_write`, `stripe_api_details`, account info and documentation search, plus an implementation planner.
+
+### Mechanics (verified 3 Sep 2026)
+- `list_available_accounts_or_orgs` lists the five accounts; use it to
+  confirm ids before anything else.
+- `stripe_api_read({stripe_api_operation_id, parameters, stripe_context,
+  livemode:true})`: `stripe_context` is the account id. Operation ids follow
+  the OpenAPI names (`GetBalance`, `GetCharges`, `GetRefunds`, `GetPayouts`,
+  `GetBalanceTransactions`, `GetCustomers`); `stripe_api_details` gives the
+  parameters for one before you call it.
+- Amounts are **integer cents**; divide by 100 and label the currency.
+  GetBalance returns `{available:[{amount,currency}], pending:[...]}`.
+- `stripe_api_search` is the fast path for "find the charge for $84.00 on 2
+  Sep" (Stripe search query syntax: `amount:8400 AND created>1756684800`).
+- The console's Money tab sums GetBalance across all five accounts every
+  four minutes when open; the page never declares `stripe_api_write`.
+
+### Reconciliation playbook (a refund or a "missing" payment)
+1. Name the account and livemode. Pull the charge or refund in Stripe by
+   amount and date (`stripe_api_search`), note `ch_`/`pi_`/`re_` ids and the
+   `balance_transaction`.
+2. In Salesforce find the Opportunity by amount and CloseDate (Woo orders
+   carry `transaction_id` = the Stripe id in post meta and often on the
+   Opportunity); check `npe01__OppPayment__c` rows. A refund will appear as a
+   second **positive** payment with `Paid = false` and Type
+   `shop_order_refund`, if it appears at all.
+3. Check `stripeGC__Sync_Log__c` for an error on that date.
+4. In NetSuite (or from Finance) find the bank deposit 1 to 3 business days
+   later in 118636581 or the ABF account 11103.
+5. Report the three views with dates and the gap. Recommend, never apply, a
+   correction; Nina Lewis owns reconciliation, and the `Block_Reconciled_
+   Changes` validation rule will stop a manual edit of a reconciled payment
+   anyway.
 
 **Discipline:**
 1. `stripe_api_read` and `stripe_api_search` freely — they are safe.

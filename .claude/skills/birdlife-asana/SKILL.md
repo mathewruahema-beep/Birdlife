@@ -18,7 +18,42 @@ Teams are organised by conservation programme and function, not by system. Verif
 
 Also present and worth flagging as untidy: "BirdLife's first team" and "Caroline's first team" — default artefacts that should be archived.
 
-For the **IT Operations Project Plan section GIDs**, defer to the installed `birdlife-ict-assistant` skill or call `get_project` live. Do not guess section IDs; moving a task to the wrong section is silently wrong.
+## IT Operations Project Plan: the IDs (verified, mirrored from `birdlife-ict-assistant`)
+
+Project gid **`1211042432693678`**. Sections and their gids:
+
+| Section | gid | Meaning in the flow |
+|---|---|---|
+| Backlog/Requests | `1216556543715194` | Intake. Anything here without an owner and a date is unqualified |
+| Scoping/Requirements Gathering | `1216556543715193` | Being defined; should have a decision date |
+| In Development/Progress | `1216556543715191` | Actively worked; stale here 14+ days is a standup question |
+| Awaiting Response | `1217146608838572` | Waiting on someone outside ICT; name who and chase weekly |
+| Blocked | `1216556543715197` | Cannot proceed; every item names the blocker and its owner |
+| Ready for Deployment | `1216556543715188` | Built, awaiting change window or sign-off (Nina for website) |
+| Hypercare | `1211042432693693` | Deployed, being watched; time-box it |
+| Done | `1211051239943465` | Complete |
+| Meeting agenda (Marketing+ICT) | `1214293208933456` | Not a work state: agenda items for the joint meeting |
+
+Live task memberships override this table if a section was renamed; `get_project`
+or the `memberships.section` field on a `search_tasks` result is the check. Moving
+a task to the wrong section is silently wrong, so verify by re-reading the task.
+
+### Observed API behaviour
+- `search_tasks({projects_any, completed:false, limit, opt_fields:"name,assignee.name,due_on,memberships.section.name,modified_at"})`
+  returns `{data:[...]}`; sections come through `memberships[].section.{gid,name}`.
+- `update_tasks` returns per-task `succeeded` / `failed` arrays. Check `failed`
+  before claiming success; a partial batch is the normal failure mode.
+- Section move: `update_tasks(tasks=[{task, add_projects:[{project_id, section_id}]}])`.
+- `add_comment(task_id, text)` is a human-authored story; field changes are
+  logged automatically and do not need a comment, but a decision does.
+- Task link: `https://app.asana.com/1/443963187362944/project/1211042432693678/task/<gid>`.
+
+### Board reading rules (how the console and the hygiene report judge it)
+- **Attention** = Blocked, Awaiting Response, or due date passed, or no due
+  date on anything outside Backlog.
+- **Stale** = `modified_at` older than 30 days while not in Done.
+- The recommendation per stale item is one of three words: close, delegate,
+  or date it. Anything else is avoidance.
 
 ## The Salesforce Case → Asana email rule (open blocker)
 

@@ -79,6 +79,16 @@ confirm on reassign):
 
 The duplicate accounts are themselves worth flagging to Mathew as a cleanup item.
 
+Live tie-break (used by the console's `case_assign`): among the active matches, the one
+owning Zeus cases in the last 180 days is the working account:
+```
+SELECT OwnerId, COUNT(Id) c FROM Case
+WHERE RecordType.DeveloperName = 'Zeus' AND OwnerId IN ('<id1>','<id2>')
+  AND CreatedDate = LAST_N_DAYS:180 GROUP BY OwnerId
+```
+One owner with cases: use it. Zero or several: present candidates (Username + count) and
+require an explicit choice. Log the assignment with an internal CaseComment.
+
 ---
 
 ## 3. Asana — IT Operations Project Plan
@@ -170,10 +180,16 @@ Connect-MgGraph -Scopes "User.ReadWrite.All","Group.ReadWrite.All","UserAuthenti
 Durable context so you don't re-discover it each session. A fuller knowledge base lives
 in the user's `birdlife_ict_knowledge_base.md`.
 
-**What you can reach:** Salesforce Production (write), NetSuite, Stripe (eCommerce account
-only), WooCommerce (read-only key), WordPress + Gravity Forms (REST), Asana, Canva,
-Cloudflare, Miro, M365 (productivity only — NOT admin), plus Campaign Monitor / Ortto /
-Raisely / Humanitix via Zapier (thin). AWS + Entra are desktop-bridge only.
+**What you can reach (updated 3 Sep 2026):** Salesforce Production and Salesforce Staging
+(write), NetSuite (SuiteQL, reports, records), Stripe (**five livemode accounts**:
+eCommerce `acct_1PaqQkEdZ08H7Yxq`, Memberships `acct_1DE94cH9l9pxYNgx`, Ausbirdfund
+`acct_1DffVqH1WeNbvypj`, BLP `acct_1OKucyFMYRhNDz9n`, eStore/AOC `acct_1NfHuCCj2I4WmWMH`),
+BirdLife UAT WordPress (MCP adapter, WooCommerce read + write, UAT only), Asana, Canva,
+Cloudflare (Developer Platform only, no DNS/WAF), Miro, Zoom, Granola, Atlassian, Google
+(Gmail/Calendar/Drive), Zapier, GitHub, M365 (productivity only, NOT admin), plus Campaign
+Monitor / Ortto / Raisely / Humanitix via Zapier (thin). AWS + Entra are desktop-bridge only.
+The earlier "WooCommerce read-only key" is superseded by the UAT connector and its keys
+are on the credential watchlist (rotation not verified).
 
 **Salesforce is the hub — most systems write into it and are reachable via the SF connector:**
 Stripe ×3 accounts (eCommerce/Memberships/Ausbirdfund) via `stripeGC` (sync health in

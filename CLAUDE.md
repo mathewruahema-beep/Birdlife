@@ -24,6 +24,10 @@ the real IDs, picklist values, gotchas, and playbooks:
 | `birdlife-stripe` | Payments, refunds, BECS, WooCommerce→Salesforce flow |
 | `birdlife-zapier` | The 17 connected apps, when Zapier vs native connector |
 | `birdlife-cloudflare` | DNS, SPF/DKIM, WAF, caching, the two accounts |
+| `birdlife-security` | Security posture across the estate, Essential Eight anchor, deadline register, admin ratios, incident playbooks (CONFIDENTIAL content) |
+| `birdlife-people-lifecycle` | Joiner/mover/leaver across every system, in order, with the Tier 2 scripts and the departed-staff credential sweep |
+| `birdlife-reporting` | The report library (weekly status, money state, security posture, exec brief, Board paper, incident), data discipline, production path |
+| `email-voice` | Mathew's email voice: three registers plus the report register; load before drafting anything he will send |
 | `birdlife-os` | Managing Claude itself: routine/skill/connector/artefact governance, the weekly OS audit, the registers, and operating/updating the BirdLife Australia console (Jarvis) |
 
 If the account-synced versions of these skills are also present, they take

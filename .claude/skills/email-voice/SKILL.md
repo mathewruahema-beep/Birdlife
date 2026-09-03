@@ -113,6 +113,17 @@ does the job.
 - No exclamation marks in this register — the warmth lives in the candour.
 - Close "Kind regards,\nMathew" (formal/external) or "Thanks" (internal).
 
+## Reports and papers (register C, extended)
+
+Reports, briefs and Board papers are register C with three additions: every
+number carries its as-of date, every action line carries an owner and a date,
+and a provenance line closes the document (what was read, when, what could
+not be read). The report library, skeletons and data rules live in the
+`birdlife-reporting` skill; this skill supplies the voice. Two habits carry
+over strongly: the "Short answer:" opening and owning a mistake first with
+its mechanism. Mathew's own instruction for anything written for him: no
+em dashes anywhere.
+
 ## Phrasing habits (all registers)
 
 - "X rather than Y" is his signature contrast — the chosen path and the

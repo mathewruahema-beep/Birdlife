@@ -65,6 +65,40 @@ Zapier trigger "New or Updated Employee" → filter out Contractors → Graph cl
 
 **Superseded** by the native Employment Hero → M365 integration. If it is still enabled, it is now a second uncontrolled writer into Entra. Check and disable.
 
+## Publishing the exception report: the runbook
+
+Everything below is Tier 2 (a human with Zapier and NetSuite admin runs it);
+the session prepares and verifies.
+
+1. **NetSuite TBA credentials** (do not exist yet): Setup, Integration,
+   Manage Integrations, New: name "Zapier Exception Report", Token-Based
+   Authentication ticked, TBA authorization flow off, save and capture the
+   consumer key/secret once (they are shown once). Then Setup, Users/Roles,
+   Access Tokens, New: application = that integration, user = Mathew Hema,
+   role = Administrator (note the segregation-of-duties smell; a dedicated
+   integration role with read-only transaction access is the better long-term
+   answer). Capture token id/secret once. Store all four in the Zapier
+   connection, nowhere else.
+2. **Salesforce OAuth** connection as the Zapier integration user, not
+   Mathew's personal login, so it survives a password change.
+3. **Test each step** with the report id `00ORF0000033T6z2AE` and a known
+   week; confirm the ±3-business-day matching returns both matched and
+   unmatched examples.
+4. **Second-person review** (Nina Lewis or Keith) of the step mappings and
+   the email recipient list, recorded in an Asana comment.
+5. **Publish**, then verify the first Tuesday run produced an email; a Zap
+   that runs and emails nothing is the "firing but idle" failure the OS treats
+   as an incident.
+6. Register it: `os/registers.md` gains a row (it is a scheduled job even
+   though it is not a Claude routine).
+
+## Failure routing
+Zap errors should not die in Mathew's inbox. The designed route is Zap
+Manager error, then a Salesforce Case with Type `System Notification` on the
+Zeus record type, so failures show up in the queue the team already works.
+Until that route is built, a Zapier error email is a ticket in disguise: log
+it as a Case when you see one.
+
 ## Available tooling
 
 `mcp__Zapier__*` can discover, enable, disable, inspect and execute actions, manage connections, and create Zapier skills. `list_zapier_connections` requires a `selected_api` argument — use `inspect_zapier_actions` with no arguments to enumerate apps first.

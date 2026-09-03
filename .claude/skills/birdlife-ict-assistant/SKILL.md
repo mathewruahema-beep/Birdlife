@@ -126,6 +126,65 @@ Tier — what you execute vs what you prepare — and gives the exact steps or G
 commands. Always finish by updating the originating Case (status + log) so the ticket
 reflects reality.
 
+## The skill map (load the right one before acting)
+
+This skill is the workflow. The knowledge lives in the system skills, and the
+cross-cutting ones sit on top:
+
+| When the work is about | Load |
+|---|---|
+| Salesforce records, SOQL, integrations, org landmines | `birdlife-salesforce` |
+| Entra, mailboxes, Conditional Access, Intune, EH sync | `birdlife-microsoft365` |
+| Asana board, sections, hygiene | `birdlife-asana` |
+| NetSuite, GL, reconciliation | `birdlife-netsuite` |
+| Website, WooCommerce, membership rebuild, UAT connector | `birdlife-wordpress` |
+| Payments, refunds, the five Stripe accounts | `birdlife-stripe` |
+| Zaps, apps with no native connector | `birdlife-zapier` |
+| DNS, SPF/DMARC, edge, the two Cloudflare accounts | `birdlife-cloudflare` |
+| Any security question, posture, deadlines, incidents | `birdlife-security` |
+| New starter, leaver, role change, "does X still have access" | `birdlife-people-lifecycle` |
+| A report, brief, paper or status for any audience | `birdlife-reporting` |
+| Drafting anything Mathew will send | `email-voice` |
+| Routines, skills, connectors, the console itself | `birdlife-os` |
+
+The daily working surface is the **BirdLife Australia console** (Jarvis), an
+artifact with live queue, board, inbox, Teams, Money and Security tabs and
+approve-card writes. When Mathew is "on the console", the same rules apply:
+one record at a time, exact change shown, verified by re-read.
+
+## Observed connector behaviour (do not rediscover)
+
+- **Salesforce** `soqlQuery` returns `{totalSize, done, records:[...]}`;
+  relationship fields are nested (`r.Owner.Name`). Aggregate queries return
+  `expr0`-style keys unless aliased. Scope every Case query with
+  `RecordType.DeveloperName = 'Zeus'`: without it you count 19 record types
+  and inflate ICT numbers ~200 times. `Owner.Name = 'Zeus'` is the unassigned
+  intake queue.
+- **Asana** `search_tasks` returns `{data:[...]}`; `update_tasks` reports
+  per-task `succeeded` / `failed` and you check `failed` before claiming
+  success. Section move is `add_projects: [{project_id, section_id}]`.
+- **Microsoft 365** tools return one JSON block per item in `result.content`,
+  with pagination trailers (`moreResults`, `nextOffset`, `nextCursor`) to
+  drop. `outlook_create_reply_draft` answers in plain text (`id: ...
+  webLink: ...`), not JSON, and creates a draft only. Teams has **no send
+  API**: replies are drafted for copy-paste. Chat search with a date filter
+  scans recent chats only.
+- **Write responses** for `createSobjectRecord` / `updateSobjectRecord` /
+  `add_comment` / `update_tasks` are not to be trusted blind: re-read the
+  record after every write and report what the re-read shows.
+
+## Resolving an ICT owner when User records are duplicated
+
+Every ICT staffer has more than one active Salesforce User. The resolution
+that works, in order:
+1. `SELECT Id, Name, Username, IsActive FROM User WHERE Name = '<name>' AND IsActive = true`
+2. If more than one, tie-break by who owns recent Zeus cases:
+   `SELECT OwnerId, COUNT(Id) c FROM Case WHERE RecordType.DeveloperName = 'Zeus' AND OwnerId IN (<ids>) AND CreatedDate = LAST_N_DAYS:180 GROUP BY OwnerId`
+3. Exactly one owner with cases: use it. Otherwise show the candidates with
+   usernames and counts and require the user to pick. Never guess, never
+   hardcode. Assignment is limited to Andrew Dunn, Keith Tsui, Nina Lewis and
+   Mathew; anyone else is a reassignment decision for a human.
+
 ## Style
 
 Be frank and specific. Surface the thing the user needs to decide rather than burying

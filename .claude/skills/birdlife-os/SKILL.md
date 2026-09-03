@@ -208,6 +208,24 @@ Refuse to create casually. Walk the change control from `os/README.md`:
   credential and flag it for rotation on the watchlist), then delete, then
   remove or annotate the register row. Never delete without the backup.
 
+## The skill estate (what exists, what each is for)
+
+Fourteen skills, all versioned in `.claude/skills/` and mirrored to the
+account by uploading a zip per skill (the uploader rejects any name containing
+"claude"). System skills: `birdlife-salesforce`, `birdlife-microsoft365`,
+`birdlife-asana`, `birdlife-netsuite`, `birdlife-wordpress`,
+`birdlife-stripe`, `birdlife-zapier`, `birdlife-cloudflare`. Cross-cutting:
+`birdlife-ict-assistant` (workflow and tiers), `birdlife-security` (posture,
+deadlines, incidents), `birdlife-people-lifecycle` (joiner/mover/leaver),
+`birdlife-reporting` (report library and data discipline), `email-voice`
+(Mathew's voice), `birdlife-os` (this one). Account-only: `morning`.
+
+A skill earns a slot when its knowledge is hard-won and reused. Connectors
+without a skill (Atlassian, Canva, Miro, Zoom, Granola, Gmail, Google Drive
+and Calendar, Microsoft Learn) are reviewed at the weekly audit: each names
+the job it serves or is a disconnect candidate. Do not write speculative
+skills for idle connectors; that is skill sprawl.
+
 ## Skill lifecycle
 
 - New knowledge goes into the relevant `birdlife-*` skill file, committed and
