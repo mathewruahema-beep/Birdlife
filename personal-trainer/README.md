@@ -15,7 +15,7 @@ the evidence for men over 50, and the daily structure is Te Whare Tapa Whā.
 | Train | Program, coaching cues, rest timing | 3-, 4- or 5-day programs for bodyweight, dumbbells or full gym, with power, balance and carry work built in. Guided session mode: the voice announces each exercise and cue, counts sets, runs the rest clock with a 10-second warning and 3-2-1 beeps. Live heart rate over Bluetooth (Chrome). |
 | Fuel | Calories, macros, a day of eating, the rules | Mifflin-St Jeor maintenance, goal-adjusted target, protein at 1.8–2.0 g/kg split to 35–40 g per meal, creatine, fibre, alcohol and gout guidance, example day. |
 | Progress | Track what matters | Weight trend chart, waist with risk bands (94 / 102 cm), training history, and the Samsung Health import (steps, sleep, resting heart rate, weight, workouts from the watch). |
-| Coach | Accountability beyond the gym | Voice on/off, coach style toggle (Deadpan Kiwi with a New Zealand English voice, or Straight coach), health checks that go amber when due (heart health check, HbA1c, uric acid, bowel kit, prostate conversation, skin, dental), heart-rate zones for the watch, profile, backup. |
+| Coach | Accountability beyond the gym | Voice on/off, coach style toggle (Deadpan Kiwi or Straight coach), in-app voice picker with pace and pitch controls and a guide to installing the New Zealand English voice pack, health checks that go amber when due (heart health check, HbA1c, uric acid, bowel kit, prostate conversation, skin, dental), heart-rate zones for the watch, profile, backup. |
 
 ## Samsung Health and the Galaxy Watch
 

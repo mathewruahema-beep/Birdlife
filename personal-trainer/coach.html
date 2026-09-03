@@ -325,7 +325,24 @@
       <div class="row" style="margin-top:10px">
         <button class="btn ghost small" id="btnPersona"></button>
       </div>
-      <p class="note">Deadpan Kiwi picks a New Zealand English voice on the phone if one is installed, and talks like a dry, self-aware mate who still counts your missed sessions. Straight coach is the plain version.</p>
+      <p class="note">Deadpan Kiwi talks like a dry, self-aware mate who still counts your missed sessions. Straight coach is the plain version.</p>
+      <div class="field" style="margin-top:14px"><label for="voiceSel">Which voice</label>
+        <select id="voiceSel"></select>
+        <p class="note" id="voiceNote"></p></div>
+      <div class="row">
+        <div class="field"><label for="rateIn">Pace <span id="rateVal"></span></label><input id="rateIn" type="range" min="0.7" max="1.3" step="0.05"></div>
+        <div class="field"><label for="pitchIn">Pitch <span id="pitchVal"></span></label><input id="pitchIn" type="range" min="0.7" max="1.3" step="0.05"></div>
+      </div>
+      <div class="row">
+        <button class="btn ghost small" id="btnVoiceRefresh">Refresh voice list</button>
+      </div>
+    </div>
+    <div class="card" id="kiwiHelp">
+      <h3>Get a Kiwi voice on your Samsung</h3>
+      <p class="sub">The app can only use voices your phone has installed. Do this once, then come back and pick it above.</p>
+      <p class="sub"><b>Google voice (works in Chrome):</b> Settings → General management → Text-to-speech → Preferred engine: <b>Speech Services by Google</b> → tap the gear → Install voice data → <b>English (New Zealand)</b>. Download it on Wi-Fi.</p>
+      <p class="sub"><b>Samsung voice (works in Samsung Internet):</b> same screen → Preferred engine: <b>Samsung text-to-speech engine</b> → gear → Install voice data → English (New Zealand) if it is offered; Samsung does not ship one on every model. If it is missing, use the Google engine and open this app in Chrome.</p>
+      <p class="sub">After installing, tap <b>Refresh voice list</b>. The Kiwi voices show with a ★.</p>
       <p class="note">Uses your phone's built-in speech. On Samsung, an Australian English voice is picked automatically if installed (Settings → General management → Text-to-speech).</p>
     </div>
     <div class="card">
@@ -414,6 +431,7 @@ let S = load() || { profile:null, weights:[], waists:[], workouts:[], cardio:[],
 ['weights','waists','workouts','cardio'].forEach(k=>{ if(!Array.isArray(S[k])) S[k]=[] });
 S.habits=S.habits||{}; S.checks=S.checks||{};
 S.persona=S.persona||'kiwi';
+S.voiceName=S.voiceName||''; S.rate=S.rate||1; S.pitch=S.pitch||1;
 S.health=S.health||{}; ['steps','sleep','hr','imported'].forEach(k=>{ S.health[k]=S.health[k]||{} });
 
 const dayKey = d => { const x=new Date(d); x.setMinutes(x.getMinutes()-x.getTimezoneOffset()); return x.toISOString().slice(0,10) };
@@ -424,11 +442,15 @@ function weekStart(){ const d=new Date(); const dow=(d.getDay()+6)%7; d.setDate(
 
 /* ============ voice ============ */
 let voiceReady=null;
+function allVoices(){ try{ return speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)); }catch(e){ return []; } }
 function pickVoice(){
   try{
     const vs=speechSynthesis.getVoices();
+    const chosen = S.voiceName && vs.find(v=>v.name===S.voiceName);
+    if(chosen){ voiceReady=chosen; if(document.getElementById('voiceSel')) renderVoicePicker(); return; }
     const pref = S.persona==='kiwi' ? ['en-NZ','en-AU'] : ['en-AU','en-NZ'];
     voiceReady = vs.find(v=>v.lang===pref[0]) || vs.find(v=>v.lang===pref[1]) || vs.find(v=>v.lang&&v.lang.indexOf('en-GB')===0) || vs.find(v=>v.lang&&v.lang.indexOf('en')===0) || null;
+    if(document.getElementById('voiceSel')) renderVoicePicker();
   }catch(e){}
 }
 try{ speechSynthesis.onvoiceschanged=pickVoice; pickVoice(); }catch(e){}
@@ -437,7 +459,7 @@ function speak(text, force){
   try{
     speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(text);
-    u.rate=S.persona==='kiwi'?0.98:1.03; u.pitch=1;
+    u.rate=S.rate*(S.persona==='kiwi'?0.98:1.03); u.pitch=S.pitch;
     if(voiceReady) u.voice=voiceReady;
     speechSynthesis.speak(u);
   }catch(e){}
@@ -1029,6 +1051,9 @@ function renderCoach(){
   renderHdr();
   $('btnVoice').textContent = S.voice ? '🔊 Voice: ON' : '🔇 Voice: OFF';
   $('btnPersona').textContent = '🎭 Style: '+P().label;
+  $('rateIn').value=S.rate; $('pitchIn').value=S.pitch;
+  $('rateVal').textContent=S.rate.toFixed(2)+'×'; $('pitchVal').textContent=S.pitch.toFixed(2)+'×';
+  renderVoicePicker();
   const p=S.profile, t=calcTargets();
   $('profSummary').innerHTML =
     '<span class="pill">'+p.name+'</span><span class="pill">'+p.age+' yrs</span><span class="pill">'+p.h+' cm</span><span class="pill">'+p.w+' kg</span>'+
@@ -1056,6 +1081,24 @@ function renderCoach(){
   });
   $('exportBox').value=JSON.stringify(S);
 }
+function renderVoicePicker(){
+  const sel=$('voiceSel'); if(!sel) return;
+  const vs=allVoices();
+  const rank=v=> v.lang==='en-NZ'?0 : v.lang==='en-AU'?1 : v.lang==='en-GB'?2 : 3;
+  vs.sort((a,b)=>rank(a)-rank(b)||a.name.localeCompare(b.name));
+  const cur = S.voiceName || (voiceReady?voiceReady.name:'');
+  sel.innerHTML='<option value="">Automatic (best available)</option>'+vs.map(v=>'<option value="'+v.name.replace(/"/g,'&quot;')+'"'+(v.name===cur?' selected':'')+'>'+(v.lang==='en-NZ'?'★ ':'')+v.name+' · '+v.lang+'</option>').join('');
+  const nz=vs.filter(v=>v.lang==='en-NZ').length;
+  $('voiceNote').textContent = !vs.length ? 'No voices reported yet. Tap Refresh, or open the app in Chrome.' :
+    nz ? nz+' New Zealand English voice'+(nz>1?'s':'')+' found. Pick one and test it.' :
+    'No New Zealand voice installed on this phone yet ('+vs.length+' English voices found). Follow the steps below, then Refresh.';
+  $('kiwiHelp').style.display = nz ? 'none' : '';
+}
+$('voiceSel').onchange=()=>{ S.voiceName=$('voiceSel').value; save(); pickVoice(); speak(P().voiceOn(), true); };
+$('rateIn').oninput=()=>{ S.rate=+$('rateIn').value; $('rateVal').textContent=S.rate.toFixed(2)+'×'; save(); };
+$('pitchIn').oninput=()=>{ S.pitch=+$('pitchIn').value; $('pitchVal').textContent=S.pitch.toFixed(2)+'×'; save(); };
+$('rateIn').onchange=$('pitchIn').onchange=()=>speak('Like this. Bit fast? Bit slow? Your call, mate.', true);
+$('btnVoiceRefresh').onclick=()=>{ pickVoice(); renderVoicePicker(); speak(voiceReady?'This is the voice I found.':'', true); };
 $('btnPersona').onclick=()=>{ S.persona = S.persona==='kiwi' ? 'straight' : 'kiwi'; save(); pickVoice(); renderCoach(); speak(P().voiceOn(), true); };
 $('btnVoice').onclick=()=>{ S.voice=!S.voice; save(); renderCoach(); if(S.voice) speak(P().voiceOn()); };
 $('btnVoiceTest').onclick=()=>speak(P().voiceTest(S.profile?S.profile.name:''), true);
