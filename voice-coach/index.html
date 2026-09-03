@@ -251,7 +251,7 @@ const KEY='quietstorm.v1';
 const NOTE_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const defaultState=()=>({
   profile:{name:'',voiceType:'baritone',createdAt:Date.now()},
-  settings:{a4:440,intensity:'firm',guide:true,gate:0.012,theme:'system'},
+  settings:{a4:440,intensity:'firm',guide:true,gate:0.012,theme:'system',deviceId:'',headphones:true},
   assessments:[],
   sessions:[],
   bests:{}
@@ -284,8 +284,11 @@ function lastAssessment(){return S.assessments[S.assessments.length-1]||null;}
 function rangeNow(){const a=lastAssessment();if(a&&a.low&&a.high)return {low:a.low,high:a.high};const v=voice();return {low:v.low,high:v.high};}
 
 /* ============================ AUDIO ============================ */
-let actx=null, analyser=null, micStream=null, buf=null, detector=null, rafId=null, micOn=false, wakeLock=null;
-const live={freq:0,midi:NaN,cents:0,clarity:0,rms:0,voiced:false,t:0};
+let actx=null, analyser=null, micStream=null, buf=null, detector=null, rafId=null, micOn=false, wakeLock=null, inputs=[];
+async function refreshInputs(){try{const ds=await navigator.mediaDevices.enumerateDevices();inputs=ds.filter(d=>d.kind==='audioinput');document.dispatchEvent(new CustomEvent('inputs'));}catch(e){}}
+if(navigator.mediaDevices&&navigator.mediaDevices.addEventListener)navigator.mediaDevices.addEventListener('devicechange',refreshInputs);
+async function restartMic(){if(!micOn)return;stopMic();await startMic();}
+const live={freq:0,midi:NaN,cents:0,clarity:0,rms:0,voiced:false,t:0,device:'',settings:{}};
 const listeners=new Set();
 const recentMidi=[];
 
@@ -319,7 +322,11 @@ async function startMic(){
   try{
     actx=actx||new (window.AudioContext||window.webkitAudioContext)();
     if(actx.state==='suspended')await actx.resume();
-    micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    const base={echoCancellation:!S.settings.headphones,noiseSuppression:false,autoGainControl:false};
+    try{micStream=await navigator.mediaDevices.getUserMedia({audio:S.settings.deviceId?Object.assign({deviceId:{exact:S.settings.deviceId}},base):base});}
+    catch(e){if(S.settings.deviceId&&(e.name==='OverconstrainedError'||e.name==='NotFoundError')){toast('Saved microphone not found. Using the default input.');S.settings.deviceId='';save();micStream=await navigator.mediaDevices.getUserMedia({audio:base});}else throw e;}
+    const tr=micStream.getAudioTracks()[0];live.device=tr?tr.label:'';live.settings=tr&&tr.getSettings?tr.getSettings():{};
+    refreshInputs();
     const src=actx.createMediaStreamSource(micStream);
     analyser=actx.createAnalyser();analyser.fftSize=2048;analyser.smoothingTimeConstant=0;
     src.connect(analyser);
@@ -591,7 +598,7 @@ PAGES.home=(m)=>{
           <button class="btn primary" id="startAssess">Run the baseline assessment</button>
           <button class="btn" id="goTrain">Just warm up first</button>
         </div>
-        <p class="small muted">Use headphones if you can, a quiet room, and stand up. Set your voice type in Settings first (currently <b>${V.label}</b>).</p><p class="small muted">On a phone: open this page in Chrome or Samsung Internet, allow the microphone when asked, then use the browser menu and <b>Add to Home screen</b> so it opens like an app.</p>
+        <p class="small muted">Use headphones if you can, a quiet room, and stand up. Set your voice type in Settings first (currently <b>${V.label}</b>).</p><p class="small muted">On a phone: open this page in Chrome or Samsung Internet, allow the microphone when asked, then use the browser menu and <b>Add to Home screen</b> so it opens like an app. With headphones, check <b>Settings</b> once to pick which microphone the phone is using.</p>
       </div>
       <div class="panel stack">
         <span class="eyebrow">Example scorecard</span>
@@ -663,9 +670,9 @@ PAGES.assess=(m)=>{
   function render(){
     const s=steps[i];
     if(s==='Mic check'){
-      frame(`<h2>Say a comfortable "ah" and watch the needle move.</h2><p class="ink2">Stand up. Headphones on if you have them, so the reference tones do not bleed into the mic. Aim for a quiet room. The detector needs a clean tone, so no background music.</p>${needleHTML()}<div class="status" id="st">Waiting for the mic.</div>`,
+      frame(`<h2>Say a comfortable "ah" and watch the needle move.</h2><p class="ink2">Stand up. Headphones on if you have them, so the reference tones do not bleed into the mic. Aim for a quiet room. The detector needs a clean tone, so no background music.</p><p class="small muted" id="micdev"></p>${needleHTML()}<div class="status" id="st">Waiting for the mic.</div>`,
         `<div class="panel stack"><span class="eyebrow">What this measures</span><p class="small ink2">Seven numbers: lowest and highest clean note, pitch accuracy, stability, sustain, agility and breath. Together they set your level and drive every session plan.</p><p class="small ink2">Takes about ten minutes. Be honest with the range steps: a note that cracks or goes to fry does not count, and the detector will usually agree.</p><button class="btn primary" id="micGo">Turn on the mic</button><button class="btn" id="nx" disabled>Next</button></div>`);
-      $('#micGo').onclick=async()=>{if(await startMic()){$('#st').innerHTML='Mic live. Sing an <b>ah</b>.';}};
+      $('#micGo').onclick=async()=>{if(await startMic()){$('#st').innerHTML='Mic live. Sing an <b>ah</b>.';$('#micdev').textContent='Input: '+(live.device||'default')+'. Wrong one? Change it in Settings.';}};if(micOn)$('#micdev').textContent='Input: '+(live.device||'default')+'. Wrong one? Change it in Settings.';
       let ok=0;bindNeedle(null);listeners.add(l=>{if(l.voiced){ok++;if(ok>15){$('#nx').disabled=false;$('#st').innerHTML='<b>Signal is clean.</b> Go to the next step.';}}});
       $('#nx').onclick=next;
     }
@@ -972,10 +979,28 @@ PAGES.settings=(m)=>{
     <div class="row"><label class="field">A4 tuning (Hz)<input type="number" id="a4" value="${S.settings.a4}" min="415" max="466" style="width:90px"></label><label class="field">Mic gate (0.005 quiet room, 0.03 noisy)<input type="number" id="gate" value="${S.settings.gate}" min="0.002" max="0.1" step="0.002" style="width:110px"></label></div>
     <label class="field">Theme<select id="theme"><option value="system" ${S.settings.theme==='system'?'selected':''}>System</option><option value="light" ${S.settings.theme==='light'?'selected':''}>Light</option><option value="dark" ${S.settings.theme==='dark'?'selected':''}>Dark</option></select></label>
     <button class="btn primary" id="saveBtn">Save</button></div>
-  <div class="stack"><div class="panel stack"><h2>Your data</h2><p class="small ink2">Everything lives in this browser's storage. Copy the export somewhere safe (a note, a file) to move it to another device or keep it after clearing the browser.</p><div class="row"><button class="btn" id="exp">Copy export</button><button class="btn" id="imp">Import from text below</button></div><textarea id="io" placeholder="Paste an export here to import"></textarea></div>
+  <div class="stack"><div class="panel stack"><h2>Microphone and headphones</h2>
+    <p class="small ink2">Headphones are the right call: the reference tones stay out of the mic, so the detector only hears you. What matters is which microphone the phone uses once they are connected.</p>
+    <label class="field">Input<select id="dev"><option value="">Default input (what the phone picks)</option></select></label>
+    <p class="small muted" id="devnote">Turn the mic on to list the inputs by name.</p>
+    <label class="field">Headphones connected<select id="hp"><option value="1" ${S.settings.headphones?'selected':''}>Yes: raw signal, no echo cancelling (best)</option><option value="0" ${!S.settings.headphones?'selected':''}>No, using the phone speaker: cancel the tones</option></select></label>
+    <div class="row"><button class="btn" id="micTest">${micOn?'Mic is live':'Turn on the mic'}</button><button class="btn" id="tone">Play a test tone</button></div>
+    <div class="needle" style="height:14px"><span class="pin" id="lvl" style="width:14px;height:14px;top:0;left:0;transform:none;border-radius:7px"></span></div>
+    <div class="small mono muted" id="micinfo">${micOn?esc(live.device||'input active'):'mic off'}</div>
+    <div class="note small"><b>Wired headphones or a wired headset:</b> best. If the headset has an inline mic, pick it above; otherwise the phone's own mic does the job at 20 to 30 cm from your mouth.<br><b>Bluetooth earbuds:</b> workable, with two catches. The tones arrive a fraction late, and Android drops to the low-quality call profile once the earbud mic is in use. If your phone lists the built-in mic here, choose it and keep the earbuds for listening only.</div>
+  </div>
+  <div class="panel stack"><h2>Your data</h2><p class="small ink2">Everything lives in this browser's storage. Copy the export somewhere safe (a note, a file) to move it to another device or keep it after clearing the browser.</p><div class="row"><button class="btn" id="exp">Copy export</button><button class="btn" id="imp">Import from text below</button></div><textarea id="io" placeholder="Paste an export here to import"></textarea></div>
   <div class="panel stack"><h2>How the numbers work</h2><div class="tablewrap"><table><thead><tr><th>Metric</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead><tbody>
   <tr><td>Accuracy (mean cents)</td><td>≤40</td><td>≤25</td><td>≤15</td><td>≤8</td></tr><tr><td>Stability (cents SD)</td><td>≤25</td><td>≤16</td><td>≤10</td><td>≤6</td></tr><tr><td>Sustain (s)</td><td>≥8</td><td>≥12</td><td>≥18</td><td>≥25</td></tr><tr><td>Agility (% on target)</td><td>≥40</td><td>≥60</td><td>≥75</td><td>≥90</td></tr><tr><td>Breath (s)</td><td>≥12</td><td>≥20</td><td>≥30</td><td>≥40</td></tr><tr><td>Floor vs reference</td><td>at</td><td>2 st below</td><td>4 below</td><td>6 below</td></tr><tr><td>Ceiling vs reference</td><td>at</td><td>2 st above</td><td>4 above</td><td>6 above</td></tr></tbody></table></div><p class="small muted">Level is the average: Foundation under 1.5, Developing to 2.5, Solid to 3.4, Advanced above. The detector uses a normalised autocorrelation with a clarity threshold of 0.88, so breathy or cracked notes are ignored rather than mis-scored.</p></div>
   <div class="panel stack"><h2>Danger</h2><button class="btn danger" id="reset">Delete all data</button></div></div></div>`;
+  function fillDevs(){const sel=$('#dev');if(!sel)return;const cur=S.settings.deviceId;sel.innerHTML='<option value="">Default input (what the phone picks)</option>'+inputs.map(d=>`<option value="${esc(d.deviceId)}" ${d.deviceId===cur?'selected':''}>${esc(d.label||'Microphone '+(inputs.indexOf(d)+1))}</option>`).join('');if(inputs.length)$('#devnote').textContent=inputs.length+' input'+(inputs.length>1?'s':'')+' found. Pick one and it switches straight away.';}
+  fillDevs();document.addEventListener('inputs',fillDevs);
+  $('#dev').onchange=async()=>{S.settings.deviceId=$('#dev').value;save();await restartMic();$('#micinfo').textContent=live.device||'input active';toast('Input switched');};
+  $('#hp').onchange=async()=>{S.settings.headphones=$('#hp').value==='1';save();await restartMic();};
+  $('#micTest').onclick=async()=>{if(await startMic()){$('#micTest').textContent='Mic is live';$('#micinfo').textContent=(live.device||'input active')+(live.settings.sampleRate?' · '+live.settings.sampleRate+' Hz':'')+(live.settings.echoCancellation?' · echo cancelling on':'');}};
+  $('#tone').onclick=()=>{playNote(45,1.0);setTimeout(()=>playNote(57,1.0),1100);};
+  listeners.add(l=>{const e=$('#lvl');if(e)e.style.left=Math.min(100,l.rms*600)+'%';});
+  if(micOn)refreshInputs();
   $('#saveBtn').onclick=()=>{S.profile.name=$('#name').value.trim();S.profile.voiceType=$('#vt').value;S.settings.intensity=$('#int').value;S.settings.guide=$('#guide').value==='1';S.settings.a4=clamp(+$('#a4').value||440,415,466);S.settings.gate=clamp(+$('#gate').value||0.012,0.002,0.1);S.settings.theme=$('#theme').value;applyTheme();save();toast('Saved');};
   $('#exp').onclick=async()=>{const txt=JSON.stringify(S);$('#io').value=txt;try{await navigator.clipboard.writeText(txt);toast('Export copied to clipboard');}catch(e){$('#io').select();toast('Select the text and copy it');}};
   $('#imp').onclick=()=>{try{const s=JSON.parse($('#io').value);if(!s.assessments||!s.sessions)throw new Error('not an export');S=Object.assign(defaultState(),s);save();toast('Imported');go('home');}catch(e){toast('That is not a valid export',true);}};
