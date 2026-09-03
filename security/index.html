@@ -167,6 +167,27 @@
   .empty { color: var(--ink-3); font-size: 13.5px; padding: 8px 0; }
   ul.tight { margin: 6px 0; padding-left: 18px; } ul.tight li { margin: 3px 0; font-size: 13.5px; }
   @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+
+  /* approval sheet */
+  .sheet-bg { position: fixed; inset: 0; background: rgba(10, 18, 14, .45); z-index: 30; }
+  .sheet { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: min(700px, 100%); max-height: 92vh; overflow: auto; background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); border-bottom: none; border-radius: 10px 10px 0 0; padding: 18px 20px 26px; z-index: 31; box-shadow: 0 -8px 30px rgba(0,0,0,.18); }
+  .sheet h2 { margin: 0 0 4px; }
+  .sheet .why { color: var(--ink-2); font-size: 13.5px; margin: 0 0 10px; }
+  .chg { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px 10px; align-items: center; font-size: 13.5px; background: var(--surface-2); border-radius: 6px; padding: 10px 12px; margin: 8px 0; }
+  .chg .k { grid-column: 1 / -1; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-3); }
+  .chg .from { color: var(--ink-2); word-break: break-word; } .chg .arrow { color: var(--ink-3); font-family: var(--mono); } .chg .to { font-weight: 600; word-break: break-word; }
+  .warnline { display: flex; gap: 8px; align-items: flex-start; background: var(--warn-soft); border: 1px solid var(--warn); border-radius: 6px; padding: 8px 10px; font-size: 13px; margin: 8px 0; }
+  .warnline.crit { background: var(--crit-soft); border-color: var(--crit); }
+  .sheet .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+  .sheet .armed { background: var(--crit); border-color: var(--crit); color: #fff; }
+  .result { margin-top: 10px; font-size: 13.5px; padding: 10px 12px; border-radius: 6px; }
+  .result.ok { background: var(--good-soft); color: var(--good); } .result.bad { background: var(--crit-soft); color: var(--crit); } .result.wait { background: var(--surface-2); color: var(--ink-2); }
+  .actbtns { display: flex; gap: 4px; flex-wrap: wrap; }
+  .actbtns .btn { font-size: 11.5px; padding: 2px 7px; }
+  .ck { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; margin: 8px 0; }
+  .audit-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+  .audit-row:last-child { border-bottom: none; }
+  .audit-row .m { color: var(--ink-2); font-size: 12.5px; margin-top: 2px; }
 </style>
 
 <div class="wrap">
@@ -187,6 +208,7 @@
     <button role="tab" data-tab="deadlines">Deadlines <span class="badge" id="dl-badge" hidden></span></button>
     <button role="tab" data-tab="playbooks">Playbooks</button>
     <button role="tab" data-tab="findings">Findings <span class="badge" id="fd-badge" hidden></span></button>
+    <button role="tab" data-tab="audit">Audit</button>
     <button role="tab" data-tab="report">Report</button>
   </nav>
 
@@ -309,8 +331,15 @@
       <div class="out" id="rp-out">Pick a draft.</div>
     </div>
   </section>
+
+  <!-- AUDIT -->
+  <section id="tab-audit" hidden>
+    <p class="note">Every remediation approved on this page is recorded here with who approved it, the reason given, what changed and what the re-read showed. Reversible actions carry an Undo, which opens the same approval card in the other direction.</p>
+    <div class="panel" id="audit-list"></div>
+  </section>
 </div>
 <div class="toast" id="toast"></div>
+<div id="sheet-root"></div>
 
 <script>
 (function () {
@@ -381,7 +410,7 @@
       'Cart-flood and wp-login brute force (50k hits, 67% error) were mitigated at WP Engine, not at the Cloudflare edge BirdLife pays for.'] },
     { n: 'The Claude estate', d: 'Sep 2026', pts: [
       'Connector credentials for every system sit in the claude.ai account. No credentials in routine prompts, ever. A credential found in a prompt means pause, rotate, then fix.',
-      'Write-capable routines name their write surface and caps. This page never writes to any BirdLife system; it only reads Salesforce.',
+      'Write-capable routines name their write surface and caps. This page writes only behind an approval card, one record at a time, and logs every write on its Audit tab.',
       'entra-admin-mcp certificate expires 26 Aug 2027.'] }
   ];
   var DEADLINES_BASE = [
@@ -528,7 +557,7 @@
   var tabs = $('tabs');
   function showTab(name) {
     Array.prototype.forEach.call(tabs.querySelectorAll('button'), function (b) { b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false'); });
-    ['overview', 'salesforce', 'posture', 'deadlines', 'playbooks', 'findings', 'report'].forEach(function (t) { $('tab-' + t).hidden = t !== name; });
+    ['overview', 'salesforce', 'posture', 'deadlines', 'playbooks', 'findings', 'report', 'audit'].forEach(function (t) { $('tab-' + t).hidden = t !== name; });
     try { history.replaceState(null, '', '#' + name); } catch (e) {}
     window.scrollTo(0, 0);
   }
@@ -539,7 +568,8 @@
   var live = { mcp: null, sf: 'Salesforce Production', storedAt: null, status: 'connecting' };
   var sf = { admins: null, inactiveN: null, activeN: null, stale: null, psa: null, cases: null, logins: null, audit: null, errors: {} };
   var store = { kind: 'local', db: null };
-  var findings = []; var overlay = {}; var extraDeadlines = [];
+  var findings = []; var overlay = {}; var extraDeadlines = []; var actions = [];
+  var me = { userId: null, name: null }; var profiles = null;
 
   /* ---------------- rendering: overview ---------------- */
   function ratio() { if (sf.admins && sf.activeN) return sf.admins.length / sf.activeN; return null; }
@@ -611,17 +641,17 @@
     $('sf-tiles').innerHTML = tiles.map(function (t) { return '<div class="tile still ' + t.cls + '"><div class="n">' + esc(t.n) + '</div><div class="l">' + esc(t.l) + '</div><div class="s">' + esc(t.s) + '</div></div>'; }).join('');
 
     $('sf-admins-stamp').textContent = live.storedAt ? 'read ' + new Date(live.storedAt).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }) : '';
-    $('sf-admins').innerHTML = errBox('admins') + (sf.admins ? (sf.admins.length ? '<div class="tbl"><table><tr><th>Name</th><th>Username</th><th>Role</th><th>Last login</th><th>Flags</th></tr>' + sf.admins.map(function (u) {
+    $('sf-admins').innerHTML = errBox('admins') + (sf.admins ? (sf.admins.length ? '<div class="tbl"><table><tr><th>Name</th><th>Username</th><th>Role</th><th>Last login</th><th>Flags</th><th>Remediate</th></tr>' + sf.admins.map(function (u) {
       var flags = [];
       if (isBot(u)) flags.push('<span class="chip warn">service account</span>');
       if (isExternal(u)) flags.push('<span class="chip warn">external</span>');
       var d = staleDays(u); if (d == null) flags.push('<span class="chip crit">never logged in</span>'); else if (d > 30) flags.push('<span class="chip crit">stale ' + d + 'd</span>');
       if (!flags.length) flags.push('<span class="chip good">ok</span>');
-      return '<tr><td>' + esc(u.Name) + '</td><td class="mono" style="font-size:12px">' + esc(u.Username) + '</td><td>' + esc(u.UserRole && u.UserRole.Name) + '</td><td>' + esc(ago(u.LastLoginDate)) + '</td><td>' + flags.join(' ') + '</td></tr>';
-    }).join('') + '</table></div>' : '<div class="empty">No active System Administrator users.</div>') : '<div class="empty">Waiting for Salesforce.</div>');
+      return '<tr><td>' + esc(u.Name) + '</td><td class="mono" style="font-size:12px">' + esc(u.Username) + '</td><td>' + esc(u.UserRole && u.UserRole.Name) + '</td><td>' + esc(ago(u.LastLoginDate)) + '</td><td>' + flags.join(' ') + '</td><td>' + userButtons(u, ['freeze', 'downgrade', 'deactivate']) + '</td></tr>';
+    }).join('') + '</table></div>' + actNote() : '<div class="empty">No active System Administrator users.</div>') : '<div class="empty">Waiting for Salesforce.</div>');
 
-    $('sf-psa').innerHTML = errBox('psa') + (sf.psa ? (sf.psa.length ? '<div class="tbl"><table><tr><th>Permission set</th><th>Assignee</th></tr>' + sf.psa.map(function (a) {
-      return '<tr><td>' + esc(a.PermissionSet && a.PermissionSet.Label) + '</td><td>' + esc(a.Assignee && a.Assignee.Name) + '</td></tr>';
+    $('sf-psa').innerHTML = errBox('psa') + (sf.psa ? (sf.psa.length ? '<div class="tbl"><table><tr><th>Permission set</th><th>Assignee</th><th>Remediate</th></tr>' + sf.psa.map(function (a, i) {
+      return '<tr><td>' + esc(a.PermissionSet && a.PermissionSet.Label) + '</td><td>' + esc(a.Assignee && a.Assignee.Name) + '</td><td>' + (canAct() ? '<div class="actbtns"><button class="btn" type="button" data-act="psa" data-i="' + i + '">Remove</button></div>' : '') + '</td></tr>';
     }).join('') + '</table></div><p class="note" style="margin-top:8px">Any name here that is not on the sysadmin list has admin-equivalent data rights through a permission set.</p>' : '<div class="empty">No non-profile Modify All Data assignments.</div>') : '<div class="empty">Waiting for Salesforce.</div>');
 
     if (failed) {
@@ -645,12 +675,12 @@
       }).join('') + '</table></div>' : '<div class="empty">No setup changes outside the noise filter in the last 7 days (of ' + sf.audit.length + ' entries read).</div>');
     } else $('sf-audit').innerHTML = errBox('audit') + '<div class="empty">Waiting for Salesforce.</div>';
 
-    $('sf-cases').innerHTML = errBox('cases') + (sf.cases ? (sf.cases.length ? '<div class="tbl"><table><tr><th>Case</th><th>Subject</th><th>Status</th><th>Owner</th><th>Opened</th></tr>' + sf.cases.map(function (c) {
-      return '<tr><td class="mono">' + esc(c.CaseNumber) + '</td><td>' + esc(c.Subject) + '</td><td>' + esc(c.Status) + '</td><td>' + esc(c.Owner && c.Owner.Name) + '</td><td>' + esc(ago(c.CreatedDate)) + '</td></tr>';
+    $('sf-cases').innerHTML = errBox('cases') + (sf.cases ? (sf.cases.length ? '<div class="tbl"><table><tr><th>Case</th><th>Subject</th><th>Status</th><th>Owner</th><th>Opened</th><th>Remediate</th></tr>' + sf.cases.map(function (c, i) {
+      return '<tr><td class="mono">' + esc(c.CaseNumber) + '</td><td>' + esc(c.Subject) + '</td><td>' + esc(c.Status) + '</td><td>' + esc(c.Owner && c.Owner.Name) + '</td><td>' + esc(ago(c.CreatedDate)) + '</td><td>' + (canAct() ? '<div class="actbtns"><button class="btn" type="button" data-act="casenote" data-i="' + i + '">Internal note</button><button class="btn" type="button" data-act="caseclose" data-i="' + i + '">Close</button></div>' : '') + '</td></tr>';
     }).join('') + '</table></div>' : '<div class="empty">No open Ask Zeus cases with security keywords in the subject.</div>') : '<div class="empty">Waiting for Salesforce.</div>');
 
-    $('sf-stale').innerHTML = errBox('stale') + (sf.stale ? (sf.stale.length ? '<details><summary class="muted" style="cursor:pointer;font-size:13.5px">' + sf.stale.length + ' accounts. Show the list.</summary><div class="tbl" style="margin-top:8px"><table><tr><th>Name</th><th>Username</th><th>Profile</th><th>Last login</th></tr>' + sf.stale.map(function (u) {
-      return '<tr><td>' + esc(u.Name) + (u.Profile && /System Administrator/.test(u.Profile.Name) ? ' <span class="chip crit">sysadmin</span>' : '') + '</td><td class="mono" style="font-size:12px">' + esc(u.Username) + '</td><td>' + esc(u.Profile && u.Profile.Name) + '</td><td>' + esc(ago(u.LastLoginDate)) + '</td></tr>';
+    $('sf-stale').innerHTML = errBox('stale') + (sf.stale ? (sf.stale.length ? '<details><summary class="muted" style="cursor:pointer;font-size:13.5px">' + sf.stale.length + ' accounts. Show the list.</summary><div class="tbl" style="margin-top:8px"><table><tr><th>Name</th><th>Username</th><th>Profile</th><th>Last login</th><th>Remediate</th></tr>' + sf.stale.map(function (u) {
+      return '<tr><td>' + esc(u.Name) + (u.Profile && /System Administrator/.test(u.Profile.Name) ? ' <span class="chip crit">sysadmin</span>' : '') + '</td><td class="mono" style="font-size:12px">' + esc(u.Username) + '</td><td>' + esc(u.Profile && u.Profile.Name) + '</td><td>' + esc(ago(u.LastLoginDate)) + '</td><td>' + userButtons(u, ['freeze', 'deactivate']) + '</td></tr>';
     }).join('') + '</table></div></details><p class="note" style="margin-top:8px">A stale account stays only if it is on the IT-SEC-001 service-account register with owner and site filled. Otherwise deactivate and reclaim the licence.</p>' : '<div class="empty">No stale active Standard users.</div>') : '<div class="empty">Waiting for Salesforce.</div>');
   }
 
@@ -726,8 +756,9 @@
       var ids = users.map(function (u) { return "'" + u.Id + "'"; }).join(',');
       return live.mcp.callTool(live.sf, 'soqlQuery', { q: 'SELECT UserId, LoginTime, Status, SourceIp, LoginType, Application FROM LoginHistory WHERE UserId IN (' + ids + ') AND LoginTime = LAST_N_DAYS:30 ORDER BY LoginTime DESC LIMIT 100' }).then(function (r2) {
         var lp = parsePayload(r2); var logins = (lp && lp.records) || [];
-        out.innerHTML = '<h3>Salesforce users matching ' + esc(local) + '</h3><div class="tbl"><table><tr><th>Name</th><th>Username</th><th>Active</th><th>Profile</th><th>Last login</th></tr>' + users.map(function (u) {
-          return '<tr><td>' + esc(u.Name) + '</td><td class="mono" style="font-size:12px">' + esc(u.Username) + '</td><td>' + (u.IsActive ? 'yes' : 'no') + '</td><td>' + esc(u.Profile && u.Profile.Name) + (u.Profile && /System Administrator/.test(u.Profile.Name) ? ' <span class="chip crit">admin</span>' : '') + '</td><td>' + esc(ago(u.LastLoginDate)) + '</td></tr>';
+        lookupUsers = users;
+        out.innerHTML = '<h3>Salesforce users matching ' + esc(local) + '</h3><div class="tbl"><table><tr><th>Name</th><th>Username</th><th>Active</th><th>Profile</th><th>Last login</th><th>Contain</th></tr>' + users.map(function (u, i) {
+          return '<tr><td>' + esc(u.Name) + '</td><td class="mono" style="font-size:12px">' + esc(u.Username) + '</td><td>' + (u.IsActive ? 'yes' : 'no') + '</td><td>' + esc(u.Profile && u.Profile.Name) + (u.Profile && /System Administrator/.test(u.Profile.Name) ? ' <span class="chip crit">admin</span>' : '') + '</td><td>' + esc(ago(u.LastLoginDate)) + '</td><td>' + userButtons(u, ['freeze', 'deactivate'], 'lookup', i) + '</td></tr>';
         }).join('') + '</table></div><h3>Logins, last 30 days (' + logins.length + ')</h3>' + (logins.length ? '<div class="tbl"><table><tr><th>When</th><th>Status</th><th>IP</th><th>Type</th><th>App</th></tr>' + logins.slice(0, 40).map(function (l) {
           return '<tr><td style="white-space:nowrap">' + esc(new Date(l.LoginTime).toLocaleString('en-AU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</td><td>' + (l.Status === 'Success' ? esc(l.Status) : '<span class="chip crit">' + esc(l.Status) + '</span>') + '</td><td class="mono">' + esc(l.SourceIp) + '</td><td>' + esc(l.LoginType) + '</td><td>' + esc(l.Application) + '</td></tr>';
         }).join('') + '</table></div>' : '<div class="empty">No logins in 30 days.</div>');
@@ -739,7 +770,7 @@
   function findingRow(f, compact) {
     var late = f.due && f.status !== 'closed' && daysUntil(f.due) < 0;
     var meta = esc(f.system) + ' · owner <b>' + esc(f.owner || 'nobody') + '</b> · due ' + (f.due ? '<span class="' + (late ? 'late' : '') + '">' + esc(fmtDate(f.due)) + (late ? ' (' + Math.abs(daysUntil(f.due)) + ' days past)' : '') + '</span>' : '<span class="late">no date</span>');
-    var ctl = compact ? '' : '<div class="ctl"><select data-fd="' + esc(f.id) + '" data-field="status"><option value="open"' + (f.status === 'open' ? ' selected' : '') + '>Open</option><option value="in-progress"' + (f.status === 'in-progress' ? ' selected' : '') + '>In progress</option><option value="blocked"' + (f.status === 'blocked' ? ' selected' : '') + '>Blocked</option><option value="closed"' + (f.status === 'closed' ? ' selected' : '') + '>Closed</option></select><button class="btn small" type="button" data-fdedit="' + esc(f.id) + '">Owner / date</button><button class="btn small" type="button" data-fdnote="' + esc(f.id) + '">Note</button></div>';
+    var ctl = compact ? '' : '<div class="ctl"><select data-fd="' + esc(f.id) + '" data-field="status"><option value="open"' + (f.status === 'open' ? ' selected' : '') + '>Open</option><option value="in-progress"' + (f.status === 'in-progress' ? ' selected' : '') + '>In progress</option><option value="blocked"' + (f.status === 'blocked' ? ' selected' : '') + '>Blocked</option><option value="closed"' + (f.status === 'closed' ? ' selected' : '') + '>Closed</option></select><button class="btn small" type="button" data-fdedit="' + esc(f.id) + '">Owner / date</button><button class="btn small" type="button" data-fdnote="' + esc(f.id) + '">Note</button>' + (f.asanaUrl ? '<a class="btn small" href="' + esc(f.asanaUrl) + '" target="_blank" rel="noopener">Asana task</a>' : (canAct('asana') ? '<button class="btn small" type="button" data-fdasana="' + esc(f.id) + '">Raise Asana task</button>' : '')) + '</div>';
     return '<div class="finding' + (f.status === 'closed' ? ' closed' : '') + '"><div class="sev ' + esc(f.severity) + '"></div><div><div class="t"><span class="chip slate">' + esc(f.severity) + '</span> ' + esc(f.title) + (f.status && f.status !== 'open' && f.status !== 'closed' ? ' <span class="chip acc">' + esc(f.status) + '</span>' : '') + '</div><div class="m">' + meta + (f.note ? '<br>' + esc(f.note) : '') + '</div></div>' + ctl + '</div>';
   }
   function renderFindings() {
@@ -790,6 +821,7 @@
   function saveOverlay(id, patch) { return persist('deadlines', id, patch, true); }
   function applyDocs(coll, docs) {
     if (coll === 'findings') findings = docs.map(function (d) { return Object.assign({ id: d.id }, d.data); });
+    else if (coll === 'actions') actions = docs.map(function (d) { return Object.assign({ id: d.id }, d.data); });
     else if (coll === 'deadlines') {
       overlay = {}; extraDeadlines = [];
       docs.forEach(function (d) { if (d.data.item && d.data.date) extraDeadlines.push(Object.assign({ id: d.id }, d.data)); overlay[d.id] = d.data; });
@@ -799,6 +831,7 @@
   function loadLocal() {
     var f = localAll('findings'); applyDocs('findings', Object.keys(f).map(function (k) { return { id: k, data: f[k] }; }));
     var d = localAll('deadlines'); applyDocs('deadlines', Object.keys(d).map(function (k) { return { id: k, data: d[k] }; }));
+    var a = localAll('actions'); applyDocs('actions', Object.keys(a).map(function (k) { return { id: k, data: a[k] }; }));
   }
   function initStore() {
     loadLocal();
@@ -806,7 +839,7 @@
     window.claude.use('db').then(function (db) {
       if (!db) return;
       store.db = db; store.kind = 'db';
-      ['findings', 'deadlines'].forEach(function (coll) {
+      ['findings', 'deadlines', 'actions'].forEach(function (coll) {
         db.collection(coll).onSnapshot(function (snap) {
           applyDocs(coll, snap.docs.map(function (d) { return { id: d.id, data: d.data() || {} }; }));
         }, function (err) { store.kind = 'local'; store.db = null; toast('Shared store unavailable: ' + (err && err.code)); loadLocal(); });
@@ -863,8 +896,9 @@
       mcp.listTools().then(function (res) {
         var names = (res.servers || []).map(function (s) { return s.server; });
         live.sf = names.filter(function (n) { return /salesforce production/i.test(n); })[0] || names.filter(function (n) { return /salesforce/i.test(n); })[0] || live.sf;
-        startWatches();
-      }).catch(function () { startWatches(); });
+        live.asana = names.filter(function (n) { return /^asana$/i.test(n); })[0] || names.filter(function (n) { return /asana/i.test(n); })[0] || null;
+        startWatches(); whoAmI();
+      }).catch(function () { startWatches(); whoAmI(); });
     });
   }
   $('refresh-btn').addEventListener('click', function () {
@@ -920,12 +954,347 @@
     window.claude.use('sample').then(function (s) { if (s) sampleFn = s; });
   }
 
+  /* ---------------- remediation: approval cards ---------------- */
+  var lookupUsers = [];
+  var ASANA = { project: '1211042432693678', sections: { 'Backlog/Requests': '1216556543715194', 'Scoping/Requirements Gathering': '1216556543715193', 'In Development/Progress': '1216556543715191', 'Blocked': '1216556543715197' },
+    people: { mathew: 'mathew.hema@birdlife.org.au', keith: 'keith.tsui@birdlife.org.au', andrew: 'andrew.dunn@birdlife.org.au', nina: 'nina.lewis@birdlife.org.au', karishma: 'karishma.soni@birdlife.org.au' } };
+  var CLOSE_REASONS = ['Closed - Resolved', 'Closed - Resolved First Call', 'Closed - Email Sent', 'Closed - Email Edited & Sent', 'Closed - Phone Call', 'Closed - No Action Required', 'Closed - Internal Follow up', 'Closed - Duplicate', 'Closed - Spam', 'Closed - Abandoned', 'Closed - Autoreply', 'Closed - Returned Letter'];
+  function canAct(which) { if (!live.mcp) return false; if (which === 'asana') return !!live.asana; return true; }
+  function actNote() { return '<p class="note" style="margin-top:8px">Every button opens an approval card that shows the exact change, needs a reason, and verifies by re-reading the record. One record at a time. Your own account cannot be frozen, downgraded or deactivated from here.</p>'; }
+  function userButtons(u, kinds, src, i) {
+    if (!canAct()) return '';
+    if (u.Id === me.userId) return '<span class="chip slate">you</span>';
+    var ref = src === 'lookup' ? 'data-src="lookup" data-i="' + i + '"' : 'data-uid="' + esc(u.Id) + '"';
+    return '<div class="actbtns">' + kinds.map(function (k) {
+      var label = k === 'freeze' ? 'Freeze' : k === 'deactivate' ? 'Deactivate' : 'Downgrade';
+      return '<button class="btn" type="button" data-act="' + k + '" ' + ref + '>' + label + '</button>';
+    }).join('') + '</div>';
+  }
+  function findUser(btn) {
+    if (btn.dataset.src === 'lookup') return lookupUsers[+btn.dataset.i];
+    var id = btn.dataset.uid;
+    return (sf.admins || []).concat(sf.stale || []).filter(function (u) { return u.Id === id; })[0];
+  }
+  function whoAmI() {
+    live.mcp.callTool(live.sf, 'getUserInfo', {}).then(function (res) {
+      var p = parsePayload(res); if (p && p.identity) { me.userId = p.identity.userId; me.name = p.identity.displayName; renderAll(); }
+    }).catch(function () {});
+  }
+  function sfRead(q) {
+    return live.mcp.callTool(live.sf, 'soqlQuery', { q: q }, { cache: { refresh: true } }).then(function (res) { var p = parsePayload(res); return (p && p.records) || []; });
+  }
+  function sfWrite(tool, input) { return live.mcp.callTool(live.sf, tool, input, { cache: false }); }
+  function errText(e) { return (e && (ERR_COPY[e.code] || e.message)) || 'unknown error'; }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-act]'); if (!b) return;
+    var kind = b.dataset.act;
+    if (kind === 'freeze' || kind === 'deactivate' || kind === 'downgrade') {
+      var u = findUser(b); if (!u) { toast('Record not found in the current read'); return; }
+      if (kind === 'freeze') actFreeze(u, true);
+      else if (kind === 'deactivate') actActive(u, false);
+      else actDowngrade(u);
+    } else if (kind === 'psa') { var a = (sf.psa || [])[+b.dataset.i]; if (a) actRemovePsa(a); }
+    else if (kind === 'casenote') { var c = (sf.cases || [])[+b.dataset.i]; if (c) actCaseNote(c); }
+    else if (kind === 'caseclose') { var c2 = (sf.cases || [])[+b.dataset.i]; if (c2) actCaseClose(c2); }
+  });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-fdasana]'); if (!b) return;
+    var f = findings.filter(function (x) { return x.id === b.dataset.fdasana; })[0]; if (f) actAsana(f);
+  });
+
+  /* the card */
+  function openCard(spec) {
+    var root = $('sheet-root');
+    var fields = (spec.fields || []).map(function (f) {
+      if (f.type === 'select') return '<label class="f">' + esc(f.label) + '<select name="' + f.name + '">' + f.options.map(function (o) { return '<option value="' + esc(o.value) + '"' + (o.value === f.value ? ' selected' : '') + '>' + esc(o.label) + '</option>'; }).join('') + '</select></label>';
+      if (f.type === 'textarea') return '<label class="f" style="grid-column:1/-1">' + esc(f.label) + '<textarea name="' + f.name + '">' + esc(f.value || '') + '</textarea></label>';
+      return '<label class="f">' + esc(f.label) + '<input type="' + (f.type || 'text') + '" name="' + f.name + '" value="' + esc(f.value || '') + '"></label>';
+    }).join('');
+    root.innerHTML = '<div class="sheet-bg" id="sheet-bg"></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">' +
+      '<div class="eyebrow">Approval required</div><h2 id="sheet-title">' + esc(spec.title) + '</h2><p class="why">' + esc(spec.why) + '</p>' +
+      (spec.blocked ? '<div class="warnline crit">' + esc(spec.blocked) + '</div>' : '') +
+      (spec.warns || []).map(function (w) { return '<div class="warnline ' + (w.level || '') + '">' + esc(w.text) + '</div>'; }).join('') +
+      '<div class="chg">' + (spec.changes || []).map(function (c) { return '<div class="k">' + esc(c.k) + '</div><div class="from">' + esc(c.from) + '</div><div class="arrow">to</div><div class="to">' + esc(c.to) + '</div>'; }).join('') + '</div>' +
+      (fields ? '<div class="form" id="sheet-fields">' + fields + '</div>' : '') +
+      '<label class="f" style="margin-top:10px">Reason (goes into the audit trail)<input type="text" id="sheet-reason" placeholder="Why this, why now"></label>' +
+      '<label class="ck"><input type="checkbox" id="sheet-ident"> <span>I have confirmed this is the right record. ' + esc(spec.reversible || 'This change is not reversible from this page.') + '</span></label>' +
+      '<div id="sheet-result"></div>' +
+      '<div class="actions"><span class="muted" style="font-size:12px;flex:1">' + esc(spec.audit.object + ' ' + spec.audit.recordId) + '</span><button class="btn" type="button" id="sheet-cancel">Cancel</button>' + (spec.blocked ? '' : '<button class="btn primary" type="button" id="sheet-go">Approve</button>') + '</div></div>';
+    var go = $('sheet-go'); var armed = false; var timer = null; var done = false;
+    function close() { root.innerHTML = ''; }
+    $('sheet-cancel').addEventListener('click', close);
+    $('sheet-bg').addEventListener('click', function () { if (!go || !go.disabled) close(); });
+    if (!go) return;
+    go.addEventListener('click', function () {
+      if (done) { close(); return; }
+      var reason = $('sheet-reason').value.trim();
+      if (!reason) { toast('A reason is required'); $('sheet-reason').focus(); return; }
+      if (!$('sheet-ident').checked) { toast('Confirm the record first'); return; }
+      if (!armed) { armed = true; go.textContent = 'Confirm: ' + spec.verb; go.classList.add('armed'); timer = setTimeout(function () { armed = false; go.textContent = 'Approve'; go.classList.remove('armed'); }, 10000); return; }
+      clearTimeout(timer);
+      var values = {}; Array.prototype.forEach.call(root.querySelectorAll('#sheet-fields [name]'), function (el) { values[el.name] = el.value; });
+      go.disabled = true; go.textContent = 'Working'; $('sheet-cancel').disabled = true;
+      $('sheet-result').innerHTML = '<div class="result wait">Writing, then re-reading the record.</div>';
+      spec.run(values).then(function (r) {
+        var ok = !!r.verified;
+        $('sheet-result').innerHTML = '<div class="result ' + (ok ? 'ok' : 'bad') + '">' + (ok ? 'Verified. ' : 'Did not stick. ') + esc(r.detail || '') + '</div>';
+        logAction(spec, reason, ok ? 'verified' : 'unverified', r.detail, r.undo, values);
+        finish();
+      }).catch(function (err) {
+        $('sheet-result').innerHTML = '<div class="result bad">Failed: ' + esc(errText(err)) + '. Nothing to undo unless the re-read below says otherwise.</div>';
+        logAction(spec, reason, 'failed', errText(err), null, values);
+        finish();
+      });
+      function finish() { done = true; go.disabled = false; go.textContent = 'Close'; go.classList.remove('armed'); go.classList.remove('primary'); $('sheet-cancel').disabled = false; $('sheet-cancel').hidden = true; if (live.mcp) refreshReads(); }
+    });
+  }
+  function refreshReads() { Object.keys(QUERIES).forEach(function (k) { live.mcp.callTool(live.sf, 'soqlQuery', { q: QUERIES[k] }, { cache: { refresh: true } }).catch(function () {}); }); }
+  function logAction(spec, reason, result, detail, undo, values) {
+    var id = 'a-' + Date.now().toString(36);
+    var entry = { at: new Date().toISOString(), actor: me.name || 'viewer', action: spec.audit.action, object: spec.audit.object, recordId: spec.audit.recordId, label: spec.audit.label,
+      changes: (spec.changes || []).map(function (c) { return c.k + ': ' + c.from + ' to ' + c.to; }).join('; '), reason: reason, result: result, detail: detail || '', undo: undo || null, undone: false, values: values || {} };
+    if (spec.audit.finding) entry.finding = spec.audit.finding;
+    persist('actions', id, entry);
+    if (spec.audit.undoOf) persist('actions', spec.audit.undoOf, { undone: true }, true);
+  }
+  function renderAudit() {
+    var list = actions.slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
+    $('audit-list').innerHTML = list.length ? list.map(function (a) {
+      var chip = a.result === 'verified' ? '<span class="chip good">verified</span>' : a.result === 'failed' ? '<span class="chip crit">failed</span>' : '<span class="chip warn">unverified</span>';
+      var undo = a.undo && !a.undone && a.result === 'verified' && canAct() ? '<button class="btn small" type="button" data-undo="' + esc(a.id) + '">Undo</button>' : (a.undone ? '<span class="chip slate">undone</span>' : '');
+      return '<div class="audit-row"><div><div>' + chip + ' <b>' + esc(a.action) + '</b> ' + esc(a.label) + '</div><div class="m">' + esc(new Date(a.at).toLocaleString('en-AU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + ' by ' + esc(a.actor) + ' · ' + esc(a.changes) + (a.reason ? '<br>Reason: ' + esc(a.reason) : '') + (a.detail ? '<br>' + esc(a.detail) : '') + '</div></div><div>' + undo + '</div></div>';
+    }).join('') : '<div class="empty">No actions recorded yet.</div>';
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-undo]'); if (!b) return;
+    var a = actions.filter(function (x) { return x.id === b.dataset.undo; })[0]; if (!a || !a.undo) return;
+    var u = a.undo;
+    if (u.type === 'freeze') actFreeze({ Id: u.userId, Name: u.name, Username: u.username }, u.freeze, a.id);
+    else if (u.type === 'active') actActive({ Id: u.userId, Name: u.name, Username: u.username }, u.active, a.id);
+    else if (u.type === 'profile') actSetProfile({ Id: u.userId, Name: u.name, Username: u.username }, u.profileId, u.profileName, u.fromName, a.id);
+    else if (u.type === 'psa') actRestorePsa(u, a.id);
+  });
+
+  /* Salesforce actions */
+  function selfBlock(u) { return u.Id === me.userId ? 'This is your own account. The page will not act on the account that is approving.' : null; }
+  function botWarn(u) { return isBot(u) ? [{ level: 'crit', text: 'Service or integration account. Anything that signs in as it stops the moment this is applied. Check the integration owner first.' }] : []; }
+  function actFreeze(u, freeze, undoOf) {
+    openCard({
+      title: (freeze ? 'Freeze login: ' : 'Unfreeze login: ') + u.Name,
+      why: freeze ? 'Blocks every new login immediately without deactivating the account or releasing the licence. The first containment step for a compromised or suspicious user. Existing sessions are not ended; Salesforce ends them at the next request.' : 'Allows this user to log in again.',
+      changes: [{ k: 'UserLogin.IsFrozen for ' + (u.Username || u.Id), from: String(!freeze), to: String(freeze) }],
+      warns: freeze ? botWarn(u) : [], blocked: selfBlock(u), verb: freeze ? 'freeze login' : 'unfreeze login', reversible: 'Reversible from the Audit tab.',
+      run: function () {
+        return sfRead("SELECT Id, IsFrozen FROM UserLogin WHERE UserId = '" + u.Id + "' LIMIT 1").then(function (recs) {
+          if (!recs.length) throw { message: 'no UserLogin record for this user' };
+          var id = recs[0].Id;
+          return sfWrite('updateSobjectRecord', { 'sobject-name': 'UserLogin', id: id, body: { IsFrozen: freeze } }).then(function () {
+            return sfRead("SELECT IsFrozen FROM UserLogin WHERE Id = '" + id + "'").then(function (r2) {
+              var now2 = r2.length ? r2[0].IsFrozen : null;
+              return { verified: now2 === freeze, detail: 'Re-read: IsFrozen = ' + now2, undo: { type: 'freeze', userId: u.Id, name: u.Name, username: u.Username, freeze: !freeze } };
+            });
+          });
+        });
+      },
+      audit: { action: freeze ? 'freeze login' : 'unfreeze login', object: 'UserLogin', recordId: u.Id, label: u.Name + ' (' + (u.Username || '') + ')', undoOf: undoOf }
+    });
+  }
+  function actActive(u, active, undoOf) {
+    openCard({
+      title: (active ? 'Reactivate user: ' : 'Deactivate user: ') + u.Name,
+      why: active ? 'Sets the user active again. The profile and permission sets they had are unchanged.' : 'Deactivates the user and releases the licence. Salesforce refuses if the user is the default owner of a queue, lead or case assignment, or is referenced by an approval process; the error will say so.',
+      changes: [{ k: 'User.IsActive for ' + (u.Username || u.Id), from: String(!active), to: String(active) }],
+      warns: active ? [] : botWarn(u).concat([{ level: '', text: 'Prefer Freeze for a suspected compromise: it holds the evidence and the licence. Deactivate is for leavers and stale accounts.' }]),
+      blocked: selfBlock(u), verb: active ? 'reactivate' : 'deactivate', reversible: 'Reversible from the Audit tab.',
+      run: function () {
+        return sfWrite('updateSobjectRecord', { 'sobject-name': 'User', id: u.Id, body: { IsActive: active } }).then(function () {
+          return sfRead("SELECT IsActive FROM User WHERE Id = '" + u.Id + "'").then(function (r2) {
+            var now2 = r2.length ? r2[0].IsActive : null;
+            return { verified: now2 === active, detail: 'Re-read: IsActive = ' + now2, undo: { type: 'active', userId: u.Id, name: u.Name, username: u.Username, active: !active } };
+          });
+        });
+      },
+      audit: { action: active ? 'reactivate user' : 'deactivate user', object: 'User', recordId: u.Id, label: u.Name + ' (' + (u.Username || '') + ')', undoOf: undoOf }
+    });
+  }
+  function loadProfiles() {
+    if (profiles) return Promise.resolve(profiles);
+    return sfRead("SELECT Id, Name, PermissionsModifyAllData, PermissionsManageUsers FROM Profile WHERE UserLicense.Name = 'Salesforce' ORDER BY Name LIMIT 100").then(function (recs) { profiles = recs; return recs; });
+  }
+  function actDowngrade(u) {
+    if (!canAct()) return;
+    toast('Reading profiles');
+    loadProfiles().then(function (list) {
+      var safe = list.filter(function (p) { return !p.PermissionsModifyAllData && !p.PermissionsManageUsers && !/depreciated|deprecated/i.test(p.Name); });
+      var def = safe.filter(function (p) { return p.Name === 'BirdLife Standard User'; })[0] || safe.filter(function (p) { return p.Name === 'Standard User'; })[0] || safe[0];
+      if (!def) { toast('No safe target profile found'); return; }
+      openCard({
+        title: 'Downgrade profile: ' + u.Name,
+        why: 'Moves the user off System Administrator to a profile with no Modify All Data and no Manage Users. Permission sets stay as they are; check the Modify All Data list after.',
+        changes: [{ k: 'User.ProfileId for ' + (u.Username || u.Id), from: 'System Administrator', to: '(chosen below)' }],
+        warns: botWarn(u).concat([{ level: '', text: 'Integration users that need admin-level data access should get a scoped permission set, not the admin profile. If this account runs a sync, plan the permission set before downgrading.' }]),
+        blocked: selfBlock(u), verb: 'change profile', reversible: 'Reversible from the Audit tab (restores System Administrator).',
+        fields: [{ name: 'profile', label: 'Target profile', type: 'select', value: def.Id, options: safe.map(function (p) { return { value: p.Id, label: p.Name }; }) }],
+        run: function (v) {
+          var target = safe.filter(function (p) { return p.Id === v.profile; })[0];
+          return sfRead("SELECT ProfileId, Profile.Name FROM User WHERE Id = '" + u.Id + "'").then(function (cur) {
+            var fromId = cur.length ? cur[0].ProfileId : null; var fromName = cur.length && cur[0].Profile ? cur[0].Profile.Name : 'unknown';
+            return sfWrite('updateSobjectRecord', { 'sobject-name': 'User', id: u.Id, body: { ProfileId: target.Id } }).then(function () {
+              return sfRead("SELECT ProfileId, Profile.Name FROM User WHERE Id = '" + u.Id + "'").then(function (r2) {
+                var nowId = r2.length ? r2[0].ProfileId : null;
+                return { verified: nowId === target.Id, detail: 'Re-read: profile = ' + (r2.length && r2[0].Profile ? r2[0].Profile.Name : nowId) + ' (was ' + fromName + ')', undo: { type: 'profile', userId: u.Id, name: u.Name, username: u.Username, profileId: fromId, profileName: fromName, fromName: target.Name } };
+              });
+            });
+          });
+        },
+        audit: { action: 'downgrade profile', object: 'User', recordId: u.Id, label: u.Name + ' (' + (u.Username || '') + ')' }
+      });
+    }).catch(function (e) { toast('Profile read failed: ' + errText(e)); });
+  }
+  function actSetProfile(u, profileId, profileName, fromName, undoOf) {
+    openCard({
+      title: 'Restore profile: ' + u.Name,
+      why: 'Puts the user back on the profile they had before the downgrade.',
+      changes: [{ k: 'User.ProfileId for ' + (u.Username || u.Id), from: fromName || 'current', to: profileName }],
+      warns: /System Administrator/.test(profileName || '') ? [{ level: 'crit', text: 'This restores System Administrator. The admin ratio goes back up.' }] : [],
+      blocked: selfBlock(u), verb: 'restore profile', reversible: 'Reversible: run Downgrade again.',
+      run: function () {
+        return sfWrite('updateSobjectRecord', { 'sobject-name': 'User', id: u.Id, body: { ProfileId: profileId } }).then(function () {
+          return sfRead("SELECT ProfileId, Profile.Name FROM User WHERE Id = '" + u.Id + "'").then(function (r2) {
+            var nowId = r2.length ? r2[0].ProfileId : null;
+            return { verified: nowId === profileId, detail: 'Re-read: profile = ' + (r2.length && r2[0].Profile ? r2[0].Profile.Name : nowId) };
+          });
+        });
+      },
+      audit: { action: 'restore profile', object: 'User', recordId: u.Id, label: u.Name + ' (' + (u.Username || '') + ')', undoOf: undoOf }
+    });
+  }
+  function actRemovePsa(a) {
+    var label = (a.PermissionSet && a.PermissionSet.Label) + ' from ' + (a.Assignee && a.Assignee.Name);
+    openCard({
+      title: 'Remove permission set: ' + label,
+      why: 'Deletes the assignment record. The permission set itself is untouched and can be re-assigned. Profile-based rights are not affected.',
+      changes: [{ k: 'PermissionSetAssignment ' + a.Id, from: 'assigned', to: 'removed' }],
+      warns: [{ level: '', text: 'If the assignee is on the sysadmin list, the profile still grants Modify All Data. Downgrade the profile too.' }],
+      verb: 'remove assignment', reversible: 'Reversible from the Audit tab (re-creates the assignment).',
+      run: function () {
+        return sfRead("SELECT AssigneeId, PermissionSetId FROM PermissionSetAssignment WHERE Id = '" + a.Id + "'").then(function (cur) {
+          if (!cur.length) throw { message: 'assignment no longer exists' };
+          var keep = cur[0];
+          return sfWrite('deleteSobjectRecord', { 'sobject-name': 'PermissionSetAssignment', id: a.Id }).then(function () {
+            return sfRead("SELECT Id FROM PermissionSetAssignment WHERE Id = '" + a.Id + "'").then(function (r2) {
+              return { verified: r2.length === 0, detail: 'Re-read: ' + (r2.length ? 'assignment still present' : 'assignment gone'), undo: { type: 'psa', assigneeId: keep.AssigneeId, permissionSetId: keep.PermissionSetId, label: label } };
+            });
+          });
+        });
+      },
+      audit: { action: 'remove permission set', object: 'PermissionSetAssignment', recordId: a.Id, label: label }
+    });
+  }
+  function actRestorePsa(u, undoOf) {
+    openCard({
+      title: 'Re-assign permission set: ' + u.label,
+      why: 'Creates the assignment again with the same assignee and permission set.',
+      changes: [{ k: 'PermissionSetAssignment', from: 'removed', to: 'assigned' }],
+      warns: [{ level: 'crit', text: 'This restores Modify All Data to the assignee.' }],
+      verb: 're-assign', reversible: 'Reversible: remove it again from the Salesforce tab.',
+      run: function () {
+        return sfWrite('createSobjectRecord', { 'sobject-name': 'PermissionSetAssignment', body: { AssigneeId: u.assigneeId, PermissionSetId: u.permissionSetId } }).then(function () {
+          return sfRead("SELECT Id FROM PermissionSetAssignment WHERE AssigneeId = '" + u.assigneeId + "' AND PermissionSetId = '" + u.permissionSetId + "'").then(function (r2) {
+            return { verified: r2.length > 0, detail: 'Re-read: ' + (r2.length ? 'assignment present (' + r2[0].Id + ')' : 'no assignment found') };
+          });
+        });
+      },
+      audit: { action: 're-assign permission set', object: 'PermissionSetAssignment', recordId: u.assigneeId, label: u.label, undoOf: undoOf }
+    });
+  }
+  function actCaseNote(c) {
+    openCard({
+      title: 'Internal note on case ' + c.CaseNumber,
+      why: 'Adds a CaseComment with IsPublished = false. The requester never sees it. Use it for the triage timeline: what was read, what was traced, what was decided.',
+      changes: [{ k: 'CaseComment on ' + c.CaseNumber, from: 'none', to: 'internal comment (text below)' }],
+      fields: [{ name: 'text', label: 'Note', type: 'textarea', value: 'Security triage (' + now.toISOString().slice(0, 10) + '): ' }],
+      verb: 'post internal note', reversible: 'Not reversible from this page; comments can be deleted in Salesforce.',
+      run: function (v) {
+        var text = (v.text || '').trim(); if (!text) throw { message: 'note is empty' };
+        return sfWrite('createSobjectRecord', { 'sobject-name': 'CaseComment', body: { ParentId: c.Id, CommentBody: text, IsPublished: false } }).then(function () {
+          return sfRead("SELECT Id, CommentBody, IsPublished FROM CaseComment WHERE ParentId = '" + c.Id + "' ORDER BY CreatedDate DESC LIMIT 1").then(function (r2) {
+            var ok = r2.length && r2[0].CommentBody === text && r2[0].IsPublished === false;
+            return { verified: !!ok, detail: 'Re-read: latest comment ' + (ok ? 'matches and is internal' : 'does not match') };
+          });
+        });
+      },
+      audit: { action: 'internal case note', object: 'Case', recordId: c.Id, label: c.CaseNumber + ' ' + (c.Subject || '') }
+    });
+  }
+  function actCaseClose(c) {
+    openCard({
+      title: 'Close case ' + c.CaseNumber,
+      why: 'Sets Status to Closed with a close reason (the validation rule needs both) and posts an internal audit comment. Set the Type if it is blank so the category reports stay honest.',
+      changes: [{ k: 'Case.Status on ' + c.CaseNumber, from: c.Status || '', to: 'Closed' }, { k: 'Case_Closed_Reason__c', from: 'blank', to: '(chosen below)' }],
+      warns: [{ level: '', text: 'The requester gets no email from this. If they need a reply, send it first (from the console or Outlook), then close.' }],
+      fields: [
+        { name: 'reason', label: 'Close reason', type: 'select', value: 'Closed - Resolved', options: CLOSE_REASONS.map(function (r) { return { value: r, label: r }; }) },
+        { name: 'type', label: 'Type (blank keeps current)', type: 'text', value: c.Type || 'Troubleshooting' },
+        { name: 'note', label: 'Internal audit comment', type: 'textarea', value: 'Closed from the Security Workbench after triage. ' }
+      ],
+      verb: 'close case', reversible: 'Not reversible from this page; reopen in Salesforce if needed.',
+      run: function (v) {
+        var body = { Status: 'Closed', Case_Closed_Reason__c: v.reason };
+        if ((v.type || '').trim() && (v.type || '').trim() !== c.Type) body.Type = v.type.trim();
+        return sfWrite('updateSobjectRecord', { 'sobject-name': 'Case', id: c.Id, body: body }).then(function () {
+          var note = (v.note || '').trim();
+          var p = note ? sfWrite('createSobjectRecord', { 'sobject-name': 'CaseComment', body: { ParentId: c.Id, CommentBody: note + ' Reason: ' + v.reason + '.', IsPublished: false } }).catch(function () {}) : Promise.resolve();
+          return p.then(function () {
+            return sfRead("SELECT Status, IsClosed, Case_Closed_Reason__c FROM Case WHERE Id = '" + c.Id + "'").then(function (r2) {
+              var ok = r2.length && r2[0].IsClosed;
+              return { verified: !!ok, detail: 'Re-read: Status = ' + (r2.length ? r2[0].Status : 'unknown') + ', reason = ' + (r2.length ? r2[0].Case_Closed_Reason__c : '') };
+            });
+          });
+        });
+      },
+      audit: { action: 'close case', object: 'Case', recordId: c.Id, label: c.CaseNumber + ' ' + (c.Subject || '') }
+    });
+  }
+
+  /* Asana: raise a task for a finding */
+  function actAsana(f) {
+    var key = (f.owner || '').toLowerCase().split(/[^a-z]+/)[0];
+    var email = ASANA.people[key] || 'me';
+    openCard({
+      title: 'Raise Asana task: ' + f.title.slice(0, 60) + (f.title.length > 60 ? '...' : ''),
+      why: 'Creates one task in the IT Operations Project Plan with the finding as the description, the owner as assignee and the finding\'s due date. The finding keeps a link to the task.',
+      changes: [{ k: 'IT Operations Project Plan', from: 'no task', to: '1 task, due ' + (f.due || 'unset') }],
+      warns: f.due ? [] : [{ level: 'crit', text: 'This finding has no due date. Set one on the finding first; undated tasks make the backlog worse.' }],
+      fields: [
+        { name: 'name', label: 'Task name', type: 'text', value: '[Security] ' + f.title.slice(0, 90) },
+        { name: 'assignee', label: 'Assignee (email or "me")', type: 'text', value: email },
+        { name: 'due', label: 'Due', type: 'date', value: f.due || '' },
+        { name: 'section', label: 'Section', type: 'select', value: ASANA.sections['Backlog/Requests'], options: Object.keys(ASANA.sections).map(function (k) { return { value: ASANA.sections[k], label: k }; }) }
+      ],
+      verb: 'create task', reversible: 'Not reversible from this page; delete the task in Asana if needed.',
+      run: function (v) {
+        if (!v.due) throw { message: 'a due date is required' };
+        var notes = f.title + '\n\nSeverity ' + f.severity + '. System: ' + f.system + '. Owner: ' + (f.owner || 'unset') + '.' + (f.note ? '\n' + f.note : '') + '\n\nRaised from the Security Workbench on ' + now.toISOString().slice(0, 10) + '.';
+        return live.mcp.callTool(live.asana, 'create_tasks', { default_project: ASANA.project, tasks: [{ name: v.name, notes: notes, assignee: v.assignee || 'me', due_on: v.due, project_id: ASANA.project, section_id: v.section }] }, { cache: false }).then(function (res) {
+          var p = parsePayload(res); var ok = p && p.succeeded && p.succeeded.length === 1; var t = ok ? p.succeeded[0] : null;
+          var gid = t && (t.gid || (t.task && t.task.gid)); var url = t && (t.permalink_url || (t.task && t.task.permalink_url)) || (gid ? 'https://app.asana.com/0/' + ASANA.project + '/' + gid : '');
+          if (ok && gid) persist('findings', f.id, { asanaGid: gid, asanaUrl: url }, true);
+          var failed = p && p.failed && p.failed.length ? JSON.stringify(p.failed[0]).slice(0, 200) : '';
+          return { verified: !!ok, detail: ok ? 'Asana reports 1 task created' + (gid ? ' (' + gid + ')' : '') : 'Asana did not confirm a created task. ' + failed };
+        });
+      },
+      audit: { action: 'raise Asana task', object: 'Asana task', recordId: f.id, label: f.title.slice(0, 80), finding: f.id }
+    });
+  }
+
   /* ---------------- static renders ---------------- */
   function renderPosture() {
     $('e8').innerHTML = E8.map(function (e) { return '<div class="c ' + e.s + '"><div class="t">' + esc(e.c) + '</div><div class="lvl">' + esc(e.lvl) + '</div><div class="b">' + esc(e.b) + '</div></div>'; }).join('');
     $('systems').innerHTML = SYSTEMS.map(function (s) { return '<div class="panel"><div class="sec-head"><h3 style="margin:0">' + esc(s.n) + '</h3><span class="eyebrow">as at ' + esc(s.d) + '</span></div><ul class="tight">' + s.pts.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></div>'; }).join('');
   }
-  function renderAll() { renderOverview(); renderSalesforce(); renderDeadlines(); renderFindings(); }
+  function renderAll() { renderOverview(); renderSalesforce(); renderDeadlines(); renderFindings(); renderAudit(); }
 
   renderPosture(); renderPlaybooks(); renderAll();
   initStore(); initLive(); initSample();
