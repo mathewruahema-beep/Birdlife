@@ -1,0 +1,421 @@
+<title>Remote Role Pipeline</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #F2F4F7; --surface: #FFFFFF; --surface-2: #E9EDF2; --ink: #172029; --muted: #5F6E7C; --line: #D8DEE6;
+    --accent: #0E7C7B; --accent-ink: #FFFFFF; --accent-soft: #D9F0EE;
+    --danger: #B42318; --danger-soft: #FEE4E2;
+    --c-sourced: #64748B; --c-shortlisted: #0E7C7B; --c-applied: #2563EB; --c-interviewing: #B7791F; --c-offer: #15803D; --c-closed: #8A8F98;
+    --band-hi: #15803D; --band-mid: #B7791F; --band-lo: #64748B;
+    --shadow: 0 1px 2px rgba(23,32,41,.06), 0 4px 12px rgba(23,32,41,.06);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E1318; --surface: #171E26; --surface-2: #1F2831; --ink: #E7ECF1; --muted: #98A6B3; --line: #2A3440;
+      --accent: #35C2B9; --accent-ink: #06201E; --accent-soft: #113B39;
+      --danger: #F97066; --danger-soft: #3B1613;
+      --c-sourced: #8B9AAB; --c-shortlisted: #35C2B9; --c-applied: #60A5FA; --c-interviewing: #F0B44A; --c-offer: #4ADE80; --c-closed: #7C8590;
+      --band-hi: #4ADE80; --band-mid: #F0B44A; --band-lo: #8B9AAB;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E1318; --surface: #171E26; --surface-2: #1F2831; --ink: #E7ECF1; --muted: #98A6B3; --line: #2A3440;
+    --accent: #35C2B9; --accent-ink: #06201E; --accent-soft: #113B39;
+    --danger: #F97066; --danger-soft: #3B1613;
+    --c-sourced: #8B9AAB; --c-shortlisted: #35C2B9; --c-applied: #60A5FA; --c-interviewing: #F0B44A; --c-offer: #4ADE80; --c-closed: #7C8590;
+    --band-hi: #4ADE80; --band-mid: #F0B44A; --band-lo: #8B9AAB;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+  a { color: var(--accent); }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 6px 10px; }
+  button:hover { border-color: var(--accent); }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+  button.danger { color: var(--danger); border-color: var(--danger); background: transparent; }
+  input, select, textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; }
+  textarea { width: 100%; min-height: 90px; resize: vertical; }
+
+  header { padding: 18px 20px 12px; border-bottom: 1px solid var(--line); background: var(--surface); }
+  .head-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  header .sub { color: var(--muted); font-size: 13px; }
+  .mode { margin-left: auto; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .mode .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-sourced); }
+  .mode.live .dot { background: var(--c-offer); }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 14px; }
+  .stat { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 12px; }
+  .stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .stat .v { font-size: 22px; font-weight: 600; line-height: 1.2; }
+  .stat.warn .v { color: var(--danger); }
+
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 12px 20px; }
+  .toolbar input[type=search] { min-width: 220px; flex: 1 1 220px; }
+  .toolbar label { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; }
+  .toolbar .spacer { flex: 1; }
+
+  .board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(236px, 1fr); gap: 12px; padding: 0 20px 24px; overflow-x: auto; align-items: start; }
+  .col { background: var(--surface-2); border-radius: var(--radius); min-height: 220px; display: flex; flex-direction: column; border-top: 4px solid var(--col-c); }
+  .col.drag-over { outline: 2px dashed var(--accent); outline-offset: -4px; }
+  .col-head { display: flex; align-items: center; gap: 8px; padding: 10px 12px 6px; }
+  .col-head h2 { margin: 0; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--col-c); }
+  .col-head .n { color: var(--muted); font-size: 12px; margin-left: auto; }
+  .cards { display: flex; flex-direction: column; gap: 8px; padding: 6px 8px 10px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; box-shadow: var(--shadow); cursor: grab; }
+  .card:active { cursor: grabbing; }
+  .card .top { display: flex; gap: 8px; align-items: flex-start; }
+  .card .title { font-weight: 600; line-height: 1.3; flex: 1; text-wrap: balance; }
+  .score { flex: none; min-width: 34px; text-align: center; border-radius: 6px; padding: 2px 6px; font-size: 12px; font-weight: 600; color: #fff; background: var(--band-lo); }
+  .score.hi { background: var(--band-hi); } .score.mid { background: var(--band-mid); }
+  .card .company { color: var(--ink); margin-top: 2px; }
+  .card .meta { color: var(--muted); font-size: 12px; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px 8px; }
+  .chip { display: inline-block; border: 1px solid var(--line); border-radius: 999px; padding: 0 7px; font-size: 11px; line-height: 18px; color: var(--muted); }
+  .chip.apac { border-color: var(--accent); color: var(--accent); }
+  .next { margin-top: 8px; font-size: 12px; padding: 6px 8px; border-radius: 6px; background: var(--bg); }
+  .next.over { background: var(--danger-soft); color: var(--danger); }
+  .next.today { background: var(--accent-soft); }
+  .actions { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+  .actions button { padding: 3px 8px; font-size: 12px; }
+  .actions a { font-size: 12px; margin-right: auto; }
+  .empty { color: var(--muted); font-size: 13px; padding: 14px; text-align: center; }
+
+  dialog { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); width: min(680px, 94vw); padding: 0; box-shadow: var(--shadow); }
+  dialog::backdrop { background: rgba(0,0,0,.45); }
+  .dlg-head { display: flex; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .dlg-head h3 { margin: 0; font-size: 16px; }
+  .dlg-body { padding: 14px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; max-height: 70vh; overflow: auto; }
+  .dlg-body .full { grid-column: 1 / -1; }
+  .dlg-body label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+  .dlg-body input, .dlg-body select { width: 100%; }
+  .dlg-foot { display: flex; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--line); }
+  .dlg-foot .spacer { flex: 1; }
+  .summary { font-size: 12px; color: var(--muted); white-space: pre-wrap; max-height: 120px; overflow: auto; background: var(--bg); padding: 8px; border-radius: 6px; }
+  .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 8px; font-size: 13px; box-shadow: var(--shadow); }
+  .help { padding: 0 20px 20px; color: var(--muted); font-size: 12px; max-width: 70ch; }
+  @media (max-width: 640px) { .board { grid-auto-columns: 86vw; } header { padding: 14px 14px 10px; } .toolbar, .board, .help { padding-left: 14px; padding-right: 14px; } .dlg-body { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: no-preference) { .card { transition: transform .12s ease; } .card:hover { transform: translateY(-1px); } }
+</style>
+
+<header>
+  <div class="head-row">
+    <h1>Remote Role Pipeline</h1>
+    <span class="sub">Mathew Hema · Melbourne-friendly remote IT leadership roles · <span id="stamp" class="mono"></span></span>
+    <span class="mode" id="mode"><span class="dot"></span><span id="modeText">Browser storage</span></span>
+  </div>
+  <div class="stats" id="stats"></div>
+</header>
+
+<div class="toolbar">
+  <input type="search" id="q" placeholder="Search title, company, notes" aria-label="Search">
+  <label>Min score <input type="range" id="minScore" min="0" max="100" value="0" style="width:110px"> <span id="minScoreV" class="mono">0</span></label>
+  <label>Source <select id="srcFilter"><option value="">All</option></select></label>
+  <label><input type="checkbox" id="hideClosed" checked> Hide closed</label>
+  <span class="spacer"></span>
+  <button id="btnSeed" hidden>Load seeded roles</button>
+  <button id="btnImport">Import JSON</button>
+  <button id="btnExport">Export JSON</button>
+  <button class="primary" id="btnAdd">Add role</button>
+</div>
+
+<div class="board" id="board"></div>
+
+<p class="help">Drag a card between columns or use the arrows. Click a card to edit notes, next action and due date. Export JSON and feed it back with <span class="mono">python jobsearch.py import board-export.json</span> to keep the command line copy in step. Scores are the tool's keyword match against your profile, 0 to 100. The APAC chip means the posting names Australia, APAC or a compatible time zone; WW means worldwide; open means remote with no stated restriction, so check eligibility before applying.</p>
+
+<dialog id="dlg">
+  <form method="dialog" id="form">
+    <div class="dlg-head"><h3 id="dlgTitle">Edit role</h3><span class="spacer" style="flex:1"></span><button type="button" id="dlgClose" aria-label="Close">✕</button></div>
+    <div class="dlg-body">
+      <label class="full">Title <input name="title" required></label>
+      <label>Company <input name="company" required></label>
+      <label>Status <select name="status"></select></label>
+      <label class="full">Link <input name="url" type="url" placeholder="https://"></label>
+      <label>Source <input name="source" placeholder="seek, linkedin, referral"></label>
+      <label>Location text <input name="location_raw" placeholder="Remote, Australia"></label>
+      <label>Remote policy <select name="remote_policy"><option value="explicit_apac_or_au">APAC or AU stated</option><option value="worldwide">Worldwide</option><option value="unrestricted">Remote, unstated</option><option value="unknown">Unknown</option></select></label>
+      <label>Score <input name="score" type="number" min="0" max="100"></label>
+      <label>Posted <input name="posted" type="date"></label>
+      <label>Salary <input name="salary"></label>
+      <label>Applied on <input name="applied_on" type="date"></label>
+      <label>Next due <input name="next_due" type="date"></label>
+      <label class="full">Next action <input name="next_action" placeholder="Send tailored resume, chase recruiter, prep for panel"></label>
+      <label class="full">Notes <textarea name="notes"></textarea></label>
+      <div class="full"><div style="font-size:12px;color:var(--muted);margin-bottom:4px">Posting summary</div><div class="summary" id="dlgSummary"></div></div>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="danger" id="dlgDelete">Delete</button>
+      <span class="spacer"></span>
+      <button type="button" id="dlgCancel">Cancel</button>
+      <button type="submit" class="primary">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="ioDlg">
+  <div class="dlg-head"><h3 id="ioTitle">Import JSON</h3><span style="flex:1"></span><button type="button" id="ioClose" aria-label="Close">✕</button></div>
+  <div class="dlg-body" style="grid-template-columns:1fr">
+    <p id="ioHelp" style="margin:0;font-size:13px;color:var(--muted)"></p>
+    <textarea id="ioText" style="min-height:220px" class="mono"></textarea>
+  </div>
+  <div class="dlg-foot"><span class="spacer"></span><button type="button" id="ioCancel">Close</button><button type="button" class="primary" id="ioGo">Import</button></div>
+</dialog>
+
+<script id="seed" type="application/json">{"generated": "2026-09-03T10:31", "jobs": [{"id": "091da3a7ba", "title": "Head of Technology (Remote / Work from Home)", "company": "KIK Innovation", "url": "https://www.ethicaljobs.com.au/members/kikinnovation/head-of-technology-remote-work-from-home", "source": "ethicaljobs", "location_raw": "Remote, Australia", "remote_policy": "explicit_apac_or_au", "posted": "2026-09-03", "salary": "", "score": 62, "reasons": ["title matches 'head of technology' (+30)", "seniority 'head' (+6)", "skills: not-for-profit, strategy, charity (+14)", "remote policy explicit_apac_or_au (+12)"], "status": "shortlisted", "notes": "[2026-09-03] Application pack prepared at applications/091da3a7ba-kik-innovation-head-of-technology-remote-work-from-home", "next_action": "Review pack, tailor resume, submit", "next_due": "", "applied_on": "", "first_seen": "2026-09-03", "last_seen": "2026-09-03", "tags": [], "summary": "Senior leadership role responsible for leading KIK's technical strategy and owning the management and maintenance of the online learning platform, managing resources efficiently within a not-for-profit context. Charity. Work from home."}, {"id": "784756c40f", "title": "Fractional CIO / CTO network member", "company": "Technology Leaders Australia", "url": "https://theconsultingcio.com/join-network", "source": "fractional", "location_raw": "Australia and New Zealand, remote", "remote_policy": "explicit_apac_or_au", "posted": "2026-09-03", "salary": "", "score": 61, "reasons": ["title matches 'cio' (+30)", "skills: security, governance, budget, strategy, board (+19)", "remote policy explicit_apac_or_au (+12)"], "status": "sourced", "notes": "", "next_action": "", "next_due": "", "applied_on": "", "first_seen": "2026-09-03", "last_seen": "2026-09-03", "tags": [], "summary": "ANZ fractional CIO/CTO network. Interim CIO/CTO engagements of 3 to 12 months, M&A technology due diligence, board advisory for technology governance. Strategy, governance, security, board reporting, budget."}, {"id": "f418e27092", "title": "Director / Vice President, Remote Service Operations", "company": "Coretelligent", "url": "https://job-boards.greenhouse.io/coretelligent/jobs/5363208008", "source": "greenhouse", "location_raw": "Remote", "remote_policy": "unrestricted", "posted": "2026-09-03", "salary": "", "score": 44, "reasons": ["title matches 'cto' (+18)", "seniority 'director' (+6)", "skills: itil, vendor management, security, managed service (+17)", "remote policy unrestricted (+3)"], "status": "sourced", "notes": "", "next_action": "", "next_due": "", "applied_on": "", "first_seen": "2026-09-03", "last_seen": "2026-09-03", "tags": [], "summary": "Lead remote service operations for a managed service provider. Service delivery, ITIL, SLA, vendor management, security. Likely US based; confirm eligibility."}, {"id": "5afac09487", "title": "IT Team Lead, APAC", "company": "TechnologyAdvice", "url": "https://builtin.com/job/it-team-lead/3410682", "source": "builtin", "location_raw": "Remote, APAC", "remote_policy": "explicit_apac_or_au", "posted": "2026-09-03", "salary": "", "score": 32, "reasons": ["title matches 'lead' (+4)", "seniority 'lead' (+2)", "skills: microsoft 365, security, service management (+14)", "remote policy explicit_apac_or_au (+12)"], "status": "sourced", "notes": "", "next_action": "", "next_due": "", "applied_on": "", "first_seen": "2026-09-03", "last_seen": "2026-09-03", "tags": [], "summary": "Manage the APAC IT team, oversee technical projects, troubleshoot issues, ensure network security. Remote position. Microsoft 365, security, service management."}]}</script>
+
+<script>
+(() => {
+  const STATUSES = ["sourced", "shortlisted", "applied", "interviewing", "offer", "closed"];
+  const LABELS = { sourced: "Sourced", shortlisted: "Shortlisted", applied: "Applied", interviewing: "Interviewing", offer: "Offer", closed: "Closed" };
+  const LS_KEY = "jobsearch.board.v1";
+  const $ = (s) => document.querySelector(s);
+  const today = () => new Date().toISOString().slice(0, 10);
+
+  let jobs = {};          // id -> job
+  let backend = null;     // {save(job), remove(id)} or null while booting
+  let dbRef = null;
+
+  const seedRaw = (() => { try { return JSON.parse($("#seed").textContent || "{}"); } catch { return {}; } })();
+  const seedJobs = Array.isArray(seedRaw.jobs) ? seedRaw.jobs : [];
+  $("#stamp").textContent = seedRaw.generated ? "data " + seedRaw.generated.replace("T", " ") : "";
+
+  // ---------- storage ----------
+  function lsLoad() { try { return JSON.parse(localStorage.getItem(LS_KEY) || "null"); } catch { return null; } }
+  function lsSave() { try { localStorage.setItem(LS_KEY, JSON.stringify({ seedStamp: seedRaw.generated || "", jobs })); } catch {} }
+
+  function mergeIn(rows, { preserveState = true } = {}) {
+    let n = 0;
+    for (const r of rows) {
+      if (!r || !r.id) continue;
+      const cur = jobs[r.id];
+      if (cur && preserveState) {
+        const keepIdx = Math.max(STATUSES.indexOf(cur.status), STATUSES.indexOf(r.status || "sourced"));
+        const merged = { ...cur, ...r, status: STATUSES[keepIdx] || cur.status };
+        for (const k of ["notes", "next_action", "next_due", "applied_on"]) merged[k] = cur[k] || r[k] || "";
+        if (cur.notes && r.notes && cur.notes !== r.notes && !cur.notes.includes(r.notes)) merged.notes = cur.notes + "\n" + r.notes;
+        jobs[r.id] = merged;
+      } else {
+        jobs[r.id] = { status: "sourced", notes: "", next_action: "", next_due: "", applied_on: "", ...r };
+      }
+      n++;
+    }
+    return n;
+  }
+
+  const localBackend = {
+    save(job) { jobs[job.id] = job; lsSave(); render(); },
+    remove(id) { delete jobs[id]; lsSave(); render(); },
+    bulk(rows) { const n = mergeIn(rows); lsSave(); render(); return Promise.resolve(n); },
+  };
+
+  function dbBackend(db) {
+    const col = db.collection("jobs");
+    return {
+      async save(job) { jobs[job.id] = job; render(); try { await col.doc(job.id).set(job); } catch (e) { toast("Save failed: " + (e.message || e.code)); } },
+      async remove(id) { delete jobs[id]; render(); try { await col.doc(id).delete(); } catch (e) { toast("Delete failed: " + (e.message || e.code)); } },
+      async bulk(rows) {
+        const before = { ...jobs };
+        const n = mergeIn(rows);
+        render();
+        let failed = 0;
+        for (const r of rows) {
+          if (!r || !r.id) continue;
+          const j = jobs[r.id];
+          if (JSON.stringify(before[r.id]) === JSON.stringify(j)) continue;
+          try { await col.doc(r.id).set(j); } catch { failed++; }
+        }
+        if (failed) toast(failed + " rows failed to save");
+        return n;
+      },
+    };
+  }
+
+  function bootLocal() {
+    const saved = lsLoad();
+    if (saved && saved.jobs) jobs = saved.jobs;
+    if (!saved || (seedRaw.generated && saved.seedStamp !== seedRaw.generated)) { mergeIn(seedJobs); lsSave(); }
+    backend = localBackend;
+    $("#modeText").textContent = "Browser storage on this device";
+    render();
+  }
+
+  async function boot() {
+    render(); // resting state before any capability answers
+    let db = null;
+    try { if (window.claude && typeof window.claude.use === "function") db = await window.claude.use("db"); } catch { db = null; }
+    if (!db) { bootLocal(); return; }
+    dbRef = db;
+    backend = dbBackend(db);
+    $("#mode").classList.add("live");
+    $("#modeText").textContent = "Shared database, live";
+    let first = true;
+    db.collection("jobs").onSnapshot((snap) => {
+      const next = {};
+      snap.docs.forEach((d) => { if (d.exists) next[d.id] = d.data(); });
+      jobs = next;
+      if (first) { first = false; $("#btnSeed").hidden = !(snap.empty && seedJobs.length); }
+      render();
+    }, (e) => { toast("Live updates stopped: " + e.code); });
+  }
+
+  // ---------- rendering ----------
+  function band(s) { s = +s || 0; return s >= 60 ? "hi" : s >= 40 ? "mid" : ""; }
+  function esc(s) { return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+  function policyChip(p) { return p === "explicit_apac_or_au" ? '<span class="chip apac">APAC/AU</span>' : p === "worldwide" ? '<span class="chip">WW</span>' : p === "unrestricted" ? '<span class="chip">open</span>' : ""; }
+  function dueClass(d) { if (!d) return ""; const t = today(); return d < t ? "over" : d === t ? "today" : ""; }
+
+  function filtered() {
+    const q = $("#q").value.trim().toLowerCase();
+    const min = +$("#minScore").value;
+    const src = $("#srcFilter").value;
+    const hide = $("#hideClosed").checked;
+    return Object.values(jobs).filter((j) => {
+      if (hide && j.status === "closed") return false;
+      if ((+j.score || 0) < min) return false;
+      if (src && (j.source || "") !== src) return false;
+      if (q && !(`${j.title} ${j.company} ${j.notes} ${j.next_action} ${j.location_raw}`.toLowerCase().includes(q))) return false;
+      return true;
+    });
+  }
+
+  function render() {
+    const all = Object.values(jobs);
+    const counts = Object.fromEntries(STATUSES.map((s) => [s, all.filter((j) => j.status === s).length]));
+    const t = today();
+    const overdue = all.filter((j) => j.status !== "closed" && j.next_due && j.next_due < t).length;
+    const dueToday = all.filter((j) => j.status !== "closed" && j.next_due === t).length;
+    const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+    const appliedWk = all.filter((j) => j.applied_on && j.applied_on >= weekAgo).length;
+    $("#stats").innerHTML = [
+      ["Active", all.filter((j) => j.status !== "closed").length],
+      ["Applied this week", appliedWk],
+      ["Interviewing", counts.interviewing],
+      ["Offers", counts.offer],
+      ["Due today", dueToday],
+      ["Overdue", overdue, overdue > 0],
+    ].map(([k, v, warn]) => `<div class="stat${warn ? " warn" : ""}"><div class="k">${k}</div><div class="v mono">${v}</div></div>`).join("");
+
+    const sources = [...new Set(all.map((j) => j.source).filter(Boolean))].sort();
+    const sel = $("#srcFilter"); const cur = sel.value;
+    sel.innerHTML = '<option value="">All</option>' + sources.map((s) => `<option${s === cur ? " selected" : ""}>${esc(s)}</option>`).join("");
+
+    const rows = filtered();
+    const board = $("#board");
+    board.innerHTML = STATUSES.map((s) => {
+      const list = rows.filter((j) => j.status === s).sort((a, b) => (b.score || 0) - (a.score || 0) || String(a.title).localeCompare(b.title));
+      const cards = list.map(card).join("") || `<div class="empty">Nothing here</div>`;
+      return `<section class="col" data-status="${s}" style="--col-c: var(--c-${s})"><div class="col-head"><h2>${LABELS[s]}</h2><span class="n mono">${list.length}</span></div><div class="cards">${cards}</div></section>`;
+    }).join("");
+    wireBoard();
+  }
+
+  function card(j) {
+    const idx = STATUSES.indexOf(j.status);
+    const meta = [j.source, j.location_raw, j.posted ? "posted " + j.posted : "", j.salary].filter(Boolean).map(esc).join(" · ");
+    const next = j.next_action || j.next_due ? `<div class="next ${dueClass(j.next_due)}">${esc(j.next_action || "Next step")}${j.next_due ? ` <span class="mono">· ${esc(j.next_due)}</span>` : ""}</div>` : "";
+    return `<article class="card" draggable="true" data-id="${esc(j.id)}" tabindex="0" aria-label="${esc(j.title)} at ${esc(j.company)}">
+      <div class="top"><div class="title">${esc(j.title)}</div><span class="score mono ${band(j.score)}">${+j.score || 0}</span></div>
+      <div class="company">${esc(j.company)} ${policyChip(j.remote_policy)}</div>
+      <div class="meta">${meta}</div>${next}
+      <div class="actions">${j.url ? `<a href="${esc(j.url)}" target="_blank" rel="noopener">Open posting</a>` : "<span></span>"}
+        <button type="button" data-move="-1" ${idx <= 0 ? "disabled" : ""} aria-label="Move left">←</button>
+        <button type="button" data-move="1" ${idx >= STATUSES.length - 1 ? "disabled" : ""} aria-label="Move right">→</button>
+        <button type="button" data-edit>Edit</button></div></article>`;
+  }
+
+  function move(id, dir) {
+    const j = jobs[id]; if (!j) return;
+    const ni = STATUSES.indexOf(j.status) + dir;
+    if (ni < 0 || ni >= STATUSES.length) return;
+    setStatus(j, STATUSES[ni]);
+  }
+  function setStatus(j, status) {
+    const upd = { ...j, status };
+    if (status === "applied" && !upd.applied_on) upd.applied_on = today();
+    if (status === "closed") { upd.next_action = ""; upd.next_due = ""; }
+    backend.save(upd);
+  }
+
+  function wireBoard() {
+    document.querySelectorAll(".card").forEach((el) => {
+      el.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/plain", el.dataset.id); e.dataTransfer.effectAllowed = "move"; });
+      el.addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (b && b.dataset.move) { move(el.dataset.id, +b.dataset.move); return; }
+        if (b && b.hasAttribute("data-edit")) { openEdit(jobs[el.dataset.id]); return; }
+        if (e.target.closest("a")) return;
+        openEdit(jobs[el.dataset.id]);
+      });
+      el.addEventListener("keydown", (e) => { if (e.key === "Enter") openEdit(jobs[el.dataset.id]); if (e.key === "ArrowRight" && e.altKey) move(el.dataset.id, 1); if (e.key === "ArrowLeft" && e.altKey) move(el.dataset.id, -1); });
+    });
+    document.querySelectorAll(".col").forEach((col) => {
+      col.addEventListener("dragover", (e) => { e.preventDefault(); col.classList.add("drag-over"); });
+      col.addEventListener("dragleave", () => col.classList.remove("drag-over"));
+      col.addEventListener("drop", (e) => { e.preventDefault(); col.classList.remove("drag-over"); const id = e.dataTransfer.getData("text/plain"); if (jobs[id] && jobs[id].status !== col.dataset.status) setStatus(jobs[id], col.dataset.status); });
+    });
+  }
+
+  // ---------- edit dialog ----------
+  const dlg = $("#dlg"), form = $("#form");
+  form.status.innerHTML = STATUSES.map((s) => `<option value="${s}">${LABELS[s]}</option>`).join("");
+  let editing = null;
+  function openEdit(j) {
+    editing = j ? { ...j } : { id: "m" + Date.now().toString(36), status: "sourced", source: "manual", remote_policy: "unknown", score: 50, posted: today(), notes: "", next_action: "", next_due: "", applied_on: "", first_seen: today() };
+    $("#dlgTitle").textContent = j ? "Edit role" : "Add role";
+    for (const el of form.elements) if (el.name) el.value = editing[el.name] ?? "";
+    $("#dlgSummary").textContent = (editing.summary || "") + (editing.reasons && editing.reasons.length ? "\n\nWhy this score: " + editing.reasons.join("; ") : "");
+    $("#dlgDelete").hidden = !j;
+    dlg.showModal();
+  }
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const out = { ...editing };
+    for (const el of form.elements) if (el.name) out[el.name] = el.name === "score" ? Math.max(0, Math.min(100, +el.value || 0)) : el.value.trim();
+    if (out.status === "applied" && !out.applied_on) out.applied_on = today();
+    out.last_seen = today();
+    backend.save(out); dlg.close(); toast("Saved");
+  });
+  $("#dlgCancel").onclick = $("#dlgClose").onclick = () => dlg.close();
+  $("#dlgDelete").onclick = () => { if (editing && confirm("Delete this role from the board?")) { backend.remove(editing.id); dlg.close(); } };
+  $("#btnAdd").onclick = () => openEdit(null);
+
+  // ---------- import / export ----------
+  const io = $("#ioDlg");
+  $("#btnImport").onclick = () => {
+    $("#ioTitle").textContent = "Import JSON"; $("#ioGo").hidden = false; $("#ioText").value = ""; $("#ioText").readOnly = false;
+    $("#ioHelp").textContent = "Paste the contents of data/board-export.json (or data/jobs.json) from the command line tool. Existing cards keep their status, notes and next actions; new roles are added.";
+    io.showModal();
+  };
+  $("#btnExport").onclick = async () => {
+    const text = JSON.stringify({ exported: new Date().toISOString(), jobs: Object.values(jobs) }, null, 2);
+    let dl = null;
+    try { if (window.claude && typeof window.claude.use === "function") dl = await window.claude.use("downloads"); } catch { dl = null; }
+    if (dl) { try { await dl.save({ filename: "board-export.json", data: text }); toast("Saved board-export.json"); return; } catch {} }
+    $("#ioTitle").textContent = "Export JSON"; $("#ioGo").hidden = true; $("#ioText").value = text; $("#ioText").readOnly = true;
+    $("#ioHelp").textContent = "Copy this into data/board-export.json, then run: python jobsearch.py import data/board-export.json";
+    io.showModal(); $("#ioText").select();
+  };
+  $("#ioGo").onclick = async () => {
+    let data; try { data = JSON.parse($("#ioText").value); } catch { toast("That is not valid JSON"); return; }
+    const rows = Array.isArray(data) ? data : data.jobs || [];
+    const n = await backend.bulk(rows); io.close(); toast(`Imported ${n} roles`);
+  };
+  $("#ioCancel").onclick = $("#ioClose").onclick = () => io.close();
+  $("#btnSeed").onclick = async () => { const n = await backend.bulk(seedJobs); $("#btnSeed").hidden = true; toast(`Loaded ${n} seeded roles`); };
+
+  // ---------- filters ----------
+  ["#q", "#srcFilter", "#hideClosed"].forEach((s) => $(s).addEventListener("input", render));
+  $("#minScore").addEventListener("input", () => { $("#minScoreV").textContent = $("#minScore").value; render(); });
+
+  let toastT;
+  function toast(msg) { let t = $(".toast"); if (!t) { t = document.createElement("div"); t.className = "toast"; document.body.appendChild(t); } t.textContent = msg; clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 2600); }
+
+  boot();
+})();
+</script>

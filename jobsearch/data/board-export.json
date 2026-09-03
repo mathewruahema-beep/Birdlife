@@ -1,0 +1,111 @@
+{
+  "jobs": [
+    {
+      "id": "091da3a7ba",
+      "title": "Head of Technology (Remote / Work from Home)",
+      "company": "KIK Innovation",
+      "url": "https://www.ethicaljobs.com.au/members/kikinnovation/head-of-technology-remote-work-from-home",
+      "source": "ethicaljobs",
+      "location_raw": "Remote, Australia",
+      "remote_policy": "explicit_apac_or_au",
+      "posted": "2026-09-03",
+      "salary": "",
+      "score": 62,
+      "reasons": [
+        "title matches 'head of technology' (+30)",
+        "seniority 'head' (+6)",
+        "skills: not-for-profit, strategy, charity (+14)",
+        "remote policy explicit_apac_or_au (+12)"
+      ],
+      "status": "shortlisted",
+      "notes": "[2026-09-03] Application pack prepared at applications/091da3a7ba-kik-innovation-head-of-technology-remote-work-from-home",
+      "next_action": "Review pack, tailor resume, submit",
+      "next_due": "",
+      "applied_on": "",
+      "first_seen": "2026-09-03",
+      "last_seen": "2026-09-03",
+      "tags": [],
+      "summary": "Senior leadership role responsible for leading KIK's technical strategy and owning the management and maintenance of the online learning platform, managing resources efficiently within a not-for-profit context. Charity. Work from home."
+    },
+    {
+      "id": "784756c40f",
+      "title": "Fractional CIO / CTO network member",
+      "company": "Technology Leaders Australia",
+      "url": "https://theconsultingcio.com/join-network",
+      "source": "fractional",
+      "location_raw": "Australia and New Zealand, remote",
+      "remote_policy": "explicit_apac_or_au",
+      "posted": "2026-09-03",
+      "salary": "",
+      "score": 61,
+      "reasons": [
+        "title matches 'cio' (+30)",
+        "skills: security, governance, budget, strategy, board (+19)",
+        "remote policy explicit_apac_or_au (+12)"
+      ],
+      "status": "sourced",
+      "notes": "",
+      "next_action": "",
+      "next_due": "",
+      "applied_on": "",
+      "first_seen": "2026-09-03",
+      "last_seen": "2026-09-03",
+      "tags": [],
+      "summary": "ANZ fractional CIO/CTO network. Interim CIO/CTO engagements of 3 to 12 months, M&A technology due diligence, board advisory for technology governance. Strategy, governance, security, board reporting, budget."
+    },
+    {
+      "id": "f418e27092",
+      "title": "Director / Vice President, Remote Service Operations",
+      "company": "Coretelligent",
+      "url": "https://job-boards.greenhouse.io/coretelligent/jobs/5363208008",
+      "source": "greenhouse",
+      "location_raw": "Remote",
+      "remote_policy": "unrestricted",
+      "posted": "2026-09-03",
+      "salary": "",
+      "score": 44,
+      "reasons": [
+        "title matches 'cto' (+18)",
+        "seniority 'director' (+6)",
+        "skills: itil, vendor management, security, managed service (+17)",
+        "remote policy unrestricted (+3)"
+      ],
+      "status": "sourced",
+      "notes": "",
+      "next_action": "",
+      "next_due": "",
+      "applied_on": "",
+      "first_seen": "2026-09-03",
+      "last_seen": "2026-09-03",
+      "tags": [],
+      "summary": "Lead remote service operations for a managed service provider. Service delivery, ITIL, SLA, vendor management, security. Likely US based; confirm eligibility."
+    },
+    {
+      "id": "5afac09487",
+      "title": "IT Team Lead, APAC",
+      "company": "TechnologyAdvice",
+      "url": "https://builtin.com/job/it-team-lead/3410682",
+      "source": "builtin",
+      "location_raw": "Remote, APAC",
+      "remote_policy": "explicit_apac_or_au",
+      "posted": "2026-09-03",
+      "salary": "",
+      "score": 32,
+      "reasons": [
+        "title matches 'lead' (+4)",
+        "seniority 'lead' (+2)",
+        "skills: microsoft 365, security, service management (+14)",
+        "remote policy explicit_apac_or_au (+12)"
+      ],
+      "status": "sourced",
+      "notes": "",
+      "next_action": "",
+      "next_due": "",
+      "applied_on": "",
+      "first_seen": "2026-09-03",
+      "last_seen": "2026-09-03",
+      "tags": [],
+      "summary": "Manage the APAC IT team, oversee technical projects, troubleshoot issues, ensure network security. Remote position. Microsoft 365, security, service management."
+    }
+  ]
+}
