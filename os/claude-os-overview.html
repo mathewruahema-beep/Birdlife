@@ -289,7 +289,7 @@ footer .mono{font-size:11.5px}
     <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>12</b> recurring routines</span>
     <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>2</b> one-shots</span>
     <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>9</b> retired 2 Sep, backed up</span>
-    <span class="chip" role="button" tabindex="0" data-goto="registers:skills"><b>12</b> skills in repo</span>
+    <span class="chip" role="button" tabindex="0" data-goto="registers:skills"><b>15</b> skills in repo</span>
     <span class="chip warn" role="button" tabindex="0" data-goto="rules"><b>2</b> decisions open</span>
   </div>
   <p class="hint">Everything is tappable: chips navigate, tiles filter, rows load Jarvis with a ready question, and reply/close/complete buttons start an approved action.</p>
@@ -511,8 +511,8 @@ const LAYERS = [
  {role:"Charter", sub:"kernel", kernel:true, what:"Loads into every session on this repo and sets who the assistant is and what it may never do.", home:"CLAUDE.md",
   points:["Three honesty tiers: T1 executes with approval (Salesforce data, Asana, user-level M365), T2 prepares exact fixes for an admin (Entra/Exchange), T3 designs only (Salesforce config).","Hard guardrails: propose then write, no external email without showing the draft, no bulk updates or deletes, confirm identity before reassigning, log every write.","Changed only by a commit Mathew approves."]},
  {role:"Skills", sub:"memory", what:"Versioned operator knowledge. This is how the assistant learns: change the file, commit, and every future session on any device knows it.", home:".claude/skills/  (mirrored to the claude.ai account)",
-  points:["Nine birdlife-* system skills: ict-assistant, salesforce, microsoft365, asana, netsuite, wordpress, stripe, zapier, cloudflare.","email-voice: Mathew's three email registers, committed to the repo 2 Sep 2026 after living account-only.","claude-os: the operator skill for this OS. Any session told to run the audit follows the same playbook."]},
- {role:"Routines", sub:"scheduler", what:"Unattended work on cron. 13 recurring plus 2 one-shots, governed by a budget of 12 and one-job-per-outcome.", home:"claude.ai Routines",
+  points:["Nine birdlife-* system skills: ict-assistant, salesforce, microsoft365, asana, netsuite, wordpress, stripe, zapier, cloudflare.","Four cross-cutting skills added 3 Sep: security, people-lifecycle, reporting, improvement (the loop behind the Fixes tab).","email-voice: Mathew's registers, committed 2 Sep. birdlife-os: the operator skill for this OS and the console."]},
+ {role:"Routines", sub:"scheduler", what:"Unattended work on cron. 12 recurring plus 2 one-shots, at the budget of 12, one job per outcome.", home:"claude.ai Routines",
   points:["Every routine carries a passport: name that says what and when, UTC cron with the AEST translation, prompt with goal and hard rules, connectors, notification, register row.","Write-capable routines name their exact write surface and hard caps in the prompt. Model: the overnight pre-draft, internal comments only, max 8.","Retirement always exports the definition to routines/ first. Nothing is deleted unrecoverably."]},
  {role:"Connectors", sub:"drivers", what:"Access to the real systems: Salesforce, Asana, Microsoft 365, NetSuite, Stripe, Zapier, Cloudflare, GitHub and more.", home:"claude.ai Settings, Connectors",
   points:["Attached and detached by Mathew only, in the UI. Sessions never touch connector configuration.","Routines carry their own per-routine grants; a routine created without them fires but reads nothing, the most common silent failure.","Salesforce Staging for anything experimental; Production writes follow the charter."]},
@@ -589,8 +589,12 @@ const SKILLS = [
  ["birdlife-stripe","Payments, refunds, BECS, payment flow","yes","yes"],
  ["birdlife-zapier","The 17 connected apps, when Zapier vs native","yes","yes"],
  ["birdlife-cloudflare","DNS, SPF/DKIM, WAF, the two accounts","yes","yes"],
- ["claude-os","This operating system","yes","sync it"],
- ["email-voice","Mathew's email voice, three registers","yes (2 Sep)","yes"],
+ ["birdlife-security","Posture, deadlines, incident playbooks (confidential)","yes (3 Sep)","upload"],
+ ["birdlife-people-lifecycle","Joiner, mover, leaver across every system","yes (3 Sep)","upload"],
+ ["birdlife-reporting","Report library, data discipline, production path","yes (3 Sep)","upload"],
+ ["birdlife-improvement","Observe, propose, track, verify, learn (the Fixes tab)","yes (3 Sep)","upload"],
+ ["birdlife-os","This operating system and the console","yes","re-upload"],
+ ["email-voice","Mathew's email voice, three registers plus reports","yes (2 Sep)","re-upload"],
  ["morning","Morning brief","account only","yes"]
 ];
 const CONN_CORE = [
@@ -741,7 +745,7 @@ function rcard(r){
 }
 (function(){
   const host=$("#reg-routines");
-  host.append(el("div","grouphead","Active recurring · 13 of a budget of 12 · decision open"));
+  host.append(el("div","grouphead","Active recurring · 12 of a budget of 12 · budget resolved 3 Sep"));
   const list=el("div","rlist"); R.forEach(r=>list.append(rcard(r))); host.append(list);
   host.append(el("div","grouphead","One-shots · exempt from the budget"));
   const l2=el("div","rlist");
@@ -1705,7 +1709,7 @@ let updateTicker=()=>{};
     "SECURITY: for posture questions call security_snapshot first. Its content is confidential: keep it to this conversation, name overdue items bluntly, and treat a never-logged-in or bot sysadmin as a finding. What the page cannot see, say plainly and point to the Sunday security dashboard.\n" +
     "REPORTS: you write Mathew's reports on request, register C voice, plain text ready to paste. Library: 'weekly ICT status' (queue and board movement, money line, security line, decisions made and open, next week), 'money state' (the three lenses, gaps, bridges, one action), 'security posture' (live posture, deadlines by urgency, two fixes), 'exec brief' (five sentences, money first). Method: pull the needed snapshots first, lead with the conclusion, concrete numbers with their lens named, every action gets an owner and a date, end before any sign-off. For a polished Word or PDF document, give Mathew the one-line session ask instead (a repo session has the docx skill).\n" +
     "FIXES: the Fixes tab is the catalogue of suggested fixes, technical and process, ranked money first then what blocks people then risk. For any 'what should we fix', 'quick wins', 'prepare fix X' or 'track fix X' question call the fixes tool (action list) first. Preparing a fix means the exact commands, click-paths or SOQL in order, what to verify, and a one-line message to the owner in Mathew's voice; tier 2 and 3 fixes are prepared for an admin, never claimed as done. fix_track creates one Asana task behind an approval card. When asked to suggest new fixes, read the live snapshots and the catalogue, propose at most three that are genuinely not listed, add each with the fixes tool (action propose) (steps concrete, impact on people stated, owner named), and say which you would do first. the fixes tool (action status) records progress; only mark done when Mathew says it is done.\n" +
-    "Finding automations: use automation_signals plus live data. Propose at most 3, each with name, schedule, exact write posture and hard caps, connectors, which existing routine could absorb it (rule 2), and budget impact (rule 3, currently 13 of 12). End with the session ask to create the best one through the OS change control.\n" +
+    "Finding automations: use automation_signals plus live data. Propose at most 3, each with name, schedule, exact write posture and hard caps, connectors, which existing routine could absorb it (rule 2), and budget impact (rule 3, currently 12 of 12). End with the session ask to create the best one through the OS change control.\n" +
     "If something is not in the state pack or reachable by a tool, say so in one line and point at os/registers.md or a session; never guess.\n\nSTATE PACK:\n";
 
   const turns = [];
