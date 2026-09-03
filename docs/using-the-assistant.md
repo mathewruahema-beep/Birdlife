@@ -31,6 +31,20 @@ assistant session "update the console" to change it. (Don't enable GitHub Pages
 for it on a free plan: Pages would make the page public, and it names internal
 systems. The artifact URL is private to you.)
 
+## The External ICT Console (work outside BirdLife)
+
+**https://claude.ai/code/artifact/cfac6ca4-ad47-4df1-bd9e-d49d7132fbc0** is the sibling console for
+engagements that are not BirdLife: contract ICT management, security reviews,
+Essential Eight reads, tenant work and code review for other organisations. It
+holds an engagement register (client, role, tenant, written authorisation on
+file, data-handling note, next action) and open items across engagements in the
+page's own private database, a prompt composer whose every request opens with the
+separation rule, three parameterised runbooks (leaver offboarding for any tenant,
+read-only tenant baseline check, incident first hour), and a reference page with
+the engagement rules, the Essential Eight one-line read and the severity matrix.
+It wires **no BirdLife connector** on purpose. The charter behind it is the
+`external-ict-assistant` skill; source is `console/external-ict-console.html`.
+
 ## Ways to reach it
 
 **1. Phone or any browser — claude.ai/code.** Start a new session on

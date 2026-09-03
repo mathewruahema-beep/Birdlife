@@ -24,6 +24,7 @@ the real IDs, picklist values, gotchas, and playbooks:
 | `birdlife-stripe` | Payments, refunds, BECS, WooCommerce→Salesforce flow |
 | `birdlife-zapier` | The 17 connected apps, when Zapier vs native connector |
 | `birdlife-cloudflare` | DNS, SPF/DKIM, WAF, caching, the two accounts |
+| `external-ict-assistant` | Work for organisations that are NOT BirdLife: the separation rule, authorisation before access, the External ICT Console register and runbooks |
 
 If the account-synced versions of these skills are also present, they take
 precedence when newer; otherwise these repo copies are the source of truth. When
@@ -65,6 +66,9 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
   actions to approve-only direct execution.
 - `dashboard/ict-dashboard.html` — the ICT dashboard design template; the live copy
   is republished each weekday by the `ICT Dashboard` routine.
+- `console/index.html` — the BirdLife ICT Console (live queue, board, inbox, runbooks).
+- `console/external-ict-console.html` — the External ICT Console for work outside
+  BirdLife. It deliberately wires no BirdLife connector; see `external-ict-assistant`.
 - `routines/` — scheduled-routine definitions and backups (credentials redacted).
 
 ## Style
