@@ -114,6 +114,7 @@ after it.
 
 | When | What | Where |
 |---|---|---|
+| Mon/Wed/Fri 7am | Delivery briefing routine `trig_01F7wy1pGcauqCsgUxVU4b47` (read only) writes the briefing into the Desk's Today tab and pushes it to Mathew's phone; Fridays it adds the status draft | routine, see `routines/membership-delivery-briefing.md` |
 | Daily | Read the Desk's Today tab; chase the "you are the blocker" items first | Desk |
 | Friday 9:30 | Standup with Karishma: done / blocked / date still right, per item; load check | Desk → Standup |
 | Friday pm | Post the weekly status (Overall / Done since / At risk / Decisions / Next week) | Desk → Weekly status → session posts via `create_project_status_update` after approval |

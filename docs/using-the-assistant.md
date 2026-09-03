@@ -50,6 +50,12 @@ task) or mark it complete, two-tap confirmed and verified by re-read. Source is
 `birdlife-membership-delivery` skill. Tell any session "update the delivery
 desk" to change it.
 
+A read-only routine briefs you on it at 7am AEST on Monday, Wednesday and Friday
+(what moved, what is late and who holds it, the tightest link, today's three
+conversations, decisions due), writes the briefing into the Desk's Today tab and
+pushes it to your phone. On Fridays it adds the weekly status draft for you to approve
+before anything is posted. Definition: `routines/membership-delivery-briefing.md`.
+
 ## Ways to reach it
 
 **1. Phone or any browser — claude.ai/code.** Start a new session on
