@@ -11,8 +11,8 @@ the Friday variant of this routine. Recurring routine budget stays at 12 of 12.
 | Session | fresh session per run, this environment |
 | Connectors needed | Asana (read), Salesforce Staging (read), Salesforce Production (read), Microsoft 365 (Outlook read). Attach in claude.ai → Routines; the assistant cannot attach connectors. |
 | Notification | push on completion (email off) |
-| Writes | none to Asana, Salesforce or Outlook. The only write is republishing the Membership Delivery Desk artifact with the new briefing block. |
-| Output | a sub-300-word delivery briefing (SendUserMessage + written into the Desk's Today tab); on Fridays also the weekly status draft ending "Post as written, or changes?" |
+| Writes | none. Read only everywhere. (The first validation run on 3 Sep stalled on a permission prompt when it tried to republish the Desk artifact; fresh routine sessions cannot publish artifacts unattended, so the briefing is delivered by message and push only.) |
+| Output | a sub-300-word delivery briefing delivered by SendUserMessage (push to phone); on Fridays also the weekly status draft ending "Post as written, or changes?" The Desk's briefing block is filled only when an interactive session republishes the page. |
 
 ## What the briefing contains
 
@@ -32,7 +32,8 @@ threads for vendor commitments.
 
 The full prompt is stored on the trigger. Re-read it with `list_triggers` before editing;
 change it with `update_trigger` (never delete and recreate, that loses run history).
-Hard rules baked in: Asana read only, no email, no status posting, no credentials, never
+Hard rules baked in: read only everywhere (no Asana writes, no email, no status posting,
+no artifact publish, no git), never wait on a permission prompt, no credentials, never
 fabricate a figure, say which connector was missing.
 
 ## Register note
