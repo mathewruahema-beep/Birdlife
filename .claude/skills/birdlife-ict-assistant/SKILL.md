@@ -144,6 +144,7 @@ cross-cutting ones sit on top:
 | Any security question, posture, deadlines, incidents | `birdlife-security` |
 | New starter, leaver, role change, "does X still have access" | `birdlife-people-lifecycle` |
 | A report, brief, paper or status for any audience | `birdlife-reporting` |
+| "What should we fix", quick wins, a recurring problem, a lesson to keep | `birdlife-improvement` |
 | Drafting anything Mathew will send | `email-voice` |
 | Routines, skills, connectors, the console itself | `birdlife-os` |
 

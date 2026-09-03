@@ -81,6 +81,30 @@ h2.vt{font-size:22px;font-weight:600;margin-bottom:4px}
 .rowacts{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
 .rowacts button{font-size:11.5px;font-family:var(--mono);color:var(--accent);border:1px solid var(--line2);border-radius:6px;padding:2px 9px;background:var(--surface);transition:background .12s}
 .rowacts button:hover{background:var(--surface2)}
+.fxbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.fxbar input[type=search]{flex:1;min-width:180px;font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line2);border-radius:999px;padding:6px 14px}
+.fxbar select{font-family:var(--mono);font-size:12px;color:var(--ink2);background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:5px 8px}
+.fxchips{display:flex;gap:6px;flex-wrap:wrap}
+.fxchips button{font-family:var(--mono);font-size:11.5px;color:var(--ink3);border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:3px 11px;transition:color .12s,border-color .12s}
+.fxchips button[aria-pressed=true]{color:var(--accent);border-color:var(--accent);box-shadow:0 0 8px var(--j-cyan-glow)}
+.fxprog{height:6px;border-radius:999px;background:var(--surface2);overflow:hidden;margin:6px 0 14px;border:1px solid var(--line)}
+.fxprog i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),var(--accent));transition:width .4s}
+.fxcard{background:var(--surface);border:1px solid var(--line2);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.fxcard:hover{border-color:var(--accent)}
+.fxcard.done{opacity:.6}
+.fxcard.dismissed{opacity:.45}
+.fxhead{display:flex;gap:10px;align-items:center;padding:10px 14px;cursor:pointer;flex-wrap:wrap}
+.fxhead .t{font-weight:600;flex:1;min-width:200px}
+.fxhead .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.fxhead select{font-family:var(--mono);font-size:11px;color:var(--ink2);background:var(--surface2);border:1px solid var(--line2);border-radius:6px;padding:2px 6px}
+.fxbody{display:none;padding:0 14px 12px;border-top:1px solid var(--line);font-size:13.5px}
+.fxcard.open .fxbody{display:block}
+.fxbody h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:12px 0 4px}
+.fxbody ol{margin:0;padding-left:20px}
+.fxbody li{margin:2px 0}
+.fxbody .owner{font-family:var(--mono);font-size:12px;color:var(--ink2)}
+.sev1{background:var(--crit-bg);color:var(--crit)} .sev2{background:var(--warn-bg);color:var(--warn)} .sev3{background:var(--surface2);color:var(--ink2);border:1px solid var(--line2)}
+.fxempty{padding:24px;text-align:center;color:var(--ink3);font-style:italic}
 .degraded{background:var(--surface);border:1px dashed var(--line2);border-radius:12px;padding:16px 18px;color:var(--ink2);font-size:14px}
 .degraded b{color:var(--ink)}
 .unread{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:1px}
@@ -277,6 +301,7 @@ footer .mono{font-size:11.5px}
   <button role="tab" data-view="board" aria-selected="false">Projects</button>
   <button role="tab" data-view="money" aria-selected="false">Money</button>
   <button role="tab" data-view="security" aria-selected="false">Security</button>
+  <button role="tab" data-view="fixes" aria-selected="false">Fixes</button>
   <button role="tab" data-view="system" aria-selected="false">The system</button>
   <button role="tab" data-view="schedule" aria-selected="false">Schedule</button>
   <button role="tab" data-view="registers" aria-selected="false">Registers</button>
@@ -350,6 +375,18 @@ footer .mono{font-size:11.5px}
   </div>
   <p class="lede">The live posture where this page can truly see it (Salesforce), the hard deadlines counted from today, and an honest list of what is not readable from here. The full confidential read stays on the weekly Security dashboard.</p>
   <div id="sec-host"><div class="degraded"><b>Loads inside the Claude viewer</b> with the Salesforce Production connector allowed.</div></div>
+</div>
+
+<!-- ============ FIXES ============ -->
+<div class="view" id="view-fixes" hidden>
+  <div class="todaybar">
+    <h2 class="vt" style="margin:0">Suggested fixes</h2>
+    <span class="asof" id="fx-count"></span>
+    <button class="refresh" id="fx-suggest">Ask Jarvis for new fixes</button>
+    <button class="refresh" id="fx-reset">Reset filters</button>
+  </div>
+  <p class="lede">Every fix the assistant knows about, technical and process, drawn from the skills and from live reads, ranked the way Mathew ranks: money, then what blocks people, then risk. Each one says why, who it affects, the exact steps, and who should own it. Track a fix into Asana, hand it to Jarvis to prepare, or mark where it is up to. Status is remembered on this device.</p>
+  <div id="fx-host"></div>
 </div>
 
 <!-- ============ SYSTEM ============ -->
@@ -609,7 +646,7 @@ function jAsk(q){ if(JarvisBus.ask) JarvisBus.ask(q); else if(JarvisBus.prefill)
 function jPre(q){ if(JarvisBus.prefill) JarvisBus.prefill(q); }
 
 // ---------- tabs ----------
-const VIEWS=["command","today","board","money","security","system","schedule","registers","rules"];
+const VIEWS=["command","today","board","money","security","fixes","system","schedule","registers","rules"];
 const tabs=[...document.querySelectorAll('nav.tabs button')];
 function showView(v){
   if(!VIEWS.includes(v)) return;
@@ -618,6 +655,7 @@ function showView(v){
   remember("tab",v);
   if(v==="money" && typeof loadMoney==="function") loadMoney(false);
   if(v==="security" && typeof loadSecurity==="function") loadSecurity(false);
+  if(v==="fixes"){ try{ renderFixes(); }catch(e){ /* declarations later in the script; rendered again once they exist */ } }
 }
 tabs.forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 
@@ -1319,6 +1357,297 @@ function renderSecurity(){
 }
 $("#sec-refresh")&&$("#sec-refresh").addEventListener("click",()=>loadSecurity(true));
 
+
+// ================= FIXES (AI-suggested fixes, technical and process) =================
+// Seeded from the skills' verified findings; Jarvis appends live suggestions via fix_propose.
+// sev 1 critical, 2 high, 3 medium. tier 1 execute, 2 prepare for an admin, 3 design (SF config). effort minutes|hours|project.
+const FIXES_SEED=[
+ {id:"wp-selfreg",title:"Turn off public self-registration defaulting to Shop Manager",system:"WordPress",cat:"security",sev:1,tier:2,effort:"minutes",owner:"Nina Lewis",
+  why:"Anyone can register on birdlife.org.au and lands in the Shop Manager role, which reads orders and customer data.",
+  people:"Every customer's order history and contact details are exposed to whoever registers; a member data breach starts here.",
+  steps:["WP admin, Settings, General: untick Anyone can register (or set default role to Customer).","Audit users created in the last 90 days with role Shop Manager and demote or remove.","Record the change on an Asana task and the security register."],src:"birdlife-wordpress"},
+ {id:"wp-fm-pma",title:"Deactivate WP File Manager and WP phpMyAdmin",system:"WordPress",cat:"security",sev:1,tier:2,effort:"minutes",owner:"Nina Lewis",
+  why:"Either plugin is a full-compromise path; File Manager v8.0.2 has a CVE history and both run on the production site.",
+  people:"A site compromise takes down donations, memberships and the shop for every supporter until restored.",
+  steps:["Deactivate both plugins on production; delete after 7 days without complaint.","Use WP Engine SFTP and phpMyAdmin through the WP Engine portal instead.","Check the 82,089 logged emails with PII and purge the log table."],src:"birdlife-wordpress"},
+ {id:"wp-admins",title:"Execute the agreed admin removal list and enforce 2FA on elevated users",system:"WordPress",cat:"security",sev:2,tier:2,effort:"hours",owner:"Nina Lewis",
+  why:"25 admin accounts, 20 never logged in, 2FA enforced on none; the removal decisions were made and not executed.",
+  people:"Vendors who have finished their work still hold the keys to the site; the people still working there carry the blame if one is misused.",
+  steps:["Remove: Ahilya, Ayush Saxena, David Arvaji, Holly Browne, James O'Brien, Justin Joseph, Justin Rivera, Krish, Ross James; set wpengine inactive.","Decide the undecided four (Fiona Cahill, Hannah Langford, James Vilinsky, editors) with James Vilinsky.","Enforce email 2FA (WP 2FA) for Administrator and Shop Manager; update WP 2FA (four majors behind)."],src:"birdlife-wordpress"},
+ {id:"woo-licences",title:"Renew WooCommerce Subscriptions and Memberships licences",system:"WordPress",cat:"money",sev:1,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Subscriptions is running unlicensed on live payments (~A$11,108/month) and Memberships is inactive, which blocks all Blitzm membership work.",
+  people:"Blitzm is building against nothing and the membership project slips; members renewing today depend on an unsupported plugin.",
+  steps:["Purchase or renew both licences (ICT-owned blocker).","Activate Memberships on staging, re-run the 45 Not Tested cases.","Confirm Automattic support entitlement covers the live payment path."],src:"birdlife-wordpress"},
+ {id:"woo-keys",title:"Verify the WooCommerce API key rotation actually happened",system:"WordPress",cat:"process",sev:2,tier:2,effort:"minutes",owner:"Mathew Hema",
+  why:"Keys were exposed in Claude routine prompts in Aug 2026; rotation was flagged and never confirmed. Woo Read keys can write.",
+  people:"Anyone with the old keys can alter orders; the register carries an open item until someone says done.",
+  steps:["WooCommerce, Settings, Advanced, REST API: confirm the old key's last-access date and revoke it.","Issue a new key with Read only and test that it cannot write (known enforcement gap).","Close the credential watchlist row in os/registers.md."],src:"birdlife-os"},
+ {id:"dmarc-pct",title:"Ramp DMARC from pct=10 to pct=100",system:"Email / Cloudflare",cat:"security",sev:1,tier:2,effort:"project",owner:"Mathew Hema",
+  why:"DMARC says reject but only 10% of failing mail is rejected; the organisation believes it is protected against spoofing and is 10% protected.",
+  people:"Donors and members can be phished with mail that looks exactly like BirdLife's; that is reputational and financial harm to them, not to ICT.",
+  steps:["Inventory every legitimate sender (Exchange, Salesforce, Exclaimer, Campaign Monitor, Ortto, Raisely, EH, WP Engine, Payments2Us, Conga, Zapier, NetSuite).","Add rua= aggregate reporting if absent; wait two weeks; fix SPF/DKIM per sender.","Ramp pct 10 to 50 to 100, one to two weeks each, with a written rollback."],src:"birdlife-cloudflare"},
+ {id:"spf-salesforce",title:"Add include:_spf.salesforce.com through a reviewed SPF change",system:"Email / Cloudflare",cat:"process",sev:2,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Salesforce mail from zeus@ fails SPF alignment; Asana rejects Case emails so the Case to task automation has never worked.",
+  people:"The team hand-copies tickets into Asana and the board drifts from the queue; requesters get slower answers.",
+  steps:["Count current SPF DNS lookups (10 limit) and prune dead includes.","Propose old and new TXT side by side with rollback and test plan; apply after hours.","Enable Enhanced Domains and DKIM in Salesforce Setup, Email, Deliverability; re-test Case to Asana."],src:"birdlife-asana"},
+ {id:"mfa-tenant",title:"Enforce tenant-wide MFA through Conditional Access by 15 Sep",system:"Entra ID",cat:"security",sev:1,tier:2,effort:"project",owner:"Mathew Hema",
+  why:"No tenant-wide enforced MFA policy exists; 116 users signed in over 7 days with zero CA coverage. Essential Eight MFA sits below ML1.",
+  people:"A single phished password gives an attacker a staff mailbox and SharePoint; the person phished carries that, and every colleague they email.",
+  steps:["Create the two break-glass accounts first (see separate fix).","Policy Require MFA all users, all cloud apps, exclude break-glass and the CA-NoMFA-ServiceAccounts group; Report-only 7 to 14 days.","Review the report-only sign-in log, communicate to staff, enforce; migrate the 16 SMS users to Authenticator."],src:"birdlife-microsoft365"},
+ {id:"breakglass",title:"Create the two break-glass Global Admin accounts",system:"Entra ID",cat:"security",sev:1,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"breakglass01 and breakglass02 are referenced as CA exclusions in the programme guide and do not exist. Any CA enforcement without them risks locking the tenant.",
+  people:"If a CA policy misfires, nobody can get in to fix it; the whole organisation stops working until Microsoft support intervenes.",
+  steps:["Create two cloud-only accounts with 30+ character vaulted passwords, FIDO2 keys held separately, no licence, Global Administrator.","Exclude from every CA policy; alert on any sign-in.","Test one sign-in, record in the vault and the security register."],src:"birdlife-microsoft365"},
+ {id:"shared-ga",title:"Retire the two shared .onmicrosoft.com Global Admin accounts",system:"Entra ID",cat:"security",sev:1,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Office365.admin and admin.365 are shared credentials holding the highest privilege in the tenant; 6 GAs against a recommendation of 4 to 5.",
+  people:"Nobody can say who acted as those accounts, so an incident cannot be attributed and the people who did nothing wrong cannot prove it.",
+  steps:["Inventory what still authenticates as them (scripts, vendors, Exclaimer setup).","Convert one to break-glass pattern or disable both once dependencies are moved to named .admin accounts.","Re-run the GA count; target 4."],src:"birdlife-microsoft365"},
+ {id:"ross-ga",title:"Verify Ross James's status; remove ross.james.admin from Global Admin if departed",system:"Entra ID",cat:"security",sev:1,tier:2,effort:"minutes",owner:"Mathew Hema",
+  why:"ross.james.admin holds Global Administrator and Ross James is on the WordPress admin removal list; a departed GA is the worst state the estate can be in.",
+  people:"One person's forgotten account outranks every current staff member's access; the risk sits with people who do not know it exists.",
+  steps:["Confirm employment status with People and Culture.","If departed: revoke sessions, disable, remove GA, convert mailbox, reclaim licence (people-lifecycle leaver order).","If current: confirm phishing-resistant MFA on the admin account."],src:"birdlife-people-lifecycle"},
+ {id:"test-accounts",title:"Disable test101 and test123 and the other test accounts",system:"Entra ID",cat:"security",sev:1,tier:2,effort:"minutes",owner:"Keith Tsui",
+  why:"Six test accounts exist; test101 and test123 are active with real credentials and no MFA.",
+  people:"A test account is a front door with no owner; whoever created it has moved on and nobody is watching the sign-in log.",
+  steps:["Disable Test, keith.stafftest, test101, test123, testbqcases, testcalendar2.","Delete after 30 days if nothing breaks.","Add a rule: test accounts get an owner, an expiry and a licence of none."],src:"birdlife-microsoft365"},
+ {id:"autofwd",title:"Block external email auto-forwarding tenant-wide",system:"Exchange Online",cat:"security",sev:2,tier:2,effort:"minutes",owner:"Keith Tsui",
+  why:"External auto-forwarding is allowed; it is the standard exfiltration path after a mailbox compromise and the check is manual every time.",
+  people:"A compromised staff mailbox silently copies donor correspondence to an attacker for weeks; the staff member never knows.",
+  steps:["Exchange admin, Mail flow, Remote domains, Default: Automatic forwarding Off; or the outbound spam policy setting.","Inventory existing forwarding rules first and confirm the legitimate ones with their owners.","Alert on new forwarding rules via Defender."],src:"birdlife-microsoft365"},
+ {id:"tamper-lsa",title:"Turn on Tamper Protection and LSA Protection via Intune",system:"Intune / Defender",cat:"security",sev:2,tier:2,effort:"hours",owner:"Keith Tsui",
+  why:"Both are OFF across the fleet; an attacker with local admin can disable Defender and dump credentials.",
+  people:"The team's own laptops are the soft target; a stolen credential from one device becomes everyone's problem.",
+  steps:["Intune, Endpoint security, Antivirus: Windows Security Experience profile, Tamper Protection On.","Device configuration: LSA protection (RunAsPPL) enabled; pilot ring first.","Then the ASR rules (0 of 19) as the next tranche."],src:"birdlife-microsoft365"},
+ {id:"edge-cve",title:"Patch CVE-2026-12440 (Edge, CVSS 9.6) on 109 devices and set update rings",system:"Intune / Defender",cat:"security",sev:1,tier:2,effort:"hours",owner:"Keith Tsui",
+  why:"A critical browser CVE was already 5 days past the Essential Eight 48-hour SLA at review; there are no Windows Update rings.",
+  people:"Every staff member browsing with an exploitable Edge is one malicious page from compromise.",
+  steps:["Push the Edge update now via Intune; confirm in Defender vulnerability management.","Create Windows Update for Business rings (pilot, broad) and an Edge update policy.","Start the Windows 11 24H2 upgrade plan; Windows 10 is past EOL."],src:"birdlife-microsoft365"},
+ {id:"intune-compliance",title:"Link device compliance to Conditional Access and fix the compliant-by-default setting",system:"Intune",cat:"security",sev:2,tier:2,effort:"hours",owner:"Keith Tsui",
+  why:"Compliance state controls nothing because no CA policy requires it, and devices with no policy are marked compliant.",
+  people:"A stale unmanaged laptop with no disk encryption can open SharePoint as freely as a managed one.",
+  steps:["Intune, Compliance policy settings: Mark devices with no compliance policy as Not compliant.","Add a BitLocker requirement and a Windows 11 compliance policy; retire the Android Device Administrator policy (EOL Dec 2024).","CA policy Require compliant device for M365, report-only first."],src:"birdlife-microsoft365"},
+ {id:"eh-addon-scope",title:"Scope the Employment Hero to M365 add-on to four fields",system:"Employment Hero / Entra",cat:"data",sev:2,tier:2,effort:"minutes",owner:"Mathew Hema",
+  why:"The native add-on overwrites and never merges; a blank EH field blanks the Entra field, including display name and UPN if in scope.",
+  people:"A payroll admin leaving a field blank can rename or break a colleague's login without knowing.",
+  steps:["In the EH integration settings restrict to Job Title, Department, Manager, Office Location.","Confirm Display Name, UPN and address are excluded.","Document in the M365 skill and the people-lifecycle skill."],src:"birdlife-microsoft365"},
+ {id:"eh-sync-403",title:"Unblock the Employment Hero to Entra employeeId sync and fix its two defects",system:"Azure Logic App",cat:"process",sev:3,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Deployed and 0 of 2 runs succeeded (EH 403); the rotated EH refresh token is not persisted to Key Vault, so it would fail again on the next run.",
+  people:"Until BLA### is in Entra, every NetSuite and payroll join is done by hand and the leaver sweep cannot match people.",
+  steps:["Grant the EH account org-wide view-employees or Admin.","Add the Key Vault set-secret step after token refresh; add expiry metadata to the five secrets.","Run, verify employeeId on three users, then schedule."],src:"birdlife-microsoft365"},
+ {id:"enterprise-apps",title:"Complete the enterprise app review before 19 Sep: decommission 18 unassigned, dedupe registrations",system:"Entra ID",cat:"security",sev:2,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"129 apps reviewed on 21 Jun with every decision field blank; 18 have no assigned principals; Asana x6-7, Zoom x3, Wrike x3, Exclaimer x3 duplicates; an ADAL app past deadline.",
+  people:"Each idle app is a consent someone granted and forgot; the review is the only time anyone looks.",
+  steps:["Decide each of the 18 no-principal apps (delete unless a vendor names a use).","Remove duplicate registrations keeping the one with sign-ins.","Migrate or delete P2P Server (2019) ADAL; record decisions in the review sheet."],src:"birdlife-microsoft365"},
+ {id:"vevox-cert",title:"Renew the Vevox SAML certificate before 8 Sep and verify the 21 Aug one",system:"Entra ID",cat:"security",sev:2,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Vevox Dashboard certificate expired 21 Aug 2026 and Vevox expires 8 Sep 2026; SSO breaks on the day.",
+  people:"Staff running live polls and events lose access mid-event; it looks like an ICT outage to the audience.",
+  steps:["Entra, Enterprise apps, Vevox, Single sign-on: generate new certificate, upload to Vevox, activate.","Test SSO with one user; check the 21 Aug one is actually still working or already broken.","Add both to the deadline register with the new dates."],src:"birdlife-security"},
+ {id:"ns-cert",title:"Revoke the orphaned NetSuite OAuth2 certificate before it expires 17 Sep",system:"NetSuite",cat:"security",sev:2,tier:2,effort:"hours",owner:"Mathew Hema / CFO",
+  why:"An M2M credential linked to a departed employee, created by a departed contractor, with zero recorded activity; expiring is not the same as revoked.",
+  people:"Finance's system of record has a key nobody owns; the CFO was briefed 20 Jul and no action has been taken.",
+  steps:["Confirm with Fusion5 and Infinet that no scheduled job uses the SuiteCloud Development Integration.","Revoke the certificate; monitor for 2 weeks; then delete.","Note the TBA credential the Zapier report needs is separate and still to be created."],src:"birdlife-netsuite"},
+ {id:"sf-admin-ratio",title:"Cut Salesforce System Administrators from 15% to 5%; deactivate 23 inactive sysadmins; take birdbots off sysadmin",system:"Salesforce",cat:"security",sev:2,tier:1,effort:"hours",owner:"Mathew Hema",
+  why:"15% of internal users are sysadmins (target 5%), 9 of 14 lack MFA, 23 inactive admin records remain, birdbot1/5/6 hold sysadmin in the CEO role node.",
+  people:"Every extra admin is someone who can delete donor data by accident; the people below them carry the consequences.",
+  steps:["Use the console Security tab list; for each admin decide keep, downgrade, deactivate; one record at a time with an internal note.","Deactivate the 23 inactive sysadmin Users (frees licences: 70 of 70 consumed).","Give the bots a dedicated integration profile with least privilege."],src:"birdlife-salesforce"},
+ {id:"sf-release-updates",title:"Verify and action the overdue Salesforce Release Updates",system:"Salesforce",cat:"security",sev:2,tier:3,effort:"hours",owner:"Mathew Hema / Karishma Soni",
+  why:"Release Updates 0% actioned; Transaction Security Policies overdue since 13 Jul; the 1 Sep set (OAuth username-password retirement, instanced URLs, Authorized Email Domains, Profile Filtering) is now past and MoveData is flagged as affected.",
+  people:"If Salesforce enforced the OAuth change on 1 Sep, Raisely donations may have stopped syncing and nobody has looked.",
+  steps:["Setup, Release Updates: read the state of each; check MoveData and Raisely logs since 1 Sep.","Test each update in Staging; enable in production in a change window.","Record in the deadline register with outcomes."],src:"birdlife-salesforce"},
+ {id:"sf-dashboards",title:"Move Mathew's private Zeus dashboards to a shared folder",system:"Salesforce",cat:"process",sev:3,tier:1,effort:"minutes",owner:"Mathew Hema",
+  why:"Zeus Helpdesk Dashboard and Improvement Metrics live in a private folder; private dashboards die with the user and nobody else can see the queue metrics.",
+  people:"Andrew, Keith and Nina work a queue they cannot measure; the numbers only exist when Mathew is logged in.",
+  steps:["Create folder ICT Helpdesk shared with the ICT public group.","Move dashboards 01ZRF00000FcXoj2AF and 01ZRF00000FcYsr2AF and their 10 reports.","Pin the dashboard in the Zeus app."],src:"birdlife-salesforce"},
+ {id:"case-history",title:"Enable field history tracking on Case Status",system:"Salesforce",cat:"data",sev:3,tier:3,effort:"minutes",owner:"Karishma Soni",
+  why:"Without Status history there is no time-to-acknowledge measure, which is the metric the 3,600-in-New backlog demands.",
+  people:"The team is judged on a backlog nobody can measure properly; the fix makes their improvement visible.",
+  steps:["Setup, Object Manager, Case, Fields, Set History Tracking: Status, Owner, Priority.","Build the time-in-New report from CaseHistory.","Add the metric to the weekly ICT status report."],src:"birdlife-salesforce"},
+ {id:"subtype-on-close",title:"Require the enquiry sub-type when a case is closed",system:"Salesforce",cat:"data",sev:3,tier:3,effort:"hours",owner:"Karishma Soni",
+  why:"About 48% of Zeus cases have SC_Additional_Enquiry_Type__c blank, so every report on what the team spends time on is half guesswork.",
+  people:"Automation candidates stay invisible; the team keeps doing by hand what a pattern report would have flagged.",
+  steps:["Validation rule: IsClosed = true AND ISBLANK(SC_Additional_Enquiry_Type__c) on the Zeus record type.","Backfill the top 200 open cases via the console close flow (it sets Type; extend to sub-type).","Report by sub-type monthly."],src:"birdlife-ict-assistant"},
+ {id:"refund-id",title:"Add Stripe_Refund_ID__c on Payment and map it from WooCommerce",system:"Salesforce / Stripe",cat:"money",sev:2,tier:3,effort:"hours",owner:"Karishma Soni",
+  why:"Stripe refunds are untraceable from Salesforce; refunds appear as a second positive payment with Paid false and Stage set to the raw string refunded.",
+  people:"Supporter Care cannot tell a member whether their refund happened without opening Stripe; Finance reconciles two positive lines for one refund.",
+  steps:["Field on npe01__OppPayment__c; FLS to the miniOrange integration user BEFORE first sync.","Map re_ id and negative amount in the miniOrange refund mapping; fix Stage to a valid picklist value.","Test on staging order #22553 pattern; this is Karishma's Week-4 decision gate."],src:"birdlife-stripe"},
+ {id:"zap-exception",title:"Publish the Unreconciled Income Exception Report (Zap 371228125)",system:"Zapier / NetSuite",cat:"money",sev:1,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Unreconciled income was $671,117 across 2,878 records at 3 Jul and growing about $87K a day; the detection mechanism exists and is switched off in DRAFT.",
+  people:"Finance finds mismatches weeks late and Nina reconciles by hand; the CFO reports income that may not be in the bank.",
+  steps:["Create the NetSuite TBA credential (integration record, consumer key, token for Mathew, Administrator role) and store it only in Zapier.","Connect Salesforce as the integration user; test both Find steps on a known week.","Second-person review, publish, verify the first Tuesday email; register it."],src:"birdlife-zapier"},
+ {id:"bank-rec",title:"Clear the 11104 and 11103 bank reconciliation backlog (unreconciled since 31 Mar 2022)",system:"NetSuite",cat:"money",sev:1,tier:2,effort:"project",owner:"Claudia Abad / CFO",
+  why:"378 and 120 unmatched items over four years on the operations and donations bank accounts; an audit finding waiting, and a hard precondition of any Business Central migration.",
+  people:"The organisation cannot prove its cash position line by line; auditors, the Board and the CFO are exposed.",
+  steps:["Finance owns it; ICT provides SuiteQL extracts of unmatched lines by month.","Agree a catch-up plan with dates and a weekly count reported in the money state.","Do not let a BC conversation proceed as though this clears during cutover."],src:"birdlife-netsuite"},
+ {id:"sf-ns-bridge",title:"Replace the manual monthly CSV with a scheduled Salesforce to NetSuite export and the +3 business day policy",system:"Salesforce / NetSuite",cat:"money",sev:2,tier:2,effort:"project",owner:"Mathew Hema / Nina Lewis",
+  why:"There is no integration; SF Close Date and NS posting date never align (1 to 3 day bank lag) and the gap compounds daily.",
+  people:"Nina and Finance rebuild the same match every month by hand; every board figure lags reality by weeks.",
+  steps:["Adopt Option A: SF Close Date plus a NetSuite +3 business day month-end window.","Schedule the export (report 00ORF0000033T6z2AE) via Zapier or a Salesforce scheduled report to SharePoint.","Measure: unreconciled count weekly until it trends down."],src:"birdlife-netsuite"},
+ {id:"conga-fy",title:"Parameterise the Conga EOFY query FY code and restore the EOFY Receipt button",system:"Salesforce / Conga",cat:"data",sev:2,tier:3,effort:"hours",owner:"Karishma Soni",
+  why:"CMQ-0008 has FY code hardcoded 25f so zero contacts process at the next EOFY run; the individual EOFY Receipt button is deleted and points at a file-less template.",
+  people:"Donors do not get tax receipts on time and Supporter Care cannot regenerate one on request during tax season.",
+  steps:["Change the query to derive FY from the run date; test with a small batch on staging.","Rebuild the button against a working template; never click Regenerate Solution on the batch (URL mismatch would break it).","Fold into the native receipting replacement plan."],src:"birdlife-salesforce"},
+ {id:"active-bl-member",title:"Have Membership__c take over Active_BL_Member__c before Payments2Us is decommissioned",system:"Salesforce",cat:"data",sev:2,tier:3,effort:"project",owner:"Karishma Soni / James Vilinsky",
+  why:"Active_BL_Member__c is maintained by Payments2Us; Taylor and Francis Emu journal access depends on it and no other document records this.",
+  people:"Members silently lose journal access at migration and blame BirdLife, not the plugin.",
+  steps:["Add the flag to the Membership__c lifecycle flow spec now.","Test journal access for a migrated member on staging.","Communicate the dependency to Blitzm and Participation."],src:"birdlife-salesforce"},
+ {id:"offboarding-checklist",title:"Adopt the leaver checklist as the standard and require it on every Departing Staff case",system:"Process",cat:"process",sev:1,tier:1,effort:"hours",owner:"Mathew Hema",
+  why:"There is no offboarding checklist in use; leaver access removal is ad hoc and departed people still hold a NetSuite certificate and possibly a Global Admin role.",
+  people:"Former staff keep access to donor data; current staff inherit the blame when it is misused.",
+  steps:["Use the people-lifecycle skill's leaver order as the checklist; post it as an internal comment on every Departing Staff case.","Weekly: query Departing Staff cases closed without a checklist comment.","Automate the Entra half as the approve-only Power Automate flow once the admin connector is consented."],src:"birdlife-people-lifecycle"},
+ {id:"asana-hygiene",title:"Date, delegate or close the undated and stale Asana tasks",system:"Asana",cat:"process",sev:2,tier:1,effort:"hours",owner:"Mathew Hema",
+  why:"About 30 tasks have no due date and a block of 25 migration tasks was last touched in a bulk edit six months ago; delegation prompts are unactioned.",
+  people:"Keith, Karishma and Nina run standups off a board that does not reflect reality, so meetings reconstruct status instead of removing blockers.",
+  steps:["Console Projects tab: for each attention item choose close, delegate or date it (three words only).","Action the Consider delegating prompts (they signal a leaver or mover missed).","Let the Monday hygiene report hold the line."],src:"birdlife-asana"},
+ {id:"asana-teams",title:"Archive the duplicate Finance teams and the two first-team artefacts in Asana",system:"Asana",cat:"estate",sev:3,tier:1,effort:"minutes",owner:"Mathew Hema",
+  why:"Two Finance teams and two default first teams exist; tasks land in the wrong place and reports double count.",
+  people:"Finance staff cannot tell which team is theirs; new starters are added to the wrong one.",
+  steps:["Confirm which Finance team has live tasks; move the rest; archive the other.","Archive BirdLife's first team and Caroline's first team.","Rule: no new teams without the ICT manager."],src:"birdlife-asana"},
+ {id:"cloudflare-waf",title:"Move the cart-flood and wp-login controls from WP Engine rules to Cloudflare WAF and rate limiting",system:"Cloudflare",cat:"security",sev:2,tier:2,effort:"hours",owner:"Keith Tsui",
+  why:"The flood was mitigated at the origin with a Referer rule that false-positives privacy browsers; /wp-login.php took 50,000 hits at 67% error. BirdLife pays for an edge it is not using for this.",
+  people:"Customers on privacy browsers are blocked from the cart today; the shop loses those sales silently.",
+  steps:["Rate limit /wp-login.php and /cart/?remove_item= at the edge; challenge, not block, first.","Bot Fight Mode on; review the WAF managed ruleset.","Then relax the WP Engine Referer rule and measure cart errors."],src:"birdlife-cloudflare"},
+ {id:"cloudflare-accounts",title:"Consolidate or document the two Cloudflare accounts",system:"Cloudflare",cat:"estate",sev:3,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Domain.admin and Mathew.hema each own an account; nobody has written down which holds the zone or why both exist.",
+  people:"A DNS emergency starts with a hunt for the right login.",
+  steps:["List zones and members in each account.","Move zones to one account or record the reason for two in the cloudflare skill.","Enable 2FA on every member."],src:"birdlife-cloudflare"},
+ {id:"learnupon-hook",title:"Rotate and re-own the LearnUpon to Zapier catch-hook",system:"Zapier / LearnUpon",cat:"security",sev:3,tier:2,effort:"minutes",owner:"Keith Tsui",
+  why:"A live webhook URL sits in plaintext in documentation and belongs to Keith's personal Zapier account; only enrolment is ticked, not completion.",
+  people:"If Keith's account changes the automation dies silently and nobody knows what it fed.",
+  steps:["Confirm purpose with Keith; regenerate the hook in a shared Zapier connection.","Scrub the URL from documents.","Decide whether completion events are wanted."],src:"birdlife-zapier"},
+ {id:"zap-eh-aad",title:"Confirm the superseded EH to Azure AD manager-sync Zap is disabled",system:"Zapier / Entra",cat:"data",sev:2,tier:2,effort:"minutes",owner:"Mathew Hema",
+  why:"The native EH to M365 add-on replaced it; if still enabled it is a second uncontrolled writer into Entra using User.ReadWrite.All.",
+  people:"Two systems fighting over the manager field produces an org chart nobody trusts.",
+  steps:["Zapier: find the New or Updated Employee Zap; turn off.","Entra: review app EH-OrgSync-Zapier; remove the permission or delete the registration.","Record in the zapier skill."],src:"birdlife-zapier"},
+ {id:"os-connectors",title:"Review idle connectors: name the job or disconnect",system:"Claude estate",cat:"estate",sev:3,tier:1,effort:"minutes",owner:"Mathew Hema",
+  why:"Atlassian, Canva, Miro, Zoom, Granola, Gmail, Google Drive and Calendar are connected with no skill and no routine using them; each is credentialed attack surface.",
+  people:"A connector nobody uses is a door nobody watches.",
+  steps:["At the Monday audit, each connector names the routine or session task it serves.","Disconnect the ones with no answer; register the rest.","Re-check quarterly."],src:"birdlife-os"},
+ {id:"sec-exception-register",title:"Fill the IT-SEC-001 service account exception register",system:"Entra ID",cat:"process",sev:3,tier:1,effort:"minutes",owner:"Mathew Hema",
+  why:"Only discovery.centre is populated and its site and owner fields are blank; the standard exists and is not being kept.",
+  people:"A no-MFA account with no owner is nobody's job to remove.",
+  steps:["Add birdbot4, sxiq.local, sxiq.text, wa.server, website.logins, bnb.count, emu.review with owner, site, purpose, review date.","Move each into CA-NoMFA-ServiceAccounts or off the exception.","Review monthly with the MFA audit."],src:"birdlife-microsoft365"}
+];
+const FX_STATUSES=[["proposed","Proposed"],["accepted","Accepted"],["in_progress","In progress"],["done","Done"],["dismissed","Dismissed"]];
+const FX_CATS=[["all","All"],["security","Security"],["process","Process"],["money","Money"],["data","Data"],["estate","Estate"]];
+function fxLoadJSON(k,d){ try{ const v=recall(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
+let fxExtra=fxLoadJSON("fixes.extra",[]);
+let fxStatus=fxLoadJSON("fixes.status",{});
+const fxFilter={q:"",cat:"all",sev:"all",tier:"all",status:"open",sort:"rank"};
+const fxOpen=new Set();
+function fxAll(){ return FIXES_SEED.concat(fxExtra); }
+function fxGet(id){ return fxAll().find(f=>f.id===id)||null; }
+function fxStat(f){ return fxStatus[f.id]||"proposed"; }
+function fxSetStatus(id,st){
+  if(!FX_STATUSES.some(([k])=>k===st)) throw new Error("Unknown status "+st);
+  if(!fxGet(id)) throw new Error("Unknown fix "+id);
+  fxStatus[id]=st; remember("fixes.status",JSON.stringify(fxStatus)); renderFixes(); return st;
+}
+function fxAdd(f){
+  const id=String(f.id||("ai-"+Date.now())).replace(/[^a-z0-9-]/gi,"-").toLowerCase();
+  if(fxGet(id)) throw new Error("A fix with id "+id+" already exists");
+  const clean={id, title:String(f.title||"").slice(0,140), system:String(f.system||"General").slice(0,40),
+    cat:FX_CATS.some(([k])=>k===f.cat)&&f.cat!=="all"?f.cat:"process", sev:[1,2,3].includes(Number(f.sev))?Number(f.sev):2,
+    tier:[1,2,3].includes(Number(f.tier))?Number(f.tier):2, effort:["minutes","hours","project"].includes(f.effort)?f.effort:"hours",
+    owner:String(f.owner||"Mathew Hema").slice(0,60), why:String(f.why||"").slice(0,400), people:String(f.people||"").slice(0,400),
+    steps:(Array.isArray(f.steps)?f.steps:[]).slice(0,6).map(x=>String(x).slice(0,240)), src:"jarvis "+new Date().toISOString().slice(0,10)};
+  if(!clean.title||!clean.why) throw new Error("A fix needs a title and a why");
+  fxExtra.push(clean); remember("fixes.extra",JSON.stringify(fxExtra)); renderFixes(); return clean;
+}
+function fxRemoveExtra(id){ const n=fxExtra.length; fxExtra=fxExtra.filter(f=>f.id!==id); remember("fixes.extra",JSON.stringify(fxExtra)); delete fxStatus[id]; remember("fixes.status",JSON.stringify(fxStatus)); renderFixes(); return fxExtra.length<n; }
+const FX_EFFORT_RANK={minutes:0,hours:1,project:2};
+function fxRunbook(f){
+  return f.title+"\nSystem: "+f.system+" | Severity "+f.sev+" | Tier "+f.tier+" | Effort: "+f.effort+" | Owner: "+f.owner+
+    "\n\nWhy: "+f.why+"\nImpact on people: "+f.people+"\n\nSteps:\n"+f.steps.map((s,i)=>(i+1)+". "+s).join("\n")+"\n\nSource: "+f.src;
+}
+function fxVisible(){
+  const q=fxFilter.q.trim().toLowerCase();
+  let list=fxAll().filter(f=>{
+    const st=fxStat(f);
+    if(fxFilter.status==="open" && (st==="done"||st==="dismissed")) return false;
+    if(fxFilter.status!=="open" && fxFilter.status!=="all" && st!==fxFilter.status) return false;
+    if(fxFilter.cat!=="all" && f.cat!==fxFilter.cat) return false;
+    if(fxFilter.sev!=="all" && String(f.sev)!==fxFilter.sev) return false;
+    if(fxFilter.tier!=="all" && String(f.tier)!==fxFilter.tier) return false;
+    if(q && !(f.title+" "+f.system+" "+f.why+" "+f.people+" "+f.owner+" "+f.steps.join(" ")).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const catRank={money:0,process:1,security:2,data:3,estate:4};
+  list.sort((a,b)=>{
+    if(fxFilter.sort==="effort") return FX_EFFORT_RANK[a.effort]-FX_EFFORT_RANK[b.effort] || a.sev-b.sev;
+    if(fxFilter.sort==="system") return a.system.localeCompare(b.system) || a.sev-b.sev;
+    return a.sev-b.sev || (catRank[a.cat]??9)-(catRank[b.cat]??9) || FX_EFFORT_RANK[a.effort]-FX_EFFORT_RANK[b.effort];
+  });
+  return list;
+}
+function renderFixes(){
+  const host=$("#fx-host"); if(!host) return;
+  const all=fxAll(), open=all.filter(f=>!["done","dismissed"].includes(fxStat(f)));
+  const done=all.filter(f=>fxStat(f)==="done"), crit=open.filter(f=>f.sev===1), quick=open.filter(f=>f.effort==="minutes"&&f.sev<=2), prog=all.filter(f=>fxStat(f)==="in_progress");
+  $("#fx-count").textContent=open.length+" open of "+all.length;
+  host.innerHTML="";
+  const tiles=el("div","tiles");
+  const tile=(v,l,cls,onclick)=>{const t=el("div","tile"+(cls?" "+cls:""),`<div class="v">${v}</div><div class="l">${esc(l)}</div>`); if(onclick){t.style.cursor="pointer"; t.addEventListener("click",onclick);} tiles.append(t);};
+  tile(crit.length,"critical, still open",crit.length?"crit":"ok",()=>{fxFilter.sev="1";fxFilter.status="open";renderFixes();});
+  tile(quick.length,"quick wins (minutes, high impact)",quick.length?"warn":"ok",()=>{fxFilter.sort="effort";fxFilter.status="open";fxFilter.sev="all";renderFixes();});
+  tile(prog.length,"in progress","",()=>{fxFilter.status="in_progress";renderFixes();});
+  tile(all.length?Math.round(100*done.length/all.length)+"%":"0%","done",done.length?"ok":"",()=>{fxFilter.status="done";renderFixes();});
+  tile(fxExtra.length,"suggested live by Jarvis","",()=>{fxFilter.q="jarvis";renderFixes();});
+  host.append(tiles);
+  const prog2=el("div","fxprog",`<i style="width:${all.length?Math.round(100*done.length/all.length):0}%"></i>`); host.append(prog2);
+  // filter bar
+  const bar=el("div","fxbar");
+  const search=el("input"); search.type="search"; search.placeholder="Search fixes, systems, owners, steps"; search.value=fxFilter.q;
+  search.addEventListener("input",()=>{fxFilter.q=search.value; renderList();});
+  const chips=el("div","fxchips");
+  FX_CATS.forEach(([k,l])=>{const b=el("button",null,esc(l)); b.setAttribute("aria-pressed",String(fxFilter.cat===k)); b.addEventListener("click",()=>{fxFilter.cat=k;renderFixes();}); chips.append(b);});
+  const sel=(opts,cur,on,label)=>{const s=el("select"); s.title=label; opts.forEach(([v,t])=>{const o=el("option",null,esc(t)); o.value=v; if(v===cur) o.selected=true; s.append(o);}); s.addEventListener("change",()=>{on(s.value);renderFixes();}); return s;};
+  bar.append(search,chips,
+    sel([["all","Any severity"],["1","Critical"],["2","High"],["3","Medium"]],fxFilter.sev,v=>fxFilter.sev=v,"Severity"),
+    sel([["all","Any tier"],["1","Tier 1: execute"],["2","Tier 2: prepare"],["3","Tier 3: design"]],fxFilter.tier,v=>fxFilter.tier=v,"Tier"),
+    sel([["open","Open"],["all","All statuses"]].concat(FX_STATUSES),fxFilter.status,v=>fxFilter.status=v,"Status"),
+    sel([["rank","Sort: Mathew's ranking"],["effort","Sort: quickest first"],["system","Sort: by system"]],fxFilter.sort,v=>fxFilter.sort=v,"Sort"));
+  host.append(bar);
+  const listHost=el("div"); host.append(listHost);
+  function renderList(){
+    listHost.innerHTML="";
+    const list=fxVisible();
+    if(!list.length){ listHost.append(el("div","fxempty","Nothing matches. Reset the filters, or ask Jarvis for new fixes.")); return; }
+    list.forEach(f=>listHost.append(fxCard(f)));
+  }
+  renderList();
+  host.append(el("p","schednote","Seeded from the skills' verified findings (dated Jun to Sep 2026) plus anything Jarvis proposes from live reads. Status and Jarvis additions are stored in this browser only. Tier 2 and 3 fixes are prepared for an admin, never faked; tracking into Asana goes through an approval card."));
+  const sug=$("#fx-suggest"); if(sug && !sug.dataset.wired){ sug.dataset.wired="1"; sug.addEventListener("click",()=>jAsk("Look at the live snapshots (queue, board, money, security) and the fixes catalogue. Propose up to three NEW fixes that are not already listed, each with title, system, category, severity, tier, effort, why, impact on people, steps and owner, and add each with fix_propose. Then tell me the one you would do first and why.")); }
+  const rst=$("#fx-reset"); if(rst && !rst.dataset.wired){ rst.dataset.wired="1"; rst.addEventListener("click",()=>{Object.assign(fxFilter,{q:"",cat:"all",sev:"all",tier:"all",status:"open",sort:"rank"}); renderFixes();}); }
+}
+function fxCard(f){
+  const st=fxStat(f);
+  const card=el("div","fxcard"+(fxOpen.has(f.id)?" open":"")+(st==="done"?" done":st==="dismissed"?" dismissed":""));
+  const sevName={1:"critical",2:"high",3:"medium"}[f.sev];
+  const head=el("div","fxhead",
+    `<span class="pill sev${f.sev}">${sevName}</span><span class="t">${esc(f.title)}</span>`+
+    `<span class="meta"><span class="tag gov">${esc(f.system)}</span><span class="tag ${f.tier===1?"read":"write"}">tier ${f.tier}</span><span class="tag gov">${esc(f.effort)}</span>${/^jarvis/.test(f.src)?'<span class="tag write">jarvis</span>':""}</span>`);
+  const sel=el("select"); FX_STATUSES.forEach(([v,t])=>{const o=el("option",null,esc(t)); o.value=v; if(v===st) o.selected=true; sel.append(o);});
+  sel.addEventListener("click",e=>e.stopPropagation());
+  sel.addEventListener("change",()=>fxSetStatus(f.id,sel.value));
+  head.querySelector(".meta").append(sel);
+  head.addEventListener("click",()=>{ if(fxOpen.has(f.id)) fxOpen.delete(f.id); else fxOpen.add(f.id); card.classList.toggle("open"); });
+  const body=el("div","fxbody",
+    `<h4>Why</h4><div>${esc(f.why)}</div><h4>Impact on people</h4><div>${esc(f.people)}</div><h4>Steps</h4><ol>${f.steps.map(s=>"<li>"+esc(s)+"</li>").join("")}</ol>`+
+    `<h4>Owner</h4><div class="owner">${esc(f.owner)} · source: ${esc(f.src)} · ${f.tier===1?"tier 1, the console or a session can execute after approval":f.tier===2?"tier 2, prepared as exact commands for an admin":"tier 3, designed for a Salesforce admin or developer to build"}</div>`);
+  const acts=el("div","rowacts");
+  const mk=(label,fn)=>{const b=el("button",null,esc(label)); b.addEventListener("click",e=>{e.stopPropagation();fn();}); acts.append(b);};
+  mk("prepare with jarvis",()=>jAsk("Prepare fix \""+f.title+"\" (id "+f.id+", "+f.system+", tier "+f.tier+"). Read it from fixes_catalog. Give me the exact commands, click-paths or SOQL an admin runs, in order, what to verify afterwards, and the one-line message to the owner ("+f.owner+") in my voice. If any step is within your action tools, offer to run it through an approval card."));
+  mk("track in asana",()=>jAsk("Track fix \""+f.title+"\" (id "+f.id+") in Asana using fix_track: Backlog/Requests section, notes from the runbook, owner "+f.owner+", due date two weeks from today unless the fix has a hard deadline sooner."));
+  mk("draft the nudge",()=>jAsk("Draft a short message from me to "+f.owner+" about fix \""+f.title+"\": what, why it matters to people, the first step, and a date. Register B, my voice, ready to paste into Teams or an email draft."));
+  mk("copy runbook",async()=>{try{await navigator.clipboard.writeText(fxRunbook(f));}catch(e){}});
+  if(st!=="done") mk("mark done",()=>fxSetStatus(f.id,"done"));
+  if(/^jarvis/.test(f.src)) mk("remove suggestion",()=>fxRemoveExtra(f.id));
+  body.append(acts); card.append(head,body);
+  return card;
+}
+window.FixesBus={all:fxAll,get:fxGet,status:fxStat,setStatus:fxSetStatus,add:fxAdd,remove:fxRemoveExtra,runbook:fxRunbook};
+if(recall("tab")==="fixes") renderFixes();
+
 // ================= JARVIS =================
 let updateTicker=()=>{};
 (async function(){
@@ -1375,6 +1704,7 @@ let updateTicker=()=>{};
     "MONEY: for any money question call money_snapshot first. Doctrine: Stripe, Salesforce and NetSuite rarely agree and the gap IS the finding; always name the lens a number came from (opportunity close date vs payment date vs Stripe settlement). Five livemode Stripe accounts exist (eCommerce, Memberships, Ausbirdfund, BLP, eStore/AOC). NEVER touch stripe_api_write or propose it; a mistaken write is real donor money. Money page tools are read only.\n" +
     "SECURITY: for posture questions call security_snapshot first. Its content is confidential: keep it to this conversation, name overdue items bluntly, and treat a never-logged-in or bot sysadmin as a finding. What the page cannot see, say plainly and point to the Sunday security dashboard.\n" +
     "REPORTS: you write Mathew's reports on request, register C voice, plain text ready to paste. Library: 'weekly ICT status' (queue and board movement, money line, security line, decisions made and open, next week), 'money state' (the three lenses, gaps, bridges, one action), 'security posture' (live posture, deadlines by urgency, two fixes), 'exec brief' (five sentences, money first). Method: pull the needed snapshots first, lead with the conclusion, concrete numbers with their lens named, every action gets an owner and a date, end before any sign-off. For a polished Word or PDF document, give Mathew the one-line session ask instead (a repo session has the docx skill).\n" +
+    "FIXES: the Fixes tab is the catalogue of suggested fixes, technical and process, ranked money first then what blocks people then risk. For any 'what should we fix', 'quick wins', 'prepare fix X' or 'track fix X' question call fixes_catalog first. Preparing a fix means the exact commands, click-paths or SOQL in order, what to verify, and a one-line message to the owner in Mathew's voice; tier 2 and 3 fixes are prepared for an admin, never claimed as done. fix_track creates one Asana task behind an approval card. When asked to suggest new fixes, read the live snapshots and the catalogue, propose at most three that are genuinely not listed, add each with fix_propose (steps concrete, impact on people stated, owner named), and say which you would do first. fix_status records progress; only mark done when Mathew says it is done.\n" +
     "Finding automations: use automation_signals plus live data. Propose at most 3, each with name, schedule, exact write posture and hard caps, connectors, which existing routine could absorb it (rule 2), and budget impact (rule 3, currently 13 of 12). End with the session ask to create the best one through the OS change control.\n" +
     "If something is not in the state pack or reachable by a tool, say so in one line and point at os/registers.md or a session; never guess.\n\nSTATE PACK:\n";
 
@@ -1486,7 +1816,7 @@ let updateTicker=()=>{};
          finally{ tn.remove(); }
        }},
       {name:"show",
-       description:"Navigates this page. tab is one of today, system, schedule, registers, rules; day (0=Mon..6=Sun) optionally selects a schedule day.",
+       description:"Navigates this page. tab is one of command, today, board, money, security, fixes, system, schedule, registers, rules; day (0=Mon..6=Sun) optionally selects a schedule day.",
        inputSchema:{type:"object",properties:{tab:{type:"string"},day:{type:"number"}},required:["tab"]},
        execute(input){
          const tab=String(input.tab||"").toLowerCase();
@@ -1521,6 +1851,58 @@ let updateTicker=()=>{};
            deadlines:DEADLINES.map(([n,d])=>({item:n,date:d,days:Math.round((new Date(d)-new Date(today))/864e5)})),
            not_readable:"Secure Score, Entra MFA/CA, Intune/BitLocker, Defender, WP 2FA, AWS root MFA, Google 2SV (weekly Security dashboard covers them)",
            watchlist:"WooCommerce key rotation from August still unverified"},12000);
+       }},
+      {name:"fixes_catalog",
+       description:"Returns the suggested-fixes catalogue: every known technical and process fix (id, title, system, category, severity 1-3, tier, effort, owner, why, impact on people, steps, source) with its current status (proposed, accepted, in_progress, done, dismissed). Optional filters: status, cat, sev, system, q (text). Use before preparing, tracking or proposing fixes.",
+       inputSchema:{type:"object",properties:{status:{type:"string"},cat:{type:"string"},sev:{type:"number"},system:{type:"string"},q:{type:"string"}}},
+       execute(input){
+         let list=fxAll().map(f=>Object.assign({status:fxStat(f)},f));
+         if(input&&input.status) list=list.filter(f=>input.status==="open"?!["done","dismissed"].includes(f.status):f.status===input.status);
+         if(input&&input.cat) list=list.filter(f=>f.cat===input.cat);
+         if(input&&input.sev) list=list.filter(f=>f.sev===Number(input.sev));
+         if(input&&input.system) list=list.filter(f=>f.system.toLowerCase().includes(String(input.system).toLowerCase()));
+         if(input&&input.q){ const q=String(input.q).toLowerCase(); list=list.filter(f=>(f.title+" "+f.why+" "+f.people+" "+f.steps.join(" ")).toLowerCase().includes(q)); }
+         return clip({count:list.length, fixes:list},14000);
+       }},
+      {name:"fix_propose",
+       description:"Adds a NEW suggested fix to the Fixes page (stored on this device, no external write). Use after reading live snapshots and fixes_catalog so you never duplicate an existing fix. Required: title, why, steps (array), people (impact on people). Optional: id (kebab-case), system, cat (security|process|money|data|estate), sev (1 critical, 2 high, 3 medium), tier (1 execute, 2 prepare for admin, 3 design), effort (minutes|hours|project), owner.",
+       inputSchema:{type:"object",properties:{id:{type:"string"},title:{type:"string"},system:{type:"string"},cat:{type:"string"},sev:{type:"number"},tier:{type:"number"},effort:{type:"string"},owner:{type:"string"},why:{type:"string"},people:{type:"string"},steps:{type:"array",items:{type:"string"}}},required:["title","why","people","steps"]},
+       execute(input){
+         const dup=fxAll().find(f=>f.title.toLowerCase()===String(input.title||"").toLowerCase());
+         if(dup) throw new Error("Already listed as "+dup.id+"; do not add a duplicate");
+         const f=fxAdd(input); showView("fixes");
+         return "Added fix "+f.id+" (\""+f.title+"\", severity "+f.sev+", tier "+f.tier+"). It shows on the Fixes tab tagged jarvis.";
+       }},
+      {name:"fix_status",
+       description:"Sets the status of a fix on the Fixes page (proposed, accepted, in_progress, done, dismissed). Local to this device, no external write. Provide id and status.",
+       inputSchema:{type:"object",properties:{id:{type:"string"},status:{type:"string"}},required:["id","status"]},
+       execute(input){ const st=fxSetStatus(String(input.id),String(input.status)); return "Fix "+input.id+" is now "+st+"."; }},
+      {name:"fix_track",
+       description:"Creates ONE Asana task on the IT Operations Project Plan for a fix, after the user approves. Provide id (from fixes_catalog); optional section (default Backlog/Requests), assignee (email of Andrew Dunn, Keith Tsui, Nina Lewis or Mathew Hema), due_on (YYYY-MM-DD). Notes are the fix runbook. Verified by re-reading the board; sets the fix status to accepted. Never creates more than one task per call.",
+       inputSchema:{type:"object",properties:{id:{type:"string"},section:{type:"string"},assignee:{type:"string"},due_on:{type:"string"}},required:["id"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const f=fxGet(String(input.id)); if(!f) throw new Error("Unknown fix "+input.id);
+         const secs=sectionsMap(); const secName=input.section&&secs[input.section]?input.section:"Backlog/Requests";
+         const section_id=secs[secName]; if(!section_id) throw new Error("Section not found: "+secName);
+         const assignee=input.assignee?String(input.assignee).trim():null;
+         if(assignee && !/^(andrew\.dunn|keith\.tsui|nina\.lewis|mathew\.hema)@birdlife\.org\.au$/i.test(assignee)) throw new Error("Assignee must be one of the ICT team emails");
+         const due=input.due_on&&/^\d{4}-\d{2}-\d{2}$/.test(input.due_on)?input.due_on:null;
+         const name="[Fix] "+f.title;
+         const notes=fxRunbook(f)+"\n\nCreated from the BirdLife Australia console Fixes tab.";
+         const ok=await requestApproval("Create Asana task", name+"\nSection: "+secName+(assignee?"\nAssignee: "+assignee:"")+(due?"\nDue: "+due:"")+"\n\nNotes: the fix runbook (why, impact, steps, owner).", context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         const task={name, notes, section_id}; if(assignee) task.assignee=assignee; if(due) task.due_on=due;
+         const r=await mcpNS.callTool(AS_SERVER,"create_tasks",{default_project:PROJECT,tasks:[task]});
+         let gid=null; try{ const m=JSON.stringify(r&&r.payload!==undefined?r.payload:r).match(/"gid"\s*:\s*"(\d{6,})"/); if(m) gid=m[1]; }catch(e){}
+         afterWrite();
+         if(!gid){
+           const v=await mcpNS.callTool(AS_SERVER,"search_tasks",Object.assign({},AS_INPUT,{limit:100}),{cache:false});
+           const rows=(v&&v.payload&&Array.isArray(v.payload.data))?v.payload.data:[]; const hit=rows.find(t=>t.name===name); if(hit) gid=hit.gid;
+         }
+         if(!gid) return "The create call returned but the task could not be verified on the board. Check Asana before retrying; do not create it twice.";
+         fxSetStatus(f.id,"accepted");
+         return "Done. Task created and verified: "+name+" (gid "+gid+") in "+secName+". https://app.asana.com/1/443963187362944/project/"+PROJECT+"/task/"+gid+" Fix marked accepted.";
        }},
       // ---- write actions, each behind an approval card ----
       {name:"case_internal_note",
@@ -1741,6 +2123,8 @@ let updateTicker=()=>{};
    ["Coach me","Coach me: look at the live queue, board, inbox and the patterns, and give me the three highest-leverage moves I should make this week as Senior Manager ICT. Be frank about what I am neglecting."],
    ["Money state","Give me the money state: use the money snapshot, lead with the lens gap and the reconciliation bridges, and tell me what has moved since I last looked."],
    ["Security posture","Give me the security posture: use the security snapshot, admins first, then the deadlines in date order with days remaining. Flag anything overdue in the first line."],
+   ["Quick wins","From fixes_catalog, give me the five quickest high-impact fixes still open, who owns each, and which one I should do in the next hour."],
+   ["Suggest fixes","Look at the live snapshots and the fixes catalogue. Propose up to three new fixes not already listed, add each with fix_propose, and tell me the one you would do first."],
    ["Weekly report","Write my weekly ICT status report: queue and board movement, money state, security posture, and the decisions I owe. Pull fresh snapshots first, one page, in my voice, each action with an owner and a date."]
   ].forEach(([label,q])=>{
     const c = el("button",null,esc(label));

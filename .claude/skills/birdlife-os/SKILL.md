@@ -34,8 +34,9 @@ Source of truth: `os/claude-os-overview.html` in this repo. Stark HUD single-loo
 design (dark, cyan/gold, explicit colours). Tabs: Command (default, the full
 picture: operations, project rollup, decisions, patterns), Today, Projects
 (Asana board by section), Money (money in/out and the reconciliation bridges),
-Security (posture, admins, deadlines — CONFIDENTIAL), The system, Schedule,
-Registers, Rules.
+Security (posture, admins, deadlines — CONFIDENTIAL), Fixes (the suggested-fixes
+catalogue, technical and process, with Jarvis live suggestions), The system,
+Schedule, Registers, Rules.
 
 ### Updating it
 1. Edit `os/claude-os-overview.html`, then republish with the Artifact tool
@@ -44,7 +45,8 @@ Registers, Rules.
    a full-set declaration; omitting it also works and carries the stored one):
    `sample: {}` plus `mcp.servers`:
    - "Salesforce Production": soqlQuery, createSobjectRecord, updateSobjectRecord
-   - "Asana": search_tasks, add_comment, update_tasks
+   - "Asana": search_tasks, add_comment, update_tasks, create_tasks (one task
+     per approval, used only by fix_track)
    - "Microsoft 365": outlook_email_search, chat_message_search,
      teams_list_chats, outlook_create_reply_draft
    - "Stripe": stripe_api_read (READ ONLY — never declare stripe_api_write)
@@ -115,6 +117,20 @@ User queries, and the deadline board with days remaining. Jarvis has a
 `security_snapshot` tool; posture beyond Salesforce (Entra, CA, Intune) is not
 readable from the page and the snapshot says so instead of guessing. The deep
 dive stays in the weekly Security dashboard artifact (linked from the tab).
+
+### Fixes tab and the fix tools
+The Fixes tab is the improvement loop's working surface (process in
+`birdlife-improvement`). Seed catalogue lives in the page as `FIXES_SEED`
+(id, title, system, cat, sev 1-3, tier 1-3, effort, owner, why, people,
+steps, src); Jarvis adds live suggestions with `fix_propose`, reads with
+`fixes_catalog`, records progress with `fix_status`, and `fix_track` creates
+ONE Asana task in Backlog/Requests behind an approval card, verified by
+re-reading the board. Status and Jarvis additions are per-browser
+(localStorage); the durable record is the Asana task and, once done, the
+skill update. When a seeded fix is completed for good, remove it from
+`FIXES_SEED` and record the outcome in the owning skill in the same commit.
+`create_tasks` response shape was not observed before first use; the tool
+verifies by re-read and refuses to create twice.
 
 ### Reports (the console writes them, sessions polish them)
 Jarvis on the page writes reports from live snapshots on request. Library:
@@ -217,8 +233,10 @@ account by uploading a zip per skill (the uploader rejects any name containing
 `birdlife-stripe`, `birdlife-zapier`, `birdlife-cloudflare`. Cross-cutting:
 `birdlife-ict-assistant` (workflow and tiers), `birdlife-security` (posture,
 deadlines, incidents), `birdlife-people-lifecycle` (joiner/mover/leaver),
-`birdlife-reporting` (report library and data discipline), `email-voice`
-(Mathew's voice), `birdlife-os` (this one). Account-only: `morning`.
+`birdlife-reporting` (report library and data discipline),
+`birdlife-improvement` (the process-to-fix-to-learning loop behind the Fixes
+tab), `email-voice` (Mathew's voice), `birdlife-os` (this one). Account-only:
+`morning`.
 
 A skill earns a slot when its knowledge is hard-won and reused. Connectors
 without a skill (Atlassian, Canva, Miro, Zoom, Granola, Gmail, Google Drive
