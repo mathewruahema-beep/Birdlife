@@ -65,6 +65,9 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
   actions to approve-only direct execution.
 - `dashboard/ict-dashboard.html` — the ICT dashboard design template; the live copy
   is republished each weekday by the `ICT Dashboard` routine.
+- `security/index.html` — the Security Workbench (live Salesforce posture, deadline
+  register, incident playbooks with prepared Tier 2 commands, findings tracker).
+  Guide in `docs/security-workbench.md`. Confidential; reads only.
 - `routines/` — scheduled-routine definitions and backups (credentials redacted).
 
 ## Style

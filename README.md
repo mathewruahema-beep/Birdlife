@@ -16,6 +16,7 @@ This repository is two things:
 | | |
 |---|---|
 | Live dashboard | https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 |
+| Security Workbench | https://claude.ai/code/artifact/0e4c1fb6-95ec-4dc3-a761-166281e79d42 (confidential, see `docs/security-workbench.md`) |
 | Refresh | Weekdays 08:00 AEST, automated |
 | Salesforce org | `birdlifeaustralia.lightning.force.com` |
 | Asana project | `1211042432693678` — IT Operations Project Plan |

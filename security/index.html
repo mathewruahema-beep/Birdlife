@@ -1,0 +1,933 @@
+<title>BirdLife Security Workbench</title>
+<meta name="theme-color" content="#2e4e6b">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #f3f5f2; --surface: #ffffff; --surface-2: #eaeeea;
+    --line: #d9e0db; --line-strong: #b9c5be;
+    --ink: #172019; --ink-2: #4b5a52; --ink-3: #78877f;
+    --accent: #2e4e6b; --accent-ink: #24405a; --accent-soft: #dfe8f0;
+    --good: #2a7a4f; --good-soft: #dcefe4;
+    --warn: #9a6410; --warn-soft: #f6ecd6;
+    --crit: #a8352b; --crit-soft: #f7e1de;
+    --mono-bg: #eef1ee; --btn-ink: #ffffff;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0f1613; --surface: #172019; --surface-2: #1f2a24;
+      --line: #2b3831; --line-strong: #3d4d45;
+      --ink: #e4ebe6; --ink-2: #a5b4ac; --ink-3: #75857d;
+      --accent: #8fb5d6; --accent-ink: #a6c5e0; --accent-soft: #1c2c3a;
+      --good: #5fbf88; --good-soft: #17301f;
+      --warn: #d9a441; --warn-soft: #33290f;
+      --crit: #e0796e; --crit-soft: #38201c;
+      --mono-bg: #121a16; --btn-ink: #0f1613;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0f1613; --surface: #172019; --surface-2: #1f2a24;
+    --line: #2b3831; --line-strong: #3d4d45;
+    --ink: #e4ebe6; --ink-2: #a5b4ac; --ink-3: #75857d;
+    --accent: #8fb5d6; --accent-ink: #a6c5e0; --accent-soft: #1c2c3a;
+    --good: #5fbf88; --good-soft: #17301f;
+    --warn: #d9a441; --warn-soft: #33290f;
+    --crit: #e0796e; --crit-soft: #38201c;
+    --mono-bg: #121a16; --btn-ink: #0f1613;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 24px 18px 90px; }
+  a { color: var(--accent-ink); }
+  button { font-family: inherit; }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* masthead */
+  .mast { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--ink); padding-bottom: 12px; }
+  .kicker { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 500; }
+  h1 { font-family: var(--display); font-weight: 700; font-size: clamp(26px, 5vw, 36px); letter-spacing: -.02em; margin: 2px 0 2px; line-height: 1.05; text-wrap: balance; }
+  .lede { color: var(--ink-2); margin: 0; max-width: 62ch; font-size: 14.5px; }
+  .stamp { text-align: right; font-family: var(--mono); font-size: 11px; color: var(--ink-3); line-height: 1.7; text-transform: uppercase; letter-spacing: .06em; }
+  .stamp b { color: var(--crit); font-weight: 500; }
+  .livebar { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); margin: 12px 0 0; flex-wrap: wrap; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); flex: none; }
+  .dot.live { background: var(--good); } .dot.err { background: var(--crit); } .dot.wait { background: var(--warn); }
+
+  nav { position: sticky; top: 0; z-index: 5; background: var(--ground); display: flex; gap: 2px; margin: 14px 0 22px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  nav button { background: none; border: none; border-bottom: 2px solid transparent; font: 600 13.5px var(--sans); letter-spacing: .03em; color: var(--ink-2); padding: 10px 12px 11px; cursor: pointer; white-space: nowrap; }
+  nav button[aria-selected="true"] { color: var(--accent-ink); border-bottom-color: var(--accent); }
+  nav button .badge { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 99px; background: var(--crit); color: #fff; font: 600 11px var(--mono); line-height: 18px; text-align: center; margin-left: 5px; vertical-align: 1px; }
+
+  section[hidden] { display: none; }
+  h2 { font-family: var(--display); font-weight: 600; font-size: 19px; letter-spacing: -.01em; margin: 26px 0 10px; }
+  h2:first-child { margin-top: 0; }
+  h3 { font-size: 14px; margin: 18px 0 8px; font-weight: 600; }
+  .eyebrow { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .13em; color: var(--ink-3); }
+  .sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .note { color: var(--ink-2); font-size: 13.5px; margin: 0 0 12px; max-width: 70ch; }
+  .muted { color: var(--ink-3); }
+  .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* tiles */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0 18px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; text-align: left; font-family: inherit; color: inherit; cursor: pointer; border-top: 3px solid var(--line-strong); }
+  .tile:hover { border-color: var(--accent); }
+  .tile .n { font: 600 28px var(--display); font-variant-numeric: tabular-nums; line-height: 1.05; letter-spacing: -.02em; }
+  .tile .l { font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; margin-top: 4px; }
+  .tile .s { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+  .tile.good { border-top-color: var(--good); } .tile.good .n { color: var(--good); }
+  .tile.warn { border-top-color: var(--warn); } .tile.warn .n { color: var(--warn); }
+  .tile.crit { border-top-color: var(--crit); } .tile.crit .n { color: var(--crit); }
+  .tile.still { cursor: default; }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; }
+  .panel.err { border-color: var(--crit); background: var(--crit-soft); }
+  .panel.warnbox { border-color: var(--warn); background: var(--warn-soft); }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .tbl { overflow-x: auto; }
+  th { text-align: left; font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-3); font-weight: 500; padding: 0 10px 6px 0; border-bottom: 1px solid var(--line-strong); white-space: nowrap; }
+  td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td.r, th.r { text-align: right; }
+
+  .chip { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .05em; padding: 1px 7px; border-radius: 3px; white-space: nowrap; vertical-align: 1px; text-transform: uppercase; }
+  .chip.good { background: var(--good-soft); color: var(--good); }
+  .chip.warn { background: var(--warn-soft); color: var(--warn); }
+  .chip.crit { background: var(--crit-soft); color: var(--crit); }
+  .chip.slate { background: var(--surface-2); color: var(--ink-2); }
+  .chip.acc { background: var(--accent-soft); color: var(--accent-ink); }
+  .chip.t1 { background: var(--good-soft); color: var(--good); }
+  .chip.t2 { background: var(--warn-soft); color: var(--warn); }
+  .chip.t3 { background: var(--surface-2); color: var(--ink-2); }
+
+  .btn { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); border-radius: 5px; font: 600 13px var(--sans); padding: 6px 12px; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--btn-ink); }
+  .btn.small { font-size: 12px; padding: 3px 9px; }
+  .btn.danger { border-color: var(--crit); color: var(--crit); }
+  .btn[disabled] { opacity: .5; cursor: default; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  input[type="text"], input[type="date"], select, textarea { font: 400 14px var(--sans); color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 5px; padding: 6px 9px; }
+  textarea { width: 100%; min-height: 80px; resize: vertical; }
+  label.f { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--ink-2); font-weight: 600; }
+  .form { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; align-items: end; }
+
+  pre { background: var(--mono-bg); border: 1px solid var(--line); border-radius: 5px; padding: 12px 14px; font: 12.5px/1.55 var(--mono); overflow-x: auto; margin: 8px 0; white-space: pre; }
+  .codehead { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; }
+  .codehead .t { font-size: 13px; font-weight: 600; }
+
+  details.pb { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; margin-bottom: 10px; }
+  details.pb summary { list-style: none; cursor: pointer; padding: 12px 16px; display: flex; gap: 10px; align-items: baseline; font-weight: 600; }
+  details.pb summary::-webkit-details-marker { display: none; }
+  details.pb summary .sub { color: var(--ink-3); font-weight: 400; font-size: 13px; flex: 1; }
+  details.pb .body { padding: 0 16px 16px; border-top: 1px solid var(--line); }
+  ol.steps { padding-left: 0; list-style: none; margin: 10px 0; }
+  ol.steps li { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); align-items: flex-start; }
+  ol.steps li:last-child { border-bottom: none; }
+  ol.steps input { margin-top: 4px; }
+  ol.steps .st { flex: 1; }
+  ol.steps .st.done { color: var(--ink-3); text-decoration: line-through; }
+
+  .dl { display: grid; grid-template-columns: 96px 1fr auto; gap: 10px 14px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .dl:last-child { border-bottom: none; }
+  .dl .days { font: 600 22px var(--display); font-variant-numeric: tabular-nums; line-height: 1.05; letter-spacing: -.02em; }
+  .dl .days small { display: block; font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-top: 2px; }
+  .dl.over .days { color: var(--crit); } .dl.soon .days { color: var(--warn); } .dl.verify .days { color: var(--warn); } .dl.done .days { color: var(--good); }
+  .dl .what { font-weight: 600; }
+  .dl .meta { font-size: 12.5px; color: var(--ink-2); }
+  .dl .outcome { font-size: 12.5px; color: var(--good); margin-top: 3px; }
+  .dl .act { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  @media (max-width: 600px) { .dl { grid-template-columns: 80px 1fr; } .dl .act { grid-column: 1 / -1; flex-direction: row; align-items: center; } }
+
+  .e8 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+  .e8 .c { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; border-left: 4px solid var(--line-strong); }
+  .e8 .c.crit { border-left-color: var(--crit); } .e8 .c.warn { border-left-color: var(--warn); } .e8 .c.good { border-left-color: var(--good); }
+  .e8 .c .t { font-weight: 600; } .e8 .c .lvl { font-family: var(--mono); font-size: 11.5px; margin: 2px 0 4px; } .e8 .c .b { font-size: 13px; color: var(--ink-2); }
+
+  .finding { display: grid; grid-template-columns: 8px 1fr auto; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); align-items: start; }
+  .finding:last-child { border-bottom: none; }
+  .finding .sev { width: 8px; border-radius: 2px; align-self: stretch; background: var(--line-strong); }
+  .finding .sev.P1 { background: var(--crit); } .finding .sev.P2 { background: var(--warn); } .finding .sev.P3 { background: var(--accent); }
+  .finding .t { font-weight: 600; }
+  .finding .m { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+  .finding .m .late { color: var(--crit); font-weight: 600; }
+  .finding.closed .t { color: var(--ink-3); text-decoration: line-through; }
+  .finding .ctl { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .finding .ctl select { font-size: 12px; padding: 3px 6px; }
+
+  .out { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; min-height: 120px; white-space: pre-wrap; font-size: 14px; line-height: 1.55; }
+  .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--ink); color: var(--ground); padding: 8px 14px; border-radius: 6px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 20; }
+  .toast.on { opacity: 1; }
+  .empty { color: var(--ink-3); font-size: 13.5px; padding: 8px 0; }
+  ul.tight { margin: 6px 0; padding-left: 18px; } ul.tight li { margin: 3px 0; font-size: 13.5px; }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <div class="kicker">BirdLife Australia · ICT Security</div>
+      <h1>Security Workbench</h1>
+      <p class="lede">Live Salesforce posture, the deadline register, incident playbooks that write the Tier 2 commands for you, and a findings list where every line has an owner and a date.</p>
+    </div>
+    <div class="stamp"><b>Confidential</b><br>Essential Eight + SaaS overlay<br><span id="clock">—</span></div>
+  </header>
+  <div class="livebar"><span class="dot" id="live-dot"></span><span id="live-text">Connecting to Salesforce Production...</span><button class="btn small" id="refresh-btn" type="button" hidden>Refresh</button></div>
+
+  <nav role="tablist" id="tabs">
+    <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
+    <button role="tab" data-tab="salesforce">Salesforce</button>
+    <button role="tab" data-tab="posture">Posture</button>
+    <button role="tab" data-tab="deadlines">Deadlines <span class="badge" id="dl-badge" hidden></span></button>
+    <button role="tab" data-tab="playbooks">Playbooks</button>
+    <button role="tab" data-tab="findings">Findings <span class="badge" id="fd-badge" hidden></span></button>
+    <button role="tab" data-tab="report">Report</button>
+  </nav>
+
+  <!-- OVERVIEW -->
+  <section id="tab-overview">
+    <div class="tiles" id="ov-tiles"></div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="sec-head"><h2>What is due</h2><span class="eyebrow">next 30 days and overdue</span></div>
+        <div id="ov-deadlines"></div>
+      </div>
+      <div class="panel">
+        <div class="sec-head"><h2>Open findings</h2><span class="eyebrow">P1 first</span></div>
+        <div id="ov-findings"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="sec-head"><h2>Lines to hold</h2><span class="eyebrow">thresholds from the security doctrine</span></div>
+      <div class="tbl"><table id="ov-lines"></table></div>
+    </div>
+  </section>
+
+  <!-- SALESFORCE -->
+  <section id="tab-salesforce" hidden>
+    <p class="note">Every read is scoped the way the doctrine says: sysadmins by profile, ratio against active Standard users, Cases by the Zeus record type. Names on this tab come from the live org, never from the page.</p>
+    <div class="tiles" id="sf-tiles"></div>
+    <div class="panel">
+      <div class="sec-head"><h2>Active System Administrators</h2><span class="eyebrow" id="sf-admins-stamp"></span></div>
+      <div id="sf-admins"></div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="sec-head"><h2>Modify All Data outside a profile</h2><span class="eyebrow">permission set assignments</span></div>
+        <div id="sf-psa"></div>
+      </div>
+      <div class="panel">
+        <div class="sec-head"><h2>Failed logins, last 24 hours</h2><span class="eyebrow">LoginHistory, non-success</span></div>
+        <div id="sf-logins"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="sec-head"><h2>Setup changes to review, last 7 days</h2><span class="eyebrow">portal self-service and Bird Bot noise removed</span></div>
+      <div id="sf-audit"></div>
+    </div>
+    <div class="panel">
+      <div class="sec-head"><h2>Security-flagged Ask Zeus cases</h2><span class="eyebrow">open, subject keywords</span></div>
+      <div id="sf-cases"></div>
+    </div>
+    <div class="panel">
+      <div class="sec-head"><h2>Stale active users</h2><span class="eyebrow">no sign-in for 30 days</span></div>
+      <div id="sf-stale"></div>
+    </div>
+  </section>
+
+  <!-- POSTURE -->
+  <section id="tab-posture" hidden>
+    <p class="note">Point-in-time positions from the security doctrine. Every number carries its date. Re-read the source before asserting any of it is still true; the Salesforce tab is the only live surface here.</p>
+    <div class="sec-head"><h2>Essential Eight</h2><span class="eyebrow">target ML1 in 12 weeks, ML2 in 12 months (programme set Jun 2026)</span></div>
+    <div class="e8" id="e8"></div>
+    <div class="sec-head"><h2>By system</h2><span class="eyebrow">the SaaS and identity overlay</span></div>
+    <div class="stack" id="systems"></div>
+  </section>
+
+  <!-- DEADLINES -->
+  <section id="tab-deadlines" hidden>
+    <p class="note">Days remaining are computed when the page opens. Anything past its date is a finding, not a date, until an outcome is recorded here. Rows never get deleted.</p>
+    <div class="panel" id="dl-list"></div>
+    <div class="panel">
+      <h2>Add a date</h2>
+      <p class="note">Add a row the moment a new certificate, secret, licence or regulatory date is learned.</p>
+      <form class="form" id="dl-form">
+        <label class="f">Item<input type="text" name="item" required placeholder="e.g. Vevox SAML certificate"></label>
+        <label class="f">Date<input type="date" name="date" required></label>
+        <label class="f">System<input type="text" name="system" required placeholder="Entra, Salesforce..."></label>
+        <label class="f">Owner<input type="text" name="owner" required placeholder="Mathew"></label>
+        <button class="btn primary" type="submit">Add to register</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- PLAYBOOKS -->
+  <section id="tab-playbooks" hidden>
+    <p class="note">Severity first, then containment, then comms. The page prepares; a human executes anything Tier 2 (Entra, Exchange, Intune, Defender) or anything that removes a person's access. Never destroy evidence during triage.</p>
+    <div id="playbooks"></div>
+  </section>
+
+  <!-- FINDINGS -->
+  <section id="tab-findings" hidden>
+    <p class="note">One finding, one owner, one date. A line without both is a wish, not a plan. Findings are stored with the page, so they survive reloads and any assistant session can read them back.</p>
+    <div class="panel">
+      <form class="form" id="fd-form">
+        <label class="f" style="grid-column: span 2">Finding<input type="text" name="title" required placeholder="What is wrong, in one line"></label>
+        <label class="f">System<select name="system"><option>Entra / M365</option><option>Salesforce</option><option>WordPress</option><option>NetSuite</option><option>Stripe</option><option>Zapier</option><option>Email / Cloudflare</option><option>Claude estate</option><option>Devices</option></select></label>
+        <label class="f">Severity<select name="severity"><option>P1</option><option selected>P2</option><option>P3</option></select></label>
+        <label class="f">Owner<input type="text" name="owner" required placeholder="Mathew"></label>
+        <label class="f">Due<input type="date" name="due" required></label>
+        <button class="btn primary" type="submit">Add finding</button>
+      </form>
+      <div class="row" style="margin-top:10px">
+        <span class="muted" style="font-size:12.5px">Show:</span>
+        <select id="fd-filter"><option value="open">Open</option><option value="all">All</option><option value="closed">Closed</option></select>
+        <span id="fd-store" class="muted" style="font-size:12.5px"></span>
+      </div>
+    </div>
+    <div class="panel" id="fd-list"></div>
+  </section>
+
+  <!-- REPORT -->
+  <section id="tab-report" hidden>
+    <p class="note">Drafts are built from the live snapshot, the deadline register and the open findings, in Mathew's voice. Board and exec drafts carry counts and ratios only, never names. Copy and polish in a session for a finished document.</p>
+    <div class="panel">
+      <div class="row">
+        <button class="btn primary" data-report="team" type="button">Security posture (ICT team)</button>
+        <button class="btn" data-report="exec" type="button">Exec brief (counts only)</button>
+        <button class="btn" data-report="chase" type="button">Deadline chase list</button>
+        <button class="btn" data-report="prompt" type="button">Prompt for a Claude session</button>
+        <button class="btn small" id="rp-copy" type="button" hidden>Copy</button>
+      </div>
+      <div id="rp-status" class="muted" style="font-size:12.5px;margin:8px 0 6px"></div>
+      <div class="out" id="rp-out">Pick a draft.</div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var DAY = 86400000;
+  var now = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  function daysUntil(iso) { var d = new Date(iso + 'T00:00:00'); return Math.round((d - today) / DAY); }
+  function fmtDate(iso) { if (!iso) return ''; var d = new Date(iso.length > 10 ? iso : iso + 'T00:00:00'); return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }); }
+  function ago(iso) { if (!iso) return 'never'; var d = Math.floor((now - new Date(iso)) / DAY); return d === 0 ? 'today' : d === 1 ? 'yesterday' : d + ' days ago'; }
+  function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('on'); setTimeout(function () { t.classList.remove('on'); }, 1800); }
+  function copy(text) { if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { toast('Copied'); }, function () { toast('Copy failed'); }); else toast('Clipboard not available'); }
+  $('clock').textContent = now.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+
+  /* ---------------- doctrine (dated, counts only) ---------------- */
+  var THRESHOLDS = [
+    { line: 'Salesforce sysadmins as a share of active Standard users', target: '5% or fewer', key: 'ratio' },
+    { line: 'Entra Global Administrators', target: '4 or fewer, none shared, all phishing-resistant', asOf: '6 (Jun 2026, two shared)' },
+    { line: 'Privileged role assignments (Entra)', target: '10 or fewer', asOf: '20 (Jun 2026)' },
+    { line: 'Stale accounts', target: 'no active account without a sign-in for 30 days unless on the IT-SEC-001 service-account register', key: 'stale' },
+    { line: 'Critical CVE remediation', target: '48 hours (Essential Eight)', asOf: '200 critical, 122 exploitable (Jun 2026)' },
+    { line: 'Conditional Access changes', target: 'report-only 7 to 14 days, written rollback, then enforce', asOf: 'standing rule' }
+  ];
+  var E8 = [
+    { c: 'Patch applications', lvl: 'Below ML1', s: 'crit', b: 'Browser and OpenSSL CVEs on most of the fleet.' },
+    { c: 'Patch operating systems', lvl: 'ML1 partial', s: 'warn', b: 'Windows 10 past EOL, Win 11 24H2 not started, no Windows Update for Business rings.' },
+    { c: 'Multi-factor authentication', lvl: 'Below ML1 (~8% capable)', s: 'crit', b: 'No tenant-wide enforced Conditional Access MFA policy. Target 15 Sep 2026.' },
+    { c: 'Restrict admin privileges', lvl: 'Below ML1', s: 'crit', b: '6 Global Admins, 20 privileged assignments, LSA and Tamper Protection off, no PIM on a P1 licence.' },
+    { c: 'Application control', lvl: 'Below ML1', s: 'crit', b: '0 of 19 attack surface reduction rules.' },
+    { c: 'Restrict Office macros', lvl: 'Below ML1', s: 'crit', b: 'Macro ASR rules absent.' },
+    { c: 'User application hardening', lvl: 'Below ML1', s: 'crit', b: 'Email protection presets, WinRM, AutoPlay, Adobe JS, Chrome ADMX.' },
+    { c: 'Regular backups', lvl: 'Partial', s: 'warn', b: 'BitLocker policy absent, no independent backup audit.' }
+  ];
+  var SYSTEMS = [
+    { n: 'Entra ID / Microsoft 365', d: 'Jun 2026', pts: [
+      'Entra ID P1 only. No risk-based CA, no PIM, no automated access reviews. PIM is a licence purchase (about A$2,500 a year), not a config change.',
+      '8 Conditional Access policies, no tenant-wide enforced MFA. SharePoint external-sharing block is report-only. 116 users signed in over 7 days with zero CA coverage.',
+      'MFA-capable 203 of 2,561 (7.9%). Remediation list of 237 accounts, all Pending since 30 Jun. Monthly MFA audit overdue.',
+      'Break-glass accounts documented as CA exclusions and not yet created.',
+      'Secure Score 48.19%. Tamper Protection off, LSA Protection off, external auto-forwarding allowed, no Safe Links or Safe Attachments.',
+      '5,422 device vulnerabilities, 200 critical, 122 exploitable. Compliance is not linked to CA, so compliance state controls nothing.',
+      '129 enterprise apps, every quarterly review decision field blank. Next review 19 Sep 2026.'] },
+    { n: 'Salesforce (Zeus)', d: 'Jul 2026, admin list live on the Salesforce tab', pts: [
+      'Health Check 83%, but 0 trusted IP ranges, 8 objects with public external access, guest profiles with Edit on 45 objects, admins can log in as any user.',
+      'Sysadmin share of internal users was 15% against a 5% target. Three birdbot service accounts hold System Administrator in the CEO role node.',
+      'Release Updates 0% actioned. Transaction Security Policies overdue since 13 Jul 2026. The 1 Sep 2026 retirements (OAuth username-password, instanced URLs, Authorized Email Domains, Profile Filtering) have passed: verify what changed and what MoveData did.'] },
+    { n: 'WordPress / WooCommerce', d: 'Aug 2026', pts: [
+      '"Anyone can register" enabled with default role Shop Manager: public self-registration into order and customer data. One toggle. Fix today.',
+      '25 admin accounts, 2FA enforced on none, 20 never logged in. Removal list agreed, not executed.',
+      'WP File Manager and WP phpMyAdmin active (either is a full compromise path). ACF to REST API exposed. WP_DEBUG_LOG writing publicly. 82,089 logged emails with PII in the database.',
+      'miniOrange webhook access keys leaked in plaintext in three documents; WooCommerce keys exposed in deleted routine prompts. Rotation not verified for either.'] },
+    { n: 'NetSuite', d: 'Aug 2026', pts: [
+      'OAuth2 M2M certificate on the SuiteCloud Development Integration linked to departed staff, zero activity, expires 17 Sep 2026. Revoke, monitor, delete, in that order.',
+      'Native approval routing off for all 7 transaction types; a workflow auto-approves no-PO bills. Weakest financial control.',
+      'Four role templates with excessive GL, bank and journal rights. External logins for four vendors.'] },
+    { n: 'Stripe', d: 'Aug 2026', pts: [
+      'Five livemode accounts holding real donor money. Writes only with explicit human approval naming object and amount, never from a page or a routine.',
+      'Refund IDs not synced to Salesforce: a fraud or error investigation starts in Stripe, not the CRM.'] },
+    { n: 'Zapier', d: 'Aug 2026', pts: [
+      '17 connected apps, 8 Outlook and 9 Excel connections of unknown ownership.',
+      'LearnUpon catch-hook URL in plaintext in documentation. A webhook URL is a credential.',
+      'The superseded Employment Hero to Azure AD manager-sync Zap may still be enabled: a second uncontrolled writer into Entra.'] },
+    { n: 'Email authentication and edge', d: 'Aug 2026', pts: [
+      'DMARC p=reject with pct=10: 90% of spoofed mail is not rejected. Move to pct=100 after verifying every legitimate sender.',
+      'SPF lacks the Salesforce include. Changing SPF is a domain-wide, reviewed, rollback-planned change.',
+      'Cart-flood and wp-login brute force (50k hits, 67% error) were mitigated at WP Engine, not at the Cloudflare edge BirdLife pays for.'] },
+    { n: 'The Claude estate', d: 'Sep 2026', pts: [
+      'Connector credentials for every system sit in the claude.ai account. No credentials in routine prompts, ever. A credential found in a prompt means pause, rotate, then fix.',
+      'Write-capable routines name their write surface and caps. This page never writes to any BirdLife system; it only reads Salesforce.',
+      'entra-admin-mcp certificate expires 26 Aug 2027.'] }
+  ];
+  var DEADLINES_BASE = [
+    { id: 'sf-tsp', item: 'Salesforce Transaction Security Policies release update', date: '2026-07-13', system: 'Salesforce', owner: 'Mathew' },
+    { id: 'vevox-dash', item: 'Vevox Dashboard SAML certificate (verify SSO still works)', date: '2026-08-21', system: 'Entra', owner: 'Mathew' },
+    { id: 'pardot', item: 'Pardot hard cutover; pi__ and sl_flow uninstall approval', date: '2026-08-31', system: 'Salesforce', owner: 'Karishma / Jonathon' },
+    { id: 'sf-sep1', item: 'Salesforce 1 Sep release updates: OAuth username-password retirement, instanced URLs, Authorized Email Domains, Profile Filtering (verify MoveData)', date: '2026-09-01', system: 'Salesforce', owner: 'Mathew' },
+    { id: 'vevox', item: 'Vevox SAML certificate', date: '2026-09-08', system: 'Entra', owner: 'Mathew' },
+    { id: 'mfa-ca', item: 'Tenant-wide MFA Conditional Access target', date: '2026-09-15', system: 'Entra', owner: 'Mathew' },
+    { id: 'ns-oauth', item: 'NetSuite OAuth2 certificate (orphaned, departed staff)', date: '2026-09-17', system: 'NetSuite', owner: 'Mathew / CFO' },
+    { id: 'app-review', item: 'Enterprise app access review (quarterly, 129 apps)', date: '2026-09-19', system: 'Entra', owner: 'Mathew' },
+    { id: 'eh-secret', item: 'Employment Hero sync Graph secret', date: '2027-01-05', system: 'Entra / Key Vault', owner: 'Mathew' },
+    { id: 'ortto', item: 'Ortto renewal', date: '2027-08-12', system: 'Ortto', owner: 'Marketing / Mathew' },
+    { id: 'entra-mcp', item: 'entra-admin-mcp certificate', date: '2027-08-26', system: 'Claude estate', owner: 'Mathew' }
+  ];
+
+  /* ---------------- playbooks ---------------- */
+  var PLAYBOOKS = [
+    { id: 'phish', title: 'Phishing report', sub: 'A Case with Type Troubleshooting or sub-type Phishing Email',
+      steps: [
+        ['Read the message headers from the Case itself, not a forwarded copy.', 'T1'],
+        ['Run a message trace to find everyone who received it (Exchange admin).', 'T2'],
+        ['If anyone entered credentials, switch to the compromised-account playbook for each of them.', 'T1'],
+        ['Block the sender or domain in the tenant allow/block list if it is a campaign.', 'T2'],
+        ['Reply to the requester in Mathew\'s voice: thank them, say what was done, say whether to delete.', 'T1'],
+        ['Close the Case: Status Closed, reason Closed - Resolved, set the sub-type, note the sender domain for the pattern report.', 'T1']],
+      gen: { fields: [['sender', 'Sender address or domain', 'text'], ['subject', 'Subject fragment', 'text'], ['days', 'Days back', 'text', '2']],
+        build: function (v) {
+          var s = v.sender || '<sender@domain>'; var subj = v.subject || '<subject fragment>'; var d = parseInt(v.days, 10) || 2;
+          return [
+            ['Exchange Online: who received it (Tier 2, run as Exchange admin)',
+             'Connect-ExchangeOnline\n' +
+             '$start = (Get-Date).AddDays(-' + d + ')\n' +
+             'Get-MessageTrace -SenderAddress "' + s + '" -StartDate $start -EndDate (Get-Date) -PageSize 5000 |\n' +
+             '  Where-Object { $_.Subject -like "*' + subj + '*" } |\n' +
+             '  Select-Object Received, RecipientAddress, Subject, Status | Sort-Object Received |\n' +
+             '  Format-Table -AutoSize\n' +
+             '# Mathew\'s line for the reply: "I ran a trace and these are the people who received it."'],
+            ['Block the sender for the tenant (Tier 2, only for a confirmed campaign)',
+             'New-TenantAllowBlockListItems -ListType Sender -Block -Entries "' + s + '" -ExpirationDate (Get-Date).AddDays(90) -Notes "Phishing campaign, Case <number>"'],
+            ['Salesforce: internal Case comment to log the triage (Tier 1, via the console or a session)',
+             'Phishing triage: headers read from Case. Message trace run for sender ' + s + ' over the last ' + d + ' days: <n> recipients. Credentials entered: <none / names>. Sender blocked: <yes/no>. Requester told to delete.']
+          ];
+        } } },
+    { id: 'compromise', title: 'Compromised or suspected compromised account', sub: 'Prepare every step; a human runs the Entra and Exchange parts',
+      steps: [
+        ['Revoke all sessions first. Everything else waits until the attacker is signed out.', 'T2'],
+        ['Reset the password, then reset MFA methods (remove attacker-registered methods).', 'T2'],
+        ['Review 30 days of sign-in logs: locations, apps, legacy protocols.', 'T2'],
+        ['Check inbox rules and forwarding. Auto-forwarding is allowed tenant-wide, so check it every time.', 'T2'],
+        ['If the account holds any admin role, escalate to Mathew immediately.', 'T1'],
+        ['If it has Salesforce access, read LoginHistory and recent record edits (the lookup below does this live).', 'T1'],
+        ['Document the timeline in the Case with an internal comment. Never delete mail or logs during triage.', 'T1']],
+      gen: { fields: [['upn', 'User principal name', 'text']],
+        build: function (v) {
+          var u = v.upn || '<user@birdlife.org.au>';
+          return [
+            ['Entra: contain (Tier 2, Graph PowerShell as a Global or Authentication admin)',
+             'Connect-MgGraph -Scopes "User.ReadWrite.All","UserAuthenticationMethod.ReadWrite.All","AuditLog.Read.All","Directory.AccessAsUser.All"\n' +
+             '$u = Get-MgUser -UserId "' + u + '" -Property Id,DisplayName,AccountEnabled\n' +
+             '# 1. Sign them out everywhere\n' +
+             'Revoke-MgUserSignInSession -UserId $u.Id\n' +
+             '# 2. Optional hard stop while you investigate (re-enable deliberately)\n' +
+             '# Update-MgUser -UserId $u.Id -AccountEnabled:$false\n' +
+             '# 3. Reset the password (force change at next sign-in)\n' +
+             '$pwd = [System.Web.Security.Membership]::GeneratePassword(20, 4)\n' +
+             'Update-MgUser -UserId $u.Id -PasswordProfile @{ Password = $pwd; ForceChangePasswordNextSignIn = $true }\n' +
+             '# 4. List MFA methods; remove anything the person does not recognise\n' +
+             'Get-MgUserAuthenticationMethod -UserId $u.Id | Select-Object Id, AdditionalProperties\n' +
+             '# Remove-MgUserAuthenticationMicrosoftAuthenticatorMethod -UserId $u.Id -MicrosoftAuthenticatorAuthenticationMethodId <id>\n' +
+             '# Remove-MgUserAuthenticationPhoneMethod -UserId $u.Id -PhoneAuthenticationMethodId <id>\n' +
+             '# 5. Admin roles held (any hit = escalate now)\n' +
+             'Get-MgUserMemberOf -UserId $u.Id | Where-Object { $_.AdditionalProperties["@odata.type"] -eq "#microsoft.graph.directoryRole" } | ForEach-Object { $_.AdditionalProperties.displayName }'],
+            ['Entra: 30 days of sign-ins (Tier 2)',
+             '$since = (Get-Date).AddDays(-30).ToString("yyyy-MM-ddTHH:mm:ssZ")\n' +
+             'Get-MgAuditLogSignIn -Filter "userPrincipalName eq \'' + u + '\' and createdDateTime ge $since" -All |\n' +
+             '  Select-Object CreatedDateTime, AppDisplayName, IpAddress, @{n="Country";e={$_.Location.CountryOrRegion}}, @{n="City";e={$_.Location.City}}, ClientAppUsed, @{n="Result";e={$_.Status.ErrorCode}} |\n' +
+             '  Sort-Object CreatedDateTime -Descending | Export-Csv "signins-' + u.replace(/[^a-z0-9]/gi, '_') + '.csv" -NoTypeInformation'],
+            ['Exchange: inbox rules and forwarding (Tier 2)',
+             'Connect-ExchangeOnline\n' +
+             'Get-InboxRule -Mailbox "' + u + '" | Select-Object Name, Enabled, ForwardTo, ForwardAsAttachmentTo, RedirectTo, DeleteMessage, MoveToFolder | Format-List\n' +
+             'Get-Mailbox -Identity "' + u + '" | Select-Object ForwardingAddress, ForwardingSmtpAddress, DeliverToMailboxAndForward\n' +
+             '# Remove a malicious rule (keep a screenshot first, it is evidence):\n' +
+             '# Remove-InboxRule -Mailbox "' + u + '" -Identity "<rule name>"\n' +
+             '# Set-Mailbox -Identity "' + u + '" -ForwardingSmtpAddress $null -DeliverToMailboxAndForward $false'],
+            ['Salesforce: SOQL for the same person (Tier 1, run from a session or the lookup below)',
+             'SELECT Id, Name, Username, Profile.Name, LastLoginDate FROM User WHERE Username LIKE \'' + u.split('@')[0] + '%\'\n' +
+             'SELECT LoginTime, Status, SourceIp, LoginType, Application, Browser FROM LoginHistory WHERE UserId = \'<Id>\' AND LoginTime = LAST_N_DAYS:30 ORDER BY LoginTime DESC LIMIT 200']
+          ];
+        } },
+      sfLookup: true },
+    { id: 'leak', title: 'Leaked credential', sub: 'Key, token, webhook URL or password in a document, prompt or repo',
+      steps: [
+        ['Rotate first, investigate second. Rotation is the only step that closes the exposure.', 'T1'],
+        ['Scrub the document, then search for copies: SharePoint, Teams, Asana, routine prompts, repo history.', 'T1'],
+        ['Add it to the credential watchlist as "rotation not verified" until someone confirms the new secret is in use.', 'T1'],
+        ['If it was in a Claude routine prompt: pause the routine, rotate, then fix the prompt.', 'T1'],
+        ['Standing unverified rotations: WooCommerce keys (routine prompts, Aug 2026), miniOrange webhook keys (three documents), LearnUpon catch-hook URL, Raisely token in a formula field.', 'T1']],
+      gen: { fields: [['kind', 'Credential type (API key, webhook URL, password, certificate)', 'text'], ['where', 'Where it was found', 'text']],
+        build: function (v) {
+          var k = v.kind || '<type>'; var w = v.where || '<location>';
+          return [
+            ['Rotation record (paste into the Findings tab and the watchlist)',
+             'Leaked credential: ' + k + '\nFound in: ' + w + '\nFound on: ' + now.toISOString().slice(0, 10) + '\nRotated on: <date>   Rotated by: <name>\nNew secret in use verified by: <name, date, evidence>\nCopies searched: SharePoint [ ]  Teams [ ]  Asana [ ]  Routine prompts [ ]  Repo history [ ]\nStatus: rotation not verified'],
+            ['Search for copies (Tier 1, from a session)',
+             'SharePoint search: sharepoint_search for the first 12 characters of the secret\nTeams: chat_message_search for the same fragment\nAsana: search_tasks with the fragment in text\nRepo: git log -p -S "<fragment>" --all\nRoutines: list_triggers, then read each prompt']
+          ];
+        } } },
+    { id: 'payment', title: 'Payment anomaly', sub: 'Unexpected refunds, charges or payouts. Read Stripe, never write from here',
+      steps: [
+        ['Identify which of the five Stripe livemode accounts. Read only.', 'T1'],
+        ['Match to Salesforce by amount and date. Refund IDs are not synced, so there is no direct key.', 'T1'],
+        ['Hand to Nina Lewis for reconciliation and to the CFO for any money decision.', 'T1'],
+        ['Card numbers, tokens and customer PII stay out of the write-up.', 'T1']],
+      gen: { fields: [['amount', 'Amount (dollars)', 'text'], ['date', 'Date', 'date']],
+        build: function (v) {
+          var a = v.amount || '<amount>'; var d = v.date || '<yyyy-mm-dd>';
+          return [
+            ['Salesforce: candidate matches by amount and date (Tier 1)',
+             'SELECT Id, Name, Amount, CloseDate, StageName, Account.Name FROM Opportunity WHERE Amount = ' + a + ' AND CloseDate >= ' + d + ' AND CloseDate <= ' + d + ' LIMIT 50'],
+            ['Stripe: read the charge or refund (Tier 1, stripe_api_read only)',
+             'List refunds created on ' + d + ' for amount ' + a + ' in each livemode account; note the charge id, the customer id and the reason.\nNever call stripe_api_write. A refund decision is the CFO\'s.']
+          ];
+        } } },
+    { id: 'web', title: 'Website compromise or flood', sub: 'birdlife.org.au on WP Engine behind Cloudflare',
+      steps: [
+        ['WP Engine error rate and hit counts on /cart and /wp-login.php first.', 'T1'],
+        ['Containment lives in WP Engine Web Rules today. Propose the Cloudflare WAF or rate limit as the durable control and name an owner.', 'T1'],
+        ['If admin compromise is suspected: check the Shop Manager self-registration toggle and the 25 admin accounts before anything else.', 'T1'],
+        ['If donor or member personal information may be exposed, start the Notifiable Data Breach assessment clock (30 days) and tell the CEO through Mathew.', 'T1']],
+      gen: { fields: [['path', 'Path under attack', 'text', '/wp-login.php'], ['rate', 'Requests per 10 seconds per IP', 'text', '20']],
+        build: function (v) {
+          var p = v.path || '/wp-login.php'; var r = v.rate || '20';
+          return [
+            ['Cloudflare rate limiting rule (proposal, dashboard: Security, WAF, Rate limiting rules)',
+             'Rule name: BirdLife ' + p + ' brute-force limit\nIf incoming requests match: (http.request.uri.path eq "' + p + '")\nRate: ' + r + ' requests per 10 seconds, counted by IP\nAction: Block for 1 hour\nOwner: <name>   Review date: <date>'],
+            ['WordPress admin sweep (Tier 1 via the WordPress connector on UAT; production is a human in wp-admin)',
+             'Settings, General: "Anyone can register" must be OFF; default role Subscriber.\nUsers: list administrators, sort by last login, disable the never-logged-in accounts on the agreed removal list.\nPlugins: WP File Manager and WP phpMyAdmin deactivated and deleted.']
+          ];
+        } } }
+  ];
+
+  /* ---------------- tabs ---------------- */
+  var tabs = $('tabs');
+  function showTab(name) {
+    Array.prototype.forEach.call(tabs.querySelectorAll('button'), function (b) { b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false'); });
+    ['overview', 'salesforce', 'posture', 'deadlines', 'playbooks', 'findings', 'report'].forEach(function (t) { $('tab-' + t).hidden = t !== name; });
+    try { history.replaceState(null, '', '#' + name); } catch (e) {}
+    window.scrollTo(0, 0);
+  }
+  tabs.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) showTab(b.dataset.tab); });
+  var h = (location.hash || '').slice(1); if (h && $('tab-' + h)) showTab(h);
+
+  /* ---------------- state ---------------- */
+  var live = { mcp: null, sf: 'Salesforce Production', storedAt: null, status: 'connecting' };
+  var sf = { admins: null, inactiveN: null, activeN: null, stale: null, psa: null, cases: null, logins: null, audit: null, errors: {} };
+  var store = { kind: 'local', db: null };
+  var findings = []; var overlay = {}; var extraDeadlines = [];
+
+  /* ---------------- rendering: overview ---------------- */
+  function ratio() { if (sf.admins && sf.activeN) return sf.admins.length / sf.activeN; return null; }
+  function renderOverview() {
+    var r = ratio();
+    var dls = allDeadlines();
+    var overdue = dls.filter(function (d) { return d.state === 'over'; }).length;
+    var open = findings.filter(function (f) { return f.status !== 'closed'; });
+    var p1 = open.filter(function (f) { return f.severity === 'P1'; }).length;
+    var late = open.filter(function (f) { return f.due && daysUntil(f.due) < 0; }).length;
+    var tiles = [
+      { n: sf.admins ? sf.admins.length : '...', l: 'SF sysadmins', s: sf.admins ? 'live' : 'waiting for Salesforce', cls: sf.admins ? (sf.admins.length > 8 ? 'warn' : 'good') : '', tab: 'salesforce' },
+      { n: r != null ? (r * 100).toFixed(1) + '%' : '...', l: 'Admin ratio', s: 'line: 5% or fewer', cls: r != null ? (r > 0.05 ? 'crit' : 'good') : '', tab: 'salesforce' },
+      { n: sf.stale ? sf.stale.length : '...', l: 'Stale active users', s: 'no sign-in 30 days', cls: sf.stale ? (sf.stale.length ? 'warn' : 'good') : '', tab: 'salesforce' },
+      { n: overdue, l: 'Dates past, unverified', s: dls.length + ' on the register', cls: overdue ? 'crit' : 'good', tab: 'deadlines' },
+      { n: open.length, l: 'Open findings', s: p1 + ' P1' + (late ? ', ' + late + ' past due' : ''), cls: p1 || late ? 'crit' : open.length ? 'warn' : 'good', tab: 'findings' },
+      { n: sf.cases ? sf.cases.length : '...', l: 'Security cases', s: 'open in Ask Zeus', cls: sf.cases ? (sf.cases.length ? 'warn' : 'good') : '', tab: 'salesforce' }
+    ];
+    $('ov-tiles').innerHTML = tiles.map(function (t) {
+      return '<button class="tile ' + t.cls + '" type="button" data-tab="' + t.tab + '"><div class="n">' + esc(t.n) + '</div><div class="l">' + esc(t.l) + '</div><div class="s">' + esc(t.s) + '</div></button>';
+    }).join('');
+    $('ov-deadlines').innerHTML = dls.filter(function (d) { return d.days <= 30 && d.state !== 'done'; }).map(dlRow).join('') || '<div class="empty">Nothing due in the next 30 days.</div>';
+    $('ov-findings').innerHTML = open.slice(0, 6).map(function (f) { return findingRow(f, true); }).join('') || '<div class="empty">No open findings recorded.</div>';
+    $('ov-lines').innerHTML = '<tr><th>Line</th><th>Target</th><th class="r">Now</th></tr>' + THRESHOLDS.map(function (t) {
+      var nowv = t.asOf || '';
+      var cls = '';
+      if (t.key === 'ratio') { nowv = r != null ? (r * 100).toFixed(1) + '% (' + sf.admins.length + ' of ' + sf.activeN + ', live)' : 'waiting for Salesforce'; cls = r != null ? (r > 0.05 ? 'crit' : 'good') : ''; }
+      if (t.key === 'stale') { nowv = sf.stale ? sf.stale.length + ' active Standard users (live)' : 'waiting for Salesforce'; cls = sf.stale ? (sf.stale.length ? 'warn' : 'good') : ''; }
+      return '<tr><td>' + esc(t.line) + '</td><td class="muted">' + esc(t.target) + '</td><td class="r">' + (cls ? '<span class="chip ' + cls + '">' + esc(nowv) + '</span>' : esc(nowv)) + '</td></tr>';
+    }).join('');
+    var badge = $('dl-badge'); badge.hidden = !overdue; badge.textContent = overdue;
+    var fb = $('fd-badge'); fb.hidden = !(p1 + late); fb.textContent = p1 + late;
+  }
+  $('ov-tiles').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) showTab(b.dataset.tab); });
+
+  /* ---------------- rendering: salesforce ---------------- */
+  var ERR_COPY = {
+    needs_reauth: 'Reconnect Salesforce Production in claude.ai Settings, Connectors.',
+    server_not_connected: 'Add Salesforce Production in claude.ai Settings, Connectors.',
+    selection_required: 'More than one Salesforce connector matches. Choose one when claude.ai asks.',
+    blocked_by_policy: 'Blocked by organisation policy for this viewer.',
+    approval_required: 'This read needs per-call approval, which artifacts cannot give yet.',
+    not_in_manifest: 'This read is outside what the page declared. Republish with soqlQuery in the manifest.',
+    server_unavailable: 'Salesforce is not answering. Keeping the last good read.',
+    not_granted: 'This view did not grant connector access to the page.',
+    capability_disabled: 'Connector access is not available in this view.'
+  };
+  function errBox(key) {
+    var e = sf.errors[key]; if (!e) return '';
+    var msg = ERR_COPY[e.code] || (e.code === 'tool_error' ? 'Salesforce reported: ' + (e.message || 'query failed') : (e.message || e.code));
+    return '<div class="panel err" style="margin:0 0 8px"><b>' + esc(e.code) + '</b> · ' + esc(msg) + '</div>';
+  }
+  function isBot(u) { return /birdbot|bird bot|integration|readonly/i.test((u.Username || '') + ' ' + (u.Name || '')); }
+  function isExternal(u) { return !/@birdlife\.org\.au/i.test(u.Username || ''); }
+  function staleDays(u) { return u.LastLoginDate ? Math.floor((now - new Date(u.LastLoginDate)) / DAY) : null; }
+  function renderSalesforce() {
+    var r = ratio();
+    var bots = sf.admins ? sf.admins.filter(isBot).length : null;
+    var ext = sf.admins ? sf.admins.filter(isExternal).length : null;
+    var failed = sf.logins ? sf.logins.filter(function (l) { return l.Status !== 'Success'; }) : null;
+    var tiles = [
+      { n: sf.admins ? sf.admins.length : '...', l: 'Active sysadmins', s: sf.activeN ? 'of ' + sf.activeN + ' active Standard users' : '', cls: sf.admins ? (r > 0.05 ? 'crit' : 'good') : '' },
+      { n: sf.inactiveN != null ? sf.inactiveN : '...', l: 'Inactive sysadmins', s: 'not deprovisioned', cls: sf.inactiveN ? 'warn' : sf.inactiveN === 0 ? 'good' : '' },
+      { n: bots != null ? bots : '...', l: 'Service-account admins', s: 'birdbot and integration users', cls: bots ? 'warn' : '' },
+      { n: ext != null ? ext : '...', l: 'External admins', s: 'vendor domains', cls: ext ? 'warn' : ext === 0 ? 'good' : '' },
+      { n: failed ? failed.length : '...', l: 'Failed logins 24h', s: sf.logins ? 'of ' + sf.logins.length + ' most recent' : '', cls: failed ? (failed.length > 20 ? 'crit' : failed.length ? 'warn' : 'good') : '' },
+      { n: sf.stale ? sf.stale.length : '...', l: 'Stale users', s: 'active, no sign-in 30 days', cls: sf.stale ? (sf.stale.length ? 'warn' : 'good') : '' }
+    ];
+    $('sf-tiles').innerHTML = tiles.map(function (t) { return '<div class="tile still ' + t.cls + '"><div class="n">' + esc(t.n) + '</div><div class="l">' + esc(t.l) + '</div><div class="s">' + esc(t.s) + '</div></div>'; }).join('');
+
+    $('sf-admins-stamp').textContent = live.storedAt ? 'read ' + new Date(live.storedAt).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }) : '';
+    $('sf-admins').innerHTML = errBox('admins') + (sf.admins ? (sf.admins.length ? '<div class="tbl"><table><tr><th>Name</th><th>Username</th><th>Role</th><th>Last login</th><th>Flags</th></tr>' + sf.admins.map(function (u) {
+      var flags = [];
+      if (isBot(u)) flags.push('<span class="chip warn">service account</span>');
+      if (isExternal(u)) flags.push('<span class="chip warn">external</span>');
+      var d = staleDays(u); if (d == null) flags.push('<span class="chip crit">never logged in</span>'); else if (d > 30) flags.push('<span class="chip crit">stale ' + d + 'd</span>');
+      if (!flags.length) flags.push('<span class="chip good">ok</span>');
+      return '<tr><td>' + esc(u.Name) + '</td><td class="mono" style="font-size:12px">' + esc(u.Username) + '</td><td>' + esc(u.UserRole && u.UserRole.Name) + '</td><td>' + esc(ago(u.LastLoginDate)) + '</td><td>' + flags.join(' ') + '</td></tr>';
+    }).join('') + '</table></div>' : '<div class="empty">No active System Administrator users.</div>') : '<div class="empty">Waiting for Salesforce.</div>');
+
+    $('sf-psa').innerHTML = errBox('psa') + (sf.psa ? (sf.psa.length ? '<div class="tbl"><table><tr><th>Permission set</th><th>Assignee</th></tr>' + sf.psa.map(function (a) {
+      return '<tr><td>' + esc(a.PermissionSet && a.PermissionSet.Label) + '</td><td>' + esc(a.Assignee && a.Assignee.Name) + '</td></tr>';
+    }).join('') + '</table></div><p class="note" style="margin-top:8px">Any name here that is not on the sysadmin list has admin-equivalent data rights through a permission set.</p>' : '<div class="empty">No non-profile Modify All Data assignments.</div>') : '<div class="empty">Waiting for Salesforce.</div>');
+
+    if (failed) {
+      var byStatus = {}; var byIp = {};
+      failed.forEach(function (l) { byStatus[l.Status] = (byStatus[l.Status] || 0) + 1; byIp[l.SourceIp] = (byIp[l.SourceIp] || 0) + 1; });
+      var ips = Object.keys(byIp).sort(function (a, b) { return byIp[b] - byIp[a]; }).slice(0, 8);
+      $('sf-logins').innerHTML = errBox('logins') + (failed.length ? '<div class="tbl"><table><tr><th>Status</th><th class="r">Count</th></tr>' + Object.keys(byStatus).map(function (s) { return '<tr><td>' + esc(s) + '</td><td class="r num">' + byStatus[s] + '</td></tr>'; }).join('') + '</table></div><h3>Top source IPs</h3><div class="tbl"><table>' + ips.map(function (ip) { return '<tr><td class="mono">' + esc(ip) + '</td><td class="r num">' + byIp[ip] + (byIp[ip] >= 5 ? ' <span class="chip crit">spray?</span>' : '') + '</td></tr>'; }).join('') + '</table></div>' : '<div class="empty">No failed logins in the most recent ' + sf.logins.length + ' attempts.</div>');
+    } else $('sf-logins').innerHTML = errBox('logins') + '<div class="empty">Waiting for Salesforce.</div>';
+
+    if (sf.audit) {
+      var rows = sf.audit.filter(function (a) {
+        var by = (a.CreatedBy && a.CreatedBy.Name) || '';
+        if (a.Section === 'Customer Portal') return false;
+        if (/^bird bot$/i.test(by)) return false;
+        if (/^(changedpassword|resetpassword|changedUserEmailVerified|changedUserAdminVerified|registeredUserPhone|changedUserPhone)/i.test(a.Action || '')) return false;
+        return true;
+      });
+      $('sf-audit').innerHTML = errBox('audit') + (rows.length ? '<div class="tbl"><table><tr><th>When</th><th>Who</th><th>Section</th><th>Change</th></tr>' + rows.map(function (a) {
+        var hot = /Security|Profile|Permission|Connected App|Sharing|Login|Session|Remote Access|Auth/i.test((a.Section || '') + ' ' + (a.Display || ''));
+        return '<tr><td style="white-space:nowrap">' + esc(fmtDate(a.CreatedDate)) + '</td><td>' + esc(a.CreatedBy && a.CreatedBy.Name) + '</td><td>' + esc(a.Section) + (hot ? ' <span class="chip crit">security</span>' : '') + '</td><td>' + esc(a.Display) + '</td></tr>';
+      }).join('') + '</table></div>' : '<div class="empty">No setup changes outside the noise filter in the last 7 days (of ' + sf.audit.length + ' entries read).</div>');
+    } else $('sf-audit').innerHTML = errBox('audit') + '<div class="empty">Waiting for Salesforce.</div>';
+
+    $('sf-cases').innerHTML = errBox('cases') + (sf.cases ? (sf.cases.length ? '<div class="tbl"><table><tr><th>Case</th><th>Subject</th><th>Status</th><th>Owner</th><th>Opened</th></tr>' + sf.cases.map(function (c) {
+      return '<tr><td class="mono">' + esc(c.CaseNumber) + '</td><td>' + esc(c.Subject) + '</td><td>' + esc(c.Status) + '</td><td>' + esc(c.Owner && c.Owner.Name) + '</td><td>' + esc(ago(c.CreatedDate)) + '</td></tr>';
+    }).join('') + '</table></div>' : '<div class="empty">No open Ask Zeus cases with security keywords in the subject.</div>') : '<div class="empty">Waiting for Salesforce.</div>');
+
+    $('sf-stale').innerHTML = errBox('stale') + (sf.stale ? (sf.stale.length ? '<details><summary class="muted" style="cursor:pointer;font-size:13.5px">' + sf.stale.length + ' accounts. Show the list.</summary><div class="tbl" style="margin-top:8px"><table><tr><th>Name</th><th>Username</th><th>Profile</th><th>Last login</th></tr>' + sf.stale.map(function (u) {
+      return '<tr><td>' + esc(u.Name) + (u.Profile && /System Administrator/.test(u.Profile.Name) ? ' <span class="chip crit">sysadmin</span>' : '') + '</td><td class="mono" style="font-size:12px">' + esc(u.Username) + '</td><td>' + esc(u.Profile && u.Profile.Name) + '</td><td>' + esc(ago(u.LastLoginDate)) + '</td></tr>';
+    }).join('') + '</table></div></details><p class="note" style="margin-top:8px">A stale account stays only if it is on the IT-SEC-001 service-account register with owner and site filled. Otherwise deactivate and reclaim the licence.</p>' : '<div class="empty">No stale active Standard users.</div>') : '<div class="empty">Waiting for Salesforce.</div>');
+  }
+
+  /* ---------------- deadlines ---------------- */
+  function allDeadlines() {
+    return DEADLINES_BASE.concat(extraDeadlines).map(function (d) {
+      var o = overlay[d.id] || {};
+      var days = daysUntil(d.date);
+      var state = o.outcome ? 'done' : days < 0 ? 'over' : days <= 14 ? 'soon' : 'ok';
+      return Object.assign({}, d, { days: days, state: state, outcome: o.outcome, verifiedOn: o.verifiedOn });
+    }).sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+  }
+  function dlRow(d) {
+    var big = d.state === 'done' ? '✓' : Math.abs(d.days);
+    var small = d.state === 'done' ? 'verified' : d.days < 0 ? 'days past' : d.days === 0 ? 'today' : 'days left';
+    return '<div class="dl ' + d.state + '"><div class="days">' + big + '<small>' + small + '</small></div><div><div class="what">' + esc(d.item) + '</div><div class="meta">' + esc(fmtDate(d.date)) + ' · ' + esc(d.system) + ' · owner ' + esc(d.owner) + '</div>' + (d.outcome ? '<div class="outcome">Outcome: ' + esc(d.outcome) + (d.verifiedOn ? ' (' + esc(fmtDate(d.verifiedOn)) + ')' : '') + '</div>' : '') + '</div><div class="act">' + (d.state === 'done' ? '<button class="btn small" type="button" data-dl="' + esc(d.id) + '" data-act="reopen">Reopen</button>' : '<button class="btn small' + (d.days < 0 ? ' primary' : '') + '" type="button" data-dl="' + esc(d.id) + '" data-act="outcome">Record outcome</button>') + '</div></div>';
+  }
+  function renderDeadlines() { $('dl-list').innerHTML = allDeadlines().map(dlRow).join(''); }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-dl]'); if (!b) return;
+    var id = b.dataset.dl;
+    if (b.dataset.act === 'reopen') { saveOverlay(id, { outcome: null, verifiedOn: null }); return; }
+    var text = prompt('What was verified? One line, with the evidence (policy state, sign-in data, screenshot).');
+    if (text == null || !text.trim()) return;
+    saveOverlay(id, { outcome: text.trim(), verifiedOn: now.toISOString().slice(0, 10) });
+  });
+  $('dl-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = new FormData(e.target);
+    var d = { id: 'x-' + Date.now().toString(36), item: f.get('item').trim(), date: f.get('date'), system: f.get('system').trim(), owner: f.get('owner').trim(), createdAt: now.toISOString() };
+    persist('deadlines', d.id, d).then(function () { e.target.reset(); toast('Added to the register'); });
+  });
+
+  /* ---------------- playbooks ---------------- */
+  function renderPlaybooks() {
+    $('playbooks').innerHTML = PLAYBOOKS.map(function (p) {
+      var key = 'pb-' + p.id; var done = {}; try { done = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+      return '<details class="pb" id="' + key + '"><summary>' + esc(p.title) + '<span class="sub">' + esc(p.sub) + '</span></summary><div class="body">' +
+        '<ol class="steps">' + p.steps.map(function (s, i) { return '<li><input type="checkbox" data-pb="' + p.id + '" data-i="' + i + '"' + (done[i] ? ' checked' : '') + '><span class="st' + (done[i] ? ' done' : '') + '">' + esc(s[0]) + '</span><span class="chip ' + s[1].toLowerCase() + '">' + s[1] + '</span></li>'; }).join('') + '</ol>' +
+        '<div class="row" style="margin-bottom:8px"><button class="btn small" type="button" data-pbreset="' + p.id + '">Reset checklist</button><span class="muted" style="font-size:12px">T1 the assistant executes · T2 an admin runs the prepared command</span></div>' +
+        '<h3>Prepare the commands</h3><div class="form" id="gen-' + p.id + '">' + p.gen.fields.map(function (f) { return '<label class="f">' + esc(f[1]) + '<input type="' + (f[2] || 'text') + '" name="' + f[0] + '" value="' + esc(f[3] || '') + '"></label>'; }).join('') + '<button class="btn primary" type="button" data-gen="' + p.id + '">Generate</button></div>' +
+        (p.sfLookup ? '<div class="row" style="margin-top:8px"><button class="btn" type="button" data-sflookup="' + p.id + '">Look up this person in Salesforce (live)</button></div><div id="sfl-' + p.id + '"></div>' : '') +
+        '<div id="gout-' + p.id + '"></div></div></details>';
+    }).join('');
+  }
+  document.addEventListener('change', function (e) {
+    var cb = e.target; if (!cb.matches('input[data-pb]')) return;
+    var key = 'pb-' + cb.dataset.pb; var done = {}; try { done = JSON.parse(localStorage.getItem(key) || '{}'); } catch (x) {}
+    done[cb.dataset.i] = cb.checked; try { localStorage.setItem(key, JSON.stringify(done)); } catch (x) {}
+    cb.nextElementSibling.classList.toggle('done', cb.checked);
+  });
+  document.addEventListener('click', function (e) {
+    var r = e.target.closest('button[data-pbreset]'); if (r) { try { localStorage.removeItem('pb-' + r.dataset.pbreset); } catch (x) {} renderPlaybooks(); $('pb-' + r.dataset.pbreset).open = true; return; }
+    var g = e.target.closest('button[data-gen]'); if (g) {
+      var p = PLAYBOOKS.filter(function (x) { return x.id === g.dataset.gen; })[0];
+      var v = {}; Array.prototype.forEach.call($('gen-' + p.id).querySelectorAll('input'), function (i) { v[i.name] = i.value.trim(); });
+      var blocks = p.gen.build(v);
+      $('gout-' + p.id).innerHTML = blocks.map(function (b, i) { return '<div class="codehead"><span class="t">' + esc(b[0]) + '</span><button class="btn small" type="button" data-copy="' + p.id + '-' + i + '">Copy</button></div><pre id="code-' + p.id + '-' + i + '">' + esc(b[1]) + '</pre>'; }).join('');
+      return;
+    }
+    var c = e.target.closest('button[data-copy]'); if (c) { copy($('code-' + c.dataset.copy).textContent); return; }
+    var l = e.target.closest('button[data-sflookup]'); if (l) sfLookup(l.dataset.sflookup);
+  });
+  function sfLookup(pid) {
+    var out = $('sfl-' + pid); var upn = ($('gen-' + pid).querySelector('input[name=upn]').value || '').trim();
+    if (!upn) { out.innerHTML = '<div class="empty">Enter a user principal name first.</div>'; return; }
+    if (!live.mcp) { out.innerHTML = '<div class="empty">Live Salesforce is not available in this view.</div>'; return; }
+    var local = upn.split('@')[0].replace(/'/g, '');
+    out.innerHTML = '<div class="empty">Reading Salesforce...</div>';
+    live.mcp.callTool(live.sf, 'soqlQuery', { q: "SELECT Id, Name, Username, IsActive, Profile.Name, LastLoginDate FROM User WHERE Username LIKE '" + local + "%' LIMIT 10" }).then(function (res) {
+      var p = parsePayload(res); var users = (p && p.records) || [];
+      if (!users.length) { out.innerHTML = '<div class="empty">No Salesforce user matches ' + esc(local) + '.</div>'; return; }
+      var ids = users.map(function (u) { return "'" + u.Id + "'"; }).join(',');
+      return live.mcp.callTool(live.sf, 'soqlQuery', { q: 'SELECT UserId, LoginTime, Status, SourceIp, LoginType, Application FROM LoginHistory WHERE UserId IN (' + ids + ') AND LoginTime = LAST_N_DAYS:30 ORDER BY LoginTime DESC LIMIT 100' }).then(function (r2) {
+        var lp = parsePayload(r2); var logins = (lp && lp.records) || [];
+        out.innerHTML = '<h3>Salesforce users matching ' + esc(local) + '</h3><div class="tbl"><table><tr><th>Name</th><th>Username</th><th>Active</th><th>Profile</th><th>Last login</th></tr>' + users.map(function (u) {
+          return '<tr><td>' + esc(u.Name) + '</td><td class="mono" style="font-size:12px">' + esc(u.Username) + '</td><td>' + (u.IsActive ? 'yes' : 'no') + '</td><td>' + esc(u.Profile && u.Profile.Name) + (u.Profile && /System Administrator/.test(u.Profile.Name) ? ' <span class="chip crit">admin</span>' : '') + '</td><td>' + esc(ago(u.LastLoginDate)) + '</td></tr>';
+        }).join('') + '</table></div><h3>Logins, last 30 days (' + logins.length + ')</h3>' + (logins.length ? '<div class="tbl"><table><tr><th>When</th><th>Status</th><th>IP</th><th>Type</th><th>App</th></tr>' + logins.slice(0, 40).map(function (l) {
+          return '<tr><td style="white-space:nowrap">' + esc(new Date(l.LoginTime).toLocaleString('en-AU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</td><td>' + (l.Status === 'Success' ? esc(l.Status) : '<span class="chip crit">' + esc(l.Status) + '</span>') + '</td><td class="mono">' + esc(l.SourceIp) + '</td><td>' + esc(l.LoginType) + '</td><td>' + esc(l.Application) + '</td></tr>';
+        }).join('') + '</table></div>' : '<div class="empty">No logins in 30 days.</div>');
+      });
+    }).catch(function (e) { out.innerHTML = '<div class="panel err">' + esc(e && e.code) + ' · ' + esc(ERR_COPY[e && e.code] || (e && e.message) || 'lookup failed') + '</div>'; });
+  }
+
+  /* ---------------- findings ---------------- */
+  function findingRow(f, compact) {
+    var late = f.due && f.status !== 'closed' && daysUntil(f.due) < 0;
+    var meta = esc(f.system) + ' · owner <b>' + esc(f.owner || 'nobody') + '</b> · due ' + (f.due ? '<span class="' + (late ? 'late' : '') + '">' + esc(fmtDate(f.due)) + (late ? ' (' + Math.abs(daysUntil(f.due)) + ' days past)' : '') + '</span>' : '<span class="late">no date</span>');
+    var ctl = compact ? '' : '<div class="ctl"><select data-fd="' + esc(f.id) + '" data-field="status"><option value="open"' + (f.status === 'open' ? ' selected' : '') + '>Open</option><option value="in-progress"' + (f.status === 'in-progress' ? ' selected' : '') + '>In progress</option><option value="blocked"' + (f.status === 'blocked' ? ' selected' : '') + '>Blocked</option><option value="closed"' + (f.status === 'closed' ? ' selected' : '') + '>Closed</option></select><button class="btn small" type="button" data-fdedit="' + esc(f.id) + '">Owner / date</button><button class="btn small" type="button" data-fdnote="' + esc(f.id) + '">Note</button></div>';
+    return '<div class="finding' + (f.status === 'closed' ? ' closed' : '') + '"><div class="sev ' + esc(f.severity) + '"></div><div><div class="t"><span class="chip slate">' + esc(f.severity) + '</span> ' + esc(f.title) + (f.status && f.status !== 'open' && f.status !== 'closed' ? ' <span class="chip acc">' + esc(f.status) + '</span>' : '') + '</div><div class="m">' + meta + (f.note ? '<br>' + esc(f.note) : '') + '</div></div>' + ctl + '</div>';
+  }
+  function renderFindings() {
+    var mode = $('fd-filter').value;
+    var list = findings.filter(function (f) { return mode === 'all' || (mode === 'closed' ? f.status === 'closed' : f.status !== 'closed'); });
+    var order = { P1: 0, P2: 1, P3: 2 };
+    list.sort(function (a, b) { return (order[a.severity] - order[b.severity]) || ((a.due || '9') < (b.due || '9') ? -1 : 1); });
+    $('fd-list').innerHTML = list.map(function (f) { return findingRow(f, false); }).join('') || '<div class="empty">Nothing here.</div>';
+    $('fd-store').textContent = store.kind === 'db' ? 'Stored with the artifact (shared with every viewer of this page).' : 'Stored in this browser only. Open the page from claude.ai to share findings across devices and sessions.';
+  }
+  $('fd-filter').addEventListener('change', renderFindings);
+  $('fd-form').addEventListener('submit', function (e) {
+    e.preventDefault(); var f = new FormData(e.target);
+    var id = 'f-' + Date.now().toString(36);
+    persist('findings', id, { title: f.get('title').trim(), system: f.get('system'), severity: f.get('severity'), owner: f.get('owner').trim(), due: f.get('due'), status: 'open', createdAt: now.toISOString() }).then(function () { e.target.reset(); toast('Finding added'); });
+  });
+  document.addEventListener('change', function (e) {
+    var s = e.target; if (!s.matches('select[data-fd]')) return;
+    var patch = {}; patch[s.dataset.field] = s.value; if (s.value === 'closed') patch.closedAt = now.toISOString();
+    persist('findings', s.dataset.fd, patch, true);
+  });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-fdedit]'); if (b) {
+      var f = findings.filter(function (x) { return x.id === b.dataset.fdedit; })[0]; if (!f) return;
+      var owner = prompt('Owner', f.owner || ''); if (owner == null) return;
+      var due = prompt('Due date (yyyy-mm-dd)', f.due || ''); if (due == null) return;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(due)) { toast('Date must be yyyy-mm-dd'); return; }
+      persist('findings', f.id, { owner: owner.trim(), due: due }, true); return;
+    }
+    var n = e.target.closest('button[data-fdnote]'); if (n) {
+      var g = findings.filter(function (x) { return x.id === n.dataset.fdnote; })[0]; if (!g) return;
+      var note = prompt('Note (replaces the current note)', g.note || ''); if (note == null) return;
+      persist('findings', g.id, { note: note.trim() }, true);
+    }
+  });
+
+  /* ---------------- storage: db with localStorage fallback ---------------- */
+  function localAll(coll) { try { return JSON.parse(localStorage.getItem('sw-' + coll) || '{}'); } catch (e) { return {}; } }
+  function localSave(coll, obj) { try { localStorage.setItem('sw-' + coll, JSON.stringify(obj)); } catch (e) {} }
+  function persist(coll, id, data, merge) {
+    if (store.db) {
+      var ref = store.db.doc(coll + '/' + id);
+      return (merge ? ref.update(data) : ref.set(data)).catch(function (e) { toast('Save failed: ' + (e && e.code)); });
+    }
+    var all = localAll(coll); all[id] = merge ? Object.assign({}, all[id] || {}, data) : data; localSave(coll, all);
+    loadLocal(); return Promise.resolve();
+  }
+  function saveOverlay(id, patch) { return persist('deadlines', id, patch, true); }
+  function applyDocs(coll, docs) {
+    if (coll === 'findings') findings = docs.map(function (d) { return Object.assign({ id: d.id }, d.data); });
+    else if (coll === 'deadlines') {
+      overlay = {}; extraDeadlines = [];
+      docs.forEach(function (d) { if (d.data.item && d.data.date) extraDeadlines.push(Object.assign({ id: d.id }, d.data)); overlay[d.id] = d.data; });
+    }
+    renderAll();
+  }
+  function loadLocal() {
+    var f = localAll('findings'); applyDocs('findings', Object.keys(f).map(function (k) { return { id: k, data: f[k] }; }));
+    var d = localAll('deadlines'); applyDocs('deadlines', Object.keys(d).map(function (k) { return { id: k, data: d[k] }; }));
+  }
+  function initStore() {
+    loadLocal();
+    if (!window.claude || typeof window.claude.use !== 'function') return;
+    window.claude.use('db').then(function (db) {
+      if (!db) return;
+      store.db = db; store.kind = 'db';
+      ['findings', 'deadlines'].forEach(function (coll) {
+        db.collection(coll).onSnapshot(function (snap) {
+          applyDocs(coll, snap.docs.map(function (d) { return { id: d.id, data: d.data() || {} }; }));
+        }, function (err) { store.kind = 'local'; store.db = null; toast('Shared store unavailable: ' + (err && err.code)); loadLocal(); });
+      });
+    });
+  }
+
+  /* ---------------- live Salesforce ---------------- */
+  var AUTHZ = { needs_reauth: 1, server_not_connected: 1, blocked_by_policy: 1, approval_required: 1, not_granted: 1, selection_required: 1 };
+  var QUERIES = {
+    admins: "SELECT Id, Name, Username, LastLoginDate, UserRole.Name, UserType FROM User WHERE IsActive = true AND Profile.Name = 'System Administrator' ORDER BY LastLoginDate DESC NULLS LAST LIMIT 100",
+    inactive: "SELECT COUNT(Id) n FROM User WHERE IsActive = false AND Profile.Name = 'System Administrator'",
+    active: "SELECT COUNT(Id) n FROM User WHERE IsActive = true AND UserType = 'Standard'",
+    stale: "SELECT Id, Name, Username, LastLoginDate, Profile.Name FROM User WHERE IsActive = true AND UserType = 'Standard' AND (LastLoginDate < LAST_N_DAYS:30 OR LastLoginDate = null) ORDER BY LastLoginDate ASC NULLS FIRST LIMIT 200",
+    psa: "SELECT PermissionSet.Name, PermissionSet.Label, Assignee.Name, Assignee.IsActive FROM PermissionSetAssignment WHERE PermissionSet.PermissionsModifyAllData = true AND PermissionSet.IsOwnedByProfile = false AND Assignee.IsActive = true LIMIT 100",
+    cases: "SELECT Id, CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE RecordType.DeveloperName = 'Zeus' AND IsClosed = false AND (Subject LIKE '%phish%' OR Subject LIKE '%suspicious%' OR Subject LIKE '%scam%' OR Subject LIKE '%hack%' OR Subject LIKE '%compromis%' OR Subject LIKE '%password%' OR Subject LIKE '%MFA%' OR Subject LIKE '%spam%' OR Subject LIKE '%security%' OR Subject LIKE '%access%') ORDER BY CreatedDate DESC LIMIT 50",
+    logins: "SELECT UserId, LoginTime, Status, SourceIp, LoginType, Application FROM LoginHistory WHERE LoginTime = LAST_N_DAYS:1 ORDER BY LoginTime DESC LIMIT 300",
+    audit: "SELECT Id, Action, Section, CreatedDate, CreatedBy.Name, Display FROM SetupAuditTrail WHERE CreatedDate = LAST_N_DAYS:7 ORDER BY CreatedDate DESC LIMIT 150"
+  };
+  function parsePayload(res) { var p = res && res.payload; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } } return p; }
+  function setLive(state, text) { var d = $('live-dot'); d.className = 'dot ' + (state === 'live' ? 'live' : state === 'err' ? 'err' : state === 'wait' ? 'wait' : ''); $('live-text').textContent = text; }
+  function watch(key, onData) {
+    live.mcp.watchTool(live.sf, 'soqlQuery', { q: QUERIES[key] }, function (ev) {
+      if (ev.type === 'data') {
+        var p = parsePayload(ev.result);
+        if (p && p.records) { onData(p); delete sf.errors[key]; live.storedAt = ev.result.cache ? ev.result.cache.storedAt : Date.now(); live.status = 'live'; }
+      } else {
+        sf.errors[key] = ev.error || { code: 'upstream_error', message: 'no detail' };
+        if (AUTHZ[sf.errors[key].code]) { onData(null); live.status = 'err'; }
+      }
+      var errs = Object.keys(sf.errors);
+      if (live.status === 'err' || errs.length === Object.keys(QUERIES).length) setLive('err', ERR_COPY[(sf.errors[errs[0]] || {}).code] || 'Salesforce reads failed.');
+      else setLive('live', 'Salesforce Production live' + (errs.length ? ', ' + errs.length + ' read(s) failing' : '') + (live.storedAt ? ' · read ' + new Date(live.storedAt).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }) : ''));
+      renderAll();
+    }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
+  }
+  function startWatches() {
+    watch('admins', function (p) { sf.admins = p ? p.records : null; });
+    watch('inactive', function (p) { sf.inactiveN = p && p.records[0] ? p.records[0].n : null; });
+    watch('active', function (p) { sf.activeN = p && p.records[0] ? p.records[0].n : null; });
+    watch('stale', function (p) { sf.stale = p ? p.records : null; });
+    watch('psa', function (p) { sf.psa = p ? p.records : null; });
+    watch('cases', function (p) { sf.cases = p ? p.records : null; });
+    watch('logins', function (p) { sf.logins = p ? p.records : null; });
+    watch('audit', function (p) { sf.audit = p ? p.records : null; });
+  }
+  function initLive() {
+    if (!window.claude || typeof window.claude.use !== 'function') { setLive('', 'Static copy. Live Salesforce reads run on the claude.ai artifact link.'); return; }
+    setLive('wait', 'Connecting to Salesforce Production...');
+    window.claude.use('mcp').then(function (mcp) {
+      if (!mcp) { setLive('', 'Live data is not available in this view. Doctrine, deadlines and playbooks still work.'); return; }
+      live.mcp = mcp;
+      $('refresh-btn').hidden = false;
+      mcp.listTools().then(function (res) {
+        var names = (res.servers || []).map(function (s) { return s.server; });
+        live.sf = names.filter(function (n) { return /salesforce production/i.test(n); })[0] || names.filter(function (n) { return /salesforce/i.test(n); })[0] || live.sf;
+        startWatches();
+      }).catch(function () { startWatches(); });
+    });
+  }
+  $('refresh-btn').addEventListener('click', function () {
+    if (!live.mcp) return; setLive('wait', 'Refreshing...');
+    Object.keys(QUERIES).forEach(function (k) { live.mcp.callTool(live.sf, 'soqlQuery', { q: QUERIES[k] }, { cache: { refresh: true } }).catch(function () {}); });
+  });
+
+  /* ---------------- report ---------------- */
+  var sampleFn = null; var lastReport = '';
+  function snapshotText() {
+    var r = ratio(); var lines = [];
+    lines.push('Read at: ' + now.toISOString());
+    if (sf.admins) lines.push('Salesforce active System Administrators: ' + sf.admins.length + ' (service accounts ' + sf.admins.filter(isBot).length + ', external vendor accounts ' + sf.admins.filter(isExternal).length + ', stale over 30 days ' + sf.admins.filter(function (u) { var d = staleDays(u); return d == null || d > 30; }).length + ')');
+    if (sf.activeN) lines.push('Active Standard users: ' + sf.activeN + '. Admin ratio: ' + (r * 100).toFixed(1) + '% against a 5% line.');
+    if (sf.inactiveN != null) lines.push('Inactive sysadmin accounts not deprovisioned: ' + sf.inactiveN);
+    if (sf.stale) lines.push('Stale active users (no sign-in 30 days): ' + sf.stale.length);
+    if (sf.psa) lines.push('Modify All Data permission set assignments outside a profile: ' + sf.psa.length);
+    if (sf.logins) { var f = sf.logins.filter(function (l) { return l.Status !== 'Success'; }); lines.push('Failed Salesforce logins in the most recent ' + sf.logins.length + ' attempts (24h): ' + f.length); }
+    if (sf.cases) lines.push('Open Ask Zeus cases with security keywords: ' + sf.cases.length);
+    if (!sf.admins) lines.push('Live Salesforce read not available in this view; quote the dated doctrine numbers and say so.');
+    return lines.join('\n');
+  }
+  function doctrineText() {
+    return 'ESSENTIAL EIGHT (Jun 2026):\n' + E8.map(function (e) { return '- ' + e.c + ': ' + e.lvl + '. ' + e.b; }).join('\n') + '\n\nBY SYSTEM:\n' + SYSTEMS.map(function (s) { return s.n + ' (' + s.d + '):\n' + s.pts.map(function (p) { return '  - ' + p; }).join('\n'); }).join('\n');
+  }
+  function deadlinesText() { return allDeadlines().map(function (d) { return '- ' + d.item + ' | ' + d.date + ' | ' + (d.state === 'done' ? 'verified: ' + d.outcome : d.days < 0 ? Math.abs(d.days) + ' days PAST, unverified' : d.days + ' days left') + ' | ' + d.system + ' | owner ' + d.owner; }).join('\n'); }
+  function findingsText() { return findings.filter(function (f) { return f.status !== 'closed'; }).map(function (f) { return '- [' + f.severity + '] ' + f.title + ' | ' + f.system + ' | owner ' + (f.owner || 'NONE') + ' | due ' + (f.due || 'NONE') + ' | ' + (f.status || 'open') + (f.note ? ' | ' + f.note : ''); }).join('\n') || '(none recorded)'; }
+  var VOICE = 'Write as Mathew Hema, Senior Manager ICT at BirdLife Australia: warm, direct, plain English, no corporate filler, no em dashes, short sentences, commitments stated plainly. Every action line names one owner and one date. Never quote a saving or a maturity level as achieved unless the evidence is in hand. Anchor on ACSC Essential Eight with the SaaS and identity overlay, and say both halves.';
+  function buildPrompt(kind) {
+    var base = 'LIVE SNAPSHOT:\n' + snapshotText() + '\n\nDOCTRINE (dated, re-verify before asserting):\n' + doctrineText() + '\n\nDEADLINE REGISTER:\n' + deadlinesText() + '\n\nOPEN FINDINGS:\n' + findingsText() + '\n\n';
+    if (kind === 'team') return VOICE + '\n\nWrite a one-page security posture note for the ICT team (Andrew Dunn, Keith Tsui, Nina Lewis). Audience is internal, so counts and system names are fine; do not list individual user names. Structure: where we stand (five lines), what is past its date, this week\'s actions with owner and date, and the decision Mathew needs to make. Mark anything computed from a live read as live and anything from doctrine with its date.\n\n' + base;
+    if (kind === 'exec') return VOICE + '\n\nWrite a half-page executive brief for the CEO and Board. Ratios and trend only, never a person\'s name or account name. State the positives (0 risky sign-ins in the last read, 19 attacks blocked in two months, 0 users in the deleted-user bin) alongside the gaps. End with the two or three decisions that need money or a licence, with the cost where known (PIM about A$2,500 a year). Mention the Notifiable Data Breach obligation in one sentence.\n\n' + base;
+    if (kind === 'chase') return VOICE + '\n\nWrite a chase list: one line per register item that is past its date and unverified or due within 30 days, in date order, each with the exact verification evidence to collect and the owner. Then one line per open finding that has no owner, no date, or is past due. Nothing else.\n\n' + base;
+    return 'You are BirdLife Australia\'s AI ICT Assistant. Load the birdlife-security skill first. Here is the state from the Security Workbench as at ' + now.toISOString().slice(0, 10) + '. Read the live systems before asserting any number is still true, then tell me the three things to do today, each with the exact command or click-path and the tier (execute, prepare, design).\n\n' + base;
+  }
+  function runReport(kind) {
+    var out = $('rp-out'); var st = $('rp-status'); var prompt = buildPrompt(kind);
+    if (kind === 'prompt') { out.textContent = prompt; lastReport = prompt; $('rp-copy').hidden = false; st.textContent = 'Copy this into a new Claude session on the Birdlife repo.'; return; }
+    if (!sampleFn) { out.textContent = prompt; lastReport = prompt; $('rp-copy').hidden = false; st.textContent = 'On-page drafting is not available in this view. The full prompt is below; paste it into a Claude session.'; return; }
+    out.textContent = 'Thinking...'; st.textContent = 'Drafting from the live snapshot.'; $('rp-copy').hidden = true;
+    sampleFn(prompt, { modelTier: 'default', cache: false, onText: function (u) { out.textContent = u.text; } }).then(function (r) {
+      lastReport = r.text; out.textContent = r.text; $('rp-copy').hidden = false; st.textContent = 'Draft. Polish in a session for a finished document.' + (r.truncated ? ' (Cut short. Ask for less.)' : '');
+    }).catch(function (e) {
+      var code = e && e.code;
+      st.textContent = code === 'not_granted' ? 'Drafting is not granted for this viewer.' : code === 'rate_limited' ? 'Rate limited. Wait a minute and try again.' : 'Draft failed: ' + (code || 'unknown');
+      out.textContent = (e && e.text) || prompt; lastReport = out.textContent; $('rp-copy').hidden = false;
+    });
+  }
+  document.querySelector('#tab-report .row').addEventListener('click', function (e) { var b = e.target.closest('button[data-report]'); if (b) runReport(b.dataset.report); });
+  $('rp-copy').addEventListener('click', function () { copy(lastReport); });
+  function initSample() {
+    if (!window.claude || typeof window.claude.use !== 'function') return;
+    window.claude.use('sample').then(function (s) { if (s) sampleFn = s; });
+  }
+
+  /* ---------------- static renders ---------------- */
+  function renderPosture() {
+    $('e8').innerHTML = E8.map(function (e) { return '<div class="c ' + e.s + '"><div class="t">' + esc(e.c) + '</div><div class="lvl">' + esc(e.lvl) + '</div><div class="b">' + esc(e.b) + '</div></div>'; }).join('');
+    $('systems').innerHTML = SYSTEMS.map(function (s) { return '<div class="panel"><div class="sec-head"><h3 style="margin:0">' + esc(s.n) + '</h3><span class="eyebrow">as at ' + esc(s.d) + '</span></div><ul class="tight">' + s.pts.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></div>'; }).join('');
+  }
+  function renderAll() { renderOverview(); renderSalesforce(); renderDeadlines(); renderFindings(); }
+
+  renderPosture(); renderPlaybooks(); renderAll();
+  initStore(); initLive(); initSample();
+})();
+</script>
