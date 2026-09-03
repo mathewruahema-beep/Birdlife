@@ -325,7 +325,7 @@
       <div class="row" style="margin-top:10px">
         <button class="btn ghost small" id="btnPersona"></button>
       </div>
-      <p class="note">Deadpan Kiwi talks like a dry, self-aware mate who still counts your missed sessions. Straight coach is the plain version.</p>
+      <p class="note">Deadpan Kiwi talks like a dry, self-aware mate with te reo Māori woven through, and still counts your missed sessions. Te reo words are respelled for the speech engine so they sound right. Straight coach is the plain version.</p>
       <div class="field" style="margin-top:14px"><label for="voiceSel">Which voice</label>
         <select id="voiceSel"></select>
         <p class="note" id="voiceNote"></p></div>
@@ -342,7 +342,7 @@
       <p class="sub">The app can only use voices your phone has installed. Do this once, then come back and pick it above.</p>
       <p class="sub"><b>Google voice (works in Chrome):</b> Settings → General management → Text-to-speech → Preferred engine: <b>Speech Services by Google</b> → tap the gear → Install voice data → <b>English (New Zealand)</b>. Download it on Wi-Fi.</p>
       <p class="sub"><b>Samsung voice (works in Samsung Internet):</b> same screen → Preferred engine: <b>Samsung text-to-speech engine</b> → gear → Install voice data → English (New Zealand) if it is offered; Samsung does not ship one on every model. If it is missing, use the Google engine and open this app in Chrome.</p>
-      <p class="sub">After installing, tap <b>Refresh voice list</b>. The Kiwi voices show with a ★.</p>
+      <p class="sub">After installing, tap <b>Refresh voice list</b>. Kiwi voices show with a ★; the smoother network voices are marked <b>smooth</b> and need data or Wi-Fi to speak.</p>
       <p class="note">Uses your phone's built-in speech. On Samsung, an Australian English voice is picked automatically if installed (Settings → General management → Text-to-speech).</p>
     </div>
     <div class="card">
@@ -449,19 +449,35 @@ function pickVoice(){
     const chosen = S.voiceName && vs.find(v=>v.name===S.voiceName);
     if(chosen){ voiceReady=chosen; if(document.getElementById('voiceSel')) renderVoicePicker(); return; }
     const pref = S.persona==='kiwi' ? ['en-NZ','en-AU'] : ['en-AU','en-NZ'];
-    voiceReady = vs.find(v=>v.lang===pref[0]) || vs.find(v=>v.lang===pref[1]) || vs.find(v=>v.lang&&v.lang.indexOf('en-GB')===0) || vs.find(v=>v.lang&&v.lang.indexOf('en')===0) || null;
+    const rich=v=>!v.localService || /neural|natural|wavenet|premium|enhanced|network/i.test(v.name);
+    voiceReady = vs.find(v=>v.lang===pref[0]&&rich(v)) || vs.find(v=>v.lang===pref[0]) || vs.find(v=>v.lang===pref[1]&&rich(v)) || vs.find(v=>v.lang===pref[1]) || vs.find(v=>v.lang&&v.lang.indexOf('en-GB')===0) || vs.find(v=>v.lang&&v.lang.indexOf('en')===0) || null;
     if(document.getElementById('voiceSel')) renderVoicePicker();
   }catch(e){}
 }
 try{ speechSynthesis.onvoiceschanged=pickVoice; pickVoice(); }catch(e){}
+/* te reo Māori respellings so an English voice says them properly. Screen text stays correct; only the speech is respelled. */
+const REO=[
+ ['kia ora','kee-a ora'],['mōrena','maw-reh-nah'],['ka pai','kah pie'],['tino pai','tee-naw pie'],['kia kaha','kee-a kah-hah'],
+ ['tū meke','too meh-keh'],['taihoa','tie-haw-ah'],['e hoa','eh haw-ah'],['whānau','far-no'],['mokopuna','mor-kor-poo-nah'],
+ ['koro','kor-ror'],['whare','fah-reh'],['tinana','tee-nah-nah'],['hinengaro','hee-neh-ngah-raw'],['wairua','why-roo-ah'],
+ ['kōrero','kaw-reh-raw'],['karakia','kah-rah-kee-ah'],['mahi','mah-hee'],['kai','kye'],['āe','eye'],['ngā mihi','ngah mee-hee'],
+ ['mauri ora','mow-ree ora'],['kei te pai','kay teh pie'],['haere mai','high-reh my'],['haere','high-reh'],['whakapakari','fah-kah-pah-kah-ree'],
+ ['aroha','ah-raw-hah'],['tāne','tah-neh'],['tangata','tah-ngah-tah'],['tautoko','toe-taw-kaw'],['hei konā','hay kaw-nah']
+];
+const REO_RX=REO.map(pr=>[new RegExp('(^|[^A-Za-zĀāĒēĪīŌōŪū])'+pr[0]+'(?![A-Za-zĀāĒēĪīŌōŪū])','gi'), pr[1]]);
+function forSpeech(t){ let s=t; REO_RX.forEach(pr=>{ s=s.replace(pr[0], (m,pre)=>pre+pr[1]); }); return s; }
 function speak(text, force){
   if(!S.voice && !force) return;
   try{
     speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text);
-    u.rate=S.rate*(S.persona==='kiwi'?0.98:1.03); u.pitch=S.pitch;
-    if(voiceReady) u.voice=voiceReady;
-    speechSynthesis.speak(u);
+    const kiwi=S.persona==='kiwi';
+    const parts=forSpeech(text).split(/(?<=[.!?])\s+/).filter(Boolean);
+    parts.forEach(pt=>{
+      const u=new SpeechSynthesisUtterance(pt);
+      u.rate=S.rate*(kiwi?0.94:1.0); u.pitch=S.pitch*(kiwi?0.96:1);
+      if(voiceReady) u.voice=voiceReady;
+      speechSynthesis.speak(u);
+    });
   }catch(e){}
 }
 let AC=null;
@@ -716,34 +732,35 @@ const PERSONAS={
   pepStatus:(ws)=> ws.missed>0 ? ' You are '+ws.missed+' session'+(ws.missed>1?'s':'')+' down this week. Fix it today.' : ws.sessions>=ws.target ? ' Week’s strength target is done. Do not coast.' : ' '+(ws.target-ws.sessions)+' sessions left this week.'
  },
  kiwi:{
-  label:'Deadpan Kiwi',
-  allWalls:n=>'All four walls up, '+n+'. Look at that. That’s a whare. Bit smug about it, are we? Good. Be smug.',
-  cardio:(m,t)=> t==='hiit' ? 'Intervals done. Your heart just found out what it’s for. Sweet as.' : m+' minutes of zone two, logged. Not a marathon. But marathons are mostly walking with better marketing anyway.',
-  weight:(v,n)=>v+' kilos. Logged. It’s one day, '+n+'. One day is not a story. Fifty days is a story. We’re writing the fifty.',
-  waist:(v,b)=>v+' centimetres. '+(b==='ok'?'On target. I’m not going to make a big thing of it. It is a big thing though.':b==='warn'?'That’s the raised-risk band, which is a polite way of saying the doctors have a name for it. Under ninety-four. That’s the number. We’re going there.':'Right. That’s the high-risk band. Not a lecture, just a fact, and facts are what we attack. This one’s first.'),
-  check:()=>'Logged. A health check. Most blokes would rather wrestle a possum. You did the check. Good man.',
-  voiceOn:()=>'Voice on. Hello. It’s me, the voice in your phone. Let’s go and do something about your body, eh.',
-  voiceTest:n=>'Kia ora '+n+'. I’m your pocket coach. I call the exercises, count your sets, and run the rest clock. I’ll also notice when you don’t turn up. I’m very good at noticing. It’s basically my whole thing.',
-  built:(n,d)=>'Program’s built, '+n+'. '+d+' strength sessions a week, a hundred and fifty minutes of zone two, and four walls every day. I’ll hold you to it. Gently. Like a large friendly dog holding a stick.',
-  start:(n,s,ex)=>'Right, '+n+'. '+s+'. Warm-up first. Five minutes, properly. Not that thing where you swing one arm and call it a warm-up. Then '+ex+'.',
-  next:(why,e)=>(why==='warm'?'You’re warm. Lovely. ':why==='skip'?'Skipping that one. Interesting choice. Moving on. ':pick(['Done. Beautiful. ','That’s one. Majestic, honestly. ','Done. Nobody saw that but me, and I was impressed. ','Good. Solid. Very solid. Like a fridge. ']))+'Next: '+e.n+'. '+e.s+' sets of '+cleanReps(e.r)+'. '+e.cue,
-  rest:s=>pick(['Rest, '+s+' seconds. Breathe. Look at the ceiling. Contemplate your choices.','Rest, '+s+' seconds. Have a little stand there. You’ve earned a stand.','Rest, '+s+' seconds. Don’t look at your phone. Well, this is your phone. Look at it, but only at me.']),
-  ten:()=>pick(['Ten seconds. Get set. The ceiling’s had enough of you.','Ten seconds. Right. Back to it. Pretend someone’s watching. Someone is. It’s me.']),
-  go:()=>pick(['Go!','Go. Go go go.','And, go.']),
-  finish:(n,sets,mins,hit,left)=>'Done, '+n+'. '+sets+' sets in '+mins+' minutes. '+(hit?'That’s the week’s strength target. Ka pai. Have a little sit down. You’ve earned a sit down.':left+' to go this week. That’s not a suggestion, it’s more of a fact.')+' Protein and water within the hour. Then be smug at somebody.',
-  early:()=>'Ended early. It doesn’t count, and I say that with love. Tomorrow, then. I’ll be here. I’m always here. It’s a bit sad, really.',
-  hrOn:()=>'Heart rate’s connected. I can see your actual heart now. Bit intimate. Let’s go.',
-  importOk:()=>'Watch data’s in. Now I can see what you actually did, as opposed to the version you told yourself. The two are usually different.',
-  importNone:()=>'No Samsung Health files in that one, mate. Pick the zip from Download personal data.',
+  label:'Deadpan Kiwi · te reo',
+  allWalls:n=>'Tū meke, '+n+'. All four walls up. That’s a whare. Bit smug about it, are we? Ka pai. Be smug.',
+  cardio:(m,t)=> t==='hiit' ? 'Intervals done. Tino pai. Your heart just found out what it’s for.' : m+' minutes of zone two, logged. Ka pai. Not a marathon. But marathons are mostly walking with better marketing anyway.',
+  weight:(v,n)=>v+' kilos. Logged. It’s one day, e hoa. One day is not a story. Fifty days is a story. We’re writing the fifty.',
+  waist:(v,b)=>v+' centimetres. '+(b==='ok'?'On target. Ka pai. I’m not going to make a big thing of it. It is a big thing though.':b==='warn'?'That’s the raised-risk band, which is a polite way of saying the doctors have a name for it. Under ninety-four. That’s the number. Kia kaha, we’re going there.':'Āe. That’s the high-risk band. Not a lecture, just a fact, and facts are what we attack. This one’s first.'),
+  check:()=>'Logged. A health check. Most blokes would rather wrestle a possum. You did the check. Ka pai, e hoa.',
+  voiceOn:()=>'Kia ora. It’s me, the voice in your phone. Let’s go and do some mahi on that body, eh.',
+  voiceTest:n=>'Kia ora '+n+', e hoa. I’m your pocket coach. I call the exercises, count your sets, and run the rest clock. I’ll also notice when you don’t turn up. I’m very good at noticing. It’s basically my whole thing. Mauri ora.',
+  built:(n,d)=>'Ka pai, '+n+'. Program’s built. '+d+' strength sessions a week, a hundred and fifty minutes of zone two, and four walls every day. Whakapakari tinana. I’ll hold you to it. Gently. Like a large friendly dog holding a stick.',
+  start:(n,s,ex)=>'Kia ora, '+n+'. '+s+'. Mahi time. Warm-up first. Five minutes, properly. Not that thing where you swing one arm and call it a warm-up. Then '+ex+'.',
+  next:(why,e)=>(why==='warm'?'You’re warm. Ka pai. ':why==='skip'?'Skipping that one. Interesting choice, e hoa. Moving on. ':pick(['Done. Ka pai. ','That’s one. Majestic, honestly. ','Tino pai. Nobody saw that but me, and I was impressed. ','Good. Solid. Very solid. Like a fridge. ','Āe. That’s the one. ']))+'Next: '+e.n+'. '+e.s+' sets of '+cleanReps(e.r)+'. '+e.cue,
+  rest:s=>pick(['Taihoa. Rest, '+s+' seconds. Breathe. Look at the ceiling. Contemplate your choices.','Taihoa, e hoa. '+s+' seconds. Have a little stand there. You’ve earned a stand.','Rest, '+s+' seconds. Don’t look at your phone. Well, this is your phone. Look at it, but only at me.']),
+  ten:()=>pick(['Ten seconds. Get set. The ceiling’s had enough of you.','Ten seconds. Kia kaha. Pretend someone’s watching. Someone is. It’s me.']),
+  go:()=>pick(['Go!','Haere. Go go go.','Āe. Go.']),
+  finish:(n,sets,mins,hit,left)=>'Tū meke, '+n+'. '+sets+' sets in '+mins+' minutes. '+(hit?'That’s the week’s strength target. Ka pai. Have a little sit down. You’ve earned a sit down.':left+' to go this week. That’s not a suggestion, it’s more of a fact.')+' Kai and water within the hour. Protein first. Then be smug at somebody. Mauri ora.',
+  early:()=>'Ended early. It doesn’t count, and I say that with aroha. Tomorrow, then. I’ll be here. I’m always here. It’s a bit sad, really.',
+  hrOn:()=>'Heart rate’s connected. I can see your actual heart now. Bit intimate. Kia kaha. Let’s go.',
+  importOk:()=>'Watch data’s in. Ka pai. Now I can see what you actually did, as opposed to the version you told yourself. The two are usually different.',
+  importNone:()=>'No Samsung Health files in that one, e hoa. Pick the zip from Download personal data.',
   pep:[
-   'Right, {n}. Shoes on. Water bottle. We’re doing this properly today, and by properly I mean actually doing it.',
-   '{n}. You’re fifty-six. That’s not old, that’s experienced. Now go and be experienced at squats.',
+   'Kia ora, {n}. Shoes on. Water bottle. Mahi time. We’re doing this properly today, and by properly I mean actually doing it.',
+   '{n}, e hoa. You’re fifty-six. That’s not old, that’s experienced. Now go and be experienced at squats.',
    'Nobody’s coming to do it for you, {n}. Which sounds bleak. But think about it: nobody can stop you either. Freedom. Terrifying, sweaty freedom.',
-   'The hardest set is the first one. After that it’s just momentum and mild regret, and you’re already good at both.',
+   'The hardest set is the first one. After that it’s just momentum and mild regret, and you’re already good at both. Kia kaha.',
    'Kia kaha, {n}. Your mokopuna are going to need a koro who can get down on the floor and, crucially, get back up. That second bit’s the training.',
-   'You’ve finished every workout you’ve ever started, {n}. That’s a hundred percent record. Don’t ruin a hundred percent record. Start.',
-   'Look, I’m not going to yell. Yelling’s for people who don’t have a plan. We have a plan. It’s on the Train tab. Go and look at it with your legs.'],
-  pepStatus:(ws)=> ws.missed>0 ? ' You’re '+ws.missed+' down this week, by the way. I noticed. I notice everything. Fix it today.' : ws.sessions>=ws.target ? ' Week’s strength target is done. Don’t get weird about it. Go for a walk.' : ' '+(ws.target-ws.sessions)+' left this week. That’s a fact, not a vibe.'
+   'You’ve finished every workout you’ve ever started, {n}. That’s a hundred percent record. Don’t ruin a hundred percent record. Haere mai. Start.',
+   'Look, I’m not going to yell. Yelling’s for people who don’t have a plan. We have a plan. It’s on the Train tab. Go and look at it with your legs.',
+   'Whakapakari tinana, {n}. Strengthen the body. It’s not a slogan, it’s the to-do list. One item. Go.'],
+  pepStatus:(ws)=> ws.missed>0 ? ' You’re '+ws.missed+' down this week, by the way. I noticed. I notice everything. Fix it today, e hoa.' : ws.sessions>=ws.target ? ' Week’s strength target is done. Ka pai. Don’t get weird about it. Go for a walk.' : ' '+(ws.target-ws.sessions)+' left this week. That’s a fact, not a vibe.'
  }
 };
 function P(){ return PERSONAS[S.persona]||PERSONAS.kiwi; }
@@ -1084,10 +1101,11 @@ function renderCoach(){
 function renderVoicePicker(){
   const sel=$('voiceSel'); if(!sel) return;
   const vs=allVoices();
-  const rank=v=> v.lang==='en-NZ'?0 : v.lang==='en-AU'?1 : v.lang==='en-GB'?2 : 3;
+  const rich=v=>!v.localService || /neural|natural|wavenet|premium|enhanced|network/i.test(v.name);
+  const rank=v=> (v.lang==='en-NZ'?0 : v.lang==='en-AU'?10 : v.lang==='en-GB'?20 : 30) + (rich(v)?0:1);
   vs.sort((a,b)=>rank(a)-rank(b)||a.name.localeCompare(b.name));
   const cur = S.voiceName || (voiceReady?voiceReady.name:'');
-  sel.innerHTML='<option value="">Automatic (best available)</option>'+vs.map(v=>'<option value="'+v.name.replace(/"/g,'&quot;')+'"'+(v.name===cur?' selected':'')+'>'+(v.lang==='en-NZ'?'★ ':'')+v.name+' · '+v.lang+'</option>').join('');
+  sel.innerHTML='<option value="">Automatic (best available)</option>'+vs.map(v=>'<option value="'+v.name.replace(/"/g,'&quot;')+'"'+(v.name===cur?' selected':'')+'>'+(v.lang==='en-NZ'?'★ ':'')+v.name+' · '+v.lang+(rich(v)?' · smooth':'')+'</option>').join('');
   const nz=vs.filter(v=>v.lang==='en-NZ').length;
   $('voiceNote').textContent = !vs.length ? 'No voices reported yet. Tap Refresh, or open the app in Chrome.' :
     nz ? nz+' New Zealand English voice'+(nz>1?'s':'')+' found. Pick one and test it.' :
@@ -1097,7 +1115,7 @@ function renderVoicePicker(){
 $('voiceSel').onchange=()=>{ S.voiceName=$('voiceSel').value; save(); pickVoice(); speak(P().voiceOn(), true); };
 $('rateIn').oninput=()=>{ S.rate=+$('rateIn').value; $('rateVal').textContent=S.rate.toFixed(2)+'×'; save(); };
 $('pitchIn').oninput=()=>{ S.pitch=+$('pitchIn').value; $('pitchVal').textContent=S.pitch.toFixed(2)+'×'; save(); };
-$('rateIn').onchange=$('pitchIn').onchange=()=>speak('Like this. Bit fast? Bit slow? Your call, mate.', true);
+$('rateIn').onchange=$('pitchIn').onchange=()=>speak('Kia ora. Like this. Bit fast? Bit slow? Your call, e hoa.', true);
 $('btnVoiceRefresh').onclick=()=>{ pickVoice(); renderVoicePicker(); speak(voiceReady?'This is the voice I found.':'', true); };
 $('btnPersona').onclick=()=>{ S.persona = S.persona==='kiwi' ? 'straight' : 'kiwi'; save(); pickVoice(); renderCoach(); speak(P().voiceOn(), true); };
 $('btnVoice').onclick=()=>{ S.voice=!S.voice; save(); renderCoach(); if(S.voice) speak(P().voiceOn()); };
