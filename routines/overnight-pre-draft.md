@@ -1,12 +1,9 @@
 # Routine: ICT overnight pre-draft (approve-first)
 
-**Status: ready to create — not yet live.** Creating scheduled routines was denied
-from the remote build session's permission mode (2026-08-23), so this is the
-complete definition. To make it live, either tell any interactive assistant
-session "create the overnight pre-draft routine from routines/overnight-pre-draft.md",
-or create it at claude.ai → Routines with the settings below. Attach the
-**Salesforce Production** connector to it (same one-time step as the dashboard
-routine) and turn on the push notification.
+**Status: LIVE** as `trig_01EbMkfD4UcGUKLkUB1mNQ8V` (confirmed in the 2 Sep 2026
+OS audit, see `os/registers.md`). This file remains the definition of record;
+if the live prompt drifts from it, reconcile and update both. Originally created
+from this definition after remote creation was denied on 2026-08-23.
 
 | Setting | Value |
 |---|---|

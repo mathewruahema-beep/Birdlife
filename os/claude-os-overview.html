@@ -1,0 +1,2212 @@
+<title>BirdLife Australia</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Stark HUD: a deliberate single-theme look, every colour explicit, holds on any host ground */
+:root{
+  --ground:#060b10; --surface:#0c151d; --surface2:#122029; --surface3:#183041;
+  --ink:#d8ecf4; --ink2:#8fb0bf; --ink3:#63808e;
+  --accent:#54d7f2; --accent-ink:#04222c; --glow:rgba(84,215,242,.10); --glow2:rgba(84,215,242,.35);
+  --gold:#f0b429; --gold-ink:#1c1502;
+  --line:#16333f; --line2:#24485a;
+  --warn:#f0b429; --warn-bg:#2b2208;
+  --crit:#e0685c; --crit-bg:#33150f;
+  --ok:#3fd6a5; --ok-bg:#0b2b20;
+  --dock:rgba(6,14,19,.93);
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --disp:'Bricolage Grotesque','Instrument Sans',system-ui,sans-serif;
+  --body:'Instrument Sans',system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;margin:0;
+  background:radial-gradient(1100px 560px at 82% -8%, rgba(84,215,242,.07), transparent 60%),
+             radial-gradient(800px 500px at -10% 108%, rgba(240,180,41,.05), transparent 55%),
+             var(--ground)}
+header h1{text-shadow:0 0 34px var(--glow2)}
+::selection{background:var(--accent);color:var(--accent-ink)}
+.wrap{max-width:1040px;margin:0 auto;padding:34px 22px 190px}
+a{color:var(--accent)}
+h1,h2,h3{font-family:var(--disp);text-wrap:balance;margin:0}
+.mono{font-family:var(--mono)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;text-align:left;padding:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+header{position:relative;border-bottom:2px solid var(--ink);padding-bottom:20px;overflow:hidden}
+header::before{content:"";position:absolute;top:-140px;right:-100px;width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,var(--glow) 0%,transparent 70%);pointer-events:none}
+header h1{font-size:clamp(30px,5vw,42px);font-weight:700;line-height:1.05;margin:6px 0 10px}
+header .sub{color:var(--ink2);max-width:64ch;margin:0}
+.livedot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:1px;animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--glow2)}50%{box-shadow:0 0 0 7px transparent}}
+.statebar{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{display:inline-flex;align-items:baseline;gap:7px;border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--ink2);transition:transform .15s,border-color .15s;cursor:pointer}
+.chip:hover{transform:translateY(-1px);border-color:var(--accent)}
+.chip b{font-family:var(--mono);font-size:14px;color:var(--ink);font-weight:600}
+.chip.warn{border-color:var(--warn);background:var(--warn-bg);color:var(--warn)}
+.chip.warn b{color:var(--warn)}
+.hint{font-size:12px;color:var(--ink3);margin:10px 0 0}
+
+nav.tabs{position:sticky;top:0;z-index:5;background:var(--ground);display:flex;gap:4px;padding:12px 0 10px;border-bottom:1px solid var(--line2);margin-bottom:26px;overflow-x:auto}
+nav.tabs button{font-family:var(--disp);font-weight:600;font-size:14.5px;padding:7px 15px;border-radius:8px;color:var(--ink2);white-space:nowrap;transition:background .15s,color .15s}
+nav.tabs button:hover{background:var(--surface2)}
+nav.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);box-shadow:0 2px 10px var(--glow)}
+.view[hidden]{display:none}
+.lede{color:var(--ink2);max-width:70ch;margin:0 0 18px}
+h2.vt{font-size:22px;font-weight:600;margin-bottom:4px}
+
+/* today */
+.todaybar{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.todaybar .asof{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+.refresh{font-size:13px;font-weight:600;color:var(--accent);border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:4px 13px;transition:background .15s}
+.refresh:hover{background:var(--surface2)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:16px}
+.tile{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:12px 14px;transition:transform .15s,box-shadow .15s,border-color .15s}
+.tile[data-filter]{cursor:pointer}
+.tile:hover{transform:translateY(-2px);box-shadow:0 4px 14px var(--glow)}
+.tile.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--glow2)}
+.tile .v{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile .l{font-size:12px;color:var(--ink3);margin-top:2px}
+.tile.warn .v{color:var(--warn)} .tile.crit .v{color:var(--crit)} .tile.ok .v{color:var(--ok)}
+.todaycols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.todaycols{grid-template-columns:1fr}}
+.tlist{background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden}
+.tlist h3{font-size:14px;font-weight:600;padding:10px 15px;background:var(--surface2);border-bottom:1px solid var(--line)}
+.trow{padding:9px 15px;border-top:1px solid var(--line);font-size:13.5px}
+.trow:first-of-type{border-top:none}
+.trow .t1{font-weight:600}
+.trow .t2{color:var(--ink3);font-size:12.5px;font-family:var(--mono)}
+.trow.empty{color:var(--ink3);font-style:italic}
+.rowacts{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.rowacts button{font-size:11.5px;font-family:var(--mono);color:var(--accent);border:1px solid var(--line2);border-radius:6px;padding:2px 9px;background:var(--surface);transition:background .12s}
+.rowacts button:hover{background:var(--surface2)}
+.fxbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.fxbar input[type=search]{flex:1;min-width:180px;font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line2);border-radius:999px;padding:6px 14px}
+.fxbar select{font-family:var(--mono);font-size:12px;color:var(--ink2);background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:5px 8px}
+.fxchips{display:flex;gap:6px;flex-wrap:wrap}
+.fxchips button{font-family:var(--mono);font-size:11.5px;color:var(--ink3);border:1px solid var(--line2);background:var(--surface);border-radius:999px;padding:3px 11px;transition:color .12s,border-color .12s}
+.fxchips button[aria-pressed=true]{color:var(--accent);border-color:var(--accent);box-shadow:0 0 8px var(--j-cyan-glow)}
+.fxprog{height:6px;border-radius:999px;background:var(--surface2);overflow:hidden;margin:6px 0 14px;border:1px solid var(--line)}
+.fxprog i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),var(--accent));transition:width .4s}
+.fxcard{background:var(--surface);border:1px solid var(--line2);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.fxcard:hover{border-color:var(--accent)}
+.fxcard.done{opacity:.6}
+.fxcard.dismissed{opacity:.45}
+.fxhead{display:flex;gap:10px;align-items:center;padding:10px 14px;cursor:pointer;flex-wrap:wrap}
+.fxhead .t{font-weight:600;flex:1;min-width:200px}
+.fxhead .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.fxhead select{font-family:var(--mono);font-size:11px;color:var(--ink2);background:var(--surface2);border:1px solid var(--line2);border-radius:6px;padding:2px 6px}
+.fxbody{display:none;padding:0 14px 12px;border-top:1px solid var(--line);font-size:13.5px}
+.fxcard.open .fxbody{display:block}
+.fxbody h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:12px 0 4px}
+.fxbody ol{margin:0;padding-left:20px}
+.fxbody li{margin:2px 0}
+.fxbody .owner{font-family:var(--mono);font-size:12px;color:var(--ink2)}
+.sev1{background:var(--crit-bg);color:var(--crit)} .sev2{background:var(--warn-bg);color:var(--warn)} .sev3{background:var(--surface2);color:var(--ink2);border:1px solid var(--line2)}
+.fxempty{padding:24px;text-align:center;color:var(--ink3);font-style:italic}
+.degraded{background:var(--surface);border:1px dashed var(--line2);border-radius:12px;padding:16px 18px;color:var(--ink2);font-size:14px}
+.degraded b{color:var(--ink)}
+.unread{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:1px}
+.boardwrap{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;align-items:flex-start}
+.bcol{min-width:240px;max-width:300px;flex:1;background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden}
+.bcol h3{font-size:13px;font-weight:600;padding:9px 13px;background:var(--surface2);border-bottom:1px solid var(--line)}
+.bcol h3 .cnt{font-family:var(--mono);color:var(--ink3);font-weight:400;margin-left:6px;font-size:12px}
+
+.stack{border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--surface);box-shadow:0 1px 3px var(--glow)}
+.layer{border-top:1px solid var(--line)}
+.layer:first-child{border-top:none}
+.layer>button{display:grid;grid-template-columns:180px 1fr auto;gap:14px;width:100%;padding:13px 18px;align-items:baseline;transition:background .15s}
+.layer>button:hover{background:var(--surface2)}
+.layer .role{font-family:var(--disp);font-weight:600;font-size:15px}
+.layer .role small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:400}
+.layer .what{color:var(--ink2);font-size:14px}
+.layer .caret{font-family:var(--mono);color:var(--ink3);transition:transform .18s}
+.layer.open .caret{transform:rotate(90deg)}
+.layer .detail{padding:2px 18px 16px 212px;font-size:14px;color:var(--ink2)}
+.layer .detail .home{font-family:var(--mono);font-size:12px;color:var(--accent);display:block;margin-bottom:6px}
+.layer .detail ul{margin:6px 0 0;padding-left:18px}
+.layer .detail li{margin:4px 0}
+.layer.kernel>button{background:var(--accent)}
+.layer.kernel>button:hover{filter:brightness(1.06)}
+.layer.kernel .role,.layer.kernel .what,.layer.kernel .caret{color:var(--accent-ink)}
+.layer.kernel .role small{color:var(--accent-ink);opacity:.75}
+@media (max-width:700px){.layer>button{grid-template-columns:1fr auto}.layer .what{grid-column:1/-1}.layer .detail{padding-left:18px}}
+
+.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:26px}
+.loop .step{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:13px 15px 15px;transition:transform .15s,box-shadow .15s;cursor:pointer}
+.loop .step:hover{transform:translateY(-2px);box-shadow:0 4px 14px var(--glow)}
+.loop .step .n{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.1em}
+.loop .step h3{font-size:15px;font-weight:600;margin:3px 0 4px}
+.loop .step p{margin:0;font-size:13px;color:var(--ink2)}
+.loop .step .more{display:none;margin-top:7px;font-size:12.5px;color:var(--ink3);border-top:1px dashed var(--line);padding-top:6px}
+.loop .step.open .more{display:block}
+@media (max-width:760px){.loop{grid-template-columns:1fr 1fr}}
+@media (max-width:460px){.loop{grid-template-columns:1fr}}
+
+.days{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.days button{font-family:var(--mono);font-size:13px;font-weight:600;padding:6px 13px;border-radius:8px;border:1px solid var(--line2);background:var(--surface);color:var(--ink2);transition:background .15s,transform .1s}
+.days button:hover{background:var(--surface2);transform:translateY(-1px)}
+.days button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:0 2px 10px var(--glow)}
+.sched{border:1px solid var(--line2);border-radius:12px;background:var(--surface);overflow:hidden}
+.srow{display:grid;grid-template-columns:110px 1fr;border-top:1px solid var(--line);cursor:pointer}
+.srow:first-child{border-top:none}
+.srow:hover .sbody{background:var(--surface2)}
+.stime{font-family:var(--mono);font-size:13px;font-weight:600;padding:11px 14px;background:var(--surface2);color:var(--ink2);border-right:1px solid var(--line);font-variant-numeric:tabular-nums}
+.sbody{padding:11px 16px 12px;transition:background .12s}
+.sbody .rname{font-weight:600;font-size:14.5px}
+.sbody .rwhat{color:var(--ink2);font-size:13.5px}
+.sbody .rid{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:3px}
+.tag{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;border-radius:4px;padding:1.5px 7px;margin-left:8px;vertical-align:1px}
+.tag.write{background:var(--warn-bg);color:var(--warn)}
+.tag.read{background:var(--ok-bg);color:var(--ok)}
+.tag.gov{background:var(--surface2);color:var(--ink2);border:1px solid var(--line2)}
+.tag.retired{background:var(--crit-bg);color:var(--crit)}
+.schednote{font-size:13px;color:var(--ink3);margin-top:10px}
+
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.subtabs button{font-size:13.5px;font-weight:600;padding:5px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--surface);color:var(--ink2);transition:background .15s}
+.subtabs button:hover{background:var(--surface2)}
+.subtabs button[aria-selected="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.rlist{display:flex;flex-direction:column;gap:8px}
+.rcard{background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden;transition:border-color .15s}
+.rcard:hover{border-color:var(--accent)}
+.rcard>button{width:100%;display:flex;gap:10px;align-items:baseline;padding:11px 15px;flex-wrap:wrap}
+.rcard .rname{font-weight:600;font-size:14.5px}
+.rcard .rsched{font-family:var(--mono);font-size:12px;color:var(--ink3);margin-left:auto;font-variant-numeric:tabular-nums}
+.rcard .caret{font-family:var(--mono);color:var(--ink3);transition:transform .18s}
+.rcard.open .caret{transform:rotate(90deg)}
+.rcard .detail{border-top:1px solid var(--line);padding:12px 15px 14px;font-size:13.5px;color:var(--ink2);display:grid;grid-template-columns:150px 1fr;gap:5px 14px}
+.rcard .detail dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding-top:2px}
+.rcard .detail dd{margin:0}
+.rcard .detail dd.mono{font-size:12.5px}
+.rcard .detail .rowacts{grid-column:1/-1}
+@media (max-width:560px){.rcard .detail{grid-template-columns:1fr}.rcard .detail dt{padding-top:6px}}
+.grouphead{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:20px 0 8px}
+table.reg{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden;font-size:14px}
+.tablewrap{overflow-x:auto;border-radius:12px}
+table.reg th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left;padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--line2)}
+table.reg td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+table.reg tr:last-child td{border-bottom:none}
+table.reg td.mono{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
+table.reg tbody tr.clicky{cursor:pointer;transition:background .12s}
+table.reg tbody tr.clicky:hover td{background:var(--surface2)}
+.pill{display:inline-block;font-family:var(--mono);font-size:10.5px;border-radius:4px;padding:1.5px 7px}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.crit{background:var(--crit-bg);color:var(--crit)}
+.conngrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.conn{border:1px solid var(--line2);background:var(--surface);border-radius:8px;padding:8px 13px;font-size:13.5px;transition:transform .12s,border-color .15s;cursor:pointer}
+.conn:hover{transform:translateY(-1px);border-color:var(--accent)}
+.conn b{display:block;font-size:14px}
+.conn span{color:var(--ink3);font-size:12px}
+
+.rules{display:flex;flex-direction:column;gap:8px}
+.rule{background:var(--surface);border:1px solid var(--line2);border-radius:12px;overflow:hidden;transition:border-color .15s}
+.rule:hover{border-color:var(--accent)}
+.rule>button{width:100%;display:flex;gap:14px;align-items:baseline;padding:11px 15px}
+.rule .n{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent);border:1px solid var(--line2);border-radius:6px;min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:var(--surface2);align-self:center}
+.rule b{font-size:14.5px}
+.rule .caret{margin-left:auto;font-family:var(--mono);color:var(--ink3);align-self:center;transition:transform .18s}
+.rule.open .caret{transform:rotate(90deg)}
+.rule .detail{border-top:1px solid var(--line);padding:11px 15px 13px 55px;font-size:13.5px;color:var(--ink2)}
+.rule .detail .why{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--warn);display:block;margin-bottom:3px}
+@media (max-width:560px){.rule .detail{padding-left:15px}}
+
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+@media (max-width:760px){.twocol{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:15px 17px}
+.panel h3{font-size:16px;font-weight:600;margin-bottom:8px}
+.panel ul{margin:0;padding-left:18px}
+.panel li{margin:7px 0;font-size:14px;color:var(--ink2)}
+.panel li.clicky{cursor:pointer;transition:color .12s}
+.panel li.clicky:hover{color:var(--ink)}
+.panel li b{color:var(--ink)}
+.panel.warnp{border-left:4px solid var(--warn)}
+.panel.watchp{border-left:4px solid var(--accent)}
+
+footer{margin-top:48px;border-top:1px solid var(--line2);padding-top:14px;font-size:12.5px;color:var(--ink3)}
+footer .mono{font-size:11.5px}
+
+/* ---------- Jarvis HUD dock (committed single look: deep glass, arc cyan, gold controls) ---------- */
+#jarvis{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;width:min(760px,calc(100vw - 24px));z-index:20;
+  --j-bg:rgba(7,15,21,.93); --j-panel:#0d1c26; --j-panel2:#122430; --j-line:#1e3947;
+  --j-cyan:#54d7f2; --j-cyan-dim:#8bb7c4; --j-cyan-glow:rgba(84,215,242,.28); --j-ink:#dff2f9; --j-ink2:#9dbcc8;
+  --j-gold:#f0b429; --j-gold-ink:#1c1502; --j-red:#e0685c}
+.jpanel{position:relative;background:var(--j-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--j-line);border-radius:16px;box-shadow:0 10px 34px rgba(0,0,0,.45),0 0 0 1px var(--j-cyan-glow),0 0 24px var(--j-cyan-glow);overflow:hidden;color:var(--j-ink)}
+.jscan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--j-cyan),transparent);background-size:200% 100%;animation:scan 3.2s linear infinite;opacity:.85}
+@keyframes scan{from{background-position:200% 0}to{background-position:-200% 0}}
+.jhead{display:flex;align-items:center;gap:10px;padding:11px 15px 0}
+.jorb{position:relative;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#bdeffb,var(--j-cyan) 55%,#1b7f99);flex:none;box-shadow:0 0 10px var(--j-cyan-glow),0 0 22px var(--j-cyan-glow)}
+.jorb::before{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--j-cyan);opacity:.7}
+.jorb::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:1px dashed var(--j-cyan);opacity:.45;animation:reticle 6s linear infinite}
+@keyframes reticle{to{transform:rotate(360deg)}}
+.jorb.busy{animation:orbthink .8s ease-in-out infinite alternate}
+@keyframes orbthink{from{transform:scale(.75);filter:brightness(.7)}to{transform:scale(1.25);filter:brightness(1.3)}}
+.jtitle{font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.34em;color:var(--j-cyan);text-shadow:0 0 12px var(--j-cyan-glow)}
+.jsub{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--j-cyan-dim);margin-left:auto;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
+.jlog{max-height:48vh;overflow-y:auto;padding:10px 15px 2px;display:none;flex-direction:column;gap:8px}
+.jlog.on{display:flex}
+.jmsg{position:relative;max-width:88%;padding:8px 12px;border-radius:12px;font-size:14px;white-space:pre-wrap;overflow-wrap:break-word}
+.jmsg.you{align-self:flex-end;background:var(--j-cyan);color:#06222c;border-bottom-right-radius:4px}
+.jmsg.jarvis{align-self:flex-start;background:var(--j-panel2);color:var(--j-ink);border:1px solid var(--j-line);border-bottom-left-radius:4px}
+.jmsg.err{align-self:flex-start;background:#2e1512;color:#f0a79e;border:1px solid #55251f}
+.jmsg .copy{position:absolute;top:4px;right:6px;font-size:11px;color:var(--j-cyan-dim);opacity:0;transition:opacity .15s;background:var(--j-panel);border:1px solid var(--j-line);border-radius:5px;padding:1px 6px}
+.jmsg:hover .copy{opacity:1}
+.jtool{align-self:flex-start;font-family:var(--mono);font-size:11px;color:var(--j-cyan-dim)}
+.japprove{align-self:stretch;background:var(--j-panel);border:1px solid var(--j-gold);border-left-width:4px;border-radius:12px;padding:11px 14px;font-size:13.5px;box-shadow:0 0 16px rgba(240,180,41,.15)}
+.japprove .at{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--j-gold);margin-bottom:4px}
+.japprove .ad{white-space:pre-wrap;color:var(--j-ink2);margin-bottom:9px}
+.japprove .ad b{color:var(--j-ink)}
+.japprove .ab{display:flex;gap:8px}
+.japprove .ab button{font-weight:700;font-size:13px;border-radius:8px;padding:6px 16px;border:1px solid var(--j-line)}
+.japprove .approve{background:var(--j-gold);color:var(--j-gold-ink);border-color:var(--j-gold)}
+.japprove .cancel{background:var(--j-panel2);color:var(--j-ink2)}
+.jchips{display:flex;gap:6px;overflow-x:auto;padding:8px 15px 0;scrollbar-width:none}
+.jchips::-webkit-scrollbar{display:none}
+.jchips button{flex:none;font-family:var(--mono);font-size:12px;color:var(--j-cyan-dim);border:1px solid var(--j-line);background:var(--j-panel);border-radius:999px;padding:4px 12px;transition:color .15s,border-color .15s,box-shadow .15s}
+.jchips button:hover{border-color:var(--j-cyan);color:var(--j-cyan);box-shadow:0 0 10px var(--j-cyan-glow)}
+.jbar{display:flex;align-items:center;gap:8px;padding:10px 12px 12px}
+.jbar input{flex:1;font:inherit;font-size:14.5px;color:var(--j-ink);background:var(--j-panel);border:1px solid var(--j-line);border-radius:10px;padding:9px 13px;outline:none;min-width:0}
+.jbar input:focus{border-color:var(--j-cyan);box-shadow:0 0 0 3px var(--j-cyan-glow)}
+.jbar input::placeholder{color:var(--j-ink2)}
+.jbtn{flex:none;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--j-line);background:var(--j-panel);color:var(--j-cyan-dim);font-size:16px;transition:background .15s,transform .1s,box-shadow .15s}
+.jbtn:hover{background:var(--j-panel2);transform:translateY(-1px);box-shadow:0 0 10px var(--j-cyan-glow)}
+.jbtn[aria-pressed="true"]{background:var(--j-cyan);color:#06222c;border-color:var(--j-cyan)}
+.jbtn.send{background:var(--j-cyan);color:#06222c;border-color:var(--j-cyan);font-weight:700;box-shadow:0 0 14px var(--j-cyan-glow)}
+.jbtn.send:disabled{opacity:.45;cursor:default;transform:none}
+.jbtn.listening{background:var(--j-red);color:#fff;border-color:var(--j-red);animation:orbthink .7s ease-in-out infinite alternate}
+.jnote{font-size:11.5px;color:var(--j-ink2);padding:0 15px 10px;display:none}
+.jnote.on{display:block}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow"><span class="livedot"></span>BirdLife Australia ICT · mathewruahema-beep/Birdlife</div>
+  <h1>BirdLife Australia</h1>
+  <p class="sub">Your daily console over the Claude estate. Command is the full picture: operations first, project work beside it, and the decisions that make you a better ICT manager. Jarvis answers in your voice, pulls live data, decides as you would when asked, and executes: every write shows the exact change and waits for your tap on Approve.</p>
+  <div class="statebar">
+    <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>12</b> recurring routines</span>
+    <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>2</b> one-shots</span>
+    <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>9</b> retired 2 Sep, backed up</span>
+    <span class="chip" role="button" tabindex="0" data-goto="registers:skills"><b>12</b> skills in repo</span>
+    <span class="chip warn" role="button" tabindex="0" data-goto="rules"><b>2</b> decisions open</span>
+  </div>
+  <p class="hint">Everything is tappable: chips navigate, tiles filter, rows load Jarvis with a ready question, and reply/close/complete buttons start an approved action.</p>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button role="tab" data-view="command" aria-selected="true">Command</button>
+  <button role="tab" data-view="today" aria-selected="false">Today</button>
+  <button role="tab" data-view="board" aria-selected="false">Projects</button>
+  <button role="tab" data-view="money" aria-selected="false">Money</button>
+  <button role="tab" data-view="security" aria-selected="false">Security</button>
+  <button role="tab" data-view="fixes" aria-selected="false">Fixes</button>
+  <button role="tab" data-view="system" aria-selected="false">The system</button>
+  <button role="tab" data-view="schedule" aria-selected="false">Schedule</button>
+  <button role="tab" data-view="registers" aria-selected="false">Registers</button>
+  <button role="tab" data-view="rules" aria-selected="false">Rules &amp; decisions</button>
+</nav>
+
+<!-- ============ COMMAND ============ -->
+<div class="view" id="view-command">
+  <h2 class="vt">The full picture</h2>
+  <p class="lede">One screen for running ICT: operations first (the essentials), then project work, then the decisions and patterns that make you a better manager of both. Everything is live where the connectors allow, and everything hands to Jarvis on a tap.</p>
+  <div class="grouphead">Operations · the essentials</div>
+  <div id="cmd-ops"><div class="degraded">Operations data loads inside the Claude viewer with your connectors allowed.</div></div>
+  <div class="grouphead">Project work</div>
+  <div id="cmd-projects"><div class="degraded">The board loads with the Asana connector.</div></div>
+  <div class="twocol" style="margin-top:18px">
+    <div class="panel warnp"><h3>Decisions waiting on you</h3><div id="cmd-decisions"></div></div>
+    <div class="panel watchp"><h3>Run yourself like a system</h3><div id="cmd-iterate"></div></div>
+  </div>
+  <div class="grouphead" style="margin-top:22px">Patterns worth acting on</div>
+  <div id="cmd-patterns"></div>
+</div>
+
+<!-- ============ TODAY ============ -->
+<div class="view" id="view-today" hidden>
+  <div class="todaybar">
+    <h2 class="vt" style="margin:0">Right now</h2>
+    <span class="asof" id="asof">connecting to your connectors...</span>
+    <button class="refresh" id="refreshbtn" hidden>Refresh</button>
+  </div>
+  <div id="today-live">
+    <div class="degraded" id="today-degraded"><b>Live data loads inside the Claude viewer.</b> Open this page at its claude.ai link and allow the Salesforce Production and Asana connectors when asked. Everything else on this page works without them.</div>
+    <div id="today-content" hidden>
+      <div class="tiles" id="tiles"></div>
+      <div class="todaycols">
+        <div class="tlist"><h3 id="qtitle">Queue: needs action first</h3><div id="qlist"></div></div>
+        <div class="tlist"><h3 id="btitle">Board: needs attention</h3><div id="blist"></div></div>
+      </div>
+      <div class="todaycols" style="margin-top:14px">
+        <div class="tlist"><h3 id="mtitle">Inbox: recent from people</h3><div id="mlist"><div class="trow empty">Waiting on Microsoft 365...</div></div></div>
+        <div class="tlist"><h3 id="ttitle">Teams: latest messages</h3><div id="tlist2"><div class="trow empty">Waiting on Microsoft 365...</div></div></div>
+      </div>
+      <p class="schednote">Scope: Record Type = Ask Zeus only, project = IT Operations Project Plan only. Owner "Zeus" is the unassigned intake queue, not a person. Reply, close, comment and complete run through Jarvis with your explicit approval on each write, and every change is verified by re-reading the record. Email replies are created as Outlook DRAFTS only, never sent; Teams has no send API, so Teams replies are drafted for you to copy.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BOARD ============ -->
+<div class="view" id="view-board" hidden>
+  <h2 class="vt">IT Operations Project Plan</h2>
+  <p class="lede">The live board by section, through your Asana connector. Tap a task to load Jarvis; comment, complete and move run through the same Approve cards.</p>
+  <div id="boardhost"><div class="degraded">Board loads inside the Claude viewer with the Asana connector allowed.</div></div>
+</div>
+
+<!-- ============ MONEY ============ -->
+<div class="view" id="view-money" hidden>
+  <div class="todaybar">
+    <h2 class="vt" style="margin:0">Money: the state of the data</h2>
+    <span class="asof" id="money-asof"></span>
+    <button class="refresh" id="money-refresh" hidden>Refresh</button>
+  </div>
+  <p class="lede">Money in and out across the estate, and, just as important, whether the systems agree. Stripe, Salesforce and NetSuite rarely match; the gap between them is the actual finding. Figures load on demand through your connectors.</p>
+  <div id="money-host"><div class="degraded"><b>Loads inside the Claude viewer.</b> Open the tab there and allow the Stripe and NetSuite connectors alongside the existing three.</div></div>
+</div>
+
+<!-- ============ SECURITY ============ -->
+<div class="view" id="view-security" hidden>
+  <div class="todaybar">
+    <h2 class="vt" style="margin:0">Security footprint</h2>
+    <span class="asof" id="sec-asof"></span>
+    <button class="refresh" id="sec-refresh" hidden>Refresh</button>
+  </div>
+  <p class="lede">The live posture where this page can truly see it (Salesforce), the hard deadlines counted from today, and an honest list of what is not readable from here. The full confidential read stays on the weekly Security dashboard.</p>
+  <div id="sec-host"><div class="degraded"><b>Loads inside the Claude viewer</b> with the Salesforce Production connector allowed.</div></div>
+</div>
+
+<!-- ============ FIXES ============ -->
+<div class="view" id="view-fixes" hidden>
+  <div class="todaybar">
+    <h2 class="vt" style="margin:0">Suggested fixes</h2>
+    <span class="asof" id="fx-count"></span>
+    <button class="refresh" id="fx-suggest">Ask Jarvis for new fixes</button>
+    <button class="refresh" id="fx-reset">Reset filters</button>
+  </div>
+  <p class="lede">Every fix the assistant knows about, technical and process, drawn from the skills and from live reads, ranked the way Mathew ranks: money, then what blocks people, then risk. Each one says why, who it affects, the exact steps, and who should own it. Track a fix into Asana, hand it to Jarvis to prepare, or mark where it is up to. Status is remembered on this device.</p>
+  <div id="fx-host"></div>
+</div>
+
+<!-- ============ SYSTEM ============ -->
+<div class="view" id="view-system" hidden>
+  <h2 class="vt">The stack</h2>
+  <p class="lede">Seven layers, each with one home and one owner. Click a layer for what lives in it and who may change it.</p>
+  <div class="stack" id="stack"></div>
+
+  <h2 class="vt" style="margin-top:34px">The governance loop</h2>
+  <p class="lede">Every change to the estate, from creating a routine to closing a case, moves through the same four steps. Click a step for a worked example.</p>
+  <div class="loop" id="loop"></div>
+</div>
+
+<!-- ============ SCHEDULE ============ -->
+<div class="view" id="view-schedule" hidden>
+  <h2 class="vt">What runs, and when</h2>
+  <p class="lede">Pick a day to see every unattended fire in Melbourne time. Tap a routine to load Jarvis with its story.</p>
+  <div class="days" role="tablist" aria-label="Day of week" id="days"></div>
+  <div class="sched" id="sched"></div>
+  <p class="schednote" id="schednote"></p>
+</div>
+
+<!-- ============ REGISTERS ============ -->
+<div class="view" id="view-registers" hidden>
+  <h2 class="vt">The registers</h2>
+  <p class="lede">The state of record, mirrored from <span class="mono">os/registers.md</span>. Anything live that is not here is drift, and drift is a finding.</p>
+  <div class="subtabs" role="tablist" aria-label="Register" id="subtabs">
+    <button role="tab" data-reg="routines" aria-selected="true">Routines</button>
+    <button role="tab" data-reg="skills" aria-selected="false">Skills</button>
+    <button role="tab" data-reg="connectors" aria-selected="false">Connectors</button>
+    <button role="tab" data-reg="artefacts" aria-selected="false">Artefacts</button>
+    <button role="tab" data-reg="credentials" aria-selected="false">Credentials</button>
+  </div>
+  <div id="reg-routines"></div>
+  <div id="reg-skills" hidden>
+    <div class="tablewrap"><table class="reg">
+      <thead><tr><th>Skill</th><th>Covers</th><th>Repo</th><th>Account</th></tr></thead>
+      <tbody id="skillrows"></tbody>
+    </table></div>
+    <p class="schednote">Tap a skill to ask Jarvis about it. Repo copies are the source of truth; when they diverge, re-sync the account from the repo unless the account copy is deliberately newer.</p>
+  </div>
+  <div id="reg-connectors" hidden>
+    <p class="lede" style="margin-bottom:8px">Attached at account level by Mathew only, in the UI. Tap a connector to ask Jarvis what runs through it.</p>
+    <div class="grouphead">Operational core</div>
+    <div class="conngrid" id="conncore"></div>
+    <div class="grouphead">Also available to sessions</div>
+    <div class="conngrid" id="connextra"></div>
+  </div>
+  <div id="reg-artefacts" hidden>
+    <div class="tablewrap"><table class="reg">
+      <thead><tr><th>Artefact</th><th>Rebuilt by</th><th>Link</th></tr></thead>
+      <tbody id="artrows"></tbody>
+    </table></div>
+    <p class="schednote">Teams channel copies (SharePoint, fixed names, never renamed): BirdLife-ICT-Operations-Dashboard.html, BirdLife-ICT-Monitoring-Dashboard.html, BirdLife-Security-Dashboard.html, plus the _dashboard-run-log.txt heartbeat. All artifact URLs are private; never publish via GitHub Pages or any public host.</p>
+  </div>
+  <div id="reg-credentials" hidden>
+    <div class="tablewrap"><table class="reg">
+      <thead><tr><th>Item</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody id="credrows"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ============ RULES ============ -->
+<div class="view" id="view-rules" hidden>
+  <h2 class="vt">The eight operating rules</h2>
+  <p class="lede">Each written from something that actually went wrong here. Click a rule for the incident behind it.</p>
+  <div class="rules" id="rules"></div>
+
+  <div class="twocol">
+    <div class="panel warnp">
+      <h3>Open decisions (tap to work one)</h3>
+      <ul>
+        <li class="clicky" data-ask="Should I retire the department dashboard suite or share this console with the team instead? Lay out both paths with effort and impact, and recommend one."><b>Dashboard estate.</b> Retire the department suite, or share this console with the team (each viewer needs their own connector grants). The budget decision itself was resolved 3 Sep at 12 of 12.</li>
+        <li class="clicky" data-ask="What exactly do I need to do to verify the WooCommerce key rotation from the August exposure, and how do I close it off the watchlist?"><b>WooCommerce key rotation.</b> Flagged in August after keys sat in routine prompts; still not verified done. Stays on the credential watchlist until confirmed.</li>
+      </ul>
+    </div>
+    <div class="panel watchp">
+      <h3>Watching this week (tap to check)</h3>
+      <ul>
+        <li class="clicky" data-ask="Check whether the merged weekday dashboards job ran its 7:04am deep slot properly: query Salesforce for evidence of the morning refresh if you can, and tell me what to look for in the Teams heartbeat."><b>Thu 3 Sep, 7:04am.</b> First deep slot for the merged weekday job. Look for the heartbeat line and the Teams file update.</li>
+        <li class="clicky" data-ask="What should I verify after the first merged weekend run on 5 to 7 Sep, including the Sunday security refresh, and what does failure look like?"><b>Sat 5 to Sun 7 Sep.</b> First weekend for the merged job; it inherits duties from three routines that failed silently since 30 Aug.</li>
+        <li class="clicky" data-ask="What will the first Claude OS weekly audit on Monday 8 Sep check, and what should I expect in its report?"><b>Mon 8 Sep, 6am.</b> First self-run of the weekly audit.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="https://github.com/mathewruahema-beep/Birdlife/blob/claude/os-for-claude-y12d5q/os/README.md">os/README.md</a> (rules) ·
+  <a href="https://github.com/mathewruahema-beep/Birdlife/blob/claude/os-for-claude-y12d5q/os/registers.md">os/registers.md</a> (state of record) ·
+  <a href="https://github.com/mathewruahema-beep/Birdlife/tree/claude/os-for-claude-y12d5q/.claude/skills/birdlife-os">birdlife-os skill</a> ·
+  <a href="https://github.com/mathewruahema-beep/Birdlife/tree/claude/os-for-claude-y12d5q/routines">routine backups</a><br>
+  Consolidation executed 2 Sep 2026. Times AEST (UTC+10); the standing DST one-shot adjusts crons on 5 Oct 2026. This page names internal systems: keep the link private.
+</footer>
+</div>
+
+<!-- ============ JARVIS ============ -->
+<div id="jarvis">
+  <div class="jpanel">
+    <div class="jscan"></div>
+    <div class="jhead">
+      <span class="jorb" id="jorb"></span>
+      <span class="jtitle">J A R V I S</span>
+      <span class="jsub" id="jsub">initialising...</span>
+    </div>
+    <div class="jlog" id="jlog" aria-live="polite"></div>
+    <div class="jchips" id="jchips"></div>
+    <div class="jbar">
+      <input id="jin" type="text" placeholder="Ask or command: triage my queue, close case 0013..., find automations" autocomplete="off" aria-label="Ask Jarvis">
+      <button class="jbtn" id="jmic" title="Speak" aria-label="Voice input" hidden>🎙</button>
+      <button class="jbtn" id="jspk" title="Read answers aloud" aria-label="Speak answers" aria-pressed="false">🔊</button>
+      <button class="jbtn send" id="jsend" title="Ask" aria-label="Ask">↑</button>
+    </div>
+    <div class="jnote" id="jnote"></div>
+  </div>
+</div>
+
+<script>
+// ---------- data ----------
+const LAYERS = [
+ {role:"Charter", sub:"kernel", kernel:true, what:"Loads into every session on this repo and sets who the assistant is and what it may never do.", home:"CLAUDE.md",
+  points:["Three honesty tiers: T1 executes with approval (Salesforce data, Asana, user-level M365), T2 prepares exact fixes for an admin (Entra/Exchange), T3 designs only (Salesforce config).","Hard guardrails: propose then write, no external email without showing the draft, no bulk updates or deletes, confirm identity before reassigning, log every write.","Changed only by a commit Mathew approves."]},
+ {role:"Skills", sub:"memory", what:"Versioned operator knowledge. This is how the assistant learns: change the file, commit, and every future session on any device knows it.", home:".claude/skills/  (mirrored to the claude.ai account)",
+  points:["Nine birdlife-* system skills: ict-assistant, salesforce, microsoft365, asana, netsuite, wordpress, stripe, zapier, cloudflare.","email-voice: Mathew's three email registers, committed to the repo 2 Sep 2026 after living account-only.","claude-os: the operator skill for this OS. Any session told to run the audit follows the same playbook."]},
+ {role:"Routines", sub:"scheduler", what:"Unattended work on cron. 13 recurring plus 2 one-shots, governed by a budget of 12 and one-job-per-outcome.", home:"claude.ai Routines",
+  points:["Every routine carries a passport: name that says what and when, UTC cron with the AEST translation, prompt with goal and hard rules, connectors, notification, register row.","Write-capable routines name their exact write surface and hard caps in the prompt. Model: the overnight pre-draft, internal comments only, max 8.","Retirement always exports the definition to routines/ first. Nothing is deleted unrecoverably."]},
+ {role:"Connectors", sub:"drivers", what:"Access to the real systems: Salesforce, Asana, Microsoft 365, NetSuite, Stripe, Zapier, Cloudflare, GitHub and more.", home:"claude.ai Settings, Connectors",
+  points:["Attached and detached by Mathew only, in the UI. Sessions never touch connector configuration.","Routines carry their own per-routine grants; a routine created without them fires but reads nothing, the most common silent failure.","Salesforce Staging for anything experimental; Production writes follow the charter."]},
+ {role:"Sessions", sub:"processes", what:"Interactive (phone, browser, desktop, GitHub issue) or routine-fired. Ephemeral by design.", home:"claude.ai/code",
+  points:["Any session on this repo becomes the ICT assistant automatically via the charter.","Anything worth keeping is committed or registered before the session ends; the container is reclaimed after.","Routine-fired sessions are fresh each run and must load their connector tools via ToolSearch first, which every prompt now says explicitly."]},
+ {role:"Artefacts", sub:"outputs", what:"The pages people actually read: three ICT dashboards, the nine-page department suite, the ICT Console, this console.", home:"artifact URLs + SharePoint Teams files",
+  points:["Stable private artifact URLs, republished in place so links never change.","Teams channel copies use fixed SharePoint filenames, never renamed, never dated variants.","The _dashboard-run-log.txt heartbeat makes silent failure impossible: a missing weekday line means the run did not happen."]},
+ {role:"Registers", sub:"state of record", what:"Routine, skill, connector, artefact and credential registers. The layer that keeps every other layer honest.", home:"os/registers.md",
+  points:["Updated in the same commit as any estate change. No 'will document later'.","The Monday audit diffs the registers against live state and reports drift as findings.","This page mirrors them; the markdown in the repo is authoritative."]}
+];
+const LOOPSTEPS=[
+ ["STEP 1","Propose","The exact change: name, cron in UTC and AEST, prompt, connectors, and which existing job absorbs or is absorbed.","Example: closing a case through Jarvis. It states the case number, the new Status, the close reason and the note, in full, before anything moves."],
+ ["STEP 2","Approve","Mathew gives the go-ahead. Per-session relaxations honoured, same as the charter.","Example: the amber Approve card in the Jarvis dock. No tap, no write. A cancelled card changes nothing and Jarvis says so."],
+ ["STEP 3","Execute + verify","Make the change, then prove it took: next fire time sane, connectors attached, a paused routine actually stopped.","Example: after a close, the page re-reads the case and reports the verified Status and reason, never assumes success."],
+ ["STEP 4","Record","Register updated, retired definitions backed up to routines/, committed and pushed in the same session.","Example: every case write leaves an internal audit comment on the case, and estate changes land in os/registers.md in the same commit."]
+];
+
+const R = [ // routines. days: 0=Mon..6=Sun
+ {n:"ICT overnight pre-draft (approve-first)", t:"trig_01EbMkfD4UcGUKLkUB1mNQ8V", cron:"30 19 * * 0-4", sched:"weekdays 5:30am", days:[0,1,2,3,4], time:"5:30am", sort:530, type:"write",
+  what:"Drafts requester replies as internal case comments so every case has a response waiting by morning. You approve and post; it never contacts requesters.",
+  detail:{Writes:"Internal CaseComments only (IsPublished=false), max 8 per night, marked [ASSISTANT DRAFT]. Never touches Status, Owner, Type or email.", Connectors:"Salesforce Production", Definition:"routines/overnight-pre-draft.md"}},
+ {n:"Claude OS weekly audit", t:"trig_01V3i4b5zekjZuuFTF6Ymu9G", cron:"0 20 * * 0", sched:"Mon 6am", days:[0], time:"6:00am", sort:600, type:"gov",
+  what:"The OS auditing itself: verdicts every trigger, checks the budget and skill drift, hunts stale references, commits the register update, and reports the decisions you need to make.",
+  detail:{Writes:"os/registers.md only (commit + push)", Connectors:"None needed: repo and trigger list come from the environment", Created:"2 Sep 2026", Definition:"routines/os-weekly-audit.md"}},
+ {n:"ICT weekday dashboards and monitor (single job)", t:"trig_01HhAKnEe6PXAvo6EEq72BHo", cron:"4 21-23,0-7 * * *", sched:"hourly 7:04am-5:04pm", days:[0,1,2,3,4], time:"7:04am +", sort:704, type:"read",
+  what:"The single weekday job. Deep 7:04am slot: Ops dashboard rebuilt and pushed to Teams, heartbeat logged, monitor sweep posted, Monitoring dashboard refreshed, nine department pages republished. Every other hour: probe-gated light refresh, Teams post only on a new failure.",
+  detail:{Merged:"Absorbed five routines on 2 Sep: daily 7am + Teams push, hourly monitor, daytime hourly, and the morning hourly it grew from", Quirk:"Cron cannot span the UTC midnight boundary, so it also fires on Melbourne weekends and exits via a weekend gate; those no-ops are expected", "Fail loudly":"Connector, SharePoint or heartbeat failure emails Mathew; silence means it worked", Connectors:"Salesforce, Asana, M365, NetSuite, Stripe, Zapier, Cloudflare"}},
+ {n:"Membership boards date sync (Build to Model)", t:"trig_01K4kh1m8foc2oYAv9Gs8xqo", cron:"30 21 * * *", sched:"daily 7:30am", days:[0,1,2,3,4,5,6], time:"7:30am", sort:730, type:"read",
+  what:"Keeps the membership Build and Model boards' dates aligned.", detail:{}},
+ {n:"Offboarding detector, daily scan and approval pack", t:"trig_016nQBEZNDReT1DyrEbbqeSU", cron:"0 22 * * *", sched:"daily 8am", days:[0,1,2,3,4,5,6], time:"8:00am", sort:800, type:"read",
+  what:"Scans for genuine leavers and prepares the approval pack: nothing executes until a human says so.", detail:{}},
+ {n:"Refund fix watch, daily blast radius scan", t:"trig_01VdzVKqN12nyemiu976mNca", cron:"15 22 * * *", sched:"daily 8:15am", days:[0,1,2,3,4,5,6], time:"8:15am", sort:815, type:"read",
+  what:"Watches the blast radius of the refund traceability fix.", detail:{}},
+ {n:"Onboarding detector, daily scan and approval pack", t:"trig_01HiCsJkKpSUqPxq2xUpAbEo", cron:"30 22 * * *", sched:"daily 8:30am", days:[0,1,2,3,4,5,6], time:"8:30am", sort:830, type:"read",
+  what:"Scans for genuine starters and prepares the approval pack.", detail:{}},
+ {n:"Stale case chaser (report-only)", t:"trig_01S3ShSb7KSBA32LxFWaLaNa", cron:"30 22 * * 0", sched:"Mon 8:30am", days:[0], time:"8:30am", sort:831, type:"read",
+  what:"Flags cases going quiet before requesters have to chase.", detail:{}},
+ {n:"Data feed and expiry monitor", t:"trig_01Q6X1Xr1syjg7U5QGNwDSUg", cron:"0 23 * * *", sched:"daily 9am", days:[0,1,2,3,4,5,6], time:"9:00am", sort:900, type:"read",
+  what:"Watches data feeds and upcoming expiries (certificates, licences, integrations).", detail:{}},
+ {n:"Membership Build: Friday status update draft", t:"trig_01F7wy1pGcauqCsgUxVU4b47", cron:"0 21 * * 4", sched:"Fri 7am", days:[4], time:"7:00am", sort:700, type:"read",
+  what:"Drafts the Friday membership build status update.", detail:{Note:"Consolidation candidate in the open budget decision"}},
+ {n:"ICT Weekly Status Update", t:"trig_01AsdSGs9WiwRUrmbRmSxtAZ", cron:"0 4 * * 5", sched:"Fri 2pm", days:[4], time:"2:00pm", sort:1400, type:"read",
+  what:"The Friday ICT rollup, delivered into its persistent session.",
+  detail:{Session:"Persistent (fires into the same conversation each week)", Note:"Consolidation candidate in the open budget decision"}},
+ {n:"Dashboards weekend + weekly security (single job)", t:"trig_01CUkTdAFSisnzyU6pwgkH4k", cron:"4 21 * * 5,6", sched:"Sat + Sun 7:04am", days:[5,6], time:"7:04am", sort:704, type:"read",
+  what:"Weekend refresh of both ICT dashboards. The Sunday fire also rebuilds the confidential Security dashboard, moved from Monday midnight.",
+  detail:{Merged:"Absorbed the weekend 6pm slot (dropped) and the Monday 12am security weekly on 2 Sep", Confidential:"Security dashboard figures never leave the dashboard, the run report and the failure email", Connectors:"Salesforce, Asana, M365, NetSuite, Stripe, Zapier, Cloudflare"}}
+];
+const ONESHOTS = [
+ {n:"DST fix for dashboards and Morning brief", t:"trig_01YY3yjtTASm7MvUCh8ceW11", sched:"5 Oct 2026",
+  what:"Adjusts every cron for Sydney daylight saving. Scope changed by the consolidation: it must now adjust the merged weekday and weekend jobs and the audit routine, not the retired triggers."},
+ {n:"Renew entra-admin-mcp certificate", t:"trig_01Vp14cTKJCLnC7psjiRZnUC", sched:"25 Jul 2027",
+  what:"Fires a month before the certificate expires on 26 Aug 2027, into its bound session."}
+];
+const RETIRED = [
+ ["Top 10 morning email draft","trig_016BES4jwEodCfNdSTBYfSow","Retired 3 Sep: overlapped the console's Catch me up; closed the routine budget at 12 of 12"],
+ ["ICT dashboard, daily refresh and Teams push","trig_01QKqXyfwVoUwejxBbe15gX9","Absorbed into the weekday job's deep slot: Teams push, heartbeat, fail-loudly email"],
+ ["ICT hourly monitor 7-9am","trig_015SYdBtkDn7jt8dz6MdvXyE","Absorbed into the weekday job: monitor checks, Teams post rules, monitoring Teams file"],
+ ["Dashboards hourly, weekday daytime","trig_01Egd8XCKdBErqNPYnFkgTJB","Absorbed into the weekday job's light slots"],
+ ["Dashboards, weekend 6pm","trig_01HaRnkdKPD8Fu2HWMn616Nm","Dropped. Abandoned since 30 Aug and nobody noticed, which is the evidence it was not needed"],
+ ["Security dashboard, weekly Monday 12am","trig_014DUzUYB3RwZSpvRTjokFFd","Absorbed into the weekend job's Sunday fire"],
+ ["Zeus triage and first-touch drafter, hourly","trig_01EpSqssk6qvoFRg2UNoEH5o","Duplicated the live overnight pre-draft"],
+ ["Meeting actions collector","trig_014XfhCxMe3nwBgAeGAACp8B","Retired on Mathew's call after a month paused. Recreate from the backup if wanted"],
+ ["Unreconciled income exception report","trig_01QC85zSvXoEWHTEzkip9ajp","Retired on Mathew's call. The Zapier-side version remains the candidate path"],
+ ["Identity lifecycle pack-to-plan","trig_01FXchh6R9btpstDt6fSaLsM","Superseded by the onboarding and offboarding detectors"]
+];
+const SKILLS = [
+ ["birdlife-ict-assistant","Core workflow, tiers, guardrails, close-reason trap","yes","yes"],
+ ["birdlife-salesforce","The Zeus org: NPSP, Payments2Us, Case model, SOQL","yes","yes"],
+ ["birdlife-microsoft365","Entra, Conditional Access, MFA, on/offboarding","yes","yes"],
+ ["birdlife-asana","IT Operations Project Plan, sections, governance","yes","yes"],
+ ["birdlife-netsuite","ERP, chart of accounts, SuiteQL, reconciliation","yes","yes"],
+ ["birdlife-wordpress","WP Engine estate, WooCommerce, plugins","yes","yes"],
+ ["birdlife-stripe","Payments, refunds, BECS, payment flow","yes","yes"],
+ ["birdlife-zapier","The 17 connected apps, when Zapier vs native","yes","yes"],
+ ["birdlife-cloudflare","DNS, SPF/DKIM, WAF, the two accounts","yes","yes"],
+ ["claude-os","This operating system","yes","sync it"],
+ ["email-voice","Mathew's email voice, three registers","yes (2 Sep)","yes"],
+ ["morning","Morning brief","account only","yes"]
+];
+const CONN_CORE = [
+ ["Salesforce Production","the Zeus org, read/write data"],["Salesforce Staging","experiments go here first"],
+ ["Asana","IT Operations Project Plan"],["Microsoft 365","mail, Teams, SharePoint"],
+ ["NetSuite","ERP, SuiteQL"],["Stripe","payments"],["Zapier","17 connected apps"],
+ ["Cloudflare","two accounts: Domain.admin, Mathew.hema"],["GitHub","this repo"],["BirdLife UAT WordPress","staging site"]
+];
+const CONN_EXTRA = ["Gmail","Google Calendar","Google Drive","Canva","Miro","Zoom","Granola","Atlassian Rovo","Microsoft Learn"];
+const ARTS = [
+ ["ICT Operations dashboard","Weekday job (deep + light slots), weekend job","https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606"],
+ ["ICT Monitoring dashboard","Weekday job (every slot), weekend job","https://claude.ai/code/artifact/7ebfafd0-f0be-44af-8ce6-f770ad5e9d6b"],
+ ["Security dashboard (confidential)","Weekend job, Sunday fire","https://claude.ai/code/artifact/ff6c82e3-38d4-41de-b872-606521972498"],
+ ["Department suite, 9 pages","Weekday job, deep slot","(IDs in the weekday job's prompt, section 6)"],
+ ["ICT Console (case workbench)","Sessions, on request: 'update the console'","https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e"]
+];
+const CREDS = [
+ ["WooCommerce API keys exposed in deleted routine prompts (Aug 2026)","warn|Rotation not verified done","Confirm rotation; until confirmed, treat as open"],
+ ["entra-admin-mcp certificate","ok|Expires 26 Aug 2027","Renewal reminder one-shot live (trig_01Vp14cTKJCLnC7psjiRZnUC)"],
+ ["Zapier connected app credentials (17 apps)","ok|In Zapier vault","Reviewed in the monthly OS review"]
+];
+const RULES = [
+ ["The register is truth","Live but unregistered is drift; registered but dead is a ghost. Both are findings the audit reports.","The docs pointed at a deleted dashboard trigger for weeks; every session that read them was misled."],
+ ["One job per outcome","No two routines rebuild the same artefact or cover the same window.","By 2 Sep three jobs rebuilt the ICT dashboard inside five minutes every weekday 7am, with hourly rebuilds behind them."],
+ ["Budget: 12 recurring routines","Over budget means consolidate or retire before anything new goes live. One-shots exempt.","The estate went 10 routines, then 4 after consolidation, then 23 within a month. Unlimited slots means unlimited sprawl."],
+ ["Every routine carries its passport","Name, UTC cron with AEST shown, prompt with goal and hard rules, connectors, notification, register row.","Two August routines fired on schedule for weeks with completely empty prompts, doing nothing, 'successfully'."],
+ ["Report-only by default","A writing routine names its exact write surface and hard caps in its own prompt.","The pre-draft's caps (internal comments only, max 8, never touch Status) are why it can run unattended at 5:30am."],
+ ["No credentials in prompts. Ever","Found one: pause the routine, rotate the credential, in that order.","August's dashboard routines embedded live WooCommerce API keys in plaintext prompt text."],
+ ["Retire with a backup","Definition exported to routines/ before deletion, credentials redacted. Always reversible.","All nine 2 Sep retirements are in routines-backup-2026-09-02.json and can be recreated verbatim."],
+ ["Propose, then write","The charter rule applies to the estate itself, not just to Salesforce.","This consolidation ran exactly this way: proposed 2 Sep, approved by Mathew, executed, recorded."]
+];
+const AUTOMATION_SIGNALS = [
+ "Identity lifecycle (IAM + onboarding + offboarding) was 87 of the last 425 cases, about 20 percent of everything ICT handles",
+ "96.5 percent of Ask Zeus cases arrive by email; zero web, phone or portal; no self-service request form exists",
+ "ICT Priorities.xlsx joins Asana tasks to Zeus cases by hand and at least four divergent copies exist",
+ "Three Blocked Asana items are decision debt needing a meeting call, not developer time",
+ "Retired but recreatable from backup: meeting actions collector (Granola/Zoom to Asana proposals), unreconciled income exception report (or its Zapier-side version per the birdlife-zapier skill)",
+ "Tier 2 Entra and Exchange admin work is prepared-not-executed today; the promotion plan is docs/entra-admin-connector.md"
+];
+const CLOSE_REASONS=["Closed - Resolved","Closed - Resolved First Call","Closed - Email Sent","Closed - Email Edited & Sent","Closed - Phone Call","Closed - No Action Required","Closed - Internal Follow up","Closed - Duplicate","Closed - Spam","Closed - Abandoned","Closed - Autoreply","Closed - Returned Letter"];
+const STATUSES=["New","In Progress","Pending","On Hold-Internal","Waiting Response-External","Response Received","Closed"];
+
+// ---------- helpers ----------
+const $ = s => document.querySelector(s);
+const el = (t,c,h) => {const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e;};
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function remember(k,v){try{localStorage.setItem("claude-os."+k,v)}catch(e){}}
+function recall(k){try{return localStorage.getItem("claude-os."+k)}catch(e){return null}}
+function tagFor(t){return t==="write"?'<span class="tag write">writes, capped</span>':t==="gov"?'<span class="tag gov">governance</span>':'<span class="tag read">read-only</span>'}
+async function copyText(t,btn){try{await navigator.clipboard.writeText(t); if(btn){const o=btn.textContent;btn.textContent="copied";setTimeout(()=>btn.textContent=o,1200);}}catch(e){}}
+const JarvisBus={ask:null,prefill:null};
+function jAsk(q){ if(JarvisBus.ask) JarvisBus.ask(q); else if(JarvisBus.prefill) JarvisBus.prefill(q); }
+function jPre(q){ if(JarvisBus.prefill) JarvisBus.prefill(q); }
+
+// ---------- tabs ----------
+const VIEWS=["command","today","board","money","security","fixes","system","schedule","registers","rules"];
+const tabs=[...document.querySelectorAll('nav.tabs button')];
+function showView(v){
+  if(!VIEWS.includes(v)) return;
+  tabs.forEach(b=>b.setAttribute('aria-selected', String(b.dataset.view===v)));
+  VIEWS.forEach(id=>{$("#view-"+id).hidden = id!==v;});
+  remember("tab",v);
+  if(v==="money" && typeof loadMoney==="function") loadMoney(false);
+  if(v==="security" && typeof loadSecurity==="function") loadSecurity(false);
+  if(v==="fixes"){ try{ renderFixes(); }catch(e){ /* declarations later in the script; rendered again once they exist */ } }
+}
+tabs.forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+
+// header chips navigate
+document.querySelectorAll('.chip[data-goto]').forEach(ch=>{
+  const go=()=>{const [v,reg]=ch.dataset.goto.split(":"); showView(v);
+    if(reg){const b=[...document.querySelectorAll('#subtabs button')].find(x=>x.dataset.reg===reg); if(b) b.click();}};
+  ch.addEventListener("click",go);
+  ch.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});
+});
+
+// ---------- stack ----------
+const stack=$("#stack");
+LAYERS.forEach((L)=>{
+  const d=el("div","layer"+(L.kernel?" kernel":""));
+  const btn=el("button",null,
+    `<span class="role">${L.role}<small>${L.sub}</small></span><span class="what">${L.what}</span><span class="caret">›</span>`);
+  btn.setAttribute("aria-expanded","false");
+  const det=el("div","detail",
+    `<span class="home">${esc(L.home)}</span><ul>${L.points.map(p=>`<li>${p}</li>`).join("")}</ul>`);
+  det.hidden=true;
+  btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; d.classList.toggle("open",open); btn.setAttribute("aria-expanded",String(open));});
+  d.append(btn,det); stack.append(d);
+});
+// loop with worked examples
+const loopHost=$("#loop");
+LOOPSTEPS.forEach(([n,h,p,more])=>{
+  const s=el("div","step",`<div class="n">${n}</div><h3>${h}</h3><p>${p}</p><div class="more">${esc(more)}</div>`);
+  s.addEventListener("click",()=>s.classList.toggle("open"));
+  loopHost.append(s);
+});
+
+// ---------- schedule ----------
+const DAYNAMES=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const daysBar=$("#days");
+DAYNAMES.forEach((dn,i)=>{
+  const b=el("button",null,dn); b.setAttribute("role","tab"); b.dataset.day=i;
+  b.addEventListener("click",()=>renderDay(i));
+  daysBar.append(b);
+});
+function renderDay(day){
+  [...daysBar.children].forEach(b=>b.setAttribute("aria-selected",String(+b.dataset.day===day)));
+  const rows=R.filter(r=>r.days.includes(day)).sort((a,b)=>a.sort-b.sort);
+  const sched=$("#sched"); sched.innerHTML="";
+  rows.forEach(r=>{
+    let what=r.what;
+    if(day===6 && r.t==="trig_01CUkTdAFSisnzyU6pwgkH4k") what="Sunday run: both ICT dashboards plus the full weekly Security dashboard rebuild and Teams copy.";
+    if(day===5 && r.t==="trig_01CUkTdAFSisnzyU6pwgkH4k") what="Saturday run: probe-gated refresh of both ICT dashboards. Security waits for Sunday.";
+    const row=el("div","srow",
+      `<div class="stime">${r.time}</div><div class="sbody"><span class="rname">${esc(r.n)}</span>${tagFor(r.type)}<div class="rwhat">${what}</div><div class="rid">${r.t} · cron ${esc(r.cron)} UTC</div></div>`);
+    row.addEventListener("click",()=>jPre("Tell me about the routine \""+r.n+"\": what it does, when it fires, its write posture, and how I would know if it failed."));
+    sched.append(row);
+  });
+  $("#schednote").textContent = (day<5)
+    ? "Weekday note: the weekday dashboards job fires hourly 7:04am to 5:04pm; only the 7:04am fire is the deep run. The overnight pre-draft is the sole write-capable routine, and its caps live in its own prompt."
+    : "Weekend note: the weekday job's cron also fires on weekends (UTC boundary quirk) and exits immediately through its weekend gate. Those no-op fires are expected and not listed here.";
+  remember("day",day);
+}
+
+// ---------- routine register ----------
+function dl(obj){
+  const keys=Object.keys(obj); if(!keys.length) return "";
+  return keys.map(k=>`<dt>${esc(k)}</dt><dd>${obj[k]}</dd>`).join("");
+}
+function expandable(card,btn,det){
+  det.hidden=true; btn.setAttribute("aria-expanded","false");
+  btn.addEventListener("click",()=>{const open=det.hidden; det.hidden=!open; card.classList.toggle("open",open); btn.setAttribute("aria-expanded",String(open));});
+}
+function rcard(r){
+  const card=el("div","rcard");
+  const btn=el("button",null,
+    `<span class="caret">›</span><span class="rname">${esc(r.n)}</span>${tagFor(r.type)}<span class="rsched">${esc(r.sched)}</span>`);
+  const det=el("div","detail",
+    `<dt>Trigger</dt><dd class="mono">${r.t}</dd>
+     <dt>Cron (UTC)</dt><dd class="mono">${esc(r.cron)}</dd>
+     <dt>Does</dt><dd>${r.what}</dd>${dl(r.detail)}`);
+  const acts=el("div","rowacts");
+  const a1=el("button",null,"ask jarvis"); a1.addEventListener("click",e=>{e.stopPropagation();jAsk("Tell me about the routine \""+r.n+"\" ("+r.t+"): what it does, its schedule, write posture, and failure modes.");});
+  const a2=el("button",null,"copy change ask"); a2.addEventListener("click",e=>{e.stopPropagation();copyText("Per the Claude OS change control (os/README.md), propose a change to routine \""+r.n+"\" ("+r.t+"): <describe the change>. Show me the passport before writing anything, then update os/registers.md in the same session.",a2);});
+  acts.append(a1,a2); det.append(acts);
+  expandable(card,btn,det);
+  card.append(btn,det); return card;
+}
+(function(){
+  const host=$("#reg-routines");
+  host.append(el("div","grouphead","Active recurring · 13 of a budget of 12 · decision open"));
+  const list=el("div","rlist"); R.forEach(r=>list.append(rcard(r))); host.append(list);
+  host.append(el("div","grouphead","One-shots · exempt from the budget"));
+  const l2=el("div","rlist");
+  ONESHOTS.forEach(o=>{
+    const card=el("div","rcard");
+    const btn=el("button",null,`<span class="caret">›</span><span class="rname">${esc(o.n)}</span><span class="rsched">${esc(o.sched)}</span>`);
+    const det=el("div","detail",`<dt>Trigger</dt><dd class="mono">${o.t}</dd><dt>Does</dt><dd>${o.what}</dd>`);
+    expandable(card,btn,det); card.append(btn,det); l2.append(card);
+  });
+  host.append(l2);
+  host.append(el("div","grouphead","Retired 2 Sep 2026 · definitions in routines/routines-backup-2026-09-02.json"));
+  const l3=el("div","rlist");
+  RETIRED.forEach(([n,t,d])=>{
+    const card=el("div","rcard");
+    const btn=el("button",null,`<span class="caret">›</span><span class="rname" style="color:var(--ink2)">${esc(n)}</span><span class="tag retired">retired</span>`);
+    const det=el("div","detail",`<dt>Trigger</dt><dd class="mono">${t}</dd><dt>Disposition</dt><dd>${d}</dd>`);
+    const acts=el("div","rowacts");
+    const a=el("button",null,"copy recreate ask");
+    a.addEventListener("click",e=>{e.stopPropagation();copyText("Recreate the retired routine \""+n+"\" from routines/routines-backup-2026-09-02.json per the Claude OS change control: show me the passport first, check the budget (rule 3) and overlap (rule 2), and update os/registers.md in the same session.",a);});
+    acts.append(a); det.append(acts);
+    expandable(card,btn,det); card.append(btn,det); l3.append(card);
+  });
+  host.append(l3);
+})();
+
+// ---------- register subtabs ----------
+const subtabs=[...document.querySelectorAll('#subtabs button')];
+subtabs.forEach(b=>b.addEventListener('click',()=>{
+  subtabs.forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+  ["routines","skills","connectors","artefacts","credentials"].forEach(id=>{$("#reg-"+id).hidden = id!==b.dataset.reg;});
+  remember("reg",b.dataset.reg);
+}));
+
+// ---------- skills / connectors / artefacts / credentials ----------
+$("#skillrows").innerHTML = SKILLS.map(([n,c,r,a])=>
+  `<tr class="clicky" data-skill="${esc(n)}"><td class="mono">${esc(n)}</td><td>${esc(c)}</td><td>${r.startsWith("yes")?`<span class="pill ok">${esc(r)}</span>`:r==="account only"?`<span class="pill crit">${esc(r)}</span>`:`<span class="pill warn">${esc(r)}</span>`}</td><td><span class="pill ok">${esc(a)}</span></td></tr>`).join("");
+document.querySelectorAll('#skillrows tr').forEach(tr=>tr.addEventListener("click",()=>jPre("Tell me about the "+tr.dataset.skill+" skill: what it covers, when it triggers, and one thing in it I probably do not know.")));
+$("#conncore").innerHTML = CONN_CORE.map(([n,d])=>`<div class="conn" data-conn="${esc(n)}"><b>${esc(n)}</b><span>${esc(d)}</span></div>`).join("");
+$("#connextra").innerHTML = CONN_EXTRA.map(n=>`<div class="conn" data-conn="${esc(n)}"><b>${esc(n)}</b></div>`).join("");
+document.querySelectorAll('.conn').forEach(c=>c.addEventListener("click",()=>jPre("What runs through the "+c.dataset.conn+" connector, which routines depend on it, and what breaks if it lapses?")));
+$("#artrows").innerHTML = ARTS.map(([n,by,u])=>
+  `<tr><td>${esc(n)}</td><td>${esc(by)}</td><td class="mono">${u.startsWith("http")?`<a href="${u}" target="_blank" rel="noopener">open</a>`:esc(u)}</td></tr>`).join("");
+$("#credrows").innerHTML = CREDS.map(([n,s,a],i)=>{
+  const [cls,txt]=s.split("|");
+  return `<tr class="clicky" data-cred="${i}"><td>${esc(n)}</td><td><span class="pill ${cls}">${esc(txt)}</span></td><td>${esc(a)}</td></tr>`;}).join("");
+document.querySelectorAll('#credrows tr').forEach(tr=>tr.addEventListener("click",()=>{
+  const c=CREDS[+tr.dataset.cred]; jPre("On the credential watchlist item \""+c[0]+"\": what is its current status, and what exactly do I do next?");
+}));
+
+// ---------- rules ----------
+const rulesHost=$("#rules");
+RULES.forEach(([title,body,why],i)=>{
+  const d=el("div","rule");
+  const btn=el("button",null,`<span class="n">${i+1}</span><b>${esc(title)}</b><span class="caret">›</span>`);
+  const det=el("div","detail",`${esc(body)}<div style="margin-top:7px"><span class="why">Why it exists</span>${esc(why)}</div>`);
+  expandable(d,btn,det);
+  d.append(btn,det); rulesHost.append(d);
+});
+document.querySelectorAll('.panel li[data-ask]').forEach(li=>li.addEventListener("click",()=>jAsk(li.dataset.ask)));
+
+// ---------- restore state ----------
+(function(){
+  const v=recall("tab"); if(v) showView(v);
+  const reg=recall("reg"); if(reg){const b=subtabs.find(x=>x.dataset.reg===reg); if(b) b.click();}
+  let day=0;
+  try{
+    const wd=new Intl.DateTimeFormat("en-AU",{weekday:"short",timeZone:"Australia/Melbourne"}).format(new Date());
+    const i=DAYNAMES.indexOf(wd.slice(0,3)); if(i>=0) day=i;
+  }catch(e){}
+  const saved=recall("day"); if(saved!==null && saved!=="" && !isNaN(+saved)) day=+saved;
+  renderDay(day);
+})();
+
+// ================= LIVE (mcp) =================
+const SF_SERVER="Salesforce Production", AS_SERVER="Asana", PROJECT="1211042432693678";
+const Q_OPEN="SELECT Id, CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE IsClosed = false AND RecordType.DeveloperName = 'Zeus' ORDER BY CreatedDate ASC LIMIT 200";
+const AS_INPUT={projects_any:PROJECT, completed:false, limit:100, opt_fields:"name,assignee.name,due_on,memberships.section.name,modified_at"};
+const M365_SERVER="Microsoft 365";
+let mcpNS=null, liveCases=null, liveTasks=null, liveMail=null, liveChat=null, chatMap={}, liveErr={sf:null,as:null,m365:null}, liveAt=null, todayFilter=null;
+// M365 tools return one JSON block per item; parse all text blocks, drop pagination trailers
+function blocks(res){
+  const out=[];
+  for(const c of ((res&&res.content)||[])) if(c.type==="text"){ try{const v=JSON.parse(c.text); if(v&&typeof v==="object"&&!("moreResults"in v)&&!("nextOffset"in v)&&!("nextCursor"in v)) out.push(v);}catch(e){} }
+  return out;
+}
+function stripHtml(s){ const d=document.createElement("div"); d.innerHTML=String(s||""); return (d.textContent||"").trim(); }
+const AUTOMATED_SENDER=/no-?reply|donotreply|notifications?@|newsletter|@asana\.com|amazonses|mailer|automated/i;
+function mailFacts(){
+  const all=Array.isArray(liveMail)?liveMail:[];
+  const people=all.filter(m=>!AUTOMATED_SENDER.test(m.sender||""));
+  return {all, people, unread:people.filter(m=>!m.isRead)};
+}
+function chatFacts(){
+  const msgs=Array.isArray(liveChat)?liveChat:[];
+  const seen=new Set(), latest=[];
+  for(const m of msgs){ if(!seen.has(m.chatId)){ seen.add(m.chatId); latest.push(m); } }
+  return {msgs, latest};
+}
+function chatLabel(id){
+  const c=chatMap[id];
+  if(!c) return "Teams chat";
+  if(c.topic) return c.topic;
+  const others=(c.members||[]).map(m=>m.displayName).filter(n=>n&&!/mathew hema/i.test(n));
+  return others.slice(0,3).join(", ")||"Teams chat";
+}
+function renderExtras(){
+  const ml=$("#mlist"); if(!ml) return;
+  const mf=mailFacts();
+  ml.innerHTML="";
+  $("#mtitle").textContent="Inbox: recent from people"+(mf.unread.length?" · "+mf.unread.length+" unread":"");
+  if(liveErr.m365){ ml.append(el("div","trow empty",esc(mcpErrCopy(liveErr.m365,M365_SERVER)))); }
+  else if(!liveMail){ ml.append(el("div","trow empty","Waiting on Microsoft 365...")); }
+  else if(!mf.people.length){ ml.append(el("div","trow empty","Nothing recent from real people. Automated mail is filtered out.")); }
+  else mf.people.slice(0,8).forEach(m=>{
+    const when=new Date(m.receivedDateTime).toLocaleString("en-AU",{weekday:"short",hour:"2-digit",minute:"2-digit"});
+    const row=el("div","trow actionable",
+      `<div class="t1">${m.isRead?"":'<span class="unread"></span>'}${esc(m.sender||"?")} · ${esc(m.subject||"(no subject)")}</div><div class="t2">${esc(when)} · ${esc((m.summary||"").slice(0,110))}</div>`);
+    const acts=el("div","rowacts");
+    const b1=el("button",null,"ask"); b1.addEventListener("click",e=>{e.stopPropagation();jAsk("Summarise the email from "+(m.sender||"")+" with subject \""+(m.subject||"")+"\" and recommend how to respond.");});
+    const b2=el("button",null,"draft reply"); b2.addEventListener("click",e=>{e.stopPropagation();jPre("Draft an Outlook reply to the email from "+(m.sender||"")+" with subject \""+(m.subject||"")+"\": ");});
+    if(m.webLink){ const b3=el("button",null,"open"); b3.addEventListener("click",e=>{e.stopPropagation();window.open(m.webLink,"_blank","noopener");}); acts.append(b1,b2,b3); }
+    else acts.append(b1,b2);
+    row.append(acts);
+    row.addEventListener("click",()=>jPre("Summarise the email from "+(m.sender||"")+" with subject \""+(m.subject||"")+"\" and recommend how to respond."));
+    ml.append(row);
+  });
+  const tl=$("#tlist2"); tl.innerHTML="";
+  const cf2=chatFacts();
+  if(liveErr.m365){ tl.append(el("div","trow empty",esc(mcpErrCopy(liveErr.m365,M365_SERVER)))); }
+  else if(!liveChat){ tl.append(el("div","trow empty","Waiting on Microsoft 365...")); }
+  else if(!cf2.latest.length){ tl.append(el("div","trow empty","No Teams messages since yesterday.")); }
+  else cf2.latest.slice(0,8).forEach(m=>{
+    const when=new Date(m.createdDateTime).toLocaleString("en-AU",{weekday:"short",hour:"2-digit",minute:"2-digit"});
+    const who=(m.from&&m.from.displayName)||"?";
+    const row=el("div","trow actionable",
+      `<div class="t1">${esc(who)} · ${esc(chatLabel(m.chatId))}</div><div class="t2">${esc(when)} · ${esc(stripHtml(m.summary).slice(0,110))}</div>`);
+    const acts=el("div","rowacts");
+    const b1=el("button",null,"ask"); b1.addEventListener("click",e=>{e.stopPropagation();jAsk("In the Teams chat \""+chatLabel(m.chatId)+"\", "+who+" said: \""+stripHtml(m.summary).slice(0,200)+"\". What is the context from today's messages and how should I respond?");});
+    const b2=el("button",null,"draft reply"); b2.addEventListener("click",e=>{e.stopPropagation();jPre("Draft a Teams reply to "+who+" in \""+chatLabel(m.chatId)+"\" responding to: "+stripHtml(m.summary).slice(0,160));});
+    acts.append(b1,b2); row.append(acts);
+    tl.append(row);
+  });
+  renderBoard();
+}
+const SECTION_ORDER=["Requests","Backlog/Requests","Scoping/Requirements Gathering","In Development/Progress","Awaiting Response","Blocked","Ready for Deployment","Hypercare","Done"];
+const KNOWN_SECTIONS={ // from the birdlife-ict-assistant reference; live memberships override
+ "Meeting agenda (Marketing+ICT)":"1214293208933456","In Development/Progress":"1216556543715191",
+ "Awaiting Response":"1217146608838572","Scoping/Requirements Gathering":"1216556543715193",
+ "Blocked":"1216556543715197","Ready for Deployment":"1216556543715188",
+ "Hypercare":"1211042432693693","Backlog/Requests":"1216556543715194","Done":"1211051239943465"};
+function sectionsMap(){
+  const map={...KNOWN_SECTIONS};
+  const tasks=(liveTasks&&Array.isArray(liveTasks.data))?liveTasks.data:[];
+  tasks.forEach(t=>(t.memberships||[]).forEach(m=>{ if(m.section&&m.section.gid) map[m.section.name]=m.section.gid; }));
+  return map;
+}
+function renderBoard(){
+  const host=$("#boardhost"); if(!host) return;
+  const tf=taskFacts();
+  if(!mcpNS||!liveTasks){ host.innerHTML='<div class="degraded">Board loads inside the Claude viewer with the Asana connector allowed.</div>'; return; }
+  const bySec={};
+  tf.tasks.forEach(t=>{ const s=tf.secOf(t).split(", ")[0]; (bySec[s]=bySec[s]||[]).push(t); });
+  const names=[...SECTION_ORDER.filter(n=>bySec[n]), ...Object.keys(bySec).filter(n=>!SECTION_ORDER.includes(n))];
+  const wrap=el("div","boardwrap");
+  names.forEach(n=>{
+    const col=el("div","bcol",`<h3>${esc(n)}<span class="cnt">${bySec[n].length}</span></h3>`);
+    bySec[n].slice(0,12).forEach(t=>col.append(taskRow(t,tf)));
+    if(bySec[n].length>12) col.append(el("div","trow empty","+"+(bySec[n].length-12)+" more, ask Jarvis"));
+    wrap.append(col);
+  });
+  host.innerHTML=""; host.append(wrap);
+  host.append(el("p","schednote","Showing up to 100 incomplete tasks from the live pull. Move a task by telling Jarvis, e.g. \"move <task> to Blocked\"."));
+  renderCommand();
+}
+// ================= COMMAND: the manager lens =================
+function opsRow(icon,label,detail,ask,cls){
+  const row=el("div","trow actionable"+(cls?" ":""),
+    `<div class="t1">${icon} ${esc(label)}</div><div class="t2">${esc(detail)}</div>`);
+  row.addEventListener("click",()=>jPre(ask));
+  return row;
+}
+function renderCommand(){
+  const ops=$("#cmd-ops"); if(!ops) return;
+  const cf=caseFacts(), tf=taskFacts(), mf=mailFacts(), cf2=chatFacts();
+  // OPERATIONS
+  if(mcpNS && (liveCases||liveTasks||liveMail)){
+    ops.innerHTML="";
+    const list=el("div","tlist");
+    if(liveCases){
+      const replied=cf.byStatus["Response Received"]||0;
+      list.append(opsRow("🎫","Helpdesk: "+cf.recs.length+" open",
+        (cf.unassigned.length?cf.unassigned.length+" unassigned, ":"")+(replied?replied+" with a reply waiting on us, ":"")+(cf.newOld.length?cf.newOld.length+" in New past 2 business days, ":"")+cf.untyped.length+" untyped",
+        "Triage my queue: what needs action right now and in what order? Use the live snapshot."));
+    } else list.append(el("div","trow empty",liveErr.sf?esc(mcpErrCopy(liveErr.sf,SF_SERVER)):"Queue loading..."));
+    if(liveMail) list.append(opsRow("✉️","Inbox: "+mf.unread.length+" unread from people",
+      mf.unread.slice(0,3).map(m=>(m.sender||"").split("@")[0]).join(", ")||"all read",
+      "Catch me up on my inbox: what needs a reply from me today, in order?"));
+    if(liveChat) list.append(opsRow("💬","Teams: "+cf2.latest.length+" active chats",
+      cf2.latest[0]?("latest from "+((cf2.latest[0].from&&cf2.latest[0].from.displayName)||"someone")):"quiet",
+      "What is happening in my Teams chats since yesterday, and does anything need me?"));
+    list.append(opsRow("🛰️","Unattended: 12 routines on watch",
+      "pre-draft 5:30am, dashboards 7:04am, detectors, Monday audit",
+      "Did this morning's routines run properly? What should I check?"));
+    ops.append(list);
+  }
+  // PROJECTS
+  const pr=$("#cmd-projects");
+  if(liveTasks){
+    pr.innerHTML="";
+    const bySec={}; tf.tasks.forEach(t=>{const s=tf.secOf(t).split(", ")[0];(bySec[s]=bySec[s]||[]).push(t);});
+    const flight=["Scoping/Requirements Gathering","In Development/Progress","Awaiting Response","Blocked","Ready for Deployment","Hypercare"]
+      .map(s=>bySec[s]?((bySec[s].length)+" "+s.split("/")[0].toLowerCase()):null).filter(Boolean).join(" · ");
+    const decisions=tf.blocked.filter(t=>/decision/i.test(t.name));
+    const list=el("div","tlist");
+    list.append(opsRow("📋","Board: "+tf.tasks.length+" open items",
+      flight+(tf.overdue.length?" · "+tf.overdue.length+" overdue":""),
+      "Give me a project status rollup: what moved this week, what is stalled, what ships next. Use the live board."));
+    if(tf.blocked.length) list.append(opsRow("🧱","Blocked: "+tf.blocked.length,
+      decisions.length?decisions.length+" are decisions, not technical work":"see the Projects tab",
+      "Walk the Blocked column: for each item, what exactly unblocks it and whose call is it?"));
+    const empty=["Ready for Deployment","Hypercare"].filter(s=>!bySec[s]);
+    if(empty.length) list.append(opsRow("🚦","Release pipeline: "+empty.join(" and ")+" empty",
+      "work is skipping the release stages, straight from In Development to Done",
+      "Why is nothing reaching Ready for Deployment or Hypercare, and what one change to how we work would fix the release pipeline?"));
+    const open=el("button","refresh","Open the board"); open.style.marginTop="8px";
+    open.addEventListener("click",()=>showView("board"));
+    pr.append(list,open);
+  }
+  // DECISIONS
+  const dec=$("#cmd-decisions");
+  if(dec && !dec.dataset.built){
+    dec.dataset.built="1";
+    const items=[
+      ["WooCommerce key rotation, open since August","What exactly do I need to do to verify the WooCommerce key rotation from the August exposure, and how do I close it off the watchlist?"],
+      ["Three Blocked items are decision debt (portal email, Plauti permissions, duplicate management)","The three decision-debt items in Blocked: lay out each decision, the options, and what you would decide in my shoes. Then draft the comment to post on each."],
+      ["Dashboard estate: retire the department suite or share this console with the team","Should I retire the department dashboard suite or share this console with the team instead? Lay out both paths with effort and impact, and recommend one."]
+    ];
+    dec.innerHTML="";
+    items.forEach(([t,q])=>{const li=el("div","trow actionable",`<div class="t1">${esc(t)}</div><div class="t2">tap to work it with Jarvis</div>`);li.addEventListener("click",()=>jAsk(q));dec.append(li);});
+  }
+  // ITERATE
+  const it=$("#cmd-iterate");
+  if(it && !it.dataset.built){
+    it.dataset.built="1";
+    it.innerHTML="";
+    [["Coach me as an ICT manager","Coach me: look at the live queue, board, inbox and the patterns, and give me the three highest-leverage moves I should make this week as Senior Manager ICT. Be frank about what I am neglecting."],
+     ["Decide the next move as I would","Look at everything live and decide the single next action the way I would: money first, then efficiencies, then risk. State the decision, the one reason, and execute it if it is within your tools, otherwise hand me the session ask."],
+     ["What did we ship this week?","From the live board and queue, what actually shipped or closed in the last 7 days, and what does that say about our throughput?"],
+     ["Find automations","Find automation candidates for us, using the automation signals and the live queue and board."]
+    ].forEach(([t,q])=>{const li=el("div","trow actionable",`<div class="t1">${esc(t)}</div>`);li.addEventListener("click",()=>jAsk(q));it.append(li);});
+  }
+  // PATTERNS
+  const pat=$("#cmd-patterns");
+  if(pat){
+    pat.innerHTML="";
+    const list=el("div","tlist");
+    const untypedPct=liveCases&&cf.recs.length?Math.round(100*cf.untyped.length/cf.recs.length):null;
+    [["🪪","Identity lifecycle is 20% of everything ICT handles","87 of the last 425 cases. The detectors catch them; the missing piece is a self-service request form.","Identity work is 20 percent of our cases. Design the self-service request form and the flow that would cut it, as a passport for the change."],
+     ["📮","Ask Zeus is a single channel: 96.5% email","Zero web, phone or portal intake. Every improvement to intake starts here.","Propose the web intake form for Ask Zeus: fields, where it lives, how it lands as a typed Case, and the session ask to build it."],
+     ["🏷️",(untypedPct!=null?untypedPct+"% of the open queue is untyped":"Untyped cases blunt every report"),"Type on close is the fix; the validation rule spec is written in the README.","Give me the exact Salesforce validation rule spec for requiring Type on close of Zeus cases, ready to hand to an admin."],
+     ["📊","The Asana-to-Zeus join is a spreadsheet column","ICT Priorities.xlsx exists in at least four divergent copies. This console is the replacement.","Draft the one-line message to the team retiring ICT Priorities.xlsx in favour of this console, in my voice."]
+    ].forEach(([i,t,d,q])=>list.append(opsRow(i,t,d,q)));
+    pat.append(list);
+  }
+}
+
+function melbTodayISO(){
+  try{return new Intl.DateTimeFormat("en-CA",{timeZone:"Australia/Melbourne"}).format(new Date());}
+  catch(e){return new Date().toISOString().slice(0,10);}
+}
+function bizDaysSince(iso){
+  const from=new Date(iso), now=new Date(); let d=0;
+  const cur=new Date(from);
+  while(cur<now){ cur.setDate(cur.getDate()+1); const w=cur.getDay(); if(w!==0&&w!==6) d++; if(d>60)break; }
+  return d;
+}
+function ageDays(iso){ return Math.floor((Date.now()-new Date(iso).getTime())/864e5); }
+function mcpErrCopy(e,server){
+  switch(e&&e.code){
+    case "needs_reauth": return "Reconnect "+server+" in claude.ai Settings, Connectors.";
+    case "server_not_connected": return "Add "+server+" in claude.ai Settings, Connectors.";
+    case "selection_required": return "Choose which "+server+" connector to use when claude.ai asks.";
+    case "approval_required": return server+" needs per-call approval under your org policy.";
+    case "blocked_by_policy": return server+" is blocked by org policy for this page.";
+    case "server_unavailable": return server+" is briefly unreachable. It retries on the next refresh.";
+    case "tool_error": return server+" answered with an error: "+String(e.message||"").slice(0,140);
+    default: return server+": "+String((e&&e.message)||"connector unavailable").slice(0,140);
+  }
+}
+function caseFacts(){
+  const recs=(liveCases&&Array.isArray(liveCases.records))?liveCases.records:[];
+  const owner=r=>(r.Owner&&r.Owner.Name)||"";
+  const unassigned=recs.filter(r=>owner(r)==="Zeus");
+  const newOld=recs.filter(r=>r.Status==="New"&&bizDaysSince(r.CreatedDate)>2);
+  const aged=recs.filter(r=>ageDays(r.CreatedDate)>30&&r.Status!=="Waiting Response-External");
+  const untyped=recs.filter(r=>!r.Type);
+  const byStatus={}; recs.forEach(r=>{byStatus[r.Status]=(byStatus[r.Status]||0)+1;});
+  return {recs,unassigned,newOld,aged,untyped,byStatus,owner};
+}
+function taskFacts(){
+  const tasks=(liveTasks&&Array.isArray(liveTasks.data))?liveTasks.data:[];
+  const today=melbTodayISO();
+  const secOf=t=>((t.memberships||[]).map(m=>m.section&&m.section.name).filter(Boolean).join(", "))||"(no section)";
+  const overdue=tasks.filter(t=>t.due_on&&t.due_on<today);
+  const blocked=tasks.filter(t=>/blocked/i.test(secOf(t)));
+  const unassigned=tasks.filter(t=>!t.assignee);
+  return {tasks,overdue,blocked,unassigned,secOf};
+}
+function caseRow(r,cf,why){
+  const row=el("div","trow actionable",
+    `<div class="t1">${esc(r.CaseNumber)} · ${esc(r.Subject||"(no subject)")}</div><div class="t2">${esc(r.Status)}${r.Type?" · "+esc(r.Type):" · no type"} · ${esc(cf.owner(r)||"?")} · ${esc(why)}</div>`);
+  const acts=el("div","rowacts");
+  const b1=el("button",null,"triage"); b1.addEventListener("click",e=>{e.stopPropagation();jAsk("Triage case "+r.CaseNumber+" ("+(r.Subject||"")+"): what is it, what should happen next, and draft the move.");});
+  const b2=el("button",null,"reply"); b2.addEventListener("click",e=>{e.stopPropagation();jPre("Reply to case "+r.CaseNumber+": ");});
+  const b3=el("button",null,"close"); b3.addEventListener("click",e=>{e.stopPropagation();jPre("Close case "+r.CaseNumber+" as resolved");});
+  const b4=el("button",null,"assign"); b4.addEventListener("click",e=>{e.stopPropagation();jPre("Assign case "+r.CaseNumber+" to ");});
+  acts.append(b1,b2,b3,b4); row.append(acts);
+  row.addEventListener("click",()=>jPre("Summarise case "+r.CaseNumber+" and recommend the next action."));
+  return row;
+}
+function taskRow(t,tf){
+  const row=el("div","trow actionable",
+    `<div class="t1">${esc(t.name)}</div><div class="t2">${esc(t.assignee?t.assignee.name:"unassigned")}${t.due_on?" · due "+esc(t.due_on):""} · ${esc(tf.secOf(t))}</div>`);
+  const acts=el("div","rowacts");
+  const b1=el("button",null,"ask"); b1.addEventListener("click",e=>{e.stopPropagation();jAsk("On the board task \""+t.name+"\": what is its state and what should happen next?");});
+  const b2=el("button",null,"comment"); b2.addEventListener("click",e=>{e.stopPropagation();jPre("Comment on the task \""+t.name+"\": ");});
+  const b3=el("button",null,"complete"); b3.addEventListener("click",e=>{e.stopPropagation();jPre("Complete the task \""+t.name+"\"");});
+  const b4=el("button",null,"move"); b4.addEventListener("click",e=>{e.stopPropagation();jPre("Move the task \""+t.name+"\" to ");});
+  acts.append(b1,b2,b3,b4); row.append(acts);
+  return row;
+}
+function renderToday(){
+  const deg=$("#today-degraded"), content=$("#today-content");
+  if(!mcpNS){ deg.hidden=false; content.hidden=true; $("#asof").textContent="live data unavailable in this view"; return; }
+  deg.hidden=true; content.hidden=false;
+  const cf=caseFacts(), tf=taskFacts();
+  const tiles=$("#tiles"); tiles.innerHTML="";
+  const tile=(v,l,cls,filter)=>{
+    const t=el("div","tile"+(cls?" "+cls:"")+(todayFilter===filter&&filter?" active":""),`<div class="v">${v}</div><div class="l">${esc(l)}</div>`);
+    if(filter){ t.dataset.filter=filter; t.addEventListener("click",()=>{todayFilter=(todayFilter===filter?null:filter); renderToday();}); }
+    tiles.append(t);
+  };
+  if(liveErr.sf){ tiles.append(el("div","tile crit",`<div class="v">!</div><div class="l">${esc(mcpErrCopy(liveErr.sf,SF_SERVER))}</div>`)); }
+  else if(liveCases){
+    tile(cf.recs.length,"open cases", cf.recs.length>25?"warn":"", "all");
+    tile(cf.unassigned.length,"unassigned (Zeus queue)", cf.unassigned.length?"warn":"ok", "unassigned");
+    tile(cf.newOld.length,"New past 2 bus. days", cf.newOld.length?"crit":"ok", "new");
+    tile(cf.aged.length,"open 30+ days", cf.aged.length?"warn":"ok", "aged");
+    tile(cf.untyped.length,"untyped", cf.untyped.length?"warn":"ok", "untyped");
+  } else tile("...","queue loading");
+  if(liveErr.as){ tiles.append(el("div","tile crit",`<div class="v">!</div><div class="l">${esc(mcpErrCopy(liveErr.as,AS_SERVER))}</div>`)); }
+  else if(liveTasks){
+    tile(tf.overdue.length,"board overdue", tf.overdue.length?"warn":"ok", "overdue");
+    tile(tf.blocked.length,"in Blocked", tf.blocked.length?"warn":"ok", "blocked");
+  } else tile("...","board loading");
+
+  const q=$("#qlist"); q.innerHTML="";
+  const qtitles={all:"Queue: all open (oldest first)",unassigned:"Queue: unassigned",new:"Queue: New past 2 business days",aged:"Queue: open 30+ days",untyped:"Queue: untyped"};
+  $("#qtitle").textContent = qtitles[todayFilter] || "Queue: needs action first";
+  if(liveCases){
+    let picks;
+    if(todayFilter==="all") picks=cf.recs.slice(0,15);
+    else if(todayFilter==="unassigned") picks=cf.unassigned;
+    else if(todayFilter==="new") picks=cf.newOld;
+    else if(todayFilter==="aged") picks=cf.aged;
+    else if(todayFilter==="untyped") picks=cf.untyped.slice(0,15);
+    else picks=[...cf.unassigned, ...cf.newOld.filter(r=>cf.owner(r)!=="Zeus"), ...cf.aged.filter(r=>cf.owner(r)!=="Zeus"&&r.Status!=="New")].slice(0,8);
+    if(!picks.length) q.append(el("div","trow empty","Nothing here. Queue is in shape."));
+    picks.forEach(r=>{
+      const why=cf.owner(r)==="Zeus"?"unassigned":(r.Status==="New"?bizDaysSince(r.CreatedDate)+" bus. days in New":ageDays(r.CreatedDate)+" days old");
+      q.append(caseRow(r,cf,why));
+    });
+  } else q.append(el("div","trow empty","Waiting on Salesforce..."));
+
+  const b=$("#blist"); b.innerHTML="";
+  $("#btitle").textContent = todayFilter==="overdue"?"Board: overdue":todayFilter==="blocked"?"Board: Blocked":"Board: needs attention";
+  if(liveTasks){
+    let picks;
+    if(todayFilter==="overdue") picks=tf.overdue;
+    else if(todayFilter==="blocked") picks=tf.blocked;
+    else picks=[...tf.overdue, ...tf.blocked.filter(t=>!tf.overdue.includes(t))].slice(0,8);
+    if(!picks.length) b.append(el("div","trow empty","No overdue or blocked items surfaced."));
+    picks.forEach(t=>b.append(taskRow(t,tf)));
+  } else b.append(el("div","trow empty","Waiting on Asana..."));
+
+  $("#asof").textContent = liveAt ? ("as at "+new Date(liveAt).toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"})) : "loading...";
+  renderExtras();
+  updateTicker();
+}
+renderToday();
+renderCommand();
+
+(async function(){
+  try{ mcpNS = await claude.use("mcp"); }catch(e){ mcpNS=null; }
+  renderToday();
+  if(!mcpNS) return;
+  $("#refreshbtn").hidden=false;
+  $("#refreshbtn").addEventListener("click", async ()=>{
+    try{ await mcpNS.invalidate(); }catch(e){}
+  });
+  const opts={cache:{staleTime:60000, gcTime:900000}, refetchInterval:300000};
+  mcpNS.watchTool(SF_SERVER,"soqlQuery",{q:Q_OPEN},(ev)=>{
+    if(ev.type==="data"){
+      liveErr.sf=null;
+      const p=ev.result.payload;
+      liveCases=(p&&typeof p==="object")?p:null;
+      liveAt=(ev.result.cache&&ev.result.cache.storedAt)||Date.now();
+    }else{
+      const code=ev.error&&ev.error.code;
+      liveErr.sf=ev.error;
+      if(["needs_reauth","server_not_connected","blocked_by_policy","approval_required"].includes(code)) liveCases=null;
+    }
+    renderToday();
+  },opts);
+  mcpNS.watchTool(AS_SERVER,"search_tasks",AS_INPUT,(ev)=>{
+    if(ev.type==="data"){
+      liveErr.as=null;
+      const p=ev.result.payload;
+      liveTasks=(p&&typeof p==="object")?p:null;
+      liveAt=(ev.result.cache&&ev.result.cache.storedAt)||Date.now();
+    }else{
+      const code=ev.error&&ev.error.code;
+      liveErr.as=ev.error;
+      if(["needs_reauth","server_not_connected","blocked_by_policy","approval_required"].includes(code)) liveTasks=null;
+    }
+    renderToday();
+  },opts);
+  const m365opts={cache:{staleTime:120000, gcTime:900000}, refetchInterval:600000};
+  mcpNS.watchTool(M365_SERVER,"outlook_email_search",{folderName:"Inbox",limit:20,order:"newest"},(ev)=>{
+    if(ev.type==="data"){ liveErr.m365=null; liveMail=blocks(ev.result); }
+    else{ const code=ev.error&&ev.error.code; liveErr.m365=ev.error;
+      if(["needs_reauth","server_not_connected","blocked_by_policy","approval_required"].includes(code)){ liveMail=null; liveChat=null; } }
+    renderExtras(); updateTicker();
+  },m365opts);
+  mcpNS.watchTool(M365_SERVER,"chat_message_search",{query:"a",afterDateTime:"yesterday",limit:15},(ev)=>{
+    if(ev.type==="data"){ if(!liveErr.m365||ev.result) liveChat=blocks(ev.result); }
+    else if(!liveChat){ liveErr.m365=liveErr.m365||ev.error; }
+    renderExtras();
+  },m365opts);
+  mcpNS.callTool(M365_SERVER,"teams_list_chats",{limit:25},{cache:{staleTime:300000,gcTime:3600000}})
+    .then(res=>{ blocks(res).forEach(c=>{ if(c.id) chatMap[c.id]=c; }); renderExtras(); })
+    .catch(()=>{});
+})();
+
+// ================= MONEY =================
+const STRIPE_SERVER="Stripe", NS_SERVER="NetSuite";
+const STRIPE_ACCOUNTS=[ // all livemode, observed 3 Sep 2026
+ {ctx:"acct_1PaqQkEdZ08H7Yxq",name:"eCommerce"},
+ {ctx:"acct_1DE94cH9l9pxYNgx",name:"Memberships"},
+ {ctx:"acct_1DffVqH1WeNbvypj",name:"Ausbirdfund"},
+ {ctx:"acct_1OKucyFMYRhNDz9n",name:"BLP"},
+ {ctx:"acct_1NfHuCCj2I4WmWMH",name:"eStore/AOC"}];
+let moneyState=null, moneyLoading=false, secState=null, secLoading=false;
+const aud=v=>"$"+(Math.round(v)).toLocaleString("en-AU");
+function moneyRow(icon,title,detail,ask,cls){
+  const row=el("div","trow actionable",`<div class="t1">${icon} ${esc(title)}</div><div class="t2">${detail}</div>`);
+  if(ask) row.addEventListener("click",()=>jPre(ask));
+  if(cls) row.querySelector(".t1").style.color="var(--"+cls+")";
+  return row;
+}
+async function loadMoney(force){
+  const host=$("#money-host");
+  if(!mcpNS){ return; }
+  if(moneyLoading || (moneyState && !force)) { if(moneyState) renderMoney(); return; }
+  moneyLoading=true;
+  host.innerHTML='<div class="degraded">Reading Stripe, Salesforce and NetSuite...</div>';
+  const M={at:Date.now(), stripe:[], stripeErr:null, sf:{}, sfErr:null, ns:{ok:false,err:null}};
+  const cacheOpt={cache:{staleTime:240000, gcTime:900000}};
+  if(force) cacheOpt.cache.refresh=true;
+  // Salesforce: two lenses on money in, 7 days
+  try{
+    const q1=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) n, SUM(Amount) amt FROM Opportunity WHERE IsWon = true AND CloseDate = LAST_N_DAYS:7"},cacheOpt);
+    const q2=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) n, SUM(npe01__Payment_Amount__c) amt FROM npe01__OppPayment__c WHERE npe01__Paid__c = true AND npe01__Payment_Date__c = LAST_N_DAYS:7"},cacheOpt);
+    const q3=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) c FROM stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1"},cacheOpt);
+    const r1=(q1.payload&&q1.payload.records&&q1.payload.records[0])||{}, r2=(q2.payload&&q2.payload.records&&q2.payload.records[0])||{}, r3=(q3.payload&&q3.payload.records&&q3.payload.records[0])||{};
+    M.sf={oppN:r1.n||0, oppAmt:r1.amt||0, payN:r2.n||0, payAmt:r2.amt||0, syncErr:r3.c};
+  }catch(e){ M.sfErr=mcpErrCopy(e,SF_SERVER); }
+  // Stripe: balances across all five livemode accounts (amounts arrive in cents)
+  for(const a of STRIPE_ACCOUNTS){
+    try{
+      const r=await mcpNS.callTool(STRIPE_SERVER,"stripe_api_read",
+        {stripe_api_operation_id:"GetBalance",parameters:{},stripe_context:a.ctx,livemode:true},cacheOpt);
+      const p=r.payload||{};
+      const sum=arr=>((arr||[]).reduce((t,x)=>t+(x.amount||0),0))/100;
+      M.stripe.push({name:a.name, available:sum(p.available), pending:sum(p.pending)});
+    }catch(e){ M.stripe.push({name:a.name, err:mcpErrCopy(e,STRIPE_SERVER)}); if(!M.stripeErr) M.stripeErr=e.code; }
+  }
+  // NetSuite: connectivity (truth for money OUT lives here but arrives by manual CSV)
+  try{
+    const r=await mcpNS.callTool(NS_SERVER,"ns_runCustomSuiteQL",{sqlQuery:"SELECT id, name FROM subsidiary"},cacheOpt);
+    M.ns.ok=!!(r.payload&&r.payload.data&&r.payload.data.length);
+  }catch(e){ M.ns.err=mcpErrCopy(e,NS_SERVER); }
+  moneyState=M; moneyLoading=false; renderMoney();
+}
+function renderMoney(){
+  const host=$("#money-host"), M=moneyState; if(!M) return;
+  $("#money-refresh").hidden=false;
+  $("#money-asof").textContent="as at "+new Date(M.at).toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"});
+  host.innerHTML="";
+  const tiles=el("div","tiles");
+  const tile=(v,l,cls)=>tiles.append(el("div","tile"+(cls?" "+cls:""),`<div class="v">${v}</div><div class="l">${esc(l)}</div>`));
+  if(M.sf.oppAmt!=null){ tile(aud(M.sf.oppAmt),"won opps, 7 days","ok"); tile(aud(M.sf.payAmt),"payments paid, 7 days","ok");
+    const gap=Math.abs((M.sf.oppAmt||0)-(M.sf.payAmt||0)); tile(aud(gap),"lens gap (the finding)",gap>50000?"warn":""); }
+  const stTotal=M.stripe.reduce((t,s)=>t+(s.pending||0)+(s.available||0),0);
+  tile(aud(stTotal),"in Stripe, all 5 accounts",stTotal>20000?"warn":"");
+  tile(M.sf.syncErr!=null?M.sf.syncErr:"?","Stripe→SF sync errors, 24h",M.sf.syncErr>0?"crit":"ok");
+  host.append(tiles);
+  const list=el("div","tlist",'<h3>Money in</h3>');
+  list.append(moneyRow("💰","Salesforce, two lenses on the last 7 days",
+    esc(aud(M.sf.oppAmt||0))+" across "+(M.sf.oppN||0)+" won opportunities vs "+esc(aud(M.sf.payAmt||0))+" across "+(M.sf.payN||0)+" paid payments. These are different date bases and will not match; a widening gap is the signal.",
+    "Explain the gap between won opportunities and paid payments this week, using the money snapshot. Which lens should I quote and why?"));
+  M.stripe.forEach(s=>{
+    list.append(moneyRow("🏦","Stripe "+s.name, s.err?esc(s.err):("available "+esc(aud(s.available))+" · pending "+esc(aud(s.pending))+" (livemode)"),
+      "In the Stripe "+s.name+" account, is the pending balance normal, and when does it pay out?"));
+  });
+  host.append(list);
+  const flows=el("div","tlist",'<h3>The bridges, where money data breaks</h3>');
+  flows.append(moneyRow("🔗","WooCommerce → Stripe → Salesforce",
+    (M.sf.syncErr>0?("<b>"+M.sf.syncErr+" sync errors in the last day.</b> "):"No sync errors in the last day. ")+"Known: SyncConnectedAccountsQueueable has been failing on an expired Stripe key since 12 Aug (rotation pending).",
+    "What is the state of the WooCommerce to Salesforce money sync, and what would clear the expired Stripe key issue for good?", M.sf.syncErr>0?"crit":null));
+  flows.append(moneyRow("📤","Salesforce → NetSuite: a MANUAL monthly CSV",
+    (M.ns.ok?"NetSuite answers live. ":"NetSuite: "+esc(M.ns.err||"not reachable")+". ")+"There is no integration; the bridge is a person exporting a CSV monthly. Unreconciled income was $671K and growing ~$87K/day at last measure, and the exception report Zap (371228125) sits in DRAFT.",
+    "Lay out the plan to fix the Salesforce to NetSuite money bridge: publish the exception report Zap, then what? Passports and owners."));
+  flows.append(moneyRow("🏛️","Bank reconciliation backlog",
+    "NAT Operations (11104): 378 unmatched. NAT ABF Donations (11103): 120 unmatched. Both last reconciled 31 March 2022. A standing control risk and a hard precondition of any Business Central move.",
+    "Draft the register-C email to Finance about the 11104 and 11103 bank reconciliation backlog: the risk, the ask, a named owner and a date.", "warn"));
+  host.append(flows);
+  const out=el("div","tlist",'<h3>Money out</h3>');
+  out.append(moneyRow("↩️","Refunds: the traceability gap",
+    "A Stripe refund is not reliably reflected in Salesforce; never assert one is without verifying. The daily refund fix watch routine monitors the blast radius.",
+    "Check the refund picture: query Stripe for refunds in the last 7 days on the eCommerce account and tell me whether Salesforce agrees."));
+  out.append(moneyRow("🧾","Payables and payroll live in NetSuite",
+    "AP (21101-21117 by branch), payroll via Infinet Cloud/ZonePayroll. Not wired into this page; ask for a session when you need the AP view.",
+    "What would it take to add an accounts-payable view to this console from NetSuite, and is it worth it?"));
+  host.append(out);
+  host.append(el("p","schednote","Scope: Stripe balances are live across all five livemode accounts; Salesforce figures are org-wide money objects (not Zeus-scoped, money is not the helpdesk); NetSuite is a connectivity check because its money truth arrives by manual CSV. Three systems, three answers; quote the lens, not just the number."));
+}
+$("#money-refresh")&&$("#money-refresh").addEventListener("click",()=>loadMoney(true));
+
+// ================= SECURITY =================
+const DEADLINES=[
+ ["Vevox SAML certificate","2026-09-08"],
+ ["Tenant MFA Conditional Access target","2026-09-15"],
+ ["NetSuite OAuth2 certificate (orphaned credential)","2026-09-17"],
+ ["Enterprise app access review","2026-09-19"],
+ ["Salesforce Transaction Security Policies (overdue since 13 Jul)","2026-07-13"],
+ ["entra-admin-mcp certificate","2027-08-26"]];
+async function loadSecurity(force){
+  const host=$("#sec-host");
+  if(!mcpNS) return;
+  if(secLoading || (secState && !force)){ if(secState) renderSecurity(); return; }
+  secLoading=true;
+  host.innerHTML='<div class="degraded">Reading the Salesforce posture...</div>';
+  const S={at:Date.now(), err:null};
+  const cacheOpt={cache:{staleTime:240000, gcTime:900000}}; if(force) cacheOpt.cache.refresh=true;
+  try{
+    const admins=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT Name, Username, LastLoginDate FROM User WHERE IsActive = true AND Profile.Name = 'System Administrator' ORDER BY LastLoginDate DESC NULLS LAST LIMIT 50"},cacheOpt);
+    const inact=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) c FROM User WHERE IsActive = false AND Profile.Name = 'System Administrator'"},cacheOpt);
+    const users=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) c FROM User WHERE IsActive = true AND UserType = 'Standard'"},cacheOpt);
+    const stale=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) c FROM User WHERE IsActive = true AND UserType = 'Standard' AND LastLoginDate < LAST_N_DAYS:30"},cacheOpt);
+    S.admins=(admins.payload&&admins.payload.records)||[];
+    S.inactiveAdmins=(inact.payload.records[0]||{}).c;
+    S.activeUsers=(users.payload.records[0]||{}).c;
+    S.staleUsers=(stale.payload.records[0]||{}).c;
+  }catch(e){ S.err=mcpErrCopy(e,SF_SERVER); }
+  secState=S; secLoading=false; renderSecurity();
+}
+function renderSecurity(){
+  const host=$("#sec-host"), S=secState; if(!S) return;
+  $("#sec-refresh").hidden=false;
+  $("#sec-asof").textContent="as at "+new Date(S.at).toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"});
+  host.innerHTML="";
+  if(S.err){ host.append(el("div","degraded",esc(S.err))); return; }
+  const bots=S.admins.filter(a=>/birdbot/i.test(a.Username||""));
+  const ratio=S.activeUsers?Math.round(1000*S.admins.length/S.activeUsers)/10:null;
+  const tiles=el("div","tiles");
+  const tile=(v,l,cls)=>tiles.append(el("div","tile"+(cls?" "+cls:""),`<div class="v">${v}</div><div class="l">${esc(l)}</div>`));
+  tile(S.admins.length,"active sysadmins",(ratio&&ratio>5)?"warn":"");
+  tile(ratio!=null?ratio+"%":"?","admin ratio (target ≤5%)",(ratio&&ratio>5)?"crit":"ok");
+  tile(bots.length,"bot accounts holding sysadmin",bots.length?"warn":"ok");
+  tile(S.inactiveAdmins,"inactive admin records",S.inactiveAdmins>0?"warn":"ok");
+  tile(S.staleUsers,"active users quiet 30+ days",S.staleUsers>10?"warn":"");
+  host.append(tiles);
+  const adminsList=el("div","tlist",'<h3>Who holds System Administrator (Salesforce, live)</h3>');
+  S.admins.slice(0,12).forEach(a=>{
+    const days=a.LastLoginDate?Math.floor((Date.now()-new Date(a.LastLoginDate))/864e5):null;
+    adminsList.append(moneyRow(/birdbot/i.test(a.Username||"")?"🤖":"👤",a.Name,
+      esc(a.Username||"")+" · "+(days==null?"NEVER logged in":days===0?"logged in today":"last login "+days+"d ago"),
+      "Review the Salesforce admin account "+ (a.Username||a.Name) +": does it still need System Administrator, and what would least-privilege look like?",
+      days==null||days>60?"warn":null));
+  });
+  host.append(adminsList);
+  const dl=el("div","tlist",'<h3>Hard deadlines, counted from today</h3>');
+  const today=melbTodayISO();
+  DEADLINES.slice().sort((a,b)=>a[1].localeCompare(b[1])).forEach(([name,date])=>{
+    const days=Math.round((new Date(date)-new Date(today))/864e5);
+    const state=days<0?Math.abs(days)+" days OVERDUE":days===0?"TODAY":"in "+days+" days";
+    dl.append(moneyRow(days<0?"🔴":days<15?"🟠":"🟢",name,date+" · "+state,
+      "On the deadline \""+name+"\" ("+date+"): what exactly has to happen, who owns it, and draft the nudge.",
+      days<0?"crit":days<15?"warn":null));
+  });
+  host.append(dl);
+  const hon=el("div","tlist",'<h3>Not readable from this page (honesty list)</h3>');
+  hon.append(el("div","trow",'<div class="t2">Microsoft Secure Score, Entra MFA and Conditional Access state, Intune/BitLocker, Defender, WordPress 2FA, AWS root MFA, Google 2SV. These live on the weekly confidential Security dashboard (Sundays 7am) and in admin portals. Credential watchlist: the WooCommerce key rotation from August remains unverified.</div>'));
+  const link=el("div","rowacts");
+  const b=el("button",null,"open the confidential security dashboard");
+  b.addEventListener("click",()=>window.open("https://claude.ai/code/artifact/ff6c82e3-38d4-41de-b872-606521972498","_blank","noopener"));
+  const b2=el("button",null,"ask jarvis for the posture read");
+  b2.addEventListener("click",()=>jAsk("Give me the security footprint: the live Salesforce posture, the nearest deadlines, and the two things you would fix first. Use the security snapshot."));
+  link.append(b,b2); hon.append(link);
+  host.append(hon);
+  host.append(el("p","schednote","Confidential by nature: keep this tab's detail off screenshots and out of shared docs. The Salesforce numbers are live; everything else is baseline knowledge with its evidence dated."));
+}
+$("#sec-refresh")&&$("#sec-refresh").addEventListener("click",()=>loadSecurity(true));
+
+
+// ================= FIXES (AI-suggested fixes, technical and process) =================
+// Seeded from the skills' verified findings; Jarvis appends live suggestions via fix_propose.
+// sev 1 critical, 2 high, 3 medium. tier 1 execute, 2 prepare for an admin, 3 design (SF config). effort minutes|hours|project.
+const FIXES_SEED=[
+ {id:"wp-selfreg",title:"Turn off public self-registration defaulting to Shop Manager",system:"WordPress",cat:"security",sev:1,tier:2,effort:"minutes",owner:"Nina Lewis",
+  why:"Anyone can register on birdlife.org.au and lands in the Shop Manager role, which reads orders and customer data.",
+  people:"Every customer's order history and contact details are exposed to whoever registers; a member data breach starts here.",
+  steps:["WP admin, Settings, General: untick Anyone can register (or set default role to Customer).","Audit users created in the last 90 days with role Shop Manager and demote or remove.","Record the change on an Asana task and the security register."],src:"birdlife-wordpress"},
+ {id:"wp-fm-pma",title:"Deactivate WP File Manager and WP phpMyAdmin",system:"WordPress",cat:"security",sev:1,tier:2,effort:"minutes",owner:"Nina Lewis",
+  why:"Either plugin is a full-compromise path; File Manager v8.0.2 has a CVE history and both run on the production site.",
+  people:"A site compromise takes down donations, memberships and the shop for every supporter until restored.",
+  steps:["Deactivate both plugins on production; delete after 7 days without complaint.","Use WP Engine SFTP and phpMyAdmin through the WP Engine portal instead.","Check the 82,089 logged emails with PII and purge the log table."],src:"birdlife-wordpress"},
+ {id:"wp-admins",title:"Execute the agreed admin removal list and enforce 2FA on elevated users",system:"WordPress",cat:"security",sev:2,tier:2,effort:"hours",owner:"Nina Lewis",
+  why:"25 admin accounts, 20 never logged in, 2FA enforced on none; the removal decisions were made and not executed.",
+  people:"Vendors who have finished their work still hold the keys to the site; the people still working there carry the blame if one is misused.",
+  steps:["Remove: Ahilya, Ayush Saxena, David Arvaji, Holly Browne, James O'Brien, Justin Joseph, Justin Rivera, Krish, Ross James; set wpengine inactive.","Decide the undecided four (Fiona Cahill, Hannah Langford, James Vilinsky, editors) with James Vilinsky.","Enforce email 2FA (WP 2FA) for Administrator and Shop Manager; update WP 2FA (four majors behind)."],src:"birdlife-wordpress"},
+ {id:"woo-licences",title:"Renew WooCommerce Subscriptions and Memberships licences",system:"WordPress",cat:"money",sev:1,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Subscriptions is running unlicensed on live payments (~A$11,108/month) and Memberships is inactive, which blocks all Blitzm membership work.",
+  people:"Blitzm is building against nothing and the membership project slips; members renewing today depend on an unsupported plugin.",
+  steps:["Purchase or renew both licences (ICT-owned blocker).","Activate Memberships on staging, re-run the 45 Not Tested cases.","Confirm Automattic support entitlement covers the live payment path."],src:"birdlife-wordpress"},
+ {id:"woo-keys",title:"Verify the WooCommerce API key rotation actually happened",system:"WordPress",cat:"process",sev:2,tier:2,effort:"minutes",owner:"Mathew Hema",
+  why:"Keys were exposed in Claude routine prompts in Aug 2026; rotation was flagged and never confirmed. Woo Read keys can write.",
+  people:"Anyone with the old keys can alter orders; the register carries an open item until someone says done.",
+  steps:["WooCommerce, Settings, Advanced, REST API: confirm the old key's last-access date and revoke it.","Issue a new key with Read only and test that it cannot write (known enforcement gap).","Close the credential watchlist row in os/registers.md."],src:"birdlife-os"},
+ {id:"dmarc-pct",title:"Ramp DMARC from pct=10 to pct=100",system:"Email / Cloudflare",cat:"security",sev:1,tier:2,effort:"project",owner:"Mathew Hema",
+  why:"DMARC says reject but only 10% of failing mail is rejected; the organisation believes it is protected against spoofing and is 10% protected.",
+  people:"Donors and members can be phished with mail that looks exactly like BirdLife's; that is reputational and financial harm to them, not to ICT.",
+  steps:["Inventory every legitimate sender (Exchange, Salesforce, Exclaimer, Campaign Monitor, Ortto, Raisely, EH, WP Engine, Payments2Us, Conga, Zapier, NetSuite).","Add rua= aggregate reporting if absent; wait two weeks; fix SPF/DKIM per sender.","Ramp pct 10 to 50 to 100, one to two weeks each, with a written rollback."],src:"birdlife-cloudflare"},
+ {id:"spf-salesforce",title:"Add include:_spf.salesforce.com through a reviewed SPF change",system:"Email / Cloudflare",cat:"process",sev:2,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Salesforce mail from zeus@ fails SPF alignment; Asana rejects Case emails so the Case to task automation has never worked.",
+  people:"The team hand-copies tickets into Asana and the board drifts from the queue; requesters get slower answers.",
+  steps:["Count current SPF DNS lookups (10 limit) and prune dead includes.","Propose old and new TXT side by side with rollback and test plan; apply after hours.","Enable Enhanced Domains and DKIM in Salesforce Setup, Email, Deliverability; re-test Case to Asana."],src:"birdlife-asana"},
+ {id:"mfa-tenant",title:"Enforce tenant-wide MFA through Conditional Access by 15 Sep",system:"Entra ID",cat:"security",sev:1,tier:2,effort:"project",owner:"Mathew Hema",
+  why:"No tenant-wide enforced MFA policy exists; 116 users signed in over 7 days with zero CA coverage. Essential Eight MFA sits below ML1.",
+  people:"A single phished password gives an attacker a staff mailbox and SharePoint; the person phished carries that, and every colleague they email.",
+  steps:["Create the two break-glass accounts first (see separate fix).","Policy Require MFA all users, all cloud apps, exclude break-glass and the CA-NoMFA-ServiceAccounts group; Report-only 7 to 14 days.","Review the report-only sign-in log, communicate to staff, enforce; migrate the 16 SMS users to Authenticator."],src:"birdlife-microsoft365"},
+ {id:"breakglass",title:"Create the two break-glass Global Admin accounts",system:"Entra ID",cat:"security",sev:1,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"breakglass01 and breakglass02 are referenced as CA exclusions in the programme guide and do not exist. Any CA enforcement without them risks locking the tenant.",
+  people:"If a CA policy misfires, nobody can get in to fix it; the whole organisation stops working until Microsoft support intervenes.",
+  steps:["Create two cloud-only accounts with 30+ character vaulted passwords, FIDO2 keys held separately, no licence, Global Administrator.","Exclude from every CA policy; alert on any sign-in.","Test one sign-in, record in the vault and the security register."],src:"birdlife-microsoft365"},
+ {id:"shared-ga",title:"Retire the two shared .onmicrosoft.com Global Admin accounts",system:"Entra ID",cat:"security",sev:1,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Office365.admin and admin.365 are shared credentials holding the highest privilege in the tenant; 6 GAs against a recommendation of 4 to 5.",
+  people:"Nobody can say who acted as those accounts, so an incident cannot be attributed and the people who did nothing wrong cannot prove it.",
+  steps:["Inventory what still authenticates as them (scripts, vendors, Exclaimer setup).","Convert one to break-glass pattern or disable both once dependencies are moved to named .admin accounts.","Re-run the GA count; target 4."],src:"birdlife-microsoft365"},
+ {id:"ross-ga",title:"Verify Ross James's status; remove ross.james.admin from Global Admin if departed",system:"Entra ID",cat:"security",sev:1,tier:2,effort:"minutes",owner:"Mathew Hema",
+  why:"ross.james.admin holds Global Administrator and Ross James is on the WordPress admin removal list; a departed GA is the worst state the estate can be in.",
+  people:"One person's forgotten account outranks every current staff member's access; the risk sits with people who do not know it exists.",
+  steps:["Confirm employment status with People and Culture.","If departed: revoke sessions, disable, remove GA, convert mailbox, reclaim licence (people-lifecycle leaver order).","If current: confirm phishing-resistant MFA on the admin account."],src:"birdlife-people-lifecycle"},
+ {id:"test-accounts",title:"Disable test101 and test123 and the other test accounts",system:"Entra ID",cat:"security",sev:1,tier:2,effort:"minutes",owner:"Keith Tsui",
+  why:"Six test accounts exist; test101 and test123 are active with real credentials and no MFA.",
+  people:"A test account is a front door with no owner; whoever created it has moved on and nobody is watching the sign-in log.",
+  steps:["Disable Test, keith.stafftest, test101, test123, testbqcases, testcalendar2.","Delete after 30 days if nothing breaks.","Add a rule: test accounts get an owner, an expiry and a licence of none."],src:"birdlife-microsoft365"},
+ {id:"autofwd",title:"Block external email auto-forwarding tenant-wide",system:"Exchange Online",cat:"security",sev:2,tier:2,effort:"minutes",owner:"Keith Tsui",
+  why:"External auto-forwarding is allowed; it is the standard exfiltration path after a mailbox compromise and the check is manual every time.",
+  people:"A compromised staff mailbox silently copies donor correspondence to an attacker for weeks; the staff member never knows.",
+  steps:["Exchange admin, Mail flow, Remote domains, Default: Automatic forwarding Off; or the outbound spam policy setting.","Inventory existing forwarding rules first and confirm the legitimate ones with their owners.","Alert on new forwarding rules via Defender."],src:"birdlife-microsoft365"},
+ {id:"tamper-lsa",title:"Turn on Tamper Protection and LSA Protection via Intune",system:"Intune / Defender",cat:"security",sev:2,tier:2,effort:"hours",owner:"Keith Tsui",
+  why:"Both are OFF across the fleet; an attacker with local admin can disable Defender and dump credentials.",
+  people:"The team's own laptops are the soft target; a stolen credential from one device becomes everyone's problem.",
+  steps:["Intune, Endpoint security, Antivirus: Windows Security Experience profile, Tamper Protection On.","Device configuration: LSA protection (RunAsPPL) enabled; pilot ring first.","Then the ASR rules (0 of 19) as the next tranche."],src:"birdlife-microsoft365"},
+ {id:"edge-cve",title:"Patch CVE-2026-12440 (Edge, CVSS 9.6) on 109 devices and set update rings",system:"Intune / Defender",cat:"security",sev:1,tier:2,effort:"hours",owner:"Keith Tsui",
+  why:"A critical browser CVE was already 5 days past the Essential Eight 48-hour SLA at review; there are no Windows Update rings.",
+  people:"Every staff member browsing with an exploitable Edge is one malicious page from compromise.",
+  steps:["Push the Edge update now via Intune; confirm in Defender vulnerability management.","Create Windows Update for Business rings (pilot, broad) and an Edge update policy.","Start the Windows 11 24H2 upgrade plan; Windows 10 is past EOL."],src:"birdlife-microsoft365"},
+ {id:"intune-compliance",title:"Link device compliance to Conditional Access and fix the compliant-by-default setting",system:"Intune",cat:"security",sev:2,tier:2,effort:"hours",owner:"Keith Tsui",
+  why:"Compliance state controls nothing because no CA policy requires it, and devices with no policy are marked compliant.",
+  people:"A stale unmanaged laptop with no disk encryption can open SharePoint as freely as a managed one.",
+  steps:["Intune, Compliance policy settings: Mark devices with no compliance policy as Not compliant.","Add a BitLocker requirement and a Windows 11 compliance policy; retire the Android Device Administrator policy (EOL Dec 2024).","CA policy Require compliant device for M365, report-only first."],src:"birdlife-microsoft365"},
+ {id:"eh-addon-scope",title:"Scope the Employment Hero to M365 add-on to four fields",system:"Employment Hero / Entra",cat:"data",sev:2,tier:2,effort:"minutes",owner:"Mathew Hema",
+  why:"The native add-on overwrites and never merges; a blank EH field blanks the Entra field, including display name and UPN if in scope.",
+  people:"A payroll admin leaving a field blank can rename or break a colleague's login without knowing.",
+  steps:["In the EH integration settings restrict to Job Title, Department, Manager, Office Location.","Confirm Display Name, UPN and address are excluded.","Document in the M365 skill and the people-lifecycle skill."],src:"birdlife-microsoft365"},
+ {id:"eh-sync-403",title:"Unblock the Employment Hero to Entra employeeId sync and fix its two defects",system:"Azure Logic App",cat:"process",sev:3,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Deployed and 0 of 2 runs succeeded (EH 403); the rotated EH refresh token is not persisted to Key Vault, so it would fail again on the next run.",
+  people:"Until BLA### is in Entra, every NetSuite and payroll join is done by hand and the leaver sweep cannot match people.",
+  steps:["Grant the EH account org-wide view-employees or Admin.","Add the Key Vault set-secret step after token refresh; add expiry metadata to the five secrets.","Run, verify employeeId on three users, then schedule."],src:"birdlife-microsoft365"},
+ {id:"enterprise-apps",title:"Complete the enterprise app review before 19 Sep: decommission 18 unassigned, dedupe registrations",system:"Entra ID",cat:"security",sev:2,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"129 apps reviewed on 21 Jun with every decision field blank; 18 have no assigned principals; Asana x6-7, Zoom x3, Wrike x3, Exclaimer x3 duplicates; an ADAL app past deadline.",
+  people:"Each idle app is a consent someone granted and forgot; the review is the only time anyone looks.",
+  steps:["Decide each of the 18 no-principal apps (delete unless a vendor names a use).","Remove duplicate registrations keeping the one with sign-ins.","Migrate or delete P2P Server (2019) ADAL; record decisions in the review sheet."],src:"birdlife-microsoft365"},
+ {id:"vevox-cert",title:"Renew the Vevox SAML certificate before 8 Sep and verify the 21 Aug one",system:"Entra ID",cat:"security",sev:2,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Vevox Dashboard certificate expired 21 Aug 2026 and Vevox expires 8 Sep 2026; SSO breaks on the day.",
+  people:"Staff running live polls and events lose access mid-event; it looks like an ICT outage to the audience.",
+  steps:["Entra, Enterprise apps, Vevox, Single sign-on: generate new certificate, upload to Vevox, activate.","Test SSO with one user; check the 21 Aug one is actually still working or already broken.","Add both to the deadline register with the new dates."],src:"birdlife-security"},
+ {id:"ns-cert",title:"Revoke the orphaned NetSuite OAuth2 certificate before it expires 17 Sep",system:"NetSuite",cat:"security",sev:2,tier:2,effort:"hours",owner:"Mathew Hema / CFO",
+  why:"An M2M credential linked to a departed employee, created by a departed contractor, with zero recorded activity; expiring is not the same as revoked.",
+  people:"Finance's system of record has a key nobody owns; the CFO was briefed 20 Jul and no action has been taken.",
+  steps:["Confirm with Fusion5 and Infinet that no scheduled job uses the SuiteCloud Development Integration.","Revoke the certificate; monitor for 2 weeks; then delete.","Note the TBA credential the Zapier report needs is separate and still to be created."],src:"birdlife-netsuite"},
+ {id:"sf-admin-ratio",title:"Cut Salesforce System Administrators from 15% to 5%; deactivate 23 inactive sysadmins; take birdbots off sysadmin",system:"Salesforce",cat:"security",sev:2,tier:1,effort:"hours",owner:"Mathew Hema",
+  why:"15% of internal users are sysadmins (target 5%), 9 of 14 lack MFA, 23 inactive admin records remain, birdbot1/5/6 hold sysadmin in the CEO role node.",
+  people:"Every extra admin is someone who can delete donor data by accident; the people below them carry the consequences.",
+  steps:["Use the console Security tab list; for each admin decide keep, downgrade, deactivate; one record at a time with an internal note.","Deactivate the 23 inactive sysadmin Users (frees licences: 70 of 70 consumed).","Give the bots a dedicated integration profile with least privilege."],src:"birdlife-salesforce"},
+ {id:"sf-release-updates",title:"Verify and action the overdue Salesforce Release Updates",system:"Salesforce",cat:"security",sev:2,tier:3,effort:"hours",owner:"Mathew Hema / Karishma Soni",
+  why:"Release Updates 0% actioned; Transaction Security Policies overdue since 13 Jul; the 1 Sep set (OAuth username-password retirement, instanced URLs, Authorized Email Domains, Profile Filtering) is now past and MoveData is flagged as affected.",
+  people:"If Salesforce enforced the OAuth change on 1 Sep, Raisely donations may have stopped syncing and nobody has looked.",
+  steps:["Setup, Release Updates: read the state of each; check MoveData and Raisely logs since 1 Sep.","Test each update in Staging; enable in production in a change window.","Record in the deadline register with outcomes."],src:"birdlife-salesforce"},
+ {id:"sf-dashboards",title:"Move Mathew's private Zeus dashboards to a shared folder",system:"Salesforce",cat:"process",sev:3,tier:1,effort:"minutes",owner:"Mathew Hema",
+  why:"Zeus Helpdesk Dashboard and Improvement Metrics live in a private folder; private dashboards die with the user and nobody else can see the queue metrics.",
+  people:"Andrew, Keith and Nina work a queue they cannot measure; the numbers only exist when Mathew is logged in.",
+  steps:["Create folder ICT Helpdesk shared with the ICT public group.","Move dashboards 01ZRF00000FcXoj2AF and 01ZRF00000FcYsr2AF and their 10 reports.","Pin the dashboard in the Zeus app."],src:"birdlife-salesforce"},
+ {id:"case-history",title:"Enable field history tracking on Case Status",system:"Salesforce",cat:"data",sev:3,tier:3,effort:"minutes",owner:"Karishma Soni",
+  why:"Without Status history there is no time-to-acknowledge measure, which is the metric the 3,600-in-New backlog demands.",
+  people:"The team is judged on a backlog nobody can measure properly; the fix makes their improvement visible.",
+  steps:["Setup, Object Manager, Case, Fields, Set History Tracking: Status, Owner, Priority.","Build the time-in-New report from CaseHistory.","Add the metric to the weekly ICT status report."],src:"birdlife-salesforce"},
+ {id:"subtype-on-close",title:"Require the enquiry sub-type when a case is closed",system:"Salesforce",cat:"data",sev:3,tier:3,effort:"hours",owner:"Karishma Soni",
+  why:"About 48% of Zeus cases have SC_Additional_Enquiry_Type__c blank, so every report on what the team spends time on is half guesswork.",
+  people:"Automation candidates stay invisible; the team keeps doing by hand what a pattern report would have flagged.",
+  steps:["Validation rule: IsClosed = true AND ISBLANK(SC_Additional_Enquiry_Type__c) on the Zeus record type.","Backfill the top 200 open cases via the console close flow (it sets Type; extend to sub-type).","Report by sub-type monthly."],src:"birdlife-ict-assistant"},
+ {id:"refund-id",title:"Add Stripe_Refund_ID__c on Payment and map it from WooCommerce",system:"Salesforce / Stripe",cat:"money",sev:2,tier:3,effort:"hours",owner:"Karishma Soni",
+  why:"Stripe refunds are untraceable from Salesforce; refunds appear as a second positive payment with Paid false and Stage set to the raw string refunded.",
+  people:"Supporter Care cannot tell a member whether their refund happened without opening Stripe; Finance reconciles two positive lines for one refund.",
+  steps:["Field on npe01__OppPayment__c; FLS to the miniOrange integration user BEFORE first sync.","Map re_ id and negative amount in the miniOrange refund mapping; fix Stage to a valid picklist value.","Test on staging order #22553 pattern; this is Karishma's Week-4 decision gate."],src:"birdlife-stripe"},
+ {id:"zap-exception",title:"Publish the Unreconciled Income Exception Report (Zap 371228125)",system:"Zapier / NetSuite",cat:"money",sev:1,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Unreconciled income was $671,117 across 2,878 records at 3 Jul and growing about $87K a day; the detection mechanism exists and is switched off in DRAFT.",
+  people:"Finance finds mismatches weeks late and Nina reconciles by hand; the CFO reports income that may not be in the bank.",
+  steps:["Create the NetSuite TBA credential (integration record, consumer key, token for Mathew, Administrator role) and store it only in Zapier.","Connect Salesforce as the integration user; test both Find steps on a known week.","Second-person review, publish, verify the first Tuesday email; register it."],src:"birdlife-zapier"},
+ {id:"bank-rec",title:"Clear the 11104 and 11103 bank reconciliation backlog (unreconciled since 31 Mar 2022)",system:"NetSuite",cat:"money",sev:1,tier:2,effort:"project",owner:"Claudia Abad / CFO",
+  why:"378 and 120 unmatched items over four years on the operations and donations bank accounts; an audit finding waiting, and a hard precondition of any Business Central migration.",
+  people:"The organisation cannot prove its cash position line by line; auditors, the Board and the CFO are exposed.",
+  steps:["Finance owns it; ICT provides SuiteQL extracts of unmatched lines by month.","Agree a catch-up plan with dates and a weekly count reported in the money state.","Do not let a BC conversation proceed as though this clears during cutover."],src:"birdlife-netsuite"},
+ {id:"sf-ns-bridge",title:"Replace the manual monthly CSV with a scheduled Salesforce to NetSuite export and the +3 business day policy",system:"Salesforce / NetSuite",cat:"money",sev:2,tier:2,effort:"project",owner:"Mathew Hema / Nina Lewis",
+  why:"There is no integration; SF Close Date and NS posting date never align (1 to 3 day bank lag) and the gap compounds daily.",
+  people:"Nina and Finance rebuild the same match every month by hand; every board figure lags reality by weeks.",
+  steps:["Adopt Option A: SF Close Date plus a NetSuite +3 business day month-end window.","Schedule the export (report 00ORF0000033T6z2AE) via Zapier or a Salesforce scheduled report to SharePoint.","Measure: unreconciled count weekly until it trends down."],src:"birdlife-netsuite"},
+ {id:"conga-fy",title:"Parameterise the Conga EOFY query FY code and restore the EOFY Receipt button",system:"Salesforce / Conga",cat:"data",sev:2,tier:3,effort:"hours",owner:"Karishma Soni",
+  why:"CMQ-0008 has FY code hardcoded 25f so zero contacts process at the next EOFY run; the individual EOFY Receipt button is deleted and points at a file-less template.",
+  people:"Donors do not get tax receipts on time and Supporter Care cannot regenerate one on request during tax season.",
+  steps:["Change the query to derive FY from the run date; test with a small batch on staging.","Rebuild the button against a working template; never click Regenerate Solution on the batch (URL mismatch would break it).","Fold into the native receipting replacement plan."],src:"birdlife-salesforce"},
+ {id:"active-bl-member",title:"Have Membership__c take over Active_BL_Member__c before Payments2Us is decommissioned",system:"Salesforce",cat:"data",sev:2,tier:3,effort:"project",owner:"Karishma Soni / James Vilinsky",
+  why:"Active_BL_Member__c is maintained by Payments2Us; Taylor and Francis Emu journal access depends on it and no other document records this.",
+  people:"Members silently lose journal access at migration and blame BirdLife, not the plugin.",
+  steps:["Add the flag to the Membership__c lifecycle flow spec now.","Test journal access for a migrated member on staging.","Communicate the dependency to Blitzm and Participation."],src:"birdlife-salesforce"},
+ {id:"offboarding-checklist",title:"Adopt the leaver checklist as the standard and require it on every Departing Staff case",system:"Process",cat:"process",sev:1,tier:1,effort:"hours",owner:"Mathew Hema",
+  why:"There is no offboarding checklist in use; leaver access removal is ad hoc and departed people still hold a NetSuite certificate and possibly a Global Admin role.",
+  people:"Former staff keep access to donor data; current staff inherit the blame when it is misused.",
+  steps:["Use the people-lifecycle skill's leaver order as the checklist; post it as an internal comment on every Departing Staff case.","Weekly: query Departing Staff cases closed without a checklist comment.","Automate the Entra half as the approve-only Power Automate flow once the admin connector is consented."],src:"birdlife-people-lifecycle"},
+ {id:"asana-hygiene",title:"Date, delegate or close the undated and stale Asana tasks",system:"Asana",cat:"process",sev:2,tier:1,effort:"hours",owner:"Mathew Hema",
+  why:"About 30 tasks have no due date and a block of 25 migration tasks was last touched in a bulk edit six months ago; delegation prompts are unactioned.",
+  people:"Keith, Karishma and Nina run standups off a board that does not reflect reality, so meetings reconstruct status instead of removing blockers.",
+  steps:["Console Projects tab: for each attention item choose close, delegate or date it (three words only).","Action the Consider delegating prompts (they signal a leaver or mover missed).","Let the Monday hygiene report hold the line."],src:"birdlife-asana"},
+ {id:"asana-teams",title:"Archive the duplicate Finance teams and the two first-team artefacts in Asana",system:"Asana",cat:"estate",sev:3,tier:1,effort:"minutes",owner:"Mathew Hema",
+  why:"Two Finance teams and two default first teams exist; tasks land in the wrong place and reports double count.",
+  people:"Finance staff cannot tell which team is theirs; new starters are added to the wrong one.",
+  steps:["Confirm which Finance team has live tasks; move the rest; archive the other.","Archive BirdLife's first team and Caroline's first team.","Rule: no new teams without the ICT manager."],src:"birdlife-asana"},
+ {id:"cloudflare-waf",title:"Move the cart-flood and wp-login controls from WP Engine rules to Cloudflare WAF and rate limiting",system:"Cloudflare",cat:"security",sev:2,tier:2,effort:"hours",owner:"Keith Tsui",
+  why:"The flood was mitigated at the origin with a Referer rule that false-positives privacy browsers; /wp-login.php took 50,000 hits at 67% error. BirdLife pays for an edge it is not using for this.",
+  people:"Customers on privacy browsers are blocked from the cart today; the shop loses those sales silently.",
+  steps:["Rate limit /wp-login.php and /cart/?remove_item= at the edge; challenge, not block, first.","Bot Fight Mode on; review the WAF managed ruleset.","Then relax the WP Engine Referer rule and measure cart errors."],src:"birdlife-cloudflare"},
+ {id:"cloudflare-accounts",title:"Consolidate or document the two Cloudflare accounts",system:"Cloudflare",cat:"estate",sev:3,tier:2,effort:"hours",owner:"Mathew Hema",
+  why:"Domain.admin and Mathew.hema each own an account; nobody has written down which holds the zone or why both exist.",
+  people:"A DNS emergency starts with a hunt for the right login.",
+  steps:["List zones and members in each account.","Move zones to one account or record the reason for two in the cloudflare skill.","Enable 2FA on every member."],src:"birdlife-cloudflare"},
+ {id:"learnupon-hook",title:"Rotate and re-own the LearnUpon to Zapier catch-hook",system:"Zapier / LearnUpon",cat:"security",sev:3,tier:2,effort:"minutes",owner:"Keith Tsui",
+  why:"A live webhook URL sits in plaintext in documentation and belongs to Keith's personal Zapier account; only enrolment is ticked, not completion.",
+  people:"If Keith's account changes the automation dies silently and nobody knows what it fed.",
+  steps:["Confirm purpose with Keith; regenerate the hook in a shared Zapier connection.","Scrub the URL from documents.","Decide whether completion events are wanted."],src:"birdlife-zapier"},
+ {id:"zap-eh-aad",title:"Confirm the superseded EH to Azure AD manager-sync Zap is disabled",system:"Zapier / Entra",cat:"data",sev:2,tier:2,effort:"minutes",owner:"Mathew Hema",
+  why:"The native EH to M365 add-on replaced it; if still enabled it is a second uncontrolled writer into Entra using User.ReadWrite.All.",
+  people:"Two systems fighting over the manager field produces an org chart nobody trusts.",
+  steps:["Zapier: find the New or Updated Employee Zap; turn off.","Entra: review app EH-OrgSync-Zapier; remove the permission or delete the registration.","Record in the zapier skill."],src:"birdlife-zapier"},
+ {id:"os-connectors",title:"Review idle connectors: name the job or disconnect",system:"Claude estate",cat:"estate",sev:3,tier:1,effort:"minutes",owner:"Mathew Hema",
+  why:"Atlassian, Canva, Miro, Zoom, Granola, Gmail, Google Drive and Calendar are connected with no skill and no routine using them; each is credentialed attack surface.",
+  people:"A connector nobody uses is a door nobody watches.",
+  steps:["At the Monday audit, each connector names the routine or session task it serves.","Disconnect the ones with no answer; register the rest.","Re-check quarterly."],src:"birdlife-os"},
+ {id:"sec-exception-register",title:"Fill the IT-SEC-001 service account exception register",system:"Entra ID",cat:"process",sev:3,tier:1,effort:"minutes",owner:"Mathew Hema",
+  why:"Only discovery.centre is populated and its site and owner fields are blank; the standard exists and is not being kept.",
+  people:"A no-MFA account with no owner is nobody's job to remove.",
+  steps:["Add birdbot4, sxiq.local, sxiq.text, wa.server, website.logins, bnb.count, emu.review with owner, site, purpose, review date.","Move each into CA-NoMFA-ServiceAccounts or off the exception.","Review monthly with the MFA audit."],src:"birdlife-microsoft365"}
+];
+const FX_STATUSES=[["proposed","Proposed"],["accepted","Accepted"],["in_progress","In progress"],["done","Done"],["dismissed","Dismissed"]];
+const FX_CATS=[["all","All"],["security","Security"],["process","Process"],["money","Money"],["data","Data"],["estate","Estate"]];
+function fxLoadJSON(k,d){ try{ const v=recall(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
+let fxExtra=fxLoadJSON("fixes.extra",[]);
+let fxStatus=fxLoadJSON("fixes.status",{});
+const fxFilter={q:"",cat:"all",sev:"all",tier:"all",status:"open",sort:"rank"};
+const fxOpen=new Set();
+function fxAll(){ return FIXES_SEED.concat(fxExtra); }
+function fxGet(id){ return fxAll().find(f=>f.id===id)||null; }
+function fxStat(f){ return fxStatus[f.id]||"proposed"; }
+function fxSetStatus(id,st){
+  if(!FX_STATUSES.some(([k])=>k===st)) throw new Error("Unknown status "+st);
+  if(!fxGet(id)) throw new Error("Unknown fix "+id);
+  fxStatus[id]=st; remember("fixes.status",JSON.stringify(fxStatus)); renderFixes(); return st;
+}
+function fxAdd(f){
+  const id=String(f.id||("ai-"+Date.now())).replace(/[^a-z0-9-]/gi,"-").toLowerCase();
+  if(fxGet(id)) throw new Error("A fix with id "+id+" already exists");
+  const clean={id, title:String(f.title||"").slice(0,140), system:String(f.system||"General").slice(0,40),
+    cat:FX_CATS.some(([k])=>k===f.cat)&&f.cat!=="all"?f.cat:"process", sev:[1,2,3].includes(Number(f.sev))?Number(f.sev):2,
+    tier:[1,2,3].includes(Number(f.tier))?Number(f.tier):2, effort:["minutes","hours","project"].includes(f.effort)?f.effort:"hours",
+    owner:String(f.owner||"Mathew Hema").slice(0,60), why:String(f.why||"").slice(0,400), people:String(f.people||"").slice(0,400),
+    steps:(Array.isArray(f.steps)?f.steps:[]).slice(0,6).map(x=>String(x).slice(0,240)), src:"jarvis "+new Date().toISOString().slice(0,10)};
+  if(!clean.title||!clean.why) throw new Error("A fix needs a title and a why");
+  fxExtra.push(clean); remember("fixes.extra",JSON.stringify(fxExtra)); renderFixes(); return clean;
+}
+function fxRemoveExtra(id){ const n=fxExtra.length; fxExtra=fxExtra.filter(f=>f.id!==id); remember("fixes.extra",JSON.stringify(fxExtra)); delete fxStatus[id]; remember("fixes.status",JSON.stringify(fxStatus)); renderFixes(); return fxExtra.length<n; }
+const FX_EFFORT_RANK={minutes:0,hours:1,project:2};
+function fxRunbook(f){
+  return f.title+"\nSystem: "+f.system+" | Severity "+f.sev+" | Tier "+f.tier+" | Effort: "+f.effort+" | Owner: "+f.owner+
+    "\n\nWhy: "+f.why+"\nImpact on people: "+f.people+"\n\nSteps:\n"+f.steps.map((s,i)=>(i+1)+". "+s).join("\n")+"\n\nSource: "+f.src;
+}
+function fxVisible(){
+  const q=fxFilter.q.trim().toLowerCase();
+  let list=fxAll().filter(f=>{
+    const st=fxStat(f);
+    if(fxFilter.status==="open" && (st==="done"||st==="dismissed")) return false;
+    if(fxFilter.status!=="open" && fxFilter.status!=="all" && st!==fxFilter.status) return false;
+    if(fxFilter.cat!=="all" && f.cat!==fxFilter.cat) return false;
+    if(fxFilter.sev!=="all" && String(f.sev)!==fxFilter.sev) return false;
+    if(fxFilter.tier!=="all" && String(f.tier)!==fxFilter.tier) return false;
+    if(q && !(f.title+" "+f.system+" "+f.why+" "+f.people+" "+f.owner+" "+f.steps.join(" ")).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const catRank={money:0,process:1,security:2,data:3,estate:4};
+  list.sort((a,b)=>{
+    if(fxFilter.sort==="effort") return FX_EFFORT_RANK[a.effort]-FX_EFFORT_RANK[b.effort] || a.sev-b.sev;
+    if(fxFilter.sort==="system") return a.system.localeCompare(b.system) || a.sev-b.sev;
+    return a.sev-b.sev || (catRank[a.cat]??9)-(catRank[b.cat]??9) || FX_EFFORT_RANK[a.effort]-FX_EFFORT_RANK[b.effort];
+  });
+  return list;
+}
+function renderFixes(){
+  const host=$("#fx-host"); if(!host) return;
+  const all=fxAll(), open=all.filter(f=>!["done","dismissed"].includes(fxStat(f)));
+  const done=all.filter(f=>fxStat(f)==="done"), crit=open.filter(f=>f.sev===1), quick=open.filter(f=>f.effort==="minutes"&&f.sev<=2), prog=all.filter(f=>fxStat(f)==="in_progress");
+  $("#fx-count").textContent=open.length+" open of "+all.length;
+  host.innerHTML="";
+  const tiles=el("div","tiles");
+  const tile=(v,l,cls,onclick)=>{const t=el("div","tile"+(cls?" "+cls:""),`<div class="v">${v}</div><div class="l">${esc(l)}</div>`); if(onclick){t.style.cursor="pointer"; t.addEventListener("click",onclick);} tiles.append(t);};
+  tile(crit.length,"critical, still open",crit.length?"crit":"ok",()=>{fxFilter.sev="1";fxFilter.status="open";renderFixes();});
+  tile(quick.length,"quick wins (minutes, high impact)",quick.length?"warn":"ok",()=>{fxFilter.sort="effort";fxFilter.status="open";fxFilter.sev="all";renderFixes();});
+  tile(prog.length,"in progress","",()=>{fxFilter.status="in_progress";renderFixes();});
+  tile(all.length?Math.round(100*done.length/all.length)+"%":"0%","done",done.length?"ok":"",()=>{fxFilter.status="done";renderFixes();});
+  tile(fxExtra.length,"suggested live by Jarvis","",()=>{fxFilter.q="jarvis";renderFixes();});
+  host.append(tiles);
+  const prog2=el("div","fxprog",`<i style="width:${all.length?Math.round(100*done.length/all.length):0}%"></i>`); host.append(prog2);
+  // filter bar
+  const bar=el("div","fxbar");
+  const search=el("input"); search.type="search"; search.placeholder="Search fixes, systems, owners, steps"; search.value=fxFilter.q;
+  search.addEventListener("input",()=>{fxFilter.q=search.value; renderList();});
+  const chips=el("div","fxchips");
+  FX_CATS.forEach(([k,l])=>{const b=el("button",null,esc(l)); b.setAttribute("aria-pressed",String(fxFilter.cat===k)); b.addEventListener("click",()=>{fxFilter.cat=k;renderFixes();}); chips.append(b);});
+  const sel=(opts,cur,on,label)=>{const s=el("select"); s.title=label; opts.forEach(([v,t])=>{const o=el("option",null,esc(t)); o.value=v; if(v===cur) o.selected=true; s.append(o);}); s.addEventListener("change",()=>{on(s.value);renderFixes();}); return s;};
+  bar.append(search,chips,
+    sel([["all","Any severity"],["1","Critical"],["2","High"],["3","Medium"]],fxFilter.sev,v=>fxFilter.sev=v,"Severity"),
+    sel([["all","Any tier"],["1","Tier 1: execute"],["2","Tier 2: prepare"],["3","Tier 3: design"]],fxFilter.tier,v=>fxFilter.tier=v,"Tier"),
+    sel([["open","Open"],["all","All statuses"]].concat(FX_STATUSES),fxFilter.status,v=>fxFilter.status=v,"Status"),
+    sel([["rank","Sort: Mathew's ranking"],["effort","Sort: quickest first"],["system","Sort: by system"]],fxFilter.sort,v=>fxFilter.sort=v,"Sort"));
+  host.append(bar);
+  const listHost=el("div"); host.append(listHost);
+  function renderList(){
+    listHost.innerHTML="";
+    const list=fxVisible();
+    if(!list.length){ listHost.append(el("div","fxempty","Nothing matches. Reset the filters, or ask Jarvis for new fixes.")); return; }
+    list.forEach(f=>listHost.append(fxCard(f)));
+  }
+  renderList();
+  host.append(el("p","schednote","Seeded from the skills' verified findings (dated Jun to Sep 2026) plus anything Jarvis proposes from live reads. Status and Jarvis additions are stored in this browser only. Tier 2 and 3 fixes are prepared for an admin, never faked; tracking into Asana goes through an approval card."));
+  const sug=$("#fx-suggest"); if(sug && !sug.dataset.wired){ sug.dataset.wired="1"; sug.addEventListener("click",()=>jAsk("Look at the live snapshots (queue, board, money, security) and the fixes catalogue. Propose up to three NEW fixes that are not already listed, each with title, system, category, severity, tier, effort, why, impact on people, steps and owner, and add each with fix_propose. Then tell me the one you would do first and why.")); }
+  const rst=$("#fx-reset"); if(rst && !rst.dataset.wired){ rst.dataset.wired="1"; rst.addEventListener("click",()=>{Object.assign(fxFilter,{q:"",cat:"all",sev:"all",tier:"all",status:"open",sort:"rank"}); renderFixes();}); }
+}
+function fxCard(f){
+  const st=fxStat(f);
+  const card=el("div","fxcard"+(fxOpen.has(f.id)?" open":"")+(st==="done"?" done":st==="dismissed"?" dismissed":""));
+  const sevName={1:"critical",2:"high",3:"medium"}[f.sev];
+  const head=el("div","fxhead",
+    `<span class="pill sev${f.sev}">${sevName}</span><span class="t">${esc(f.title)}</span>`+
+    `<span class="meta"><span class="tag gov">${esc(f.system)}</span><span class="tag ${f.tier===1?"read":"write"}">tier ${f.tier}</span><span class="tag gov">${esc(f.effort)}</span>${/^jarvis/.test(f.src)?'<span class="tag write">jarvis</span>':""}</span>`);
+  const sel=el("select"); FX_STATUSES.forEach(([v,t])=>{const o=el("option",null,esc(t)); o.value=v; if(v===st) o.selected=true; sel.append(o);});
+  sel.addEventListener("click",e=>e.stopPropagation());
+  sel.addEventListener("change",()=>fxSetStatus(f.id,sel.value));
+  head.querySelector(".meta").append(sel);
+  head.addEventListener("click",()=>{ if(fxOpen.has(f.id)) fxOpen.delete(f.id); else fxOpen.add(f.id); card.classList.toggle("open"); });
+  const body=el("div","fxbody",
+    `<h4>Why</h4><div>${esc(f.why)}</div><h4>Impact on people</h4><div>${esc(f.people)}</div><h4>Steps</h4><ol>${f.steps.map(s=>"<li>"+esc(s)+"</li>").join("")}</ol>`+
+    `<h4>Owner</h4><div class="owner">${esc(f.owner)} · source: ${esc(f.src)} · ${f.tier===1?"tier 1, the console or a session can execute after approval":f.tier===2?"tier 2, prepared as exact commands for an admin":"tier 3, designed for a Salesforce admin or developer to build"}</div>`);
+  const acts=el("div","rowacts");
+  const mk=(label,fn)=>{const b=el("button",null,esc(label)); b.addEventListener("click",e=>{e.stopPropagation();fn();}); acts.append(b);};
+  mk("prepare with jarvis",()=>jAsk("Prepare fix \""+f.title+"\" (id "+f.id+", "+f.system+", tier "+f.tier+"). Read it from fixes_catalog. Give me the exact commands, click-paths or SOQL an admin runs, in order, what to verify afterwards, and the one-line message to the owner ("+f.owner+") in my voice. If any step is within your action tools, offer to run it through an approval card."));
+  mk("track in asana",()=>jAsk("Track fix \""+f.title+"\" (id "+f.id+") in Asana using fix_track: Backlog/Requests section, notes from the runbook, owner "+f.owner+", due date two weeks from today unless the fix has a hard deadline sooner."));
+  mk("draft the nudge",()=>jAsk("Draft a short message from me to "+f.owner+" about fix \""+f.title+"\": what, why it matters to people, the first step, and a date. Register B, my voice, ready to paste into Teams or an email draft."));
+  mk("copy runbook",async()=>{try{await navigator.clipboard.writeText(fxRunbook(f));}catch(e){}});
+  if(st!=="done") mk("mark done",()=>fxSetStatus(f.id,"done"));
+  if(/^jarvis/.test(f.src)) mk("remove suggestion",()=>fxRemoveExtra(f.id));
+  body.append(acts); card.append(head,body);
+  return card;
+}
+window.FixesBus={all:fxAll,get:fxGet,status:fxStat,setStatus:fxSetStatus,add:fxAdd,remove:fxRemoveExtra,runbook:fxRunbook};
+if(recall("tab")==="fixes") renderFixes();
+
+// ================= JARVIS =================
+let updateTicker=()=>{};
+(async function(){
+  const log=$("#jlog"), input=$("#jin"), sendBtn=$("#jsend"),
+        micBtn=$("#jmic"), spkBtn=$("#jspk"), orb=$("#jorb"), note=$("#jnote"), chips=$("#jchips"), sub=$("#jsub");
+
+  // status ticker
+  let tickerFacts=["systems nominal"], tickerI=0;
+  updateTicker=function(){
+    const f=[];
+    if(liveCases){const cf=caseFacts(); f.push(cf.recs.length+" open cases");
+      if(cf.unassigned.length) f.push(cf.unassigned.length+" unassigned in the Zeus queue");
+      if(cf.newOld.length) f.push(cf.newOld.length+" in New past 2 business days");}
+    if(liveTasks){const tf=taskFacts(); if(tf.overdue.length) f.push(tf.overdue.length+" board items overdue");}
+    if(liveMail){const mf=mailFacts(); if(mf.unread.length) f.push(mf.unread.length+" unread from people");}
+    f.push("12 routines on watch");
+    tickerFacts=f.length?f:["systems nominal"];
+  };
+  setInterval(()=>{ sub.textContent=tickerFacts[tickerI++%tickerFacts.length]; },5000);
+  sub.textContent="online";
+
+  const KNOWLEDGE = JSON.stringify({
+    as_at:"2 Sep 2026", timezone:"AEST (UTC+10), DST one-shot adjusts crons 5 Oct 2026",
+    stack: LAYERS.map(L=>({layer:L.role, is:L.sub, home:L.home, what:L.what, detail:L.points})),
+    routines_active: R.map(r=>({name:r.n, trigger:r.t, cron_utc:r.cron, schedule_aest:r.sched, posture:r.type, does:r.what, ...r.detail})),
+    one_shots: ONESHOTS, retired_2sep: RETIRED.map(([n,t,d])=>({name:n,trigger:t,disposition:d})),
+    skills: SKILLS.map(([n,c,rp,a])=>({skill:n,covers:c,repo:rp,account:a})),
+    connectors:{core:CONN_CORE.map(([n,d])=>n+" ("+d+")"), extra:CONN_EXTRA,
+      rules:"Attached by Mathew only in the claude.ai UI; routines carry per-routine grants; Staging for experiments"},
+    artefacts: ARTS.map(([n,by,u])=>({name:n,rebuilt_by:by,url:u})),
+    credentials_watchlist: CREDS.map(([n,s,a])=>({item:n,status:s.split("|")[1],action:a})),
+    rules: RULES.map(([t,b,w],i)=>({n:i+1,rule:t,detail:b,why:w})),
+    open_decisions:[
+      "WooCommerce key rotation from the August exposure still not verified done.",
+      "Dashboard estate: retire the department suite or share this console with the team (each viewer would need their own connector grants). Recorded 3 Sep in os/registers.md.",
+      "Routine budget resolved 3 Sep at 12 of 12 (Top 10 email draft retired)."],
+    watching:["Thu 3 Sep 7:04am first deep slot of merged weekday job","Weekend 5-7 Sep first run of merged weekend job incl Sunday security refresh","Mon 8 Sep 6am first weekly audit self-run"],
+    governance_loop:["Propose exact change","Mathew approves","Execute and verify","Record in os/registers.md, same commit"],
+    automation_signals: AUTOMATION_SIGNALS,
+    case_model:{scope:"Cases live on RecordType.DeveloperName='Zeus' (ALWAYS scope Case queries with it). Owner.Name='Zeus' is the unassigned intake queue, not a person. Asana project gid 1211042432693678.",
+      statuses:STATUSES, close_reasons:CLOSE_REASONS,
+      closing:"Closing needs Status='Closed' AND Case_Closed_Reason__c from the list. Set Type too if blank (Admin, Troubleshooting, IAM, New User, Departing Staff, New Feature, Purchase/Renew, Spam)."},
+    sources:"Authoritative: os/README.md (rules), os/registers.md (state of record), .claude/skills/birdlife-os (operator skill), routines/ (backups) in mathewruahema-beep/Birdlife"
+  });
+
+  const INSTRUCTIONS =
+    "You are JARVIS, Mathew Hema's command assistant on BirdLife Australia's console. Mathew is Senior Manager ICT; his team is Andrew Dunn, Keith Tsui and Nina Lewis. Persona: composed, dry, capable, a touch of wit, never sycophantic. Address Mathew as sir sparingly, at most once per reply.\n" +
+    "Style: frank, specific, brief. Plain text only, no markdown syntax, no headings, no em dashes (use commas or full stops). Lead with the answer. Quote real trigger IDs, case numbers, crons and dates, never invent one.\n" +
+    "MATHEW'S VOICE, use it for every draft (reply, comment, email, Teams): three registers. A, one-liners for routing and approvals ('Yes, this is approved and please send the signed document to Kate'). B, working replies, two to six sentences, often opening with OK, clauses joined with and, warm, candid ('OK my bad, I was connected to the wrong account so nothing needs to be done'). C, structured long-form for vendors and executives: lead with the conclusion, own mistakes first with the mechanism, evidence and concrete numbers, every action has a named owner and timeframe, commitments like I will come back to you either way, prefer a firm date rather than an estimate, X rather than Y contrasts, no exclamation marks. All registers: no corporate filler (no touch base, circle back, reach out, hope this finds you well), sign off Thanks internally, Kind regards, Mathew externally. When unsure, go shorter.\n" +
+    "MANAGER LENS: Mathew's standing question is how to be a better ICT manager and iterate faster. When coaching or prioritising, rank by his own weighting: money first (revenue at risk or recoverable), efficiencies second (what blocks other people, aging cases, recurring time sinks), then risk and security, then the rest. Call out what he is neglecting, frankly.\n" +
+    "DECIDE AS MATHEW: when he asks you to decide, or what he would do, make the call the way he would: apply the weighting above plus the OS rules (propose then write, one job per outcome, no bulk, evidence over assumption). State the decision in one line, the single reason, and whether it is reversible. Then, if it is within your action tools, execute it through the approval card in the same turn; otherwise hand him the exact session ask. A cancelled card means he overruled you: accept it and say what you would watch instead. Never chain more than one write per approval.\n" +
+    "Tools, when available: get_today_snapshot first for anything about the queue, board, inbox or Teams (it carries case numbers, task gids, the board sections map with gids, recent inbox emails with message ids, and recent Teams messages). salesforce_read for other Salesforce reads (one SOQL SELECT, always LIMIT, always RecordType.DeveloperName='Zeus' on Case queries). asana_search for board lookups. show to navigate the page.\n" +
+    "ACTIONS you can execute, each behind an approval card the user must tap: case_internal_note, case_reply (public comment the requester can see, optionally set a new Status such as Waiting Response-External), case_close (close reason from the exact list; set Type if blank), case_assign (ONLY to Andrew Dunn, Keith Tsui, Nina Lewis or Mathew Hema; team members have duplicate User records, so if the tool returns candidate records, show them with usernames and recent-case counts, ask which, and call again with user_id, never pick one yourself), task_comment, task_complete, task_move (section gids from board.sections), and email_draft_reply (creates an Outlook reply DRAFT threaded on the original, never sends; Mathew reviews and sends from Outlook). Triage flow: for 'triage the queue to the team', go one case at a time, propose who gets it and why, and use case_assign per case, each with its own approval. Teams has NO send API: for a Teams reply, write the message text in a reply of its own so the copy button grabs it cleanly, and say to paste it into Teams. Before calling a write tool, state in one or two lines exactly what you are about to do. Draft replies warm and plain in Mathew's voice: direct, no corporate filler, commitments like 'I will come back to you either way', sign-off 'Thanks'. If the approval card is cancelled, accept it and stop. Report the verified result the tool returns, never assume success. Never bulk actions: one record at a time. SENDING email, assigning cases to anyone outside the four ICT team members, Entra or M365 admin, and Salesforce config are NOT yours: give the exact ask for a Claude session on mathewruahema-beep/Birdlife instead.\n" +
+    "MONEY: for any money question call money_snapshot first. Doctrine: Stripe, Salesforce and NetSuite rarely agree and the gap IS the finding; always name the lens a number came from (opportunity close date vs payment date vs Stripe settlement). Five livemode Stripe accounts exist (eCommerce, Memberships, Ausbirdfund, BLP, eStore/AOC). NEVER touch stripe_api_write or propose it; a mistaken write is real donor money. Money page tools are read only.\n" +
+    "SECURITY: for posture questions call security_snapshot first. Its content is confidential: keep it to this conversation, name overdue items bluntly, and treat a never-logged-in or bot sysadmin as a finding. What the page cannot see, say plainly and point to the Sunday security dashboard.\n" +
+    "REPORTS: you write Mathew's reports on request, register C voice, plain text ready to paste. Library: 'weekly ICT status' (queue and board movement, money line, security line, decisions made and open, next week), 'money state' (the three lenses, gaps, bridges, one action), 'security posture' (live posture, deadlines by urgency, two fixes), 'exec brief' (five sentences, money first). Method: pull the needed snapshots first, lead with the conclusion, concrete numbers with their lens named, every action gets an owner and a date, end before any sign-off. For a polished Word or PDF document, give Mathew the one-line session ask instead (a repo session has the docx skill).\n" +
+    "FIXES: the Fixes tab is the catalogue of suggested fixes, technical and process, ranked money first then what blocks people then risk. For any 'what should we fix', 'quick wins', 'prepare fix X' or 'track fix X' question call fixes_catalog first. Preparing a fix means the exact commands, click-paths or SOQL in order, what to verify, and a one-line message to the owner in Mathew's voice; tier 2 and 3 fixes are prepared for an admin, never claimed as done. fix_track creates one Asana task behind an approval card. When asked to suggest new fixes, read the live snapshots and the catalogue, propose at most three that are genuinely not listed, add each with fix_propose (steps concrete, impact on people stated, owner named), and say which you would do first. fix_status records progress; only mark done when Mathew says it is done.\n" +
+    "Finding automations: use automation_signals plus live data. Propose at most 3, each with name, schedule, exact write posture and hard caps, connectors, which existing routine could absorb it (rule 2), and budget impact (rule 3, currently 13 of 12). End with the session ask to create the best one through the OS change control.\n" +
+    "If something is not in the state pack or reachable by a tool, say so in one line and point at os/registers.md or a session; never guess.\n\nSTATE PACK:\n";
+
+  const turns = [];
+  let sample = null, sampleLimits = null, busy = false, ctl = null;
+
+  function bubble(cls, text){
+    const b = el("div","jmsg "+cls); b.textContent = text;
+    log.append(b); log.classList.add("on"); log.scrollTop = log.scrollHeight;
+    return b;
+  }
+  function toolNote(t){ const n=el("div","jtool","· "+t); log.append(n); log.scrollTop=log.scrollHeight; return n; }
+  function addCopy(b){
+    const c=el("button","copy","copy");
+    c.addEventListener("click",async ev=>{ev.stopPropagation();
+      try{await navigator.clipboard.writeText(b.textContent.replace(/copy$/,""));c.textContent="copied";setTimeout(()=>c.textContent="copy",1200);}catch(e){}});
+    b.append(c);
+  }
+  function setBusy(v){
+    busy = v; orb.classList.toggle("busy", v);
+    sendBtn.textContent = v ? "■" : "↑"; sendBtn.title = v ? "Stop" : "Ask";
+  }
+  function requestApproval(title, detail, signal){
+    return new Promise(res=>{
+      const card=el("div","japprove",
+        `<div class="at">Approval required</div><div class="ad"><b>${esc(title)}</b>\n${esc(detail)}</div>`);
+      const bar=el("div","ab");
+      const ok=el("button","approve","Approve"), no=el("button","cancel","Cancel");
+      let done=false;
+      const finish=v=>{ if(done)return; done=true; card.remove(); res(v); };
+      ok.addEventListener("click",()=>finish(true));
+      no.addEventListener("click",()=>finish(false));
+      if(signal) signal.addEventListener("abort",()=>finish(false));
+      setTimeout(()=>finish(false),120000);
+      bar.append(ok,no); card.append(bar);
+      log.append(card); log.classList.add("on"); log.scrollTop=log.scrollHeight;
+    });
+  }
+  const ERRCOPY = {
+    rate_limited:"Rate limited. Give it a minute and try again.",
+    session_expired:"Your Claude session expired. Sign in again and retry.",
+    refused:"Claude declined that one. Rephrase and try again.",
+    empty_completion:"No answer came back. Try asking more simply.",
+    prompt_too_large:"That conversation got too long. Refresh the page to start fresh.",
+    upstream_error:"Transient hiccup on the Claude side. Try again.",
+  };
+  const HIDE_CODES = ["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"];
+
+  function clip(v,max){ let s; try{s=typeof v==="string"?v:JSON.stringify(v);}catch(e){s=String(v);} return s.length>max? s.slice(0,max)+"...[trimmed]" : s; }
+  async function sfQ(q,signal){ const r=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q},{signal,cache:false}); return r.payload; }
+  async function resolveCase(caseNumber){
+    const cn=String(caseNumber||"").replace(/[^0-9]/g,"");
+    if(!cn) throw new Error("No case number given");
+    const p=await sfQ("SELECT Id, CaseNumber, Subject, Status, Type, Owner.Name FROM Case WHERE CaseNumber = '"+cn+"' LIMIT 2");
+    const recs=(p&&p.records)||[];
+    if(recs.length!==1) throw new Error(recs.length?"More than one case matches "+cn:"No case found with number "+cn);
+    return recs[0];
+  }
+  function afterWrite(){ try{mcpNS.invalidate(SF_SERVER);}catch(e){} try{mcpNS.invalidate(AS_SERVER);}catch(e){} }
+
+  function buildTools(){
+    if(!sampleLimits || !sampleLimits.tools) return undefined;
+    const tools=[
+      {name:"get_today_snapshot",
+       description:"Returns the live Ask Zeus queue and Asana board snapshot: counts, unassigned, aged and untyped cases with case numbers, overdue and blocked tasks with their gids. Use first for any question about the current queue, board, or today's workload.",
+       execute(){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const cf=caseFacts(), tf=taskFacts();
+         if(!liveCases && !liveTasks) return "Live data has not loaded yet"+(liveErr.sf?"; Salesforce: "+mcpErrCopy(liveErr.sf,SF_SERVER):"")+(liveErr.as?"; Asana: "+mcpErrCopy(liveErr.as,AS_SERVER):"");
+         return clip({
+           cases:{ total:cf.recs.length, by_status:cf.byStatus,
+             unassigned:cf.unassigned.map(r=>({n:r.CaseNumber,s:r.Subject,status:r.Status,age_days:ageDays(r.CreatedDate)})),
+             new_past_2bd:cf.newOld.map(r=>({n:r.CaseNumber,s:r.Subject,owner:cf.owner(r),bus_days:bizDaysSince(r.CreatedDate)})),
+             open_30d_plus:cf.aged.map(r=>({n:r.CaseNumber,s:r.Subject,owner:cf.owner(r),age_days:ageDays(r.CreatedDate)})),
+             untyped:cf.untyped.slice(0,20).map(r=>({n:r.CaseNumber,s:r.Subject})) },
+           board:{ total:tf.tasks.length,
+             sections: sectionsMap(),
+             overdue:tf.overdue.map(t=>({gid:t.gid,name:t.name,assignee:t.assignee?t.assignee.name:null,due:t.due_on,section:tf.secOf(t)})),
+             blocked:tf.blocked.map(t=>({gid:t.gid,name:t.name,assignee:t.assignee?t.assignee.name:null,section:tf.secOf(t)})),
+             all_tasks:tf.tasks.slice(0,60).map(t=>({gid:t.gid,name:t.name,section:tf.secOf(t)})),
+             unassigned_count:tf.unassigned.length },
+           inbox: mailFacts().people.slice(0,10).map(m=>({id:m.id,from:m.sender,subject:m.subject,received:m.receivedDateTime,unread:!m.isRead,preview:(m.summary||"").slice(0,200)})),
+           teams: chatFacts().msgs.slice(0,12).map(m=>({chat:chatLabel(m.chatId),from:(m.from&&m.from.displayName)||null,when:m.createdDateTime,text:stripHtml(m.summary).slice(0,200)})),
+           errors:{salesforce:liveErr.sf?mcpErrCopy(liveErr.sf,SF_SERVER):null, asana:liveErr.as?mcpErrCopy(liveErr.as,AS_SERVER):null, microsoft365:liveErr.m365?mcpErrCopy(liveErr.m365,M365_SERVER):null}
+         },14000);
+       }},
+      {name:"salesforce_read",
+       description:"Runs one read-only SOQL SELECT against Salesforce Production with the viewer's own access and returns the JSON result. SELECT statements only; always include LIMIT; always scope Case queries with RecordType.DeveloperName='Zeus'.",
+       inputSchema:{type:"object",properties:{q:{type:"string",description:"One SOQL SELECT statement"}},required:["q"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const q=String(input.q||"").trim();
+         if(!/^select\s/i.test(q) || q.includes(";")) throw new Error("Only a single SOQL SELECT is allowed");
+         const tn=toolNote("querying Salesforce...");
+         try{ return clip((await mcpNS.callTool(SF_SERVER,"soqlQuery",{q},{signal:context.signal,cache:{staleTime:30000}})).payload,12000); }
+         catch(e){ throw new Error(mcpErrCopy(e,SF_SERVER)); }
+         finally{ tn.remove(); }
+       }},
+      {name:"asana_search",
+       description:"Searches the IT Operations Project Plan in Asana (read-only). Returns tasks with gid, name, assignee, due date and section. Provide text to search, or omit to list incomplete tasks.",
+       inputSchema:{type:"object",properties:{text:{type:"string"},completed:{type:"boolean"}}},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const args={projects_any:PROJECT, completed:!!input.completed, limit:25, opt_fields:"name,assignee.name,due_on,memberships.section.name,modified_at"};
+         if(input.text) args.text=String(input.text).slice(0,200);
+         const tn=toolNote("searching Asana...");
+         try{ return clip((await mcpNS.callTool(AS_SERVER,"search_tasks",args,{signal:context.signal,cache:{staleTime:30000}})).payload,12000); }
+         catch(e){ throw new Error(mcpErrCopy(e,AS_SERVER)); }
+         finally{ tn.remove(); }
+       }},
+      {name:"show",
+       description:"Navigates this page. tab is one of command, today, board, money, security, fixes, system, schedule, registers, rules; day (0=Mon..6=Sun) optionally selects a schedule day.",
+       inputSchema:{type:"object",properties:{tab:{type:"string"},day:{type:"number"}},required:["tab"]},
+       execute(input){
+         const tab=String(input.tab||"").toLowerCase();
+         if(!VIEWS.includes(tab)) throw new Error("Unknown tab");
+         showView(tab);
+         if(tab==="schedule" && input.day!==undefined){ const d=Math.max(0,Math.min(6,Number(input.day)||0)); renderDay(d); }
+         return "Shown: "+tab;
+       }},
+      {name:"money_snapshot",
+       description:"Loads and returns the money state: Salesforce won opportunities and paid payments (7 days, two lenses that never match), Stripe balances across all five livemode accounts, Stripe-to-Salesforce sync errors, NetSuite reachability, and the standing bridge facts (manual CSV, unreconciled income, bank rec backlog, refund gap). Use for any question about money, revenue, payments, refunds or reconciliation.",
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         await loadMoney(false);
+         if(!moneyState) throw new Error("Money data did not load");
+         return clip({live:moneyState, facts:{
+           bridge:"Salesforce to NetSuite is a MANUAL monthly CSV; no integration exists in NetSuite",
+           unreconciled:"$671,117 across 2,878 records at 3 Jul 2026, growing ~$87K/day; exception report Zap 371228125 is in DRAFT",
+           bank_rec:"11104 NAT Operations 378 unmatched, 11103 ABF Donations 120 unmatched, both since 31 Mar 2022",
+           refund_gap:"Stripe refunds are not reliably reflected in Salesforce; verify, never assume",
+           regular_giving:"always the union of NPSP Recurring Donations AND AAkPay Recurring Payments; one object alone is wrong",
+           count_rule:"never trust != null counts on number fields in this org; use != null AND != 0"}},13000);
+       }},
+      {name:"security_snapshot",
+       description:"Loads and returns the security footprint: live Salesforce admin posture (who holds System Administrator, last logins, bot accounts, admin ratio, stale users), the hard deadline list with days remaining, and the not-readable-from-here list. Use for any security, posture, audit or deadline question. Content is confidential.",
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         await loadSecurity(false);
+         if(!secState || secState.err) throw new Error(secState&&secState.err||"Security data did not load");
+         const today=melbTodayISO();
+         return clip({live:{admins:secState.admins.map(a=>({name:a.Name,username:a.Username,last_login:a.LastLoginDate})),
+           inactive_admin_records:secState.inactiveAdmins, active_users:secState.activeUsers, stale_30d:secState.staleUsers},
+           deadlines:DEADLINES.map(([n,d])=>({item:n,date:d,days:Math.round((new Date(d)-new Date(today))/864e5)})),
+           not_readable:"Secure Score, Entra MFA/CA, Intune/BitLocker, Defender, WP 2FA, AWS root MFA, Google 2SV (weekly Security dashboard covers them)",
+           watchlist:"WooCommerce key rotation from August still unverified"},12000);
+       }},
+      {name:"fixes_catalog",
+       description:"Returns the suggested-fixes catalogue: every known technical and process fix (id, title, system, category, severity 1-3, tier, effort, owner, why, impact on people, steps, source) with its current status (proposed, accepted, in_progress, done, dismissed). Optional filters: status, cat, sev, system, q (text). Use before preparing, tracking or proposing fixes.",
+       inputSchema:{type:"object",properties:{status:{type:"string"},cat:{type:"string"},sev:{type:"number"},system:{type:"string"},q:{type:"string"}}},
+       execute(input){
+         let list=fxAll().map(f=>Object.assign({status:fxStat(f)},f));
+         if(input&&input.status) list=list.filter(f=>input.status==="open"?!["done","dismissed"].includes(f.status):f.status===input.status);
+         if(input&&input.cat) list=list.filter(f=>f.cat===input.cat);
+         if(input&&input.sev) list=list.filter(f=>f.sev===Number(input.sev));
+         if(input&&input.system) list=list.filter(f=>f.system.toLowerCase().includes(String(input.system).toLowerCase()));
+         if(input&&input.q){ const q=String(input.q).toLowerCase(); list=list.filter(f=>(f.title+" "+f.why+" "+f.people+" "+f.steps.join(" ")).toLowerCase().includes(q)); }
+         return clip({count:list.length, fixes:list},14000);
+       }},
+      {name:"fix_propose",
+       description:"Adds a NEW suggested fix to the Fixes page (stored on this device, no external write). Use after reading live snapshots and fixes_catalog so you never duplicate an existing fix. Required: title, why, steps (array), people (impact on people). Optional: id (kebab-case), system, cat (security|process|money|data|estate), sev (1 critical, 2 high, 3 medium), tier (1 execute, 2 prepare for admin, 3 design), effort (minutes|hours|project), owner.",
+       inputSchema:{type:"object",properties:{id:{type:"string"},title:{type:"string"},system:{type:"string"},cat:{type:"string"},sev:{type:"number"},tier:{type:"number"},effort:{type:"string"},owner:{type:"string"},why:{type:"string"},people:{type:"string"},steps:{type:"array",items:{type:"string"}}},required:["title","why","people","steps"]},
+       execute(input){
+         const dup=fxAll().find(f=>f.title.toLowerCase()===String(input.title||"").toLowerCase());
+         if(dup) throw new Error("Already listed as "+dup.id+"; do not add a duplicate");
+         const f=fxAdd(input); showView("fixes");
+         return "Added fix "+f.id+" (\""+f.title+"\", severity "+f.sev+", tier "+f.tier+"). It shows on the Fixes tab tagged jarvis.";
+       }},
+      {name:"fix_status",
+       description:"Sets the status of a fix on the Fixes page (proposed, accepted, in_progress, done, dismissed). Local to this device, no external write. Provide id and status.",
+       inputSchema:{type:"object",properties:{id:{type:"string"},status:{type:"string"}},required:["id","status"]},
+       execute(input){ const st=fxSetStatus(String(input.id),String(input.status)); return "Fix "+input.id+" is now "+st+"."; }},
+      {name:"fix_track",
+       description:"Creates ONE Asana task on the IT Operations Project Plan for a fix, after the user approves. Provide id (from fixes_catalog); optional section (default Backlog/Requests), assignee (email of Andrew Dunn, Keith Tsui, Nina Lewis or Mathew Hema), due_on (YYYY-MM-DD). Notes are the fix runbook. Verified by re-reading the board; sets the fix status to accepted. Never creates more than one task per call.",
+       inputSchema:{type:"object",properties:{id:{type:"string"},section:{type:"string"},assignee:{type:"string"},due_on:{type:"string"}},required:["id"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const f=fxGet(String(input.id)); if(!f) throw new Error("Unknown fix "+input.id);
+         const secs=sectionsMap(); const secName=input.section&&secs[input.section]?input.section:"Backlog/Requests";
+         const section_id=secs[secName]; if(!section_id) throw new Error("Section not found: "+secName);
+         const assignee=input.assignee?String(input.assignee).trim():null;
+         if(assignee && !/^(andrew\.dunn|keith\.tsui|nina\.lewis|mathew\.hema)@birdlife\.org\.au$/i.test(assignee)) throw new Error("Assignee must be one of the ICT team emails");
+         const due=input.due_on&&/^\d{4}-\d{2}-\d{2}$/.test(input.due_on)?input.due_on:null;
+         const name="[Fix] "+f.title;
+         const notes=fxRunbook(f)+"\n\nCreated from the BirdLife Australia console Fixes tab.";
+         const ok=await requestApproval("Create Asana task", name+"\nSection: "+secName+(assignee?"\nAssignee: "+assignee:"")+(due?"\nDue: "+due:"")+"\n\nNotes: the fix runbook (why, impact, steps, owner).", context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         const task={name, notes, section_id}; if(assignee) task.assignee=assignee; if(due) task.due_on=due;
+         const r=await mcpNS.callTool(AS_SERVER,"create_tasks",{default_project:PROJECT,tasks:[task]});
+         let gid=null; try{ const m=JSON.stringify(r&&r.payload!==undefined?r.payload:r).match(/"gid"\s*:\s*"(\d{6,})"/); if(m) gid=m[1]; }catch(e){}
+         afterWrite();
+         if(!gid){
+           const v=await mcpNS.callTool(AS_SERVER,"search_tasks",Object.assign({},AS_INPUT,{limit:100}),{cache:false});
+           const rows=(v&&v.payload&&Array.isArray(v.payload.data))?v.payload.data:[]; const hit=rows.find(t=>t.name===name); if(hit) gid=hit.gid;
+         }
+         if(!gid) return "The create call returned but the task could not be verified on the board. Check Asana before retrying; do not create it twice.";
+         fxSetStatus(f.id,"accepted");
+         return "Done. Task created and verified: "+name+" (gid "+gid+") in "+secName+". https://app.asana.com/1/443963187362944/project/"+PROJECT+"/task/"+gid+" Fix marked accepted.";
+       }},
+      // ---- write actions, each behind an approval card ----
+      {name:"case_internal_note",
+       description:"Adds an INTERNAL comment to an Ask Zeus case (not visible to the requester) after the user approves. Provide case_number and note. Returns the verified result.",
+       inputSchema:{type:"object",properties:{case_number:{type:"string"},note:{type:"string"}},required:["case_number","note"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const c=await resolveCase(input.case_number);
+         const note=String(input.note||"").slice(0,4000);
+         const ok=await requestApproval("Internal note on case "+c.CaseNumber, (c.Subject||"")+"\n\n"+note+"\n\n(Internal only, requester cannot see it.)", context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:note,IsPublished:false}});
+         afterWrite();
+         return "Done. Internal note added to case "+c.CaseNumber+".";
+       }},
+      {name:"case_reply",
+       description:"Posts a PUBLIC comment on an Ask Zeus case (visible to the requester) after the user approves, and optionally sets a new Status (exact values: New, In Progress, Pending, On Hold-Internal, Waiting Response-External, Response Received). Provide case_number, reply, optional set_status. Verified by re-read.",
+       inputSchema:{type:"object",properties:{case_number:{type:"string"},reply:{type:"string"},set_status:{type:"string"}},required:["case_number","reply"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const c=await resolveCase(input.case_number);
+         const reply=String(input.reply||"").slice(0,4000);
+         const st=input.set_status?String(input.set_status):null;
+         if(st && !STATUSES.includes(st)) throw new Error("Unknown status '"+st+"'. Exact values: "+STATUSES.join(", "));
+         const ok=await requestApproval("Public reply on case "+c.CaseNumber, (c.Subject||"")+"\n\n"+reply+(st?"\n\nThen set Status: "+c.Status+" -> "+st:"")+"\n\n(Public, the requester can see this.)", context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:reply,IsPublished:true}});
+         if(st) await mcpNS.callTool(SF_SERVER,"updateSobjectRecord",{"sobject-name":"Case",id:c.Id,body:{Status:st}});
+         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:"[via BirdLife Claude OS console] Reply posted"+(st?", Status set to "+st:"")+".",IsPublished:false}});
+         const v=await sfQ("SELECT Status FROM Case WHERE Id = '"+c.Id+"' LIMIT 1");
+         afterWrite();
+         const vs=v&&v.records&&v.records[0]?v.records[0].Status:"unknown";
+         return "Done. Reply posted on case "+c.CaseNumber+"; verified Status is now "+vs+".";
+       }},
+      {name:"case_close",
+       description:"Closes an Ask Zeus case after the user approves. Provide case_number, reason (EXACTLY one of the close reasons in the state pack), optional type (set when the case has no Type), optional closing_note (internal). Verified by re-read.",
+       inputSchema:{type:"object",properties:{case_number:{type:"string"},reason:{type:"string"},type:{type:"string"},closing_note:{type:"string"}},required:["case_number","reason"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const reason=String(input.reason||"");
+         if(!CLOSE_REASONS.includes(reason)) throw new Error("Unknown close reason '"+reason+"'. Exact values: "+CLOSE_REASONS.join(" | "));
+         const c=await resolveCase(input.case_number);
+         const type=input.type?String(input.type):null;
+         const noteTxt=input.closing_note?String(input.closing_note).slice(0,2000):null;
+         const ok=await requestApproval("Close case "+c.CaseNumber, (c.Subject||"")+"\nStatus: "+c.Status+" -> Closed\nReason: "+reason+(type?"\nType: "+(c.Type||"(blank)")+" -> "+type:"")+(noteTxt?"\nInternal note: "+noteTxt:""), context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         const body={Status:"Closed",Case_Closed_Reason__c:reason}; if(type) body.Type=type;
+         await mcpNS.callTool(SF_SERVER,"updateSobjectRecord",{"sobject-name":"Case",id:c.Id,body});
+         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:"[via BirdLife Claude OS console] Closed: "+reason+(noteTxt?" | "+noteTxt:""),IsPublished:false}});
+         const v=await sfQ("SELECT Status, Case_Closed_Reason__c FROM Case WHERE Id = '"+c.Id+"' LIMIT 1");
+         afterWrite();
+         const vr=(v&&v.records&&v.records[0])||{};
+         return "Done. Case "+c.CaseNumber+" verified: Status "+(vr.Status||"unknown")+", reason "+(vr.Case_Closed_Reason__c||"unknown")+".";
+       }},
+      {name:"case_assign",
+       description:"Assigns an Ask Zeus case to a team member after the user approves. assignee must be exactly one of: Andrew Dunn, Keith Tsui, Nina Lewis, Mathew Hema. Team members have MULTIPLE active Salesforce User records; this tool resolves the working record as the one that owns recent Ask Zeus cases. If it cannot resolve to exactly one record it returns the candidates with usernames; present them to the user, ask which, then call again with user_id instead of assignee. Optional note is added as an internal comment.",
+       inputSchema:{type:"object",properties:{case_number:{type:"string"},assignee:{type:"string"},user_id:{type:"string"},note:{type:"string"}},required:["case_number"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const TEAM=["Andrew Dunn","Keith Tsui","Nina Lewis","Mathew Hema"];
+         const c=await resolveCase(input.case_number);
+         let target=null;
+         if(input.user_id){
+           const uid=String(input.user_id).replace(/[^A-Za-z0-9]/g,"");
+           const p=await sfQ("SELECT Id, Name, Username FROM User WHERE Id = '"+uid+"' AND IsActive = true LIMIT 1");
+           const u=(p&&p.records&&p.records[0])||null;
+           if(!u) throw new Error("No active User with Id "+uid);
+           if(!TEAM.includes(u.Name)) throw new Error("That User record belongs to "+u.Name+", not an ICT team member. Assignment is restricted to: "+TEAM.join(", "));
+           target=u;
+         }else{
+           const name=String(input.assignee||"");
+           if(!TEAM.includes(name)) throw new Error("assignee must be exactly one of: "+TEAM.join(", "));
+           const p=await sfQ("SELECT Id, Name, Username FROM User WHERE Name = '"+name+"' AND IsActive = true LIMIT 5");
+           const actives=(p&&p.records)||[];
+           if(!actives.length) throw new Error("No active Salesforce User named "+name);
+           if(actives.length===1) target=actives[0];
+           else{
+             const ids=actives.map(u=>"'"+u.Id+"'").join(",");
+             const o=await sfQ("SELECT OwnerId, COUNT(Id) c FROM Case WHERE RecordType.DeveloperName = 'Zeus' AND OwnerId IN ("+ids+") AND CreatedDate = LAST_N_DAYS:180 GROUP BY OwnerId");
+             const owners=(o&&o.records)||[];
+             if(owners.length===1) target=actives.find(u=>u.Id===owners[0].OwnerId)||null;
+             if(!target){
+               const counts={}; owners.forEach(r=>counts[r.OwnerId]=r.c);
+               return "Cannot resolve a single User record for "+name+". Ask the user which one, then call case_assign again with that user_id. Candidates: "+
+                 actives.map(u=>u.Id+" ("+u.Username+", "+(counts[u.Id]||0)+" recent Zeus cases)").join("; ");
+             }
+           }
+         }
+         const noteTxt=input.note?String(input.note).slice(0,2000):null;
+         const ok=await requestApproval("Assign case "+c.CaseNumber+" to "+target.Name,
+           (c.Subject||"")+"\nOwner: "+((c.Owner&&c.Owner.Name)||"?")+" -> "+target.Name+"\nUser record: "+target.Username+" ("+target.Id+")"+(noteTxt?"\nInternal note: "+noteTxt:""), context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         await mcpNS.callTool(SF_SERVER,"updateSobjectRecord",{"sobject-name":"Case",id:c.Id,body:{OwnerId:target.Id}});
+         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:"[via BirdLife Claude OS console] Assigned to "+target.Name+" ("+target.Username+")"+(noteTxt?" | "+noteTxt:""),IsPublished:false}});
+         const v=await sfQ("SELECT Owner.Name FROM Case WHERE Id = '"+c.Id+"' LIMIT 1");
+         afterWrite();
+         const vn=(v&&v.records&&v.records[0]&&v.records[0].Owner&&v.records[0].Owner.Name)||"unknown";
+         return "Done. Case "+c.CaseNumber+" verified: Owner is now "+vn+".";
+       }},
+      {name:"task_comment",
+       description:"Adds a comment to an Asana task on the IT Operations Project Plan after the user approves. Provide task_gid (from get_today_snapshot or asana_search), task_name (for the approval card), and text.",
+       inputSchema:{type:"object",properties:{task_gid:{type:"string"},task_name:{type:"string"},text:{type:"string"}},required:["task_gid","task_name","text"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const gid=String(input.task_gid||"").replace(/[^0-9]/g,"");
+         if(!gid) throw new Error("No task gid given");
+         const text=String(input.text||"").slice(0,3000);
+         const ok=await requestApproval("Comment on task: "+String(input.task_name||gid), text, context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         await mcpNS.callTool(AS_SERVER,"add_comment",{task_id:gid,text});
+         afterWrite();
+         return "Done. Comment added to \""+String(input.task_name||gid)+"\".";
+       }},
+      {name:"task_complete",
+       description:"Marks an Asana task complete on the IT Operations Project Plan after the user approves. Provide task_gid and task_name. Reports Asana's succeeded or failed result.",
+       inputSchema:{type:"object",properties:{task_gid:{type:"string"},task_name:{type:"string"}},required:["task_gid","task_name"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const gid=String(input.task_gid||"").replace(/[^0-9]/g,"");
+         if(!gid) throw new Error("No task gid given");
+         const ok=await requestApproval("Complete task: "+String(input.task_name||gid), "Marks the task complete on the IT Operations Project Plan.", context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         const r=await mcpNS.callTool(AS_SERVER,"update_tasks",{tasks:[{task:gid,completed:true}]});
+         afterWrite();
+         return "Asana result: "+clip(r.payload,1500);
+       }},
+      {name:"task_move",
+       description:"Moves an Asana task to a section of the IT Operations Project Plan after the user approves. Provide task_gid, task_name, section_gid and section_name. Get gids from get_today_snapshot (board.sections maps section names to gids; tasks carry their gid). Reports Asana's succeeded or failed result.",
+       inputSchema:{type:"object",properties:{task_gid:{type:"string"},task_name:{type:"string"},section_gid:{type:"string"},section_name:{type:"string"}},required:["task_gid","task_name","section_gid","section_name"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const gid=String(input.task_gid||"").replace(/[^0-9]/g,"");
+         const sec=String(input.section_gid||"").replace(/[^0-9]/g,"");
+         if(!gid||!sec) throw new Error("Task gid and section gid are both required");
+         const ok=await requestApproval("Move task: "+String(input.task_name||gid), "To section: "+String(input.section_name||sec)+" on the IT Operations Project Plan.", context.signal);
+         if(!ok) return "Cancelled by user. Nothing was written.";
+         const r=await mcpNS.callTool(AS_SERVER,"update_tasks",{tasks:[{task:gid,add_projects:[{project_id:PROJECT,section_id:sec}]}]});
+         afterWrite();
+         return "Asana result: "+clip(r.payload,1500);
+       }},
+      {name:"email_draft_reply",
+       description:"Creates an Outlook reply DRAFT threaded on an inbox email, after the user approves. NEVER sends; the draft lands in Mathew's Drafts folder for him to review and send from Outlook. Provide message_id (from get_today_snapshot inbox), to (the sender, for the approval card), subject, and reply_text (plain text, written in Mathew's voice). Returns the draft confirmation with its Outlook link.",
+       inputSchema:{type:"object",properties:{message_id:{type:"string"},to:{type:"string"},subject:{type:"string"},reply_text:{type:"string"}},required:["message_id","to","subject","reply_text"]},
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const mid=String(input.message_id||"");
+         if(!/^[A-Za-z0-9+/=_-]+$/.test(mid)||mid.length<10) throw new Error("message_id does not look valid; take it from get_today_snapshot inbox");
+         const text=String(input.reply_text||"").slice(0,8000);
+         const ok=await requestApproval("Outlook reply draft to "+String(input.to||"?"), "Re: "+String(input.subject||"")+"\n\n"+text+"\n\n(Draft only. Nothing is sent; you review and send from Outlook.)", context.signal);
+         if(!ok) return "Cancelled by user. No draft was created.";
+         const r=await mcpNS.callTool(M365_SERVER,"outlook_create_reply_draft",{messageId:mid,body:text,bodyType:"text"});
+         // Observed live (old console): this tool answers in plain text ("id: ... webLink: ..."), not JSON
+         let raw = typeof r.payload==="string" ? r.payload : "";
+         if(!raw && r.content && r.content[0] && r.content[0].text) raw=r.content[0].text;
+         let p=(r.payload && typeof r.payload==="object") ? r.payload : null;
+         if(!p){
+           const mId=raw.match(/\bid:\s*([A-Za-z0-9+\/=_-]+)/), mW=raw.match(/webLink:\s*(\S+)/);
+           if(mId||mW) p={id:mId&&mId[1], webLink:mW&&mW[1]};
+           else { try{p=JSON.parse(raw);}catch(e){p=null;} }
+         }
+         return "Draft created in Outlook Drafts (not sent)."+(p&&p.webLink?" Open: "+p.webLink:(raw?" "+clip(raw,400):""));
+       }}
+    ];
+    return tools;
+  }
+
+  async function ask(q){
+    if(!sample || busy) return;
+    const question = (q ?? input.value).trim();
+    if(!question) return;
+    input.value = "";
+    bubble("you", question);
+    turns.push({role:"user", content:question});
+    while(turns.length > 14) turns.splice(0,2);
+    const out = bubble("jarvis","Thinking...");
+    setBusy(true);
+    ctl = new AbortController();
+    try{
+      const {text, truncated} = await sample(
+        [{role:"user", content: INSTRUCTIONS + KNOWLEDGE}, ...turns],
+        {cache:false, modelTier:"quick", signal:ctl.signal, tools:buildTools(),
+         onText:({text})=>{out.textContent = text; log.scrollTop = log.scrollHeight;}});
+      out.textContent = text + (truncated ? "\n\n[cut short, ask for less at a time]" : "");
+      addCopy(out);
+      turns.push({role:"assistant", content:text});
+      speak(text);
+    }catch(e){
+      if(e && e.code === "cancelled"){
+        out.textContent = (e.text || "Stopped.");
+        if(e.text){ addCopy(out); turns.push({role:"assistant", content:e.text}); } else turns.pop();
+      }else if(e && HIDE_CODES.includes(e.code)){
+        out.remove(); turns.pop(); disableJarvis("Jarvis is not available for this account.");
+      }else if(e && e.code==="tools_unavailable"){
+        sampleLimits = {maxPromptBytes:65536};
+        out.className="jmsg err"; out.textContent="This viewer cannot run live tools; asking again will answer from the registers only.";
+        turns.pop();
+      }else{
+        out.className = "jmsg err";
+        out.textContent = (e && e.text) ? e.text + "\n\n" + (ERRCOPY[e.code]||ERRCOPY.upstream_error)
+                                        : (ERRCOPY[e && e.code] || ERRCOPY.upstream_error);
+        turns.pop();
+      }
+    }finally{
+      setBusy(false); ctl = null; log.scrollTop = log.scrollHeight;
+    }
+  }
+  JarvisBus.ask = q=>ask(q);
+  JarvisBus.prefill = q=>{ input.value=q; try{input.focus();}catch(e){} };
+
+  sendBtn.addEventListener("click", ()=>{ if(busy){ ctl?.abort(); } else ask(); });
+  input.addEventListener("keydown", e=>{ if(e.key==="Enter" && !busy) ask(); });
+
+  [["Catch me up","Catch me up: unread inbox from people, latest Teams messages, and anything urgent on the queue or board. Use the live snapshot, brief and prioritised."],
+   ["Triage my queue","Triage my queue: what needs action right now and in what order? Use the live snapshot."],
+   ["Find automations","Find automation candidates for us, using the automation signals and the live queue and board."],
+   ["Work the worst case","Look at the live queue, pick the case most needing action, summarise it, and propose the move. If it warrants a reply or close, draft it and I will approve."],
+   ["What runs tomorrow?","What runs tomorrow morning, in order?"],
+   ["Coach me","Coach me: look at the live queue, board, inbox and the patterns, and give me the three highest-leverage moves I should make this week as Senior Manager ICT. Be frank about what I am neglecting."],
+   ["Money state","Give me the money state: use the money snapshot, lead with the lens gap and the reconciliation bridges, and tell me what has moved since I last looked."],
+   ["Security posture","Give me the security posture: use the security snapshot, admins first, then the deadlines in date order with days remaining. Flag anything overdue in the first line."],
+   ["Quick wins","From fixes_catalog, give me the five quickest high-impact fixes still open, who owns each, and which one I should do in the next hour."],
+   ["Suggest fixes","Look at the live snapshots and the fixes catalogue. Propose up to three new fixes not already listed, add each with fix_propose, and tell me the one you would do first."],
+   ["Weekly report","Write my weekly ICT status report: queue and board movement, money state, security posture, and the decisions I owe. Pull fresh snapshots first, one page, in my voice, each action with an owner and a date."]
+  ].forEach(([label,q])=>{
+    const c = el("button",null,esc(label));
+    c.addEventListener("click",()=>ask(q));
+    chips.append(c);
+  });
+
+  // voice output
+  let speakOn = recall("speak")==="1";
+  spkBtn.setAttribute("aria-pressed", String(speakOn));
+  function speak(text){
+    if(!speakOn || !("speechSynthesis" in window)) return;
+    try{
+      speechSynthesis.cancel();
+      const clean = text.replace(/trig_[A-Za-z0-9]+/g,"").replace(/https?:\S+/g,"a link").replace(/[·|]/g,",");
+      const u = new SpeechSynthesisUtterance(clean.slice(0,1200));
+      u.lang = "en-AU"; u.rate = 1.05;
+      try{
+        const vs=speechSynthesis.getVoices();
+        const v=vs.find(x=>/en-GB/i.test(x.lang)&&/male|daniel|arthur/i.test(x.name))||vs.find(x=>/en-AU/i.test(x.lang));
+        if(v) u.voice=v;
+      }catch(e){}
+      speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  spkBtn.addEventListener("click",()=>{
+    speakOn = !speakOn;
+    spkBtn.setAttribute("aria-pressed", String(speakOn));
+    remember("speak", speakOn?"1":"0");
+    if(!speakOn){ try{speechSynthesis.cancel();}catch(e){} }
+    else speak("Voice on, sir.");
+  });
+  if(!("speechSynthesis" in window)) spkBtn.hidden = true;
+
+  // voice input
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(SR){
+    micBtn.hidden = false;
+    let rec = null, listening = false;
+    const PH = input.placeholder;
+    micBtn.addEventListener("click",()=>{
+      if(listening){ try{rec.stop();}catch(e){} return; }
+      try{
+        rec = new SR(); rec.lang = "en-AU"; rec.interimResults = true; rec.maxAlternatives = 1;
+        listening = true; micBtn.classList.add("listening"); input.placeholder = "Listening...";
+        rec.onresult = ev=>{
+          let s = "";
+          for(const r of ev.results) s += r[0].transcript;
+          input.value = s;
+          if(ev.results[ev.results.length-1].isFinal){ try{rec.stop();}catch(e){} ask(s); }
+        };
+        rec.onend = ()=>{ listening = false; micBtn.classList.remove("listening"); input.placeholder = PH; };
+        rec.onerror = rec.onend;
+        rec.start();
+      }catch(e){ listening = false; micBtn.classList.remove("listening"); }
+    });
+  }
+
+  function disableJarvis(msg){
+    input.disabled = true; sendBtn.disabled = true; micBtn.hidden = true;
+    note.textContent = msg; note.classList.add("on");
+    sub.textContent = "unavailable in this view";
+    JarvisBus.ask = null; JarvisBus.prefill = null;
+  }
+
+  try{ sample = await claude.use("sample"); }catch(e){ sample = null; }
+  if(!sample){
+    disableJarvis("Jarvis needs the Claude viewer to answer. Open this page at its claude.ai link.");
+    return;
+  }
+  try{ sampleLimits = await sample.limits(); }catch(e){ sampleLimits = {maxPromptBytes:65536}; }
+
+  // boot greeting, typed, no usage spent
+  (function(){
+    const hour=(()=>{try{return +new Intl.DateTimeFormat("en-AU",{hour:"numeric",hour12:false,timeZone:"Australia/Melbourne"}).format(new Date());}catch(e){return new Date().getHours();}})();
+    const greet=hour<12?"Good morning":hour<17?"Good afternoon":"Good evening";
+    const msg=greet+", Mathew. JARVIS online. All estate registers loaded; live queue and board connecting. Ask, or tap anything on the page.";
+    const b=bubble("jarvis","");
+    let i=0; const iv=setInterval(()=>{ b.textContent=msg.slice(0,++i); if(i>=msg.length){clearInterval(iv);} },12);
+  })();
+  note.textContent = "First question asks your permission; answers spend your Claude usage, live lookups use your connectors. Writes always show an Approve card first and are verified by re-read.";
+  note.classList.add("on");
+  setTimeout(()=>note.classList.remove("on"), 14000);
+})();
+</script>

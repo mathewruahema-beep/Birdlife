@@ -120,3 +120,27 @@ crons and local times. The reverts on the first Sunday of April 2027 are the
 retire the stale case chaser after folding its two rules into the weekday deep
 slot (one slot), merge the onboarding and offboarding detectors into one daily
 identity scan (one slot).
+
+## Actions taken the same evening (on Mathew's instruction)
+
+- Retired `trig_01CUkTdAFSisnzyU6pwgkH4k` (weekend dashboards and weekly security)
+  and `trig_01AsdSGs9WiwRUrmbRmSxtAZ` (Friday weekly status update). Definitions,
+  attached connector lists and the persistent session id are in
+  `routines/routines-backup-2026-09-03b.json`. Recurring count is now 11 of 12.
+- Weekday dashboards job: website probes moved from the Zapier webhook action to
+  WebFetch; the Zapier Teams post moved to after the SharePoint push, heartbeat
+  and monitoring dashboard so a held approval cannot take them down; weekend
+  wording updated.
+- Overnight pre-draft: prints the full draft pack as text before attempting the
+  Salesforce writes; the retired console snapshot step (step 5) removed.
+- Data feed monitor: NetSuite OAuth2 certificate now carries its real expiry,
+  17 Sep 2026, with a 14-day warning window.
+- DST fix one-shot: prompt rewritten against the 11 current recurring routines.
+- Offboarding detector: no change needed; its prompt already says plainly when
+  the Entra bridge is unreachable.
+- OS branch `claude/os-for-claude-y12d5q` merged into this branch and the default
+  branch so `os/registers.md` exists where routines run.
+
+Still only possible in the Routines UI: pre-approve the Zapier action on the
+weekday job, pre-approve createSobjectRecord on the pre-draft, turn on the
+pre-draft push notification, attach Gmail to AI Daily Ten.

@@ -7,29 +7,16 @@ Stripe, Zapier, Cloudflare) make it *your* ICT assistant. It proposes every
 production change and waits for your approval before writing. Add "dry run" to any
 prompt to preview without writing.
 
-## The online console
+## The console
 
-**https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e** — bookmark
-this on your phone. The Today tab shows the live Ask Zeus queue and Asana board
-(via your claude.ai connectors) with a prioritised "What to do next" list, and each
-case opens a workbench that can post a response on the case and close it (reason +
-type handled, two-tap confirm, internal audit comment, verified by re-query). The
-project board shows every section except Backlog, and each task has the same
-workbench: comment, move between sections, or mark complete — verified the same way.
-It also shows recent Inbox mail from real people (reply in Mathew's voice — save as
-an Outlook draft or send, threaded on the original) and recent Teams messages
-(reply drafted to copy + a deep link into the chat; Teams has no send API).
-Every reply surface offers voice drafts from the email-voice profile to pick,
-edit, and execute, plus an "Ask Claude to write it" hand-off with the full
-context packaged. Voice works too: 🔊 Brief speaks the live summary aloud, and
-the 🎙 mic takes commands — "read the briefing", "show stuck tasks", "show
-unread emails", "open case 139005", "show everything". The
-Ask tab composes exact prompts for a Claude session; Runbooks generates the full
-offboarding PowerShell sequence from a name and UPN; Reference carries close
-reasons, Asana section gids, and the scoped SOQL. Source lives at `console/index.html` in this repo — tell any
-assistant session "update the console" to change it. (Don't enable GitHub Pages
-for it on a free plan: Pages would make the page public, and it names internal
-systems. The artifact URL is private to you.)
+**https://claude.ai/code/artifact/2a9b7e57-dbc5-49e3-a4d7-c0a36bd236b2** — the
+BirdLife Australia console, bookmark it on your phone (add to home screen). Live
+Ask Zeus queue, Asana board, Outlook inbox and Teams through your own connectors,
+with Jarvis: ask anything, and reply / close / assign / comment / complete / move
+run through an Approve card, verified by re-read. Outlook replies are created as
+drafts only; Teams replies are drafted to copy (no send API). Source lives at
+`os/claude-os-overview.html`; tell any session "update the console" to change it.
+The previous ICT Console was retired 3 Sep 2026 and its old link now redirects.
 
 ## Ways to reach it
 
@@ -43,16 +30,14 @@ synced to your account, so in any Claude conversation the assistant triggers
 automatically on ticket-shaped requests, or explicitly with
 `/birdlife-ict-assistant`.
 
-**3. Scheduled routines (it works while you sleep).** Already live on the account:
-- *BirdLife ICT weekday dashboards and monitor (single job)* (`trig_01HhAKnEe6PXAvo6EEq72BHo`),
-  hourly 7am to 5pm AEST weekdays — republishes the dashboards from live data and runs the
-  health checks. It replaced `trig_0126KYAM3TAaZpBQKN8UeVdk` on 13 Aug 2026. Connectors must
-  be attached to the routine in claude.ai → Routines. The full routine list and its
-  current health is in `routines/unused-routines-review-2026-09-03.md`.
-- *BirdLife ICT stale case chaser (report-only)* — Mondays, flags stale cases.
-- *Morning brief + ICT* — weekdays 5am AEST.
-- *BirdLife security dashboard monthly refresh* — 1st of the month.
-Definitions and backups live in `routines/`.
+**3. Scheduled routines (it works while you sleep).** The live routine estate
+changes often enough that listing it here went stale twice; the state of record
+is now [`os/registers.md`](../os/registers.md), refreshed by the weekly OS
+audit. Highlights as of 3 Sep 2026: overnight pre-draft (weekdays 5:30am AEST),
+onboarding/offboarding detectors (daily), dashboard refresh (7am), stale case
+chaser (Mondays), the weekly OS audit (Mondays 6am). Connectors must be
+attached to each routine in claude.ai → Routines, one time each. Definitions
+and backups live in `routines/`; the management rules are `os/README.md`.
 
 **4. GitHub.** Open an issue on this repo describing the problem and start a Claude
 session from it (or mention the issue in a new claude.ai/code session). Useful for
