@@ -164,6 +164,12 @@ weekday morning and republished to a stable URL.
 (`trig_0126KYAM3TAaZpBQKN8UeVdk`), cron `0 22 * * 0-4` UTC = weekdays 08:00 AEST.
 Fresh session per run, read-only, push notification on completion.
 
+> **Superseded (3 Sep 2026 review).** That trigger was retired on 13 Aug 2026. The
+> dashboard is now rebuilt by `BirdLife ICT weekday dashboards and monitor (single job)`
+> (`trig_01HhAKnEe6PXAvo6EEq72BHo`). Current state of every routine is in
+> `routines/unused-routines-review-2026-09-03.md` and the register on the
+> `claude/os-for-claude-y12d5q` branch (`os/registers.md`).
+
 ### Why it replaced the old file
 
 `birdlife_ict_dashboard.html` (Google Drive, 5 Aug 2026) was correctly scoped, but:
@@ -253,7 +259,8 @@ Consolidated to one scheduled job plus an in-session loop.
 | ICT Dashboard refresh — early AM | folded in; collided with the new job at the same minute |
 
 **Kept (4):** the consolidated ICT dashboard job (`trig_0126KYAM3TAaZpBQKN8UeVdk`,
-weekdays 7am AEST), Morning brief, the working security dashboard monthly, and the
+weekdays 7am AEST; itself retired 13 Aug, see the 3 Sep 2026 review in `routines/`),
+Morning brief, the working security dashboard monthly, and the
 October DST fix — which is still needed for the Morning brief and skips the ICT part
 gracefully now that the separate dashboard triggers are gone.
 

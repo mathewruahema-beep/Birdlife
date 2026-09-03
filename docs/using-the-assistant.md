@@ -44,9 +44,11 @@ automatically on ticket-shaped requests, or explicitly with
 `/birdlife-ict-assistant`.
 
 **3. Scheduled routines (it works while you sleep).** Already live on the account:
-- *ICT Dashboard — weekday refresh & data-flow check* (`trig_0126KYAM3TAaZpBQKN8UeVdk`),
-  weekdays 7am AEST — republishes the dashboard from live data and runs the health
-  checks. Connectors must be attached to the routine in claude.ai → Routines.
+- *BirdLife ICT weekday dashboards and monitor (single job)* (`trig_01HhAKnEe6PXAvo6EEq72BHo`),
+  hourly 7am to 5pm AEST weekdays — republishes the dashboards from live data and runs the
+  health checks. It replaced `trig_0126KYAM3TAaZpBQKN8UeVdk` on 13 Aug 2026. Connectors must
+  be attached to the routine in claude.ai → Routines. The full routine list and its
+  current health is in `routines/unused-routines-review-2026-09-03.md`.
 - *BirdLife ICT stale case chaser (report-only)* — Mondays, flags stale cases.
 - *Morning brief + ICT* — weekdays 5am AEST.
 - *BirdLife security dashboard monthly refresh* — 1st of the month.
