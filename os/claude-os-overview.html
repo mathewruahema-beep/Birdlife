@@ -1,43 +1,28 @@
 <title>BirdLife Australia</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
+/* Stark HUD: a deliberate single-theme look, every colour explicit, holds on any host ground */
 :root{
-  --ground:#f2f6f3; --surface:#ffffff; --surface2:#e9efe9; --surface3:#dfe8e1;
-  --ink:#1a2620; --ink2:#4c5d54; --ink3:#71837a;
-  --accent:#1e6f50; --accent-ink:#ffffff; --glow:rgba(30,111,80,.10); --glow2:rgba(30,111,80,.25);
-  --line:#d3ddd5; --line2:#bccac0;
-  --warn:#9c6414; --warn-bg:#f6ead6;
-  --crit:#a83a30; --crit-bg:#f4e0dd;
-  --ok:#1e6f50; --ok-bg:#dfece4;
-  --dock:rgba(255,255,255,.88);
+  --ground:#060b10; --surface:#0c151d; --surface2:#122029; --surface3:#183041;
+  --ink:#d8ecf4; --ink2:#8fb0bf; --ink3:#63808e;
+  --accent:#54d7f2; --accent-ink:#04222c; --glow:rgba(84,215,242,.10); --glow2:rgba(84,215,242,.35);
+  --gold:#f0b429; --gold-ink:#1c1502;
+  --line:#16333f; --line2:#24485a;
+  --warn:#f0b429; --warn-bg:#2b2208;
+  --crit:#e0685c; --crit-bg:#33150f;
+  --ok:#3fd6a5; --ok-bg:#0b2b20;
+  --dock:rgba(6,14,19,.93);
   --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   --disp:'Bricolage Grotesque','Instrument Sans',system-ui,sans-serif;
   --body:'Instrument Sans',system-ui,-apple-system,sans-serif;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --ground:#0f1613; --surface:#171f1a; --surface2:#1e2822; --surface3:#243027;
-    --ink:#e3ebe5; --ink2:#a5b5ab; --ink3:#7e8f85;
-    --accent:#57b78c; --accent-ink:#0c1410; --glow:rgba(87,183,140,.12); --glow2:rgba(87,183,140,.3);
-    --line:#28332c; --line2:#374439;
-    --warn:#d9a04c; --warn-bg:#2d2415;
-    --crit:#e07a6e; --crit-bg:#331d1a;
-    --ok:#57b78c; --ok-bg:#16281f;
-    --dock:rgba(23,31,26,.9);
-  }
-}
-:root[data-theme="dark"]{
-  --ground:#0f1613; --surface:#171f1a; --surface2:#1e2822; --surface3:#243027;
-  --ink:#e3ebe5; --ink2:#a5b5ab; --ink3:#7e8f85;
-  --accent:#57b78c; --accent-ink:#0c1410; --glow:rgba(87,183,140,.12); --glow2:rgba(87,183,140,.3);
-  --line:#28332c; --line2:#374439;
-  --warn:#d9a04c; --warn-bg:#2d2415;
-  --crit:#e07a6e; --crit-bg:#331d1a;
-  --ok:#57b78c; --ok-bg:#16281f;
-  --dock:rgba(23,31,26,.9);
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
-body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;margin:0}
+body{color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;margin:0;
+  background:radial-gradient(1100px 560px at 82% -8%, rgba(84,215,242,.07), transparent 60%),
+             radial-gradient(800px 500px at -10% 108%, rgba(240,180,41,.05), transparent 55%),
+             var(--ground)}
+header h1{text-shadow:0 0 34px var(--glow2)}
 ::selection{background:var(--accent);color:var(--accent-ink)}
 .wrap{max-width:1040px;margin:0 auto;padding:34px 22px 190px}
 a{color:var(--accent)}
@@ -275,9 +260,9 @@ footer .mono{font-size:11.5px}
 <header>
   <div class="eyebrow"><span class="livedot"></span>BirdLife Australia ICT · mathewruahema-beep/Birdlife</div>
   <h1>BirdLife Australia</h1>
-  <p class="sub">Your daily console over the Claude estate. Today shows the live Ask Zeus queue and Asana board through your own connectors; the other tabs are the governed system underneath. Jarvis answers, pulls live data, and executes approved actions: every write shows you the exact change first and nothing happens until you tap Approve.</p>
+  <p class="sub">Your daily console over the Claude estate. Command is the full picture: operations first, project work beside it, and the decisions that make you a better ICT manager. Jarvis answers in your voice, pulls live data, decides as you would when asked, and executes: every write shows the exact change and waits for your tap on Approve.</p>
   <div class="statebar">
-    <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>13</b> recurring routines</span>
+    <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>12</b> recurring routines</span>
     <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>2</b> one-shots</span>
     <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>9</b> retired 2 Sep, backed up</span>
     <span class="chip" role="button" tabindex="0" data-goto="registers:skills"><b>12</b> skills in repo</span>
@@ -287,16 +272,33 @@ footer .mono{font-size:11.5px}
 </header>
 
 <nav class="tabs" role="tablist" aria-label="Sections">
-  <button role="tab" data-view="today" aria-selected="true">Today</button>
-  <button role="tab" data-view="board" aria-selected="false">Board</button>
+  <button role="tab" data-view="command" aria-selected="true">Command</button>
+  <button role="tab" data-view="today" aria-selected="false">Today</button>
+  <button role="tab" data-view="board" aria-selected="false">Projects</button>
   <button role="tab" data-view="system" aria-selected="false">The system</button>
   <button role="tab" data-view="schedule" aria-selected="false">Schedule</button>
   <button role="tab" data-view="registers" aria-selected="false">Registers</button>
   <button role="tab" data-view="rules" aria-selected="false">Rules &amp; decisions</button>
 </nav>
 
+<!-- ============ COMMAND ============ -->
+<div class="view" id="view-command">
+  <h2 class="vt">The full picture</h2>
+  <p class="lede">One screen for running ICT: operations first (the essentials), then project work, then the decisions and patterns that make you a better manager of both. Everything is live where the connectors allow, and everything hands to Jarvis on a tap.</p>
+  <div class="grouphead">Operations · the essentials</div>
+  <div id="cmd-ops"><div class="degraded">Operations data loads inside the Claude viewer with your connectors allowed.</div></div>
+  <div class="grouphead">Project work</div>
+  <div id="cmd-projects"><div class="degraded">The board loads with the Asana connector.</div></div>
+  <div class="twocol" style="margin-top:18px">
+    <div class="panel warnp"><h3>Decisions waiting on you</h3><div id="cmd-decisions"></div></div>
+    <div class="panel watchp"><h3>Run yourself like a system</h3><div id="cmd-iterate"></div></div>
+  </div>
+  <div class="grouphead" style="margin-top:22px">Patterns worth acting on</div>
+  <div id="cmd-patterns"></div>
+</div>
+
 <!-- ============ TODAY ============ -->
-<div class="view" id="view-today">
+<div class="view" id="view-today" hidden>
   <div class="todaybar">
     <h2 class="vt" style="margin:0">Right now</h2>
     <span class="asof" id="asof">connecting to your connectors...</span>
@@ -397,7 +399,7 @@ footer .mono{font-size:11.5px}
     <div class="panel warnp">
       <h3>Open decisions (tap to work one)</h3>
       <ul>
-        <li class="clicky" data-ask="Walk me through the routine budget decision: 13 active against a budget of 12. Lay out the three options with the trade-offs and recommend one."><b>Budget: 13 vs 12.</b> The audit routine took the thirteenth slot. Merge the two Friday status drafts, fold the Top 10 draft into the pre-draft, or raise the budget to 13.</li>
+        <li class="clicky" data-ask="Should I retire the department dashboard suite or share this console with the team instead? Lay out both paths with effort and impact, and recommend one."><b>Dashboard estate.</b> Retire the department suite, or share this console with the team (each viewer needs their own connector grants). The budget decision itself was resolved 3 Sep at 12 of 12.</li>
         <li class="clicky" data-ask="What exactly do I need to do to verify the WooCommerce key rotation from the August exposure, and how do I close it off the watchlist?"><b>WooCommerce key rotation.</b> Flagged in August after keys sat in routine prompts; still not verified done. Stays on the credential watchlist until confirmed.</li>
       </ul>
     </div>
@@ -471,9 +473,6 @@ const R = [ // routines. days: 0=Mon..6=Sun
  {n:"ICT overnight pre-draft (approve-first)", t:"trig_01EbMkfD4UcGUKLkUB1mNQ8V", cron:"30 19 * * 0-4", sched:"weekdays 5:30am", days:[0,1,2,3,4], time:"5:30am", sort:530, type:"write",
   what:"Drafts requester replies as internal case comments so every case has a response waiting by morning. You approve and post; it never contacts requesters.",
   detail:{Writes:"Internal CaseComments only (IsPublished=false), max 8 per night, marked [ASSISTANT DRAFT]. Never touches Status, Owner, Type or email.", Connectors:"Salesforce Production", Definition:"routines/overnight-pre-draft.md"}},
- {n:"Top 10 morning email draft", t:"trig_016BES4jwEodCfNdSTBYfSow", cron:"0 20 * * 0-4", sched:"weekdays 6am", days:[0,1,2,3,4], time:"6:00am", sort:600, type:"read",
-  what:"The morning priorities draft, waiting in the inbox before the day starts.",
-  detail:{Writes:"One email draft only", Note:"Named as a candidate to absorb the pre-draft's reporting in the open budget decision"}},
  {n:"Claude OS weekly audit", t:"trig_01V3i4b5zekjZuuFTF6Ymu9G", cron:"0 20 * * 0", sched:"Mon 6am", days:[0], time:"6:00am", sort:600, type:"gov",
   what:"The OS auditing itself: verdicts every trigger, checks the budget and skill drift, hunts stale references, commits the register update, and reports the decisions you need to make.",
   detail:{Writes:"os/registers.md only (commit + push)", Connectors:"None needed: repo and trigger list come from the environment", Created:"2 Sep 2026", Definition:"routines/os-weekly-audit.md"}},
@@ -508,6 +507,7 @@ const ONESHOTS = [
   what:"Fires a month before the certificate expires on 26 Aug 2027, into its bound session."}
 ];
 const RETIRED = [
+ ["Top 10 morning email draft","trig_016BES4jwEodCfNdSTBYfSow","Retired 3 Sep: overlapped the console's Catch me up; closed the routine budget at 12 of 12"],
  ["ICT dashboard, daily refresh and Teams push","trig_01QKqXyfwVoUwejxBbe15gX9","Absorbed into the weekday job's deep slot: Teams push, heartbeat, fail-loudly email"],
  ["ICT hourly monitor 7-9am","trig_015SYdBtkDn7jt8dz6MdvXyE","Absorbed into the weekday job: monitor checks, Teams post rules, monitoring Teams file"],
  ["Dashboards hourly, weekday daytime","trig_01Egd8XCKdBErqNPYnFkgTJB","Absorbed into the weekday job's light slots"],
@@ -585,7 +585,7 @@ function jAsk(q){ if(JarvisBus.ask) JarvisBus.ask(q); else if(JarvisBus.prefill)
 function jPre(q){ if(JarvisBus.prefill) JarvisBus.prefill(q); }
 
 // ---------- tabs ----------
-const VIEWS=["today","board","system","schedule","registers","rules"];
+const VIEWS=["command","today","board","system","schedule","registers","rules"];
 const tabs=[...document.querySelectorAll('nav.tabs button')];
 function showView(v){
   if(!VIEWS.includes(v)) return;
@@ -850,6 +850,98 @@ function renderBoard(){
   });
   host.innerHTML=""; host.append(wrap);
   host.append(el("p","schednote","Showing up to 100 incomplete tasks from the live pull. Move a task by telling Jarvis, e.g. \"move <task> to Blocked\"."));
+  renderCommand();
+}
+// ================= COMMAND: the manager lens =================
+function opsRow(icon,label,detail,ask,cls){
+  const row=el("div","trow actionable"+(cls?" ":""),
+    `<div class="t1">${icon} ${esc(label)}</div><div class="t2">${esc(detail)}</div>`);
+  row.addEventListener("click",()=>jPre(ask));
+  return row;
+}
+function renderCommand(){
+  const ops=$("#cmd-ops"); if(!ops) return;
+  const cf=caseFacts(), tf=taskFacts(), mf=mailFacts(), cf2=chatFacts();
+  // OPERATIONS
+  if(mcpNS && (liveCases||liveTasks||liveMail)){
+    ops.innerHTML="";
+    const list=el("div","tlist");
+    if(liveCases){
+      const replied=cf.byStatus["Response Received"]||0;
+      list.append(opsRow("🎫","Helpdesk: "+cf.recs.length+" open",
+        (cf.unassigned.length?cf.unassigned.length+" unassigned, ":"")+(replied?replied+" with a reply waiting on us, ":"")+(cf.newOld.length?cf.newOld.length+" in New past 2 business days, ":"")+cf.untyped.length+" untyped",
+        "Triage my queue: what needs action right now and in what order? Use the live snapshot."));
+    } else list.append(el("div","trow empty",liveErr.sf?esc(mcpErrCopy(liveErr.sf,SF_SERVER)):"Queue loading..."));
+    if(liveMail) list.append(opsRow("✉️","Inbox: "+mf.unread.length+" unread from people",
+      mf.unread.slice(0,3).map(m=>(m.sender||"").split("@")[0]).join(", ")||"all read",
+      "Catch me up on my inbox: what needs a reply from me today, in order?"));
+    if(liveChat) list.append(opsRow("💬","Teams: "+cf2.latest.length+" active chats",
+      cf2.latest[0]?("latest from "+((cf2.latest[0].from&&cf2.latest[0].from.displayName)||"someone")):"quiet",
+      "What is happening in my Teams chats since yesterday, and does anything need me?"));
+    list.append(opsRow("🛰️","Unattended: 12 routines on watch",
+      "pre-draft 5:30am, dashboards 7:04am, detectors, Monday audit",
+      "Did this morning's routines run properly? What should I check?"));
+    ops.append(list);
+  }
+  // PROJECTS
+  const pr=$("#cmd-projects");
+  if(liveTasks){
+    pr.innerHTML="";
+    const bySec={}; tf.tasks.forEach(t=>{const s=tf.secOf(t).split(", ")[0];(bySec[s]=bySec[s]||[]).push(t);});
+    const flight=["Scoping/Requirements Gathering","In Development/Progress","Awaiting Response","Blocked","Ready for Deployment","Hypercare"]
+      .map(s=>bySec[s]?((bySec[s].length)+" "+s.split("/")[0].toLowerCase()):null).filter(Boolean).join(" · ");
+    const decisions=tf.blocked.filter(t=>/decision/i.test(t.name));
+    const list=el("div","tlist");
+    list.append(opsRow("📋","Board: "+tf.tasks.length+" open items",
+      flight+(tf.overdue.length?" · "+tf.overdue.length+" overdue":""),
+      "Give me a project status rollup: what moved this week, what is stalled, what ships next. Use the live board."));
+    if(tf.blocked.length) list.append(opsRow("🧱","Blocked: "+tf.blocked.length,
+      decisions.length?decisions.length+" are decisions, not technical work":"see the Projects tab",
+      "Walk the Blocked column: for each item, what exactly unblocks it and whose call is it?"));
+    const empty=["Ready for Deployment","Hypercare"].filter(s=>!bySec[s]);
+    if(empty.length) list.append(opsRow("🚦","Release pipeline: "+empty.join(" and ")+" empty",
+      "work is skipping the release stages, straight from In Development to Done",
+      "Why is nothing reaching Ready for Deployment or Hypercare, and what one change to how we work would fix the release pipeline?"));
+    const open=el("button","refresh","Open the board"); open.style.marginTop="8px";
+    open.addEventListener("click",()=>showView("board"));
+    pr.append(list,open);
+  }
+  // DECISIONS
+  const dec=$("#cmd-decisions");
+  if(dec && !dec.dataset.built){
+    dec.dataset.built="1";
+    const items=[
+      ["WooCommerce key rotation, open since August","What exactly do I need to do to verify the WooCommerce key rotation from the August exposure, and how do I close it off the watchlist?"],
+      ["Three Blocked items are decision debt (portal email, Plauti permissions, duplicate management)","The three decision-debt items in Blocked: lay out each decision, the options, and what you would decide in my shoes. Then draft the comment to post on each."],
+      ["Dashboard estate: retire the department suite or share this console with the team","Should I retire the department dashboard suite or share this console with the team instead? Lay out both paths with effort and impact, and recommend one."]
+    ];
+    dec.innerHTML="";
+    items.forEach(([t,q])=>{const li=el("div","trow actionable",`<div class="t1">${esc(t)}</div><div class="t2">tap to work it with Jarvis</div>`);li.addEventListener("click",()=>jAsk(q));dec.append(li);});
+  }
+  // ITERATE
+  const it=$("#cmd-iterate");
+  if(it && !it.dataset.built){
+    it.dataset.built="1";
+    it.innerHTML="";
+    [["Coach me as an ICT manager","Coach me: look at the live queue, board, inbox and the patterns, and give me the three highest-leverage moves I should make this week as Senior Manager ICT. Be frank about what I am neglecting."],
+     ["Decide the next move as I would","Look at everything live and decide the single next action the way I would: money first, then efficiencies, then risk. State the decision, the one reason, and execute it if it is within your tools, otherwise hand me the session ask."],
+     ["What did we ship this week?","From the live board and queue, what actually shipped or closed in the last 7 days, and what does that say about our throughput?"],
+     ["Find automations","Find automation candidates for us, using the automation signals and the live queue and board."]
+    ].forEach(([t,q])=>{const li=el("div","trow actionable",`<div class="t1">${esc(t)}</div>`);li.addEventListener("click",()=>jAsk(q));it.append(li);});
+  }
+  // PATTERNS
+  const pat=$("#cmd-patterns");
+  if(pat){
+    pat.innerHTML="";
+    const list=el("div","tlist");
+    const untypedPct=liveCases&&cf.recs.length?Math.round(100*cf.untyped.length/cf.recs.length):null;
+    [["🪪","Identity lifecycle is 20% of everything ICT handles","87 of the last 425 cases. The detectors catch them; the missing piece is a self-service request form.","Identity work is 20 percent of our cases. Design the self-service request form and the flow that would cut it, as a passport for the change."],
+     ["📮","Ask Zeus is a single channel: 96.5% email","Zero web, phone or portal intake. Every improvement to intake starts here.","Propose the web intake form for Ask Zeus: fields, where it lives, how it lands as a typed Case, and the session ask to build it."],
+     ["🏷️",(untypedPct!=null?untypedPct+"% of the open queue is untyped":"Untyped cases blunt every report"),"Type on close is the fix; the validation rule spec is written in the README.","Give me the exact Salesforce validation rule spec for requiring Type on close of Zeus cases, ready to hand to an admin."],
+     ["📊","The Asana-to-Zeus join is a spreadsheet column","ICT Priorities.xlsx exists in at least four divergent copies. This console is the replacement.","Draft the one-line message to the team retiring ICT Priorities.xlsx in favour of this console, in my voice."]
+    ].forEach(([i,t,d,q])=>list.append(opsRow(i,t,d,q)));
+    pat.append(list);
+  }
 }
 
 function melbTodayISO(){
@@ -976,6 +1068,7 @@ function renderToday(){
   updateTicker();
 }
 renderToday();
+renderCommand();
 
 (async function(){
   try{ mcpNS = await claude.use("mcp"); }catch(e){ mcpNS=null; }
@@ -1044,7 +1137,7 @@ let updateTicker=()=>{};
       if(cf.newOld.length) f.push(cf.newOld.length+" in New past 2 business days");}
     if(liveTasks){const tf=taskFacts(); if(tf.overdue.length) f.push(tf.overdue.length+" board items overdue");}
     if(liveMail){const mf=mailFacts(); if(mf.unread.length) f.push(mf.unread.length+" unread from people");}
-    f.push("13 routines on watch");
+    f.push("12 routines on watch");
     tickerFacts=f.length?f:["systems nominal"];
   };
   setInterval(()=>{ sub.textContent=tickerFacts[tickerI++%tickerFacts.length]; },5000);
@@ -1062,8 +1155,9 @@ let updateTicker=()=>{};
     credentials_watchlist: CREDS.map(([n,s,a])=>({item:n,status:s.split("|")[1],action:a})),
     rules: RULES.map(([t,b,w],i)=>({n:i+1,rule:t,detail:b,why:w})),
     open_decisions:[
-      "Budget 13 recurring active vs budget of 12: merge the two Friday status drafts, fold Top 10 draft into the pre-draft, or raise the budget to 13. Mathew to decide.",
-      "WooCommerce key rotation from the August exposure still not verified done."],
+      "WooCommerce key rotation from the August exposure still not verified done.",
+      "Dashboard estate: retire the department suite or share this console with the team (each viewer would need their own connector grants). Recorded 3 Sep in os/registers.md.",
+      "Routine budget resolved 3 Sep at 12 of 12 (Top 10 email draft retired)."],
     watching:["Thu 3 Sep 7:04am first deep slot of merged weekday job","Weekend 5-7 Sep first run of merged weekend job incl Sunday security refresh","Mon 8 Sep 6am first weekly audit self-run"],
     governance_loop:["Propose exact change","Mathew approves","Execute and verify","Record in os/registers.md, same commit"],
     automation_signals: AUTOMATION_SIGNALS,
@@ -1074,8 +1168,11 @@ let updateTicker=()=>{};
   });
 
   const INSTRUCTIONS =
-    "You are JARVIS, the console assistant on BirdLife Australia's Claude Operating System page, working for Mathew Hema (Senior Manager ICT) and his ICT team (Andrew Dunn, Keith Tsui, Nina Lewis). Persona: composed, dry, capable, a touch of wit, never sycophantic. Address Mathew as sir sparingly, at most once per reply.\n" +
+    "You are JARVIS, Mathew Hema's command assistant on BirdLife Australia's console. Mathew is Senior Manager ICT; his team is Andrew Dunn, Keith Tsui and Nina Lewis. Persona: composed, dry, capable, a touch of wit, never sycophantic. Address Mathew as sir sparingly, at most once per reply.\n" +
     "Style: frank, specific, brief. Plain text only, no markdown syntax, no headings, no em dashes (use commas or full stops). Lead with the answer. Quote real trigger IDs, case numbers, crons and dates, never invent one.\n" +
+    "MATHEW'S VOICE, use it for every draft (reply, comment, email, Teams): three registers. A, one-liners for routing and approvals ('Yes, this is approved and please send the signed document to Kate'). B, working replies, two to six sentences, often opening with OK, clauses joined with and, warm, candid ('OK my bad, I was connected to the wrong account so nothing needs to be done'). C, structured long-form for vendors and executives: lead with the conclusion, own mistakes first with the mechanism, evidence and concrete numbers, every action has a named owner and timeframe, commitments like I will come back to you either way, prefer a firm date rather than an estimate, X rather than Y contrasts, no exclamation marks. All registers: no corporate filler (no touch base, circle back, reach out, hope this finds you well), sign off Thanks internally, Kind regards, Mathew externally. When unsure, go shorter.\n" +
+    "MANAGER LENS: Mathew's standing question is how to be a better ICT manager and iterate faster. When coaching or prioritising, rank by his own weighting: money first (revenue at risk or recoverable), efficiencies second (what blocks other people, aging cases, recurring time sinks), then risk and security, then the rest. Call out what he is neglecting, frankly.\n" +
+    "DECIDE AS MATHEW: when he asks you to decide, or what he would do, make the call the way he would: apply the weighting above plus the OS rules (propose then write, one job per outcome, no bulk, evidence over assumption). State the decision in one line, the single reason, and whether it is reversible. Then, if it is within your action tools, execute it through the approval card in the same turn; otherwise hand him the exact session ask. A cancelled card means he overruled you: accept it and say what you would watch instead. Never chain more than one write per approval.\n" +
     "Tools, when available: get_today_snapshot first for anything about the queue, board, inbox or Teams (it carries case numbers, task gids, the board sections map with gids, recent inbox emails with message ids, and recent Teams messages). salesforce_read for other Salesforce reads (one SOQL SELECT, always LIMIT, always RecordType.DeveloperName='Zeus' on Case queries). asana_search for board lookups. show to navigate the page.\n" +
     "ACTIONS you can execute, each behind an approval card the user must tap: case_internal_note, case_reply (public comment the requester can see, optionally set a new Status such as Waiting Response-External), case_close (close reason from the exact list; set Type if blank), case_assign (ONLY to Andrew Dunn, Keith Tsui, Nina Lewis or Mathew Hema; team members have duplicate User records, so if the tool returns candidate records, show them with usernames and recent-case counts, ask which, and call again with user_id, never pick one yourself), task_comment, task_complete, task_move (section gids from board.sections), and email_draft_reply (creates an Outlook reply DRAFT threaded on the original, never sends; Mathew reviews and sends from Outlook). Triage flow: for 'triage the queue to the team', go one case at a time, propose who gets it and why, and use case_assign per case, each with its own approval. Teams has NO send API: for a Teams reply, write the message text in a reply of its own so the copy button grabs it cleanly, and say to paste it into Teams. Before calling a write tool, state in one or two lines exactly what you are about to do. Draft replies warm and plain in Mathew's voice: direct, no corporate filler, commitments like 'I will come back to you either way', sign-off 'Thanks'. If the approval card is cancelled, accept it and stop. Report the verified result the tool returns, never assume success. Never bulk actions: one record at a time. SENDING email, assigning cases to anyone outside the four ICT team members, Entra or M365 admin, and Salesforce config are NOT yours: give the exact ask for a Claude session on mathewruahema-beep/Birdlife instead.\n" +
     "Finding automations: use automation_signals plus live data. Propose at most 3, each with name, schedule, exact write posture and hard caps, connectors, which existing routine could absorb it (rule 2), and budget impact (rule 3, currently 13 of 12). End with the session ask to create the best one through the OS change control.\n" +
@@ -1348,8 +1445,16 @@ let updateTicker=()=>{};
          const ok=await requestApproval("Outlook reply draft to "+String(input.to||"?"), "Re: "+String(input.subject||"")+"\n\n"+text+"\n\n(Draft only. Nothing is sent; you review and send from Outlook.)", context.signal);
          if(!ok) return "Cancelled by user. No draft was created.";
          const r=await mcpNS.callTool(M365_SERVER,"outlook_create_reply_draft",{messageId:mid,body:text,bodyType:"text"});
-         const p=blocks(r); const first=(p&&p[0])||r.payload||{};
-         return "Draft created in Outlook Drafts (not sent)."+(first&&first.webLink?" Open: "+first.webLink:" Details: "+clip(first,600));
+         // Observed live (old console): this tool answers in plain text ("id: ... webLink: ..."), not JSON
+         let raw = typeof r.payload==="string" ? r.payload : "";
+         if(!raw && r.content && r.content[0] && r.content[0].text) raw=r.content[0].text;
+         let p=(r.payload && typeof r.payload==="object") ? r.payload : null;
+         if(!p){
+           const mId=raw.match(/\bid:\s*([A-Za-z0-9+\/=_-]+)/), mW=raw.match(/webLink:\s*(\S+)/);
+           if(mId||mW) p={id:mId&&mId[1], webLink:mW&&mW[1]};
+           else { try{p=JSON.parse(raw);}catch(e){p=null;} }
+         }
+         return "Draft created in Outlook Drafts (not sent)."+(p&&p.webLink?" Open: "+p.webLink:(raw?" "+clip(raw,400):""));
        }}
     ];
     return tools;
@@ -1406,7 +1511,7 @@ let updateTicker=()=>{};
    ["Find automations","Find automation candidates for us, using the automation signals and the live queue and board."],
    ["Work the worst case","Look at the live queue, pick the case most needing action, summarise it, and propose the move. If it warrants a reply or close, draft it and I will approve."],
    ["What runs tomorrow?","What runs tomorrow morning, in order?"],
-   ["Why 13 routines?","Why are there 13 routines against a budget of 12, and what are my options?"]
+   ["Coach me","Coach me: look at the live queue, board, inbox and the patterns, and give me the three highest-leverage moves I should make this week as Senior Manager ICT. Be frank about what I am neglecting."]
   ].forEach(([label,q])=>{
     const c = el("button",null,esc(label));
     c.addEventListener("click",()=>ask(q));
