@@ -29,6 +29,14 @@ URL keeps the stored data.
   stake calendar, Handbook 6, the Directory, and a second row of Handbook
   chapters, temple appointments, the Missionary Portal and Church Account.
 
+- **Discipleship** (personal): five daily roots on a fourteen-day grid with a
+  thirty-day rate and streak; a Sunday review of four questions, one week at a
+  time; a monthly self-assessment on the nine Christlike attributes from Preach
+  My Gospel chapter 6, charted against the last one, with one attribute chosen
+  to work on; one goal a quarter in each of the four areas of Luke 2:52; and a
+  temple cadence with a next-due date. Stored as `disciple/habits` and
+  `disciple/journal`.
+
 ## Capabilities the artifact declares
 
 ```json

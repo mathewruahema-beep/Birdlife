@@ -202,6 +202,67 @@ details.settings[open] summary:before{transform:rotate(90deg)}
 .settings-b .full{grid-column:1/-1}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:9}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ----- discipleship ----- */
+.band{grid-column:1/-1;margin-top:10px}
+.band-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:0 0 12px;border-bottom:1px solid var(--line2);margin-bottom:18px}
+.band-h h2{font-size:26px}
+.band-h p{margin:0;color:var(--ink2);max-width:60ch;font-family:var(--display);font-size:17px;font-style:italic}
+.band-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}
+@media (max-width:900px){.band-grid{grid-template-columns:1fr}}
+.roots{width:100%;border-collapse:separate;border-spacing:0 4px;font-size:14px}
+.roots th{font-weight:500;font-size:11px;color:var(--ink3);text-align:center;padding:0 0 2px;width:26px}
+.roots th.sun{color:var(--gold);font-weight:700}
+.roots th.lbl{text-align:left;width:auto}
+.roots td{padding:0;text-align:center}
+.roots td.lbl{text-align:left;padding-right:10px;min-width:170px;font-size:13.5px;line-height:1.25}
+.roots td.lbl span[contenteditable]:focus{outline:1px dashed var(--accent);outline-offset:2px;border-radius:2px}
+.roots td.stat{text-align:right;white-space:nowrap;font-size:12px;color:var(--ink3);padding-left:8px}
+.roots td.stat b{color:var(--ink2);font-weight:600}
+.cell{width:22px;height:22px;border-radius:5px;border:1px solid var(--line2);background:var(--surface);cursor:pointer;padding:0;display:inline-block;vertical-align:middle;transition:background .1s}
+.cell:hover{border-color:var(--accent)}
+.cell.on{background:var(--accent);border-color:var(--accent)}
+.cell.today{box-shadow:0 0 0 2px var(--gold-soft), 0 0 0 3px var(--gold)}
+.roots .x{background:none;border:0;color:var(--ink3);cursor:pointer;padding:0 4px;font-size:14px}
+.roots .x:hover{color:var(--red)}
+.review{display:grid;gap:10px}
+.review label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--ink2);font-weight:500}
+.review textarea{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:7px 9px;font-size:14.5px;color:var(--ink);min-height:44px;resize:vertical;font-weight:400}
+.weeknav{display:flex;align-items:center;gap:8px}
+.weeknav button{background:none;border:1px solid var(--line2);border-radius:5px;width:26px;height:26px;cursor:pointer;color:var(--ink2);line-height:1}
+.weeknav button:hover{color:var(--accent);border-color:var(--accent)}
+.attr-chart{width:100%;height:auto;display:block;margin:4px 0 8px}
+.attr-chart text{font-family:var(--body);fill:var(--ink2);font-size:12px}
+.attr-chart .lbl{fill:var(--ink);font-weight:500}
+.attr-chart .grid{stroke:var(--line);stroke-width:1}
+.attr-chart .bar{fill:var(--accent)}
+.attr-chart .prev{fill:var(--surface);stroke:var(--ink3);stroke-width:2}
+.attr-chart .val{fill:var(--ink2);font-variant-numeric:tabular-nums}
+.attr-chart .focus{fill:var(--gold)}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--ink2);margin-bottom:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:14px;height:6px;border-radius:3px;background:var(--accent);vertical-align:middle;margin-right:5px}
+.legend i.prev{width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid var(--ink3)}
+.legend i.focus{background:var(--gold)}
+.assess{display:grid;gap:8px;margin-top:8px}
+.assess .row{display:grid;grid-template-columns:130px minmax(0,1fr) 22px;gap:10px;align-items:center;font-size:14px}
+.assess .row small{display:block;color:var(--ink3);font-size:12px;line-height:1.3}
+.assess input[type=range]{width:100%;accent-color:var(--accent)}
+.assess .v{text-align:right;font-weight:600;color:var(--ink2)}
+.assess .foot{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:4px}
+.focusrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;align-items:center;margin-top:8px;font-size:14px}
+.focusrow select,.focusrow input{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:6px 9px;font-size:14px;color:var(--ink);min-width:0}
+.areas{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+@media (max-width:600px){.areas{grid-template-columns:1fr}}
+.area{display:flex;flex-direction:column;gap:5px}
+.area .eyebrow{color:var(--accent)}
+.area input,.area textarea{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:6px 9px;font-size:14px;color:var(--ink);resize:vertical}
+.area textarea{min-height:40px;font-size:13px}
+.temple{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:14px}
+.temple input{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:5px 8px;font-size:14px;color:var(--ink)}
+.temple input[type=number]{width:64px}
+.temple .n{font-weight:600;color:var(--ink2)}
+.temple .n.over{color:var(--red)}
+.temple .n.soon{color:var(--gold)}
 </style>
 
 <header class="mast">
@@ -357,6 +418,55 @@ details.settings[open] summary:before{transform:rotate(90deg)}
       </div>
     </section>
   </div>
+
+  <section class="band" aria-labelledby="hDisc">
+    <div class="band-h">
+      <div><div class="eyebrow">Personal</div><h2 id="hDisc">Discipleship</h2></div>
+      <p>Roots every day. A review every Sunday. Christlike attributes once a month. One goal a quarter in each of the four areas of Luke 2:52. Small enough to keep.</p>
+    </div>
+    <div class="band-grid">
+      <section class="panel" aria-labelledby="hRoots">
+        <div class="panel-h"><h2 id="hRoots">Daily roots</h2><div class="meta"><span id="rootsStat"></span><button class="linkbtn" id="addRoot" type="button">Add a root</button></div></div>
+        <div class="panel-b" style="overflow-x:auto"><table class="roots" id="roots"></table>
+          <p class="tiny" style="margin:8px 0 0">Fourteen days, today at the right. Click a square to mark it done. The number is your last thirty days.</p></div>
+      </section>
+
+      <section class="panel" aria-labelledby="hRev">
+        <div class="panel-h"><h2 id="hRev">Sunday review</h2><div class="meta weeknav"><button type="button" id="wkPrev" aria-label="Previous week">‹</button><span id="wkLabel"></span><button type="button" id="wkNext" aria-label="Next week">›</button></div></div>
+        <div class="panel-b review" id="review">
+          <label>Where did I feel the Spirit this week?<textarea name="spirit"></textarea></label>
+          <label>Where did I fall short?<textarea name="short"></textarea></label>
+          <label>The one thing I will change this week<textarea name="change"></textarea></label>
+          <label>Who will I lift, and how?<textarea name="lift"></textarea></label>
+          <p class="tiny" style="margin:0">Best done before the sacrament, with the same honesty you would want from a bishop across the desk.</p>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="hAttr">
+        <div class="panel-h"><h2 id="hAttr">Christlike attributes</h2><div class="meta"><span id="attrState"></span><button class="ghost" id="attrNew" type="button">Assess this month</button></div></div>
+        <div class="panel-b">
+          <div class="legend"><span><i></i>This month</span><span><i class="prev"></i>Last assessment</span><span><i class="focus"></i>Working on</span></div>
+          <div id="attrChart"></div>
+          <div class="focusrow"><span class="muted">Working on</span><select id="attrFocus"></select><span class="muted">How</span><input id="attrHow" placeholder="One concrete practice for the month"></div>
+          <div class="assess" id="assess" hidden></div>
+          <p class="tiny" style="margin:10px 0 0">The nine attributes and the self-assessment idea come from <a href="https://www.churchofjesuschrist.org/study/manual/preach-my-gospel-2023/11-chapter-6?lang=eng" target="_blank" rel="noopener">Preach My Gospel, chapter 6</a>. Rate honestly; the point is the gap, not the score.</p>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="hAreas">
+        <div class="panel-h"><h2 id="hAreas">Four areas and the temple</h2><div class="meta" id="qtrLabel"></div></div>
+        <div class="panel-b">
+          <div class="areas" id="areas"></div>
+          <div class="temple" id="temple">
+            <span>Temple, last attended</span><input type="date" name="last">
+            <span>aim for every</span><input type="number" name="every" min="7" max="365" step="1"><span>days</span>
+            <span class="n" id="templeNext"></span>
+            <button class="ghost" type="button" id="templeToday">Attended today</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
 </main>
 <div class="toast" id="toast" role="status"></div>
 
@@ -419,7 +529,7 @@ const EXAMPLE_TASKS=[
 // ---------- local fallback ----------
 const LS="scd:v1";
 function loadLocal(){ try{ return JSON.parse(localStorage.getItem(LS)||"null"); }catch(e){ return null; } }
-function saveLocal(){ try{ localStorage.setItem(LS,JSON.stringify({tasks,profile})); }catch(e){} }
+function saveLocal(){ try{ localStorage.setItem(LS,JSON.stringify({tasks,profile,habits,journal})); }catch(e){} }
 
 function defaultProfile(){ return {stake:"",name:"",home:"",wards:[],gmailQuery:DEFAULT_QUERY,sunday:{ward:"",role:"Presiding",talk:"",interviews:"",notes:""},duties:{} }; }
 
@@ -673,12 +783,120 @@ function renderCal(events){
   </li>`).join("");
 }
 
+
+// ---------- Discipleship ----------
+let habits=null, journal=null;   // disciple/habits, disciple/journal
+const ROOTS_DEFAULT=["Morning prayer","Scripture study (Come, Follow Me)","Evening prayer with family","A ministering touch","One line in the journal"];
+const ATTRS=[
+  {id:"faith",name:"Faith",q:"I trust the Lord enough to act on promptings, not just believe them."},
+  {id:"hope",name:"Hope",q:"I expect good things from God and keep going when they are slow to come."},
+  {id:"charity",name:"Charity and love",q:"I feel and show love for people who are difficult, absent or unlike me."},
+  {id:"virtue",name:"Virtue",q:"My private thoughts and habits match what I teach in public."},
+  {id:"knowledge",name:"Knowledge",q:"I study the scriptures and the Handbook to learn, not just to prepare."},
+  {id:"patience",name:"Patience",q:"I stay calm and kind under delay, criticism and other people's slowness."},
+  {id:"humility",name:"Humility",q:"I take counsel, admit when I am wrong and give the credit away."},
+  {id:"diligence",name:"Diligence",q:"I do what I said I would do, when I said, without being chased."},
+  {id:"obedience",name:"Obedience",q:"I keep my covenants and the small commandments without negotiating them."},
+];
+const AREAS4=[{id:"spiritual",name:"Spiritual",hint:"wisdom"},{id:"social",name:"Social",hint:"favour with man"},{id:"physical",name:"Physical",hint:"stature"},{id:"intellectual",name:"Intellectual",hint:"wisdom"}];
+function defaultHabits(){ return {labels:ROOTS_DEFAULT.slice(),days:{}}; }
+function defaultJournal(){ return {reviews:{},attributes:{},focus:{attr:"",how:""},goals:{},temple:{last:"",every:30}}; }
+let hT,jT;
+function persistHabits(){ renderRoots(); clearTimeout(hT); hT=setTimeout(async()=>{ if(db){ try{ await db.doc("disciple/habits").set(habits); }catch(e){ toast("Could not save roots: "+(e.message||e.code)); } } else saveLocal(); },400); }
+function persistJournal(){ clearTimeout(jT); jT=setTimeout(async()=>{ if(db){ try{ await db.doc("disciple/journal").set(journal); }catch(e){ toast("Could not save: "+(e.message||e.code)); } } else saveLocal(); },400); }
+
+// roots
+function renderRoots(){
+  const days=[]; for(let i=13;i>=0;i--) days.push(ymd(new Date(today.getTime()-i*DAY)));
+  const last30=[]; for(let i=29;i>=0;i--) last30.push(ymd(new Date(today.getTime()-i*DAY)));
+  let head=`<tr><th class="lbl"></th>${days.map(d=>{const dt=parseYmd(d);return `<th class="${dt.getDay()===0?"sun":""}">${dt.getDay()===0?"S":fmtDay.format(dt)[0]}</th>`;}).join("")}<th></th><th></th></tr>`;
+  let rows=habits.labels.map((lab,i)=>{
+    const pct=Math.round(100*last30.filter(d=>habits.days[d]&&habits.days[d][i]).length/30);
+    let streak=0; for(let k=0;k<400;k++){ const d=ymd(new Date(today.getTime()-k*DAY)); if(habits.days[d]&&habits.days[d][i]) streak++; else if(k>0) break; }
+    return `<tr data-i="${i}"><td class="lbl"><span contenteditable="plaintext-only" spellcheck="false">${esc(lab)}</span></td>${days.map(d=>`<td><button type="button" class="cell ${habits.days[d]&&habits.days[d][i]?"on":""} ${d===TODAY?"today":""}" data-d="${d}" aria-label="${esc(lab)} on ${d}"></button></td>`).join("")}<td class="stat"><b class="num">${pct}%</b>${streak?` · ${streak} in a row`:""}</td><td><button class="x" type="button" title="Remove">×</button></td></tr>`;
+  }).join("");
+  $("#roots").innerHTML=head+rows;
+  const doneToday=habits.labels.filter((_,i)=>habits.days[TODAY]&&habits.days[TODAY][i]).length;
+  $("#rootsStat").textContent=`${doneToday} of ${habits.labels.length} today`;
+}
+$("#roots").addEventListener("click",e=>{
+  const c=e.target.closest("button.cell"); if(c){ const i=+c.closest("tr").dataset.i; const d=c.dataset.d; habits.days[d]=habits.days[d]||{}; habits.days[d][i]=!habits.days[d][i]; if(!habits.days[d][i]) delete habits.days[d][i]; persistHabits(); return; }
+  const x=e.target.closest("button.x"); if(x){ const i=+x.closest("tr").dataset.i; if(!confirm(`Remove "${habits.labels[i]}" and its history?`)) return; habits.labels.splice(i,1); for(const d in habits.days){ const o=habits.days[d]; const n={}; Object.keys(o).forEach(k=>{ k=+k; if(k<i) n[k]=true; else if(k>i) n[k-1]=true; }); habits.days[d]=n; } persistHabits(); }
+});
+$("#roots").addEventListener("blur",e=>{ const sp=e.target.closest("td.lbl span"); if(!sp) return; const i=+sp.closest("tr").dataset.i; const v=sp.textContent.trim(); if(v&&v!==habits.labels[i]){ habits.labels[i]=v; persistHabits(); } },true);
+$("#roots").addEventListener("keydown",e=>{ if(e.target.closest("td.lbl span")&&e.key==="Enter"){ e.preventDefault(); e.target.blur(); } });
+$("#addRoot").onclick=()=>{ if(habits.labels.length>=7){ toast("Seven is enough. Keep it small."); return; } habits.labels.push("New root"); persistHabits(); const sp=$("#roots tr:last-child td.lbl span"); if(sp){ sp.focus(); document.getSelection().selectAllChildren(sp); } };
+
+// sunday review
+let wk=ymd(nextSunday());
+function renderReview(){
+  const d=parseYmd(wk); const same=wk===ymd(nextSunday());
+  $("#wkLabel").textContent=(same?"Week ending ":"")+fmtDay.format(d)+(same?"":", "+d.getFullYear());
+  $("#wkNext").disabled=same;
+  const r=journal.reviews[wk]||{};
+  for(const ta of $("#review").querySelectorAll("textarea")) ta.value=r[ta.name]||"";
+}
+$("#review").addEventListener("input",e=>{ if(e.target.tagName!=="TEXTAREA") return; journal.reviews[wk]=journal.reviews[wk]||{}; journal.reviews[wk][e.target.name]=e.target.value; if(!Object.values(journal.reviews[wk]).some(v=>v.trim())) delete journal.reviews[wk]; persistJournal(); });
+$("#wkPrev").onclick=()=>{ wk=ymd(new Date(parseYmd(wk).getTime()-7*DAY)); renderReview(); };
+$("#wkNext").onclick=()=>{ if(wk===ymd(nextSunday())) return; wk=ymd(new Date(parseYmd(wk).getTime()+7*DAY)); renderReview(); };
+
+// attributes
+const MONTH=TODAY.slice(0,7);
+function attrEntries(){ return Object.keys(journal.attributes).sort(); }
+function renderAttrs(){
+  const keys=attrEntries(); const cur=keys.length?journal.attributes[keys[keys.length-1]]:null; const prev=keys.length>1?journal.attributes[keys[keys.length-2]]:null;
+  const curKey=keys[keys.length-1], prevKey=keys[keys.length-2];
+  $("#attrState").textContent=cur?(curKey===MONTH?"done this month":"last done "+curKey):"not yet assessed";
+  $("#attrFocus").innerHTML=`<option value="">choose one</option>`+ATTRS.map(a=>`<option value="${a.id}" ${journal.focus.attr===a.id?"selected":""}>${a.name}</option>`).join("");
+  $("#attrHow").value=journal.focus.how||"";
+  // chart: horizontal, one scale 1..5
+  const W=520,rowH=26,left=128,right=30,top=18,H=top+ATTRS.length*rowH+8; const x=v=>left+((v-1)/4)*(W-left-right);
+  let svg=`<svg class="attr-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Christlike attribute self-assessment, one to five">`;
+  for(let v=1;v<=5;v++) svg+=`<line class="grid" x1="${x(v)}" y1="${top-4}" x2="${x(v)}" y2="${H-8}"/><text x="${x(v)}" y="${top-8}" text-anchor="middle">${v}</text>`;
+  ATTRS.forEach((a,i)=>{ const y=top+i*rowH+rowH/2; const c=cur?cur.scores[a.id]:null; const p=prev?prev.scores[a.id]:null; const isF=journal.focus.attr===a.id;
+    svg+=`<text class="lbl" x="${left-10}" y="${y+4}" text-anchor="end">${esc(a.name)}</text>`;
+    if(c){ const w=Math.max(0,x(c)-x(1)); svg+=`<rect class="bar ${isF?"focus":""}" x="${x(1)}" y="${y-4}" width="${w}" height="8" rx="4"><title>${esc(a.name)}: ${c} of 5${prevKey?`, was ${p||"unrated"} in ${prevKey}`:""}</title></rect><text class="val" x="${x(c)+8}" y="${y+4}">${c}</text>`; }
+    if(p) svg+=`<circle class="prev" cx="${x(p)}" cy="${y}" r="5"><title>${prevKey}: ${p}</title></circle>`;
+  });
+  svg+="</svg>";
+  $("#attrChart").innerHTML=cur?svg:`<div class="empty">No assessment yet. Take ten quiet minutes and rate the nine.</div>`;
+}
+$("#attrFocus").onchange=()=>{ journal.focus.attr=$("#attrFocus").value; persistJournal(); renderAttrs(); };
+$("#attrHow").oninput=()=>{ journal.focus.how=$("#attrHow").value; persistJournal(); };
+$("#attrNew").onclick=()=>{
+  const box=$("#assess"); if(!box.hidden){ box.hidden=true; return; }
+  const ex=journal.attributes[MONTH]?journal.attributes[MONTH].scores:{};
+  box.innerHTML=ATTRS.map(a=>`<div class="row"><div>${esc(a.name)}<small>${esc(a.q)}</small></div><input type="range" min="1" max="5" step="1" name="${a.id}" value="${ex[a.id]||3}"><span class="v num">${ex[a.id]||3}</span></div>`).join("")+
+    `<div class="foot"><span class="tiny">1 means rarely true of me, 5 means nearly always.</span><button class="ghost" type="button" data-op="cancel">Cancel</button><button class="btn" type="button" data-op="save">Save for ${MONTH}</button></div>`;
+  box.hidden=false;
+};
+$("#assess").addEventListener("input",e=>{ if(e.target.type==="range") e.target.nextElementSibling.textContent=e.target.value; });
+$("#assess").addEventListener("click",e=>{ const b=e.target.closest("button[data-op]"); if(!b) return;
+  if(b.dataset.op==="save"){ const scores={}; for(const r of $("#assess").querySelectorAll("input[type=range]")) scores[r.name]=+r.value; journal.attributes[MONTH]={date:TODAY,scores}; persistJournal(); renderAttrs(); toast("Saved for "+MONTH); }
+  $("#assess").hidden=true; });
+
+// four areas and temple
+function qKey(){ return `${today.getFullYear()}-Q${Math.floor(today.getMonth()/3)+1}`; }
+function renderAreas(){
+  const q=qKey(); $("#qtrLabel").textContent=q.replace("-Q"," · quarter ");
+  const g=journal.goals[q]||{};
+  $("#areas").innerHTML=AREAS4.map(a=>{ const v=g[a.id]||{}; return `<div class="area" data-a="${a.id}"><span class="eyebrow">${a.name} <span style="color:var(--ink3);font-weight:500;text-transform:none;letter-spacing:0">${a.hint}</span></span><input name="goal" placeholder="One goal this quarter" value="${esc(v.goal||"")}"><textarea name="progress" placeholder="Where it stands">${esc(v.progress||"")}</textarea></div>`; }).join("");
+  const t=journal.temple||{}; $("#temple [name=last]").value=t.last||""; $("#temple [name=every]").value=t.every||30;
+  const n=$("#templeNext"); if(t.last){ const nd=new Date(parseYmd(t.last).getTime()+(t.every||30)*DAY); const k=Math.round((nd-today)/DAY); n.textContent=k<0?`${-k} days over`:k===0?"due today":`next by ${fmtDay.format(nd)}`; n.className="n "+(k<0?"over":k<=7?"soon":""); } else { n.textContent="not logged"; n.className="n"; }
+}
+$("#areas").addEventListener("input",e=>{ const box=e.target.closest(".area"); if(!box) return; const q=qKey(); journal.goals[q]=journal.goals[q]||{}; journal.goals[q][box.dataset.a]=journal.goals[q][box.dataset.a]||{}; journal.goals[q][box.dataset.a][e.target.name]=e.target.value; persistJournal(); });
+$("#temple").addEventListener("change",e=>{ journal.temple=journal.temple||{}; if(e.target.name==="last") journal.temple.last=e.target.value; if(e.target.name==="every") journal.temple.every=Math.max(7,+e.target.value||30); persistJournal(); renderAreas(); });
+$("#templeToday").onclick=()=>{ journal.temple=journal.temple||{}; journal.temple.last=TODAY; persistJournal(); renderAreas(); toast("Logged"); };
+
+function renderDisciple(){ renderRoots(); renderReview(); renderAttrs(); renderAreas(); }
+
 // ---------- boot ----------
 function bootLocal(){
   const l=loadLocal();
   tasks=(l&&l.tasks)||[]; profile=Object.assign(defaultProfile(),(l&&l.profile)||{});
   if(!l){ EXAMPLE_TASKS.forEach(t=>{ t.id=newId(); t.created=Date.now(); tasks.push(t); }); saveLocal(); }
-  bindProfileForms(); renderProfileBits(); renderTasks();
+  habits=Object.assign(defaultHabits(),(l&&l.habits)||{}); journal=Object.assign(defaultJournal(),(l&&l.journal)||{});
+  bindProfileForms(); renderProfileBits(); renderTasks(); renderDisciple();
 }
 async function bootDb(){
   const ref=db.doc("settings/profile");
@@ -688,6 +906,11 @@ async function bootDb(){
     for(const t of EXAMPLE_TASKS){ const {id,...b}=t; await db.doc("tasks/"+newId()).set(Object.assign({done:false,created:Date.now()},b)); } }
   bindProfileForms(); renderProfileBits();
   ref.onSnapshot(s=>{ if(!s.exists||s.metadata.hasPendingWrites) return; const d=s.data(); if(JSON.stringify(d)!==JSON.stringify(profile)){ profile=Object.assign(defaultProfile(),d); bindProfileForms(); renderProfileBits(); } },e=>toast("Settings stream ended: "+e.code));
+  const hs=await db.doc("disciple/habits").get(); habits=hs.exists?Object.assign(defaultHabits(),hs.data()):defaultHabits();
+  const js=await db.doc("disciple/journal").get(); journal=js.exists?Object.assign(defaultJournal(),js.data()):defaultJournal();
+  renderDisciple();
+  db.doc("disciple/habits").onSnapshot(sn=>{ if(!sn.exists||sn.metadata.hasPendingWrites) return; const d=sn.data(); if(JSON.stringify(d)!==JSON.stringify(habits)){ habits=Object.assign(defaultHabits(),d); renderRoots(); } },e=>toast("Roots stream ended: "+e.code));
+  db.doc("disciple/journal").onSnapshot(sn=>{ if(!sn.exists||sn.metadata.hasPendingWrites) return; const d=sn.data(); if(JSON.stringify(d)!==JSON.stringify(journal)){ journal=Object.assign(defaultJournal(),d); renderReview(); renderAttrs(); renderAreas(); } },e=>toast("Journal stream ended: "+e.code));
   db.collection("tasks").onSnapshot(s=>{ tasks=s.docs.map(d=>Object.assign({id:d.id},d.data())); renderTasks(); },e=>toast("Task stream ended: "+e.code));
   $("#storeState").textContent="saved to your store";
 }
