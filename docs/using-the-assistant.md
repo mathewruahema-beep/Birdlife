@@ -31,6 +31,22 @@ assistant session "update the console" to change it. (Don't enable GitHub Pages
 for it on a free plan: Pages would make the page public, and it names internal
 systems. The artifact URL is private to you.)
 
+## The ICT Compass
+
+**https://claude.ai/code/artifact/938b7d20-40c1-4ee0-ab97-bb27dccbc013** is the second bookmark: the
+role, not the queue. It asks the one question the week is asking, holds your
+three things and your "not this week" list, ranks the conversations to have
+with the team, leadership, programme peers and vendors (opener and impact on
+people included), keeps the decision register with the ones only you can make
+marked in blue, and runs the Monday plan and Friday review. The same knowledge
+is the `birdlife-compass` skill, so any session answers:
+
+- `Plan my week` / `Run my Friday review`
+- `Prep me for my 1:1 with Nina` / `Prep me for David on the three ownership decisions`
+- `Write the option A/B note for the duplicate management decision`
+- `Challenge my three things against the register`
+- `Reassign my IT Ops backlog by stream and show me the list first` [T1, after approval]
+
 ## Ways to reach it
 
 **1. Phone or any browser — claude.ai/code.** Start a new session on

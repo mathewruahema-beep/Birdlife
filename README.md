@@ -16,9 +16,35 @@ This repository is two things:
 | | |
 |---|---|
 | Live dashboard | https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 |
+| ICT Compass (Mathew's weekly desk) | https://claude.ai/code/artifact/938b7d20-40c1-4ee0-ab97-bb27dccbc013 |
 | Refresh | Weekdays 08:00 AEST, automated |
 | Salesforce org | `birdlifeaustralia.lightning.force.com` |
 | Asana project | `1211042432693678` — IT Operations Project Plan |
+
+---
+
+## The ICT Compass
+
+**https://claude.ai/code/artifact/938b7d20-40c1-4ee0-ab97-bb27dccbc013** is the manager's desk, not the
+helpdesk. It opens with the one question the week is asking (computed from the
+live queue and the decision register), then holds three things for the week and
+a "not this week" list, the conversations ranked by what they unblock (each
+with what the person needs, what you need, an opener in your voice and the
+impact on people), a decision register that separates decisions you are waiting
+on from decisions only you can make, the Monday plan and Friday review, and the
+role charter with a self-scored time split. Signals (unowned cases, cases stale
+in New, blocked items, your overdue tasks, meetings this week) read live through
+the Salesforce Production, Asana and Microsoft 365 connectors; last and next
+contact per person come from your calendar. Everything you type is kept in the
+artifact's own store and follows you between phone and desktop. The page never
+writes to Salesforce, Asana or Outlook.
+
+Source: `compass/index.html`. Knowledge: `.claude/skills/birdlife-compass/SKILL.md`
+(the authoritative copy of the stakeholder map, register and rituals; the page
+mirrors it). Any session on this repo answers "plan my week", "prep me for my
+1:1 with Andrew", "force the duplicates decision" or "challenge me" from that
+skill. Routine definitions for the Monday plan and Friday review are in
+`routines/compass-weekly.md`, held until the routine budget has room.
 
 ---
 

@@ -1,0 +1,967 @@
+<title>ICT Compass</title>
+<meta name="theme-color" content="#2a4fb8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #f3f4f1; --surface: #ffffff; --surface-2: #eaece8;
+    --ink: #1b2230; --muted: #66707d; --line: #d9ddd7; --line-strong: #b9c0ba;
+    --accent: #2a4fb8; --accent-ink: #1f3d91; --accent-soft: #e4eafa;
+    --owed: #9a6b12; --owed-soft: #f5edd7;
+    --late: #b0392b; --late-soft: #f6e3df;
+    --ok: #2f6b4f; --ok-soft: #e0efe6;
+    --btn-ink: #ffffff; --mono-bg: #edefeb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #141a22; --surface: #1c2530; --surface-2: #232e3b;
+      --ink: #e8ecf1; --muted: #9aa6b4; --line: #2d3947; --line-strong: #435264;
+      --accent: #8eb0ff; --accent-ink: #a7c2ff; --accent-soft: #24304a;
+      --owed: #e0b45a; --owed-soft: #3a3018;
+      --late: #ef8f80; --late-soft: #42221d;
+      --ok: #7fc9a4; --ok-soft: #1e352a;
+      --btn-ink: #0f1722; --mono-bg: #1a222c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #141a22; --surface: #1c2530; --surface-2: #232e3b;
+    --ink: #e8ecf1; --muted: #9aa6b4; --line: #2d3947; --line-strong: #435264;
+    --accent: #8eb0ff; --accent-ink: #a7c2ff; --accent-soft: #24304a;
+    --owed: #e0b45a; --owed-soft: #3a3018;
+    --late: #ef8f80; --late-soft: #42221d;
+    --ok: #7fc9a4; --ok-soft: #1e352a;
+    --btn-ink: #0f1722; --mono-bg: #1a222c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif; font-size: 16px; line-height: 1.5; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 26px 18px 90px; }
+  a { color: var(--accent-ink); }
+  button { font-family: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* masthead */
+  .mast { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+  .kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-ink); font-weight: 700; }
+  h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: clamp(28px, 6vw, 38px); margin: 2px 0 0; line-height: 1.05; letter-spacing: -.01em; }
+  .weekof { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12.5px; color: var(--muted); text-align: right; }
+  .weekof b { color: var(--ink); font-weight: 500; }
+  .live { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line-strong); }
+  .dot.on { background: var(--ok); } .dot.err { background: var(--late); }
+
+  /* thesis */
+  .thesis { margin: 26px 0 8px; padding: 22px 0 24px; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); }
+  .thesis .q { font-family: "Fraunces", Georgia, serif; font-weight: 500; font-size: clamp(22px, 4.2vw, 31px); line-height: 1.22; margin: 0; text-wrap: balance; max-width: 30ch; }
+  .thesis .why { margin: 10px 0 0; color: var(--muted); max-width: 66ch; }
+  .thesis .why b { color: var(--ink); font-weight: 600; }
+
+  nav.tabs { display: flex; gap: 2px; margin: 10px 0 26px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  nav.tabs button { background: none; border: none; border-bottom: 2px solid transparent; font: 700 14px "Source Sans 3", sans-serif;
+    letter-spacing: .04em; color: var(--muted); padding: 10px 12px 11px; cursor: pointer; white-space: nowrap; margin-bottom: -1px; }
+  nav.tabs button[aria-selected="true"] { color: var(--accent-ink); border-bottom-color: var(--accent); }
+  nav.tabs button .n { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 500; margin-left: 5px; color: var(--owed); }
+
+  h2 { font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 30px 0 12px; display: flex; align-items: baseline; gap: 10px; }
+  h2 small { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 13px; }
+  h3 { font-size: 17px; margin: 0; font-weight: 600; }
+  p { margin: 0 0 10px; }
+  .lede { color: var(--muted); max-width: 66ch; }
+
+  /* signal tiles */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 8px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px 9px; }
+  .tile .n { font: 500 28px "Fraunces", Georgia, serif; font-variant-numeric: tabular-nums; line-height: 1.05; }
+  .tile .l { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 3px; }
+  .tile .s { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .tile.late .n { color: var(--late); } .tile.owed .n { color: var(--owed); } .tile.ok .n { color: var(--ok); }
+  .prov { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+
+  /* rocks */
+  .rocks { display: grid; gap: 8px; }
+  .rock { display: grid; grid-template-columns: 26px 1fr auto; gap: 10px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .rock .idx { font: 500 20px "Fraunces", Georgia, serif; color: var(--accent-ink); line-height: 1.3; }
+  .rock input[type="text"], .rock textarea { width: 100%; border: none; background: transparent; color: var(--ink); font: 600 16px "Source Sans 3", sans-serif; padding: 2px 0; }
+  .rock input[type="text"]::placeholder { color: var(--muted); font-weight: 400; }
+  .rock .why { width: 100%; border: none; border-top: 1px dashed var(--line); background: transparent; color: var(--muted); font: 400 14px "Source Sans 3", sans-serif; padding: 4px 0 0; margin-top: 4px; resize: vertical; min-height: 26px; }
+  .rock.done input[type="text"] { text-decoration: line-through; color: var(--muted); }
+  .chk { width: 20px; height: 20px; accent-color: var(--accent); margin-top: 3px; }
+  .notlist { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+  .notlist li { display: flex; gap: 8px; align-items: center; }
+  .notlist input { flex: 1; border: none; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); font: 400 15px "Source Sans 3", sans-serif; padding: 4px 0; }
+  .x { border: none; background: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 0 4px; }
+  .x:hover { color: var(--late); }
+
+  /* generic buttons */
+  .btn { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); border-radius: 6px; font: 600 13px "Source Sans 3", sans-serif; padding: 6px 11px; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--btn-ink); }
+  .btn.small { padding: 3px 9px; font-size: 12.5px; }
+  .btn[disabled] { opacity: .5; cursor: default; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  /* chips */
+  .chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 1px 7px; border-radius: 99px; white-space: nowrap; vertical-align: 1px; }
+  .chip.owed { background: var(--owed-soft); color: var(--owed); }
+  .chip.late { background: var(--late-soft); color: var(--late); }
+  .chip.ok { background: var(--ok-soft); color: var(--ok); }
+  .chip.acc { background: var(--accent-soft); color: var(--accent-ink); }
+  .chip.grey { background: var(--surface-2); color: var(--muted); }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12.5px; }
+
+  /* people */
+  .group { margin-bottom: 8px; }
+  .person { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; margin-bottom: 8px; }
+  .person summary { list-style: none; cursor: pointer; padding: 11px 14px; display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: baseline; }
+  .person summary::-webkit-details-marker { display: none; }
+  .person .name { font-weight: 700; font-size: 16px; }
+  .person .role { color: var(--muted); font-size: 14px; }
+  .person .meta { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--muted); }
+  .person .meta b { color: var(--ink); font-weight: 500; }
+  .person .body { padding: 0 14px 14px; border-top: 1px solid var(--line); }
+  .person dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 12px 0; font-size: 14.5px; }
+  .person dt { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; padding-top: 2px; }
+  .person dd { margin: 0; }
+  .convo { background: var(--accent-soft); border-radius: 6px; padding: 10px 12px; margin: 8px 0 10px; }
+  .convo .t { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--accent-ink); }
+  .convo p { margin: 4px 0 0; }
+  .convo .opener { font-style: italic; }
+  .impact { border-left: 3px solid var(--owed); padding: 2px 10px; color: var(--muted); font-size: 14px; margin: 8px 0; }
+  .impact b { color: var(--ink); }
+  .outcome { width: 100%; border: 1px solid var(--line); border-radius: 6px; background: var(--ground); color: var(--ink); font: 400 14px "Source Sans 3", sans-serif; padding: 7px 9px; margin-top: 8px; resize: vertical; min-height: 40px; }
+
+  /* decisions */
+  .dec { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--line-strong); border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+  .dec.late { border-left-color: var(--late); } .dec.owed { border-left-color: var(--owed); } .dec.ok { border-left-color: var(--ok); } .dec.mine { border-left-color: var(--accent); }
+  .dec .head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+  .dec .age { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); }
+  .dec .age b { color: var(--ink); font-weight: 500; }
+  .dec .cost { color: var(--muted); font-size: 14.5px; margin: 6px 0; }
+  .dec .close { font-size: 14.5px; margin: 6px 0; }
+  .dec .close b { font-weight: 700; }
+  .dec select, .dec input { border: 1px solid var(--line); border-radius: 6px; background: var(--ground); color: var(--ink); font: 400 13.5px "Source Sans 3", sans-serif; padding: 5px 8px; }
+  .dec input { flex: 1; min-width: 160px; }
+
+  /* review */
+  .qs { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .qs li { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .qs .q { font-weight: 600; margin-bottom: 4px; }
+  .qs textarea { width: 100%; border: none; border-top: 1px dashed var(--line); background: transparent; color: var(--ink); font: 400 14.5px "Source Sans 3", sans-serif; padding: 6px 0 0; resize: vertical; min-height: 44px; }
+  .hist { border-top: 1px solid var(--line); padding: 10px 0; }
+  .hist .h { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); }
+  .hist p { margin: 3px 0 0; font-size: 14.5px; }
+  .logline { display: grid; grid-template-columns: 96px 1fr; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+  .logline .when { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); padding-top: 2px; }
+
+  /* role */
+  .charter { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+  .charter div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .charter h3 { font-size: 15px; margin-bottom: 4px; }
+  .charter p { font-size: 14px; color: var(--muted); margin: 0; }
+  .split { display: grid; gap: 6px; }
+  .split .bar { display: grid; grid-template-columns: 170px 1fr 52px; gap: 10px; align-items: center; font-size: 14px; }
+  .split .track { position: relative; height: 14px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+  .split .target { position: absolute; top: 0; bottom: 0; left: 0; background: var(--accent-soft); }
+  .split .actual { position: absolute; top: 3px; bottom: 3px; left: 0; background: var(--accent); border-radius: 2px; }
+  .split .actual.over { background: var(--late); }
+  .split input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .split .pct { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; text-align: right; }
+  .trap { border-left: 3px solid var(--late); padding: 4px 12px; margin: 8px 0; }
+  .trap b { display: block; }
+  .trap p { color: var(--muted); font-size: 14.5px; margin: 2px 0 0; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  td.mono { white-space: nowrap; }
+  .scroll { overflow-x: auto; }
+
+  .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--ink); color: var(--ground); padding: 9px 14px; border-radius: 6px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .foot { margin-top: 44px; border-top: 1px solid var(--line); padding-top: 12px; font-size: 13px; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+  @media (max-width: 560px) { .split .bar { grid-template-columns: 1fr; gap: 3px; } .split .pct { text-align: left; } .logline { grid-template-columns: 1fr; gap: 2px; } }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <div class="kicker">BirdLife Australia · Senior Manager ICT</div>
+      <h1>ICT Compass</h1>
+    </div>
+    <div class="weekof">
+      <div>Week <b id="week-label">36</b> · <span id="week-range">31 Aug to 4 Sep 2026</span></div>
+      <div class="live"><span class="dot" id="live-dot"></span><span id="live-text">Snapshot of 3 Sep 2026</span></div>
+    </div>
+  </header>
+
+  <section class="thesis" aria-label="The question of the week">
+    <p class="q" id="thesis-q">Five tickets have no owner. Triage is a role, not a moment. Whose is it?</p>
+    <p class="why" id="thesis-why">The queue is healthy on throughput and broken on intake. The fix is one sentence to the team, not another dashboard.</p>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="week">This week</button>
+    <button role="tab" aria-selected="false" data-tab="people">People <span class="n" id="n-people"></span></button>
+    <button role="tab" aria-selected="false" data-tab="decisions">Decisions <span class="n" id="n-dec"></span></button>
+    <button role="tab" aria-selected="false" data-tab="review">Review</button>
+    <button role="tab" aria-selected="false" data-tab="role">Role</button>
+  </nav>
+
+  <!-- THIS WEEK -->
+  <section id="tab-week" role="tabpanel">
+    <h2>Signals <small id="sig-src">snapshot 3 Sep 2026, Ask Zeus scope</small></h2>
+    <div class="tiles" id="tiles"></div>
+    <p class="prov" id="sig-prov">Live figures need the Salesforce Production, Asana and Microsoft 365 connectors on this claude.ai account.</p>
+
+    <h2>Three things this week <small>the rest is not this week</small></h2>
+    <p class="lede">Pick three outcomes, not three tasks. If you write a fourth you have written a to-do list, and you already have ninety-five of those in Asana.</p>
+    <div class="rocks" id="rocks"></div>
+
+    <h2>Not this week <small>said out loud, so people stop waiting</small></h2>
+    <ul class="notlist" id="notlist"></ul>
+    <div class="row" style="margin-top:8px"><button class="btn small" id="add-not">Add a line</button></div>
+
+    <h2>Conversations to have <small>ranked by what they unblock</small></h2>
+    <div id="week-convos"></div>
+
+    <h2>The decision to force</h2>
+    <div id="week-decision"></div>
+  </section>
+
+  <!-- PEOPLE -->
+  <section id="tab-people" role="tabpanel" hidden>
+    <p class="lede">Each card says what that person needs from ICT, what you need from them, and the one conversation worth having now. Last and next contact come from your calendar when the connector is live. Mark a conversation as had with a one line outcome and it goes into the log.</p>
+    <div id="people"></div>
+  </section>
+
+  <!-- DECISIONS -->
+  <section id="tab-decisions" role="tabpanel" hidden>
+    <p class="lede">A decision queued as a task costs every piece of work behind it. Each entry names the owner, how long it has waited, what it is costing, and the conversation that closes it. Blue edge means the decision is yours and nobody can escalate it for you.</p>
+    <div class="row" style="margin: 0 0 12px">
+      <button class="btn small" data-filter="open" aria-pressed="true">Open</button>
+      <button class="btn small" data-filter="mine" aria-pressed="false">Mine</button>
+      <button class="btn small" data-filter="all" aria-pressed="false">All</button>
+    </div>
+    <div id="decisions"></div>
+  </section>
+
+  <!-- REVIEW -->
+  <section id="tab-review" role="tabpanel" hidden>
+    <h2>Monday plan <small>ten minutes, before the standup</small></h2>
+    <ul class="qs" id="plan-qs"></ul>
+    <div class="row" style="margin-top:10px"><button class="btn primary" id="save-plan">Save plan</button><span class="mono" id="plan-saved"></span></div>
+
+    <h2>Friday review <small>the questions you would rather skip</small></h2>
+    <ul class="qs" id="review-qs"></ul>
+    <div class="row" style="margin-top:10px"><button class="btn primary" id="save-review">Save review</button><span class="mono" id="review-saved"></span></div>
+
+    <h2>Log <small>conversations had, decisions moved</small></h2>
+    <div id="log"></div>
+
+    <h2>Past weeks</h2>
+    <div id="history"></div>
+  </section>
+
+  <!-- ROLE -->
+  <section id="tab-role" role="tabpanel" hidden>
+    <p class="lede">What the role is accountable for, written down so the week can be measured against it rather than against the inbox.</p>
+    <h2>The charter</h2>
+    <div class="charter" id="charter"></div>
+
+    <h2>Where the week went <small>score yourself on Friday; the pale band is the target</small></h2>
+    <div class="split" id="split"></div>
+    <p class="prov" id="split-note"></p>
+
+    <h2>The traps this role falls into <small>observed, not hypothetical</small></h2>
+    <div id="traps"></div>
+
+    <h2>What the assistant can do for each of these</h2>
+    <div class="scroll"><table>
+      <tr><th>Need</th><th>Ask a Claude session</th><th>Tier</th></tr>
+      <tr><td>Prep for a conversation</td><td>"Prep me for my 1:1 with Andrew: his open cases, his board items, the two starters."</td><td><span class="chip acc">reads</span></td></tr>
+      <tr><td>Force a decision</td><td>"Draft the option A/B note for the duplicate management ownership decision, for David and Nadia."</td><td><span class="chip acc">drafts</span></td></tr>
+      <tr><td>Weekly written status</td><td>"Write this week's ICT status in my voice from live data."</td><td><span class="chip acc">drafts</span></td></tr>
+      <tr><td>Hold the line</td><td>"Challenge my three things for this week against the register."</td><td><span class="chip acc">reads</span></td></tr>
+      <tr><td>Delegate for real</td><td>"Reassign the Mathew-owned IT Ops backlog items by stream and show me the list before writing."</td><td><span class="chip owed">writes after approval</span></td></tr>
+    </table></div>
+  </section>
+
+  <footer class="foot" id="foot"></footer>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  'use strict';
+  // ------------------------------------------------------------------
+  // Seed knowledge. The markdown in .claude/skills/birdlife-compass is the
+  // authoritative copy; this page mirrors it. Dates are as of 3 Sep 2026.
+  // ------------------------------------------------------------------
+  var ME = 'mathew.hema@birdlife.org.au';
+  var TODAY = new Date();
+  var SNAPSHOT = {
+    asOf: '3 Sep 2026',
+    open: 20, unowned: 5, inNew: 9, newStale: 2, mineOpen: 0,
+    closed30: { 'Keith Tsui': 41, 'Andrew Dunn': 28, 'Nina Lewis': 9, 'Mathew Hema': 8 },
+    blocked: 11, inDev: 18, myTasks: 95, myOverdue: 14, meetings7: 21, meetings30: 65
+  };
+
+  var PEOPLE = [
+    // team
+    { id:'andrew', group:'Your team', name:'Andrew Dunn', email:'andrew.dunn@birdlife.org.au', role:'Microsoft 365, Google, hardware. Four days a week.',
+      needs:'Clear priorities and cover. He carries half the open queue (10 of 20 cases, 6 of them waiting on someone else) and both new starter cases from 31 August are still sitting in New.',
+      you:'A finished offboarding checklist, the licence clean-up that has been In Progress for a year, and passkeys rolled out before the SMS retirement bites.',
+      convo:'The two starters (Penney Wood, Liam Ferguson) are three days old and untouched. Agree today who provisions what, then agree a real date for the M365 licence clean-up or take it off the board.',
+      opener:'Andrew, the two starter cases from Sharon are still in New. What do you need from me to have them provisioned by tomorrow, and what is the honest date for the licence clean-up?',
+      impact:'A starter without an account on day one is the whole organisation’s first impression of ICT. Andrew is also the only person who has had one recorded 1:1 with you in the last 30 days.',
+      cadence:'Weekly 1:1, 30 minutes', rank: 95 },
+    { id:'keith', group:'Your team', name:'Keith Tsui', email:'keith.tsui@birdlife.org.au', role:'Salesforce technical. Highest ticket throughput on the team.',
+      needs:'A work-in-progress limit. He closed 41 cases in 30 days and still has eight undated items In Development, plus the SF G1 reference model on the membership critical path.',
+      you:'G1 evidence by 4 September, the Pardot campaign automation, and the Gravity Forms and portal fixes to stay closed.',
+      convo:'Name the two things Keith is doing this fortnight and move the other six back to Backlog with a rank. Ask him which of his in-progress items he would drop if you let him.',
+      opener:'Keith, you are on fifteen standups a month and eight open builds. If you could only finish two by the 18th, which two? The rest go back to the queue with a number on them.',
+      impact:'Keith is the single dependency for G2. Every side request that lands on him slips the membership build a day.',
+      cadence:'Weekly 1:1 plus standup', rank: 80 },
+    { id:'nina', group:'Your team', name:'Nina Lewis', email:'nina.lewis@birdlife.org.au', role:'Salesforce data, finance alignment, reconciliation, UAT.',
+      needs:'Decisions. Four of the eleven Blocked items are hers and every one is a decision on responsibility, not a build. She is holding the WooCommerce refund gap and the miniOrange product sync defects.',
+      you:'The outstanding gift card questions sent to stakeholders, the refund position briefed to Fundraising, and the four unreconciled manual refunds resolved with Sean and Ben.',
+      convo:'Take the three responsibility decisions off her plate. They belong in front of David and the relevant ED. Say so, and put them on the register with your name as the escalator.',
+      opener:'Nina, portal email, Plauti and the duplicate cases are not yours to decide and they have sat on you since winter. I am taking them to David this week. What do you need answered first?',
+      impact:'Nina is carrying decisions above her authority. That is how good people quietly stop raising things.',
+      cadence:'Weekly 1:1', rank: 85 },
+    { id:'karishma', group:'Your team', name:'Karishma Soni', email:'karishma.soni@birdlife.org.au', role:'Salesforce developer. Daily standup.',
+      needs:'Protection from everything that is not SF G2. Objects built from zero are due 18 September and that is the programme critical path.',
+      you:'A daily two-line standup summary instead of a meeting on the days nothing changed, and G2 evidence against the subtasks, not a verbal done.',
+      convo:'Ask what is on her plate that is not G2 or a G2 prerequisite, and move it to you or Keith at the next standup.',
+      opener:'Karishma, list everything you touched this week that was not G2. I will take it off you.',
+      impact:'The reminder ladder, the highest value outcome of the whole rebuild, sits behind her G2.',
+      cadence:'Daily standup, 15 minutes', rank: 70 },
+    // leadership
+    { id:'david', group:'Leadership', name:'David Thompson', email:'david.thompson@birdlife.org.au', role:'Executive Director Finance & Business Improvement. Your manager. Chairs FBI leadership.',
+      needs:'No surprises, a cost-neutral 2027 (a $500K gap to break-even), and the Salesforce addendum and formal complaint landed. He is chasing Salesforce himself as of this afternoon; the addendum is due close of business tomorrow.',
+      you:'A decision forum that works. The steering committee mandate lapsed in April; the two-committee paper is due to the leadership team in mid October. You also need him to own the responsibility decisions sitting in Blocked.',
+      convo:'A weekly written status (Asana project status has never been posted) and one ask: put the three ownership decisions on the FBI leadership agenda tomorrow with a decide-by date.',
+      opener:'David, three items have been blocked since January waiting for someone to say who owns duplicates, portal email and merge permissions. I want fifteen minutes at FBI leadership tomorrow to close them. Here are options A and B for each.',
+      impact:'While the committee is being redesigned, work is not being decided anywhere. Eight months blocked is a governance failure, not a risk.',
+      cadence:'Weekly 1:1 plus FBI leadership Fridays', rank: 100 },
+    { id:'kate', group:'Leadership', name:'Kate Millar', email:'kate.millar@birdlife.org.au', role:'CEO. Signed the Salesforce order form and the 1 September letter about the environment being disabled without notice.',
+      needs:'The plain-English account of what happened with Salesforce, what it cost, and the assurance it cannot recur. She hears security and vendor matters from you, not from a technician.',
+      you:'Sponsorship for the governance structure and, when the time comes, the membership go-live date said once.',
+      convo:'A half page: what the disablement was, why nobody was warned, what the addendum secures, and the one thing you want from her (a slot for the governance paper).',
+      opener:'Kate, short answer: the outage was a vendor billing action with no notice. Here is what the addendum fixes and the one gap it does not.',
+      impact:'The CEO writing to a vendor is the most expensive escalation the organisation has. It should never be the first time she hears the detail.',
+      cadence:'On event; monthly exec brief', rank: 75 },
+    { id:'john', group:'Leadership', name:'John D’Rozario', email:'john.drozario@birdlife.org.au', role:'Finance lead. Weekly catch-up. Sage evaluation with him this week.',
+      needs:'The bank reconciliation reversed to NetSuite-first, and finance as the system of truth for donation reporting. He wants an update after your Peggy session before anything is built.',
+      you:'His signature on the orphaned NetSuite integration certificate being revoked before 17 September, and an agreed line on campaign code and GAU consistency.',
+      convo:'Map the reconciliation flow with Peggy (booked Friday), then take John the five-minute version and the certificate revocation in the same conversation.',
+      opener:'John, two things: here is the reconciliation flow as Peggy runs it, and there is an unused integration certificate tied to departed staff that I want revoked before the 17th.',
+      impact:'$671K of unreconciled income was growing at roughly $87K a day in July. Every week the flow stays manual, that number is someone’s evening.',
+      cadence:'Weekly catch-up', rank: 82 },
+    { id:'geeta', group:'Leadership', name:'Geeta Rana', email:'geeta.rana@birdlife.org.au', role:'People & Safety. Culture Amp, Employment Hero, grading.',
+      needs:'The Employment Hero to Entra sync trusted, and starters and leavers handled the same way every time.',
+      you:'A joint owner for the joiner, mover, leaver process. Today there is no offboarding checklist at all and starters arrive by email from Sharon.',
+      convo:'Propose the identity lifecycle form and checklist as a People and ICT process, not an ICT ticket type.',
+      opener:'Geeta, starters and leavers are a fifth of our tickets and none of it is a process yet. Can we own one checklist between us?',
+      impact:'Departed staff keep licences and access until someone remembers. That is a security finding waiting to be written.',
+      cadence:'Fortnightly', rank: 60 },
+    { id:'nadia', group:'Leadership', name:'Nadia Watson', email:'nadia.watson@birdlife.org.au', role:'Drafted the 8-page governance charter; fundraising business rules.',
+      needs:'A co-author on the leadership team paper for the two-committee model, framed as efficiency and cost neutral.',
+      you:'Her charter as the base, and her to carry the fundraising side of the duplicate ownership decision.',
+      convo:'Agree the paper outline and split the writing this week so mid October is real.',
+      opener:'Nadia, I have read the charter. Here is the outline I would take to LT. Which sections are yours?',
+      impact:'Without the paper, the steering committee stays a reporting forum and every ED keeps not attending.',
+      cadence:'Fortnightly until the paper lands', rank: 65 },
+    { id:'kimberley', group:'Leadership', name:'Kimberley Meyers', email:'kimberley.meyers@birdlife.org.au', role:'Runs 2027 annual planning. AI policy sponsor.',
+      needs:'Your team’s 2027 plan on the whiteboard template for David’s September review, and the AI policy consultation restarted.',
+      you:'A planning slot that is not swallowed by the membership build.',
+      convo:'Book the team planning session and send the AI policy consultation list.',
+      opener:'Kimberley, team planning is booked for next week. Here is who I am consulting on AI policy and by when.',
+      impact:'A plan written after the budget is a wish list. Planning before budget was the whole point of starting in August.',
+      cadence:'Monthly', rank: 55 },
+    // programme peers
+    { id:'caroline', group:'Programme peers', name:'Caroline Scales', email:'caroline.scales@birdlife.org.au', role:'Marketing. Chairs Marketing and ICT priorities; Aussie Bird Count; Blitzm meetings.',
+      needs:'Shared hours with Blitzm honoured, the portal verification email switched off before Saturday, and a clear membership testing plan in December.',
+      you:'Marketing requests spread over the timeline rather than dropped into Ben’s week, and one home for membership work.',
+      convo:'Set the rule that new asks to Blitzm go through the Monday meeting with a hours cost attached.',
+      opener:'Caroline, every ask to Ben that is not on the plan is paid for out of the membership hours. Can we agree they come through Monday with a number on them?',
+      impact:'Gift cards went from "easy" to a release expectation in one meeting. The team then spends a week walking it back.',
+      cadence:'Weekly (Thursday priorities, Monday Blitzm)', rank: 62 },
+    { id:'james', group:'Programme peers', name:'James Vilinsky', email:'james.vilinsky@birdlife.org.au', role:'Membership and Supporter Care. ICT catch-up fortnightly.',
+      needs:'A go-live date he can plan comms and testers against, and hardship membership instructions.',
+      you:'Supporter Care testers in December, and his Grants inbox queue case (Keith) closed.',
+      convo:'Give him one date and the testing window, and ask him to name the testers now.',
+      opener:'James, the date I am planning to is the one on the board. Who are your two testers for December?',
+      impact:'Three go-live dates are circulating. James is the person who tells members.',
+      cadence:'Fortnightly ICT catch-up', rank: 58 },
+    { id:'micah', group:'Programme peers', name:'Micah Demmert', email:'micah.demmert@birdlife.org.au', role:'Digital governance; membership fortnightly group.',
+      needs:'Terms of reference for both committees, built from the steering committee’s.',
+      you:'His draft by the end of September so the LT paper has an annex.',
+      convo:'Agree the date for the terms of reference draft.',
+      opener:'Micah, can the terms of reference be with me by the 26th so they go in as an annex?',
+      impact:'A committee without terms of reference becomes another meeting.',
+      cadence:'Fortnightly', rank: 40 },
+    { id:'isis', group:'Programme peers', name:'Isis St Pierre', email:'isis.stpierre@birdlife.org.au', role:'Courses and programs. Raises a third of this week’s new cases.',
+      needs:'A single request path and an answer on duplicates. Today she wrote that fixing duplicates "is the role of people with more seniority".',
+      you:'Her cases typed and batched, and her as a member of the duplicates working group once an owner exists.',
+      convo:'Reply to the duplicates thread with the owner decision once David has made it. Until then, tell her it is with David and when.',
+      opener:'Isis, you are right that this is above you. It is with David this week and I will come back to you either way.',
+      impact:'She is the canary. When requesters start declining to own things, the ownership gap has reached the front line.',
+      cadence:'On demand', rank: 66 },
+    { id:'sharon', group:'Programme peers', name:'Sharon Wolff', email:'sharon.wolff@birdlife.org.au', role:'People and Safety. Sends the new starter cases.',
+      needs:'Starters provisioned by day one and a form instead of an email.',
+      you:'Start dates a week ahead, every time.',
+      convo:'Ask for a fortnight’s notice on starters and offer the form in return.',
+      opener:'Sharon, if I get starters two weeks ahead on a form, I can promise day-one access. Deal?',
+      impact:'Penney and Liam’s cases are three days old. Their start date is the deadline whether or not ICT knew it.',
+      cadence:'On demand', rank: 50 },
+    { id:'peggy', group:'Programme peers', name:'Peggy Dias', email:'peggy.dias@birdlife.org.au', role:'Finance. Runs the bank reconciliation. Meeting booked Friday.',
+      needs:'Someone to watch the process before changing it.',
+      you:'The real flow, step by step, including the parts that live in her head.',
+      convo:'Map the flow. Do not propose the fix in the same meeting.',
+      opener:'Peggy, walk me through last Monday’s reconciliation exactly as you did it. I am not here to change it today.',
+      impact:'Automating a process nobody has written down automates the workarounds too.',
+      cadence:'Once, then as needed', rank: 45 },
+    { id:'inna', group:'Programme peers', name:'Inna Kersman', email:'inna.kersman@birdlife.org.au', role:'Marketing automation. Pardot backup and the Auto migration.',
+      needs:'The restricted SharePoint site for the Pardot export and a review of ~70 campaigns still tied to Pardot.',
+      you:'The personal data in that export deleted on a date, written down.',
+      convo:'Agree the deletion date for the Pardot export when she uploads it.',
+      opener:'Inna, when the export is up, let’s put the deletion date on the folder now rather than "a few months".',
+      impact:'A backup of personal data with no deletion date is a privacy finding.',
+      cadence:'Weekly until Pardot is archived (8 Sep)', rank: 48 },
+    // vendors
+    { id:'blitzm', group:'Vendors', name:'Ben McKeown and James O’Brien', email:'ben@blitzmdesign.com.au', role:'Blitzm. WordPress and WooCommerce on a retainer.',
+      needs:'Written responses accepted on every scope item (G1, 8 Sep) and a clean environment before estimates (G0).',
+      you:'No scope committed to business stakeholders without a plan, and the four manual refunds with no Stripe payment explained.',
+      convo:'G1 sign-off and the refund question, in the same Monday meeting.',
+      opener:'Ben, two things for Monday: the written scope responses, and how four manual refunds happened with no Stripe payment behind them.',
+      impact:'Customers may not have received their money back. That is a supporter trust issue before it is a technical one.',
+      cadence:'Weekly Monday', rank: 72 },
+    { id:'miniorange', group:'Vendors', name:'Devendra Dantal', email:'devendra.dantal@xecurify.com', role:'miniOrange. The WooCommerce to Salesforce sync.',
+      needs:'Formal defect tickets. The write-back gap and the silent field-level security failure have been losing production data and have never been raised with a reference number.',
+      you:'Ticket numbers for I1 and I2 and the product sync blank ProductCode defect, due 4 September on your own board.',
+      convo:'Raise the defects in writing today. Every meeting without a ticket number is a meeting.',
+      opener:'Devendra, I am sending three defects with evidence. I need ticket numbers back, not a call.',
+      impact:'A vendor promised a fix in January and delivered a date of 2 September, nine months later. Without tickets there is no clock.',
+      cadence:'Weekly until the defects have numbers', rank: 78 },
+    { id:'salesforce', group:'Vendors', name:'Sahfahri Supar and Gabby Norton', email:'gabby.norton@salesforce.com', role:'Salesforce renewals. Addendum due close of business 4 September.',
+      needs:'A signed addendum covering sandbox pricing, add-back rights and discount disclosure, and a written response to the complaint.',
+      you:'The technical facts of the disablement in one paragraph for David, and the 1 September release updates verified (OAuth username-password retirement, instanced URLs, MoveData).',
+      convo:'David is running the commercial conversation. Yours is to hand him the facts and verify what changed on the 1st.',
+      opener:'David, here is the one paragraph on what the disablement did to us technically, for the complaint.',
+      impact:'$14K saved so far on a contract that was disabling the org’s CRM without notice.',
+      cadence:'Until the addendum is signed', rank: 68 }
+  ];
+
+  var DECISIONS = [
+    { id:'dup-owner', title:'Who owns duplicate management in Salesforce', owner:'David Thompson with the Fundraising ED', since:'2026-01-07', mine:false,
+      cost:'Duplicates flow into every campaign, refund, membership record and report. Today the courses lead declined to own it in writing.',
+      close:'Option A: Fundraising Data owns rules and merges, ICT owns tooling. Option B: ICT owns both with a Plauti licence line. Fifteen minutes at FBI leadership.' },
+    { id:'portal-email', title:'Portal email versus preferred email: who decides', owner:'Programs and Engagement ED', since:'2026-02-01', mine:false,
+      cost:'Every portal login ticket is diagnosed by ICT and then parked because the policy is not ICT’s to set.',
+      close:'One page: who may change a contact’s portal email and on what evidence. Decide-by date on the agenda.' },
+    { id:'plauti', title:'Plauti bulk merge permissions', owner:'David Thompson', since:'2026-02-01', mine:false,
+      cost:'Bulk merges wait on a permission nobody has been asked to grant.',
+      close:'Grant to a named role, or decline in writing. Either closes it.' },
+    { id:'sf-addendum', title:'Salesforce addendum and formal complaint', owner:'David Thompson and Kate Millar', since:'2026-09-01', mine:false,
+      cost:'Addendum due close of business 4 September. Without it the next renewal repeats this one.',
+      close:'Your part: technical facts of the disablement to David, and the 1 September release updates verified.' },
+    { id:'entra-consent', title:'Grant admin consent for the Entra admin app', owner:'Mathew Hema', since:'2026-08-04', mine:true,
+      cost:'A fifth of tickets (starters, leavers, access) end as a script waiting for an admin. There is no offboarding checklist. Nobody can escalate this decision for you.',
+      close:'Register the app, five application permissions, certificate credential, consent. One hour of your own time.' },
+    { id:'mfa-ca', title:'Tenant-wide MFA Conditional Access, target 15 September', owner:'Mathew Hema', since:'2026-06-30', mine:true,
+      cost:'116 users signed in over seven days with no Conditional Access coverage. Report-only first, then enforce; the window to hit the 15th is now.',
+      close:'Publish the policy in report-only this week. The date slips if it is not on by Monday.' },
+    { id:'pim', title:'Buy the PIM licence or accept six standing Global Admins', owner:'David Thompson', since:'2026-06-30', mine:false,
+      cost:'About A$2,500 a year in a year with no new spend. Standing admins are the finding in every audit.',
+      close:'Frame it against the Conga saving. One line in the FBI budget conversation.' },
+    { id:'ns-cert', title:'Revoke the orphaned NetSuite integration certificate', owner:'Mathew Hema with John D’Rozario', since:'2026-08-15', mine:true,
+      cost:'Expires 17 September, linked to departed staff, zero activity. Revoke, monitor, delete.',
+      close:'Confirm no scheduled job uses it, then revoke in the Friday finance catch-up.' },
+    { id:'dmarc', title:'DMARC to 100% and SPF include for Salesforce', owner:'Mathew Hema, through change review', since:'2026-07-01', mine:true,
+      cost:'Ninety percent of spoofed mail is not rejected. The Zeus to Asana email rule is blocked on the SPF record.',
+      close:'A domain-wide change with a rollback plan through the CAB process you designed in August.' },
+    { id:'conga', title:'Conga replacement: commit to the trial outcome', owner:'Mathew Hema to the steering committee', since:'2026-08-18', mine:true,
+      cost:'About $90K a year today against roughly $9K. This is the saving that funds every other ask this year.',
+      close:'Bring the trial evidence and the cost comparison to the committee with a switch date.' },
+    { id:'gov-paper', title:'Two-committee governance paper to the leadership team', owner:'Mathew Hema and Nadia Watson', since:'2026-09-02', mine:true,
+      cost:'Until it lands, the steering committee is a lapsed mandate and demand has no front door.',
+      close:'Outline agreed this week, draft by 26 September, LT mid October.' },
+    { id:'wip', title:'A WIP limit and stream owners on the IT Operations board', owner:'Mathew Hema', since:'2026-08-13', mine:true,
+      cost:'Eighteen items In Development for a team of four, ninety undated. Nothing has ever moved through Ready for Deployment or Hypercare. Recommended three weeks ago, not done.',
+      close:'Two per person. Say it at Monday’s ICT standup and move the rest yourself that afternoon.' },
+    { id:'golive', title:'One membership go-live date, said once', owner:'Mathew Hema', since:'2026-08-31', mine:true,
+      cost:'Three dates are in circulation: 11 December production on the board, 11 January tentative launch, February from the team. James plans comms against whichever he heard last.',
+      close:'Pick the board date or re-baseline it with reasons on the tasks, then say the same date to Caroline, James and David in the same week.' },
+    { id:'giftcards', title:'Gift cards: plan before any release commitment', owner:'Mathew Hema with Caroline Scales', since:'2026-08-17', mine:true,
+      cost:'Blitzm told stakeholders it was easy. It touches miniOrange, Salesforce and finance and the questions have been asked before.',
+      close:'Nina’s list of open questions goes to stakeholders with a "no plan, no date" line from you.' },
+    { id:'triage', title:'Who triages Ask Zeus and the first-touch SLA', owner:'Mathew Hema', since:'2026-08-13', mine:true,
+      cost:'Five cases have no owner today. An urgent ticket sat unowned in August. Assign within one business day, first response within two.',
+      close:'Name a triage owner per day of the week. One sentence at the ICT standup.' },
+    { id:'sprawl', title:'Which of the nine August tools survive', owner:'Mathew Hema', since:'2026-08-20', mine:true,
+      cost:'Nine unmerged branches: security workbench, CAB tool, delivery desk, companion app, insights model, agents, AI radar, work review, this one. Each is a place truth can diverge.',
+      close:'Keep two. Merge them to the default branch. Archive the rest with a note. Building is not the same as delivering.' },
+    { id:'ai-policy', title:'ICT and AI policy consultation', owner:'Kimberley Meyers with Andrew Dunn', since:'2026-08-04', mine:false,
+      cost:'Awaiting Response on the board since August. Staff are using AI tools with no policy, and the steering committee wants it as an agenda item.',
+      close:'Consultation list and a draft date. Andrew is off bequest mediation now.' },
+    { id:'sig-home', title:'Home for 11,473 Special Interest Group memberships (O7)', owner:'Mathew Hema', since:'2026-08-13', mine:true,
+      cost:'Due 11 September on your own board. Blocks the Salesforce object design.',
+      close:'Decide in the standup with Karishma and Keith; write the reason on the task.' }
+  ];
+
+  var CHARTER = [
+    { h:'Direction and governance', p:'A working decision forum (the two-committee model), the 2027 team plan, and the steering committee re-educated on its purpose.' },
+    { h:'Programme delivery', p:'The membership rebuild to one date, the Auto migration, Aussie Bird Count support. The board is the contract.' },
+    { h:'Security posture', p:'Essential Eight maturity level one in twelve weeks from June, the deadline register worked, ratios held.' },
+    { h:'Vendors and money', p:'Salesforce, Blitzm, miniOrange, Conga, NetSuite. Cost neutral 2027; every ask offset by a saving.' },
+    { h:'People', p:'Andrew, Keith, Nina and Karishma each own a stream and move their own items across the board. Weekly 1:1s that happen.' },
+    { h:'Service and data integrity', p:'Ask Zeus triaged within a day. Finance as the system of truth. Reports that do not lie.' }
+  ];
+  var SPLIT = [
+    { id:'delivery', l:'Programme delivery', target:30 },
+    { id:'people', l:'Team and 1:1s', target:20 },
+    { id:'stakeholders', l:'Leadership and governance', target:20 },
+    { id:'security', l:'Security and risk', target:15 },
+    { id:'service', l:'Tickets and firefighting', target:10 },
+    { id:'building', l:'Building tools', target:5 }
+  ];
+  var TRAPS = [
+    { b:'Assignee of last resort.', p:'Ninety-five open Asana items are yours, ten "consider delegating" prompts are unactioned since July 2025, and you closed eight helpdesk cases last month. Each one was a case someone else could have closed.' },
+    { b:'Deciding by not deciding.', p:'Eight of the eighteen register items are yours. Entra consent, the WIP limit and the go-live date have no one above you to wait for.' },
+    { b:'Meetings as a proxy for progress.', p:'Sixty-five recorded meetings in thirty days, fifteen of them Salesforce standups. One recorded 1:1 with Andrew in that time.' },
+    { b:'Building instead of delivering.', p:'Nine tools in August, on nine branches, none merged. A tool nobody else opens is a hobby with a repo.' },
+    { b:'Carrying other people’s authority.', p:'Nina holds decisions above her grade. When Isis says "this is for people with more seniority", she is describing you.' }
+  ];
+  var PLAN_QS = [
+    { id:'rocks', q:'What are the three outcomes this week, and who notices if they land?' },
+    { id:'convos', q:'Which three conversations unblock the most, and when are they booked?' },
+    { id:'decision', q:'Which one decision will you force this week, with whom, by when?' },
+    { id:'not', q:'What are you saying no to, and who needs to hear it?' }
+  ];
+  var REVIEW_QS = [
+    { id:'landed', q:'Which of the three landed? For the ones that did not, what did you do instead?' },
+    { id:'avoided', q:'Which conversation did you postpone because the timing was bad?' },
+    { id:'notmine', q:'What did you do this week that Andrew, Keith or Nina could have done?' },
+    { id:'forced', q:'Which decision did you close, and which did you carry for someone else?' },
+    { id:'stop', q:'What will you stop doing next week?' }
+  ];
+
+  // ------------------------------------------------------------------
+  // helpers
+  // ------------------------------------------------------------------
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function isoDate(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function fmt(d) { return d.getDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]; }
+  function daysSince(iso) { return Math.max(0, Math.round((TODAY - new Date(iso + 'T00:00:00')) / 86400000)); }
+  function weekInfo(d) {
+    var t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    var day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day);
+    var y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+    var wk = Math.ceil(((t - y0) / 86400000 + 1) / 7);
+    var mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay() || 7) - 1)); mon.setHours(0,0,0,0);
+    var fri = new Date(mon); fri.setDate(mon.getDate() + 4);
+    return { id: t.getUTCFullYear() + '-W' + pad(wk), n: wk, mon: mon, fri: fri };
+  }
+  var WEEK = weekInfo(TODAY);
+  $('week-label').textContent = WEEK.n;
+  $('week-range').textContent = fmt(WEEK.mon) + ' to ' + fmt(WEEK.fri) + ' ' + WEEK.fri.getFullYear();
+  var toastT;
+  function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('show'); }, 1800); }
+  function copy(text, msg) {
+    try { navigator.clipboard.writeText(text).then(function () { toast(msg || 'Copied'); }, function () { toast('Copy blocked; select and copy manually'); }); }
+    catch (e) { toast('Copy blocked; select and copy manually'); }
+  }
+
+  // ------------------------------------------------------------------
+  // persistence: artifact db when granted, localStorage otherwise
+  // ------------------------------------------------------------------
+  var store = { db: null, ready: false };
+  var state = { week: { rocks: [{},{},{}], notDoing: [], plan: {}, review: {}, split: {} }, decisions: {}, log: [], weeks: [] };
+  function lsGet(k) { try { var v = localStorage.getItem('compass:' + k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem('compass:' + k, JSON.stringify(v)); } catch (e) {} }
+  function saveWeek() {
+    lsSet('week:' + WEEK.id, state.week);
+    if (store.db) store.db.doc('weeks/' + WEEK.id).set(Object.assign({ id: WEEK.id, updatedAt: new Date().toISOString() }, state.week)).catch(function () { toast('Saved locally only'); });
+  }
+  function saveDecision(id, rec) {
+    state.decisions[id] = rec; lsSet('decisions', state.decisions);
+    if (store.db) store.db.doc('decisions/' + id).set(Object.assign({ updatedAt: new Date().toISOString() }, rec)).catch(function () { toast('Saved locally only'); });
+  }
+  function addLog(entry) {
+    entry.ts = new Date().toISOString();
+    state.log.unshift(entry); lsSet('log', state.log.slice(0, 200));
+    if (store.db) store.db.collection('log').add(entry).catch(function () { toast('Saved locally only'); });
+    renderLog();
+  }
+  function loadLocal() {
+    var w = lsGet('week:' + WEEK.id); if (w) state.week = Object.assign(state.week, w);
+    var d = lsGet('decisions'); if (d) state.decisions = d;
+    var l = lsGet('log'); if (l) state.log = l;
+  }
+  function connectDb() {
+    if (!window.claude || typeof window.claude.use !== 'function') return;
+    window.claude.use('db').then(function (db) {
+      if (!db) return;
+      store.db = db;
+      db.doc('weeks/' + WEEK.id).onSnapshot(function (snap) {
+        if (snap.exists) { state.week = Object.assign(state.week, snap.data()); renderRocks(); renderNot(); renderPlanReview(); renderSplit(); }
+      }, function () {});
+      db.collection('decisions').onSnapshot(function (qs) {
+        qs.docs.forEach(function (doc) { state.decisions[doc.id] = doc.data(); });
+        renderDecisions(); renderWeekDecision(); renderThesis();
+      }, function () {});
+      db.collection('log').orderBy('ts', 'desc').limit(120).onSnapshot(function (qs) {
+        state.log = qs.docs.map(function (d) { return d.data(); }); renderLog(); renderPeople(); renderWeekConvos();
+      }, function () {});
+      db.collection('weeks').orderBy('id', 'desc').limit(12).onSnapshot(function (qs) {
+        state.weeks = qs.docs.map(function (d) { return d.data(); }).filter(function (w) { return w.id !== WEEK.id; }); renderHistory();
+      }, function () {});
+    }).catch(function () {});
+  }
+
+  // ------------------------------------------------------------------
+  // live signals via the viewer's connectors
+  // ------------------------------------------------------------------
+  var live = { sf: null, board: null, mine: null, cal: null, err: {} };
+  var AUTHZ = { needs_reauth: 1, not_granted: 1, blocked_by_policy: 1, server_not_connected: 1, not_in_manifest: 1 };
+  var SF_SERVER = 'Salesforce Production', ASANA = 'Asana', M365 = 'Microsoft 365';
+  var SOQL = "SELECT Id, CaseNumber, Status, Owner.Name, CreatedDate FROM Case WHERE IsClosed = false AND RecordType.DeveloperName = 'Zeus' ORDER BY CreatedDate ASC LIMIT 200";
+  function parsePayload(res) {
+    var p = res && res.payload;
+    if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+    return p;
+  }
+  function blockItems(res) {
+    var out = [];
+    if (res && Array.isArray(res.payload)) return res.payload;
+    (res && res.content || []).forEach(function (b) {
+      if (b && b.type === 'text' && b.text) { try { var o = JSON.parse(b.text); if (o && !o.moreResults && !o.nextOffset && !o.nextCursor) out.push(o); } catch (e) {} }
+    });
+    return out;
+  }
+  function businessDaysAgo(iso) {
+    var d = new Date(iso), n = 0, c = new Date(TODAY);
+    while (c > d) { c.setDate(c.getDate() - 1); if (c.getDay() !== 0 && c.getDay() !== 6) n++; if (n > 60) break; }
+    return n;
+  }
+  function connectMcp() {
+    if (!window.claude || typeof window.claude.use !== 'function') { setLive(false, 'Static copy. Live figures run on the claude.ai link.'); return; }
+    window.claude.use('mcp').then(function (mcp) {
+      if (!mcp) { setLive(false, 'Snapshot of ' + SNAPSHOT.asOf + '. Live data not available in this view.'); return; }
+      var sf = SF_SERVER, as = ASANA, m3 = M365;
+      mcp.listTools().then(function (r) {
+        var names = (r.servers || []).map(function (s) { return s.server; });
+        sf = names.find(function (n) { return /salesforce/i.test(n) && !/staging/i.test(n); }) || sf;
+        as = names.find(function (n) { return /asana/i.test(n); }) || as;
+        m3 = names.find(function (n) { return /microsoft|365|outlook/i.test(n); }) || m3;
+      }).catch(function () {}).then(function () { startWatches(mcp, sf, as, m3); });
+    });
+  }
+  function startWatches(mcp, sf, as, m3) {
+    mcp.watchTool(sf, 'soqlQuery', { q: SOQL }, function (ev) {
+      if (ev.type === 'data') {
+        var p = parsePayload(ev.result);
+        if (p && p.records) {
+          var recs = p.records, unowned = 0, inNew = 0, stale = 0, mine = 0, byOwner = {};
+          recs.forEach(function (r) {
+            var o = r.Owner && r.Owner.Name || '?'; byOwner[o] = (byOwner[o] || 0) + 1;
+            if (o === 'Zeus') unowned++;
+            if (r.Status === 'New') { inNew++; if (businessDaysAgo(r.CreatedDate) > 2) stale++; }
+            if (o === 'Mathew Hema') mine++;
+          });
+          live.sf = { open: recs.length, unowned: unowned, inNew: inNew, newStale: stale, mineOpen: mine, byOwner: byOwner, at: ev.result.cache ? ev.result.cache.storedAt : Date.now() };
+          live.err.sf = null;
+        }
+      } else { live.err.sf = ev.error; if (AUTHZ[ev.error.code]) live.sf = null; }
+      renderTiles(); renderThesis();
+    }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
+
+    mcp.watchTool(as, 'search_tasks', { projects_any: '1211042432693678', completed: false, limit: 100, opt_fields: 'name,assignee.name,due_on,memberships.section.name' }, function (ev) {
+      if (ev.type === 'data') {
+        var p = parsePayload(ev.result);
+        if (p && p.data) {
+          var blocked = 0, inDev = 0, undated = 0;
+          p.data.forEach(function (t) {
+            var secs = (t.memberships || []).map(function (m) { return m.section && m.section.name || ''; });
+            if (secs.indexOf('Blocked') >= 0) blocked++;
+            if (secs.indexOf('In Development/Progress') >= 0) inDev++;
+            if (!t.due_on) undated++;
+          });
+          live.board = { total: p.data.length, blocked: blocked, inDev: inDev, undated: undated, truncated: p.data.length >= 100, at: ev.result.cache ? ev.result.cache.storedAt : Date.now() };
+          live.err.board = null;
+        }
+      } else { live.err.board = ev.error; if (AUTHZ[ev.error.code]) live.board = null; }
+      renderTiles();
+    }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
+
+    mcp.watchTool(as, 'search_tasks', { assignee_any: 'me', completed: false, limit: 100, opt_fields: 'name,due_on' }, function (ev) {
+      if (ev.type === 'data') {
+        var p = parsePayload(ev.result);
+        if (p && p.data) {
+          var today = isoDate(TODAY), overdue = 0, delegate = 0;
+          p.data.forEach(function (t) { if (t.due_on && t.due_on < today) overdue++; if (/^Consider delegating/i.test(t.name || '')) delegate++; });
+          live.mine = { total: p.data.length, overdue: overdue, delegate: delegate, truncated: p.data.length >= 100 };
+          live.err.mine = null;
+        }
+      } else { live.err.mine = ev.error; if (AUTHZ[ev.error.code]) live.mine = null; }
+      renderTiles();
+    }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
+
+    loadCalendar(mcp, m3);
+  }
+  function loadCalendar(mcp, m3) {
+    var from = new Date(TODAY); from.setDate(from.getDate() - 30);
+    var to = new Date(TODAY); to.setDate(to.getDate() + 8);
+    var events = [];
+    function page(offset) {
+      return mcp.callTool(m3, 'outlook_calendar_search', { query: '*', afterDateTime: isoDate(from), beforeDateTime: isoDate(to), limit: 25, offset: offset, order: 'oldest' }, { cache: { staleTime: 300000 } })
+        .then(function (res) {
+          var items = blockItems(res).filter(function (o) { return o && o.subject !== undefined && o.start; });
+          events = events.concat(items);
+          var more = false, next = null;
+          (res.content || []).forEach(function (b) { if (b.type === 'text') { try { var o = JSON.parse(b.text); if (o && o.moreResults) { more = true; next = o.nextOffset; } } catch (e) {} } });
+          if (more && next != null && next < 200) return page(next);
+        });
+    }
+    page(0).then(function () {
+      live.cal = { events: events, at: Date.now() }; live.err.cal = null;
+      renderTiles(); renderPeople(); renderWeekConvos(); setLiveText();
+    }).catch(function (e) { live.err.cal = e; renderTiles(); setLiveText(); });
+  }
+  function setLive(on, text) { $('live-dot').className = 'dot' + (on ? ' on' : ''); $('live-text').textContent = text; }
+  function setLiveText() {
+    var parts = [];
+    if (live.sf) parts.push('Salesforce'); if (live.board) parts.push('Asana'); if (live.cal) parts.push('calendar');
+    if (parts.length) setLive(true, 'Live: ' + parts.join(', ') + ' · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    else { var codes = Object.keys(live.err).filter(function (k) { return live.err[k]; }).map(function (k) { return k + ' ' + (live.err[k].code || 'error'); });
+      setLive(false, 'Snapshot of ' + SNAPSHOT.asOf + (codes.length ? ' · ' + codes.join(', ') : '')); $('live-dot').className = 'dot' + (codes.length ? ' err' : ''); }
+  }
+  function eventStart(e) { return new Date(e.start && e.start.dateTime ? e.start.dateTime : e.start); }
+  function contactFor(person) {
+    if (!live.cal) return null;
+    var em = (person.email || '').toLowerCase(), last = null, next = null, count = 0;
+    live.cal.events.forEach(function (e) {
+      var att = (e.attendees || []).map(function (a) { return String(a).toLowerCase(); });
+      if (e.organizer) att.push(String(e.organizer).toLowerCase());
+      if (att.indexOf(em) < 0) return;
+      var s = eventStart(e); if (isNaN(s)) return;
+      if (s <= TODAY) { count++; if (!last || s > last) last = s; } else if (!next || s < next) next = s;
+    });
+    return { last: last, next: next, count: count };
+  }
+
+  // ------------------------------------------------------------------
+  // rendering
+  // ------------------------------------------------------------------
+  function sig() {
+    var s = live.sf || SNAPSHOT, b = live.board || SNAPSHOT, m = live.mine || { total: SNAPSHOT.myTasks, overdue: SNAPSHOT.myOverdue };
+    var meet = SNAPSHOT.meetings7, hours = null;
+    if (live.cal) { var wk = live.cal.events.filter(function (e) { var d = eventStart(e); return d >= TODAY && d < new Date(TODAY.getTime() + 7 * 86400000); }); meet = wk.length;
+      hours = wk.reduce(function (a, e) { var s = eventStart(e), en = new Date(e.end && e.end.dateTime ? e.end.dateTime : e.end); return a + (isNaN(en) ? 0 : (en - s) / 3600000); }, 0); }
+    return { unowned: s.unowned, inNew: s.inNew, newStale: s.newStale, mineOpen: s.mineOpen, open: s.open, blocked: b.blocked, inDev: b.inDev, myTasks: m.total, myOverdue: m.overdue, meet: meet, hours: hours };
+  }
+  function renderTiles() {
+    var s = sig();
+    var tiles = [
+      { n: s.unowned, l: 'Unowned cases', s: 'in the Zeus queue', c: s.unowned > 0 ? 'late' : 'ok' },
+      { n: s.newStale, l: 'New over 2 days', s: 'of ' + s.inNew + ' in New', c: s.newStale > 0 ? 'owed' : 'ok' },
+      { n: s.mineOpen, l: 'Cases you own', s: 'should be zero', c: s.mineOpen > 0 ? 'late' : 'ok' },
+      { n: s.blocked, l: 'Blocked items', s: 'IT Ops board', c: s.blocked > 5 ? 'owed' : '' },
+      { n: s.inDev, l: 'In development', s: 'limit is 8 for four people', c: s.inDev > 8 ? 'late' : 'ok' },
+      { n: s.myOverdue, l: 'Your overdue tasks', s: 'of ' + s.myTasks + ' assigned to you', c: s.myOverdue > 0 ? 'owed' : 'ok' },
+      { n: s.meet, l: 'Meetings, 7 days', s: s.hours != null ? Math.round(s.hours) + ' hours booked' : 'about 10 hours', c: s.meet > 18 ? 'owed' : '' }
+    ];
+    $('tiles').innerHTML = tiles.map(function (t) { return '<div class="tile ' + t.c + '"><div class="n">' + t.n + '</div><div class="l">' + t.l + '</div><div class="s">' + esc(t.s) + '</div></div>'; }).join('');
+    var src = [];
+    src.push(live.sf ? 'Salesforce live' : 'Salesforce snapshot ' + SNAPSHOT.asOf);
+    src.push(live.board ? 'Asana live' : 'Asana snapshot ' + SNAPSHOT.asOf);
+    src.push(live.cal ? 'calendar live' : 'calendar snapshot');
+    $('sig-src').textContent = src.join(' · ') + ' · Ask Zeus scope';
+    var prov = 'Cases are scoped to RecordType.DeveloperName = Zeus. "Owner Zeus" is the unassigned intake queue, not a person. Board counts come from project 1211042432693678.';
+    if (live.board && live.board.truncated) prov += ' The board read hit the 100 task page limit; blocked and in-development counts may be low.';
+    if (live.err.sf && !live.sf) prov += ' Salesforce: ' + (live.err.sf.code === 'server_not_connected' || live.err.sf.code === 'not_granted' ? 'add or reconnect the Salesforce Production connector in claude.ai Settings.' : (live.err.sf.message || live.err.sf.code));
+    $('sig-prov').textContent = prov;
+    setLiveText();
+  }
+  function renderThesis() {
+    var s = sig(), q, why;
+    var oldest = DECISIONS.filter(function (d) { return !d.mine && decStatus(d.id) === 'open'; }).sort(function (a, b) { return a.since < b.since ? -1 : 1; })[0];
+    var mineOpen = DECISIONS.filter(function (d) { return d.mine && decStatus(d.id) === 'open'; });
+    if (s.unowned > 0) { q = s.unowned + (s.unowned === 1 ? ' ticket has' : ' tickets have') + ' no owner. Triage is a role, not a moment. Whose is it?'; why = 'The queue is healthy on throughput and broken on intake. The fix is one sentence to the team at Monday’s standup, not another dashboard.'; }
+    else if (s.mineOpen > 0) { q = 'You own ' + s.mineOpen + ' open ' + (s.mineOpen === 1 ? 'case' : 'cases') + '. Which of your team could have closed them?'; why = 'Every case you work is a case you are not managing.'; }
+    else if (oldest && daysSince(oldest.since) > 120) { q = oldest.title + ' has waited ' + daysSince(oldest.since) + ' days. Who are you asking, and when?'; why = 'A decision costs one agenda item. Months of queueing cost every piece of work behind it. Owner: <b>' + esc(oldest.owner) + '</b>.'; }
+    else if (mineOpen.length) { q = mineOpen.length + ' open decisions are yours and nobody can escalate them for you. Which one closes this week?'; why = 'Start with <b>' + esc(mineOpen[0].title) + '</b>.'; }
+    else { q = 'What would make this week worth a written status update?'; why = 'The board has never carried one. Five minutes on Friday.'; }
+    $('thesis-q').textContent = q; $('thesis-why').innerHTML = why;
+  }
+
+  function renderRocks() {
+    var rocks = state.week.rocks || [{},{},{}];
+    while (rocks.length < 3) rocks.push({});
+    $('rocks').innerHTML = rocks.slice(0, 3).map(function (r, i) {
+      return '<div class="rock' + (r.done ? ' done' : '') + '" data-i="' + i + '"><div class="idx">' + (i + 1) + '</div><div>' +
+        '<input type="text" class="rt" value="' + esc(r.text || '') + '" placeholder="' + esc(['An outcome someone else can see', 'Not a task. An outcome.', 'If in doubt, a decision closed'][i]) + '" aria-label="Thing ' + (i + 1) + '">' +
+        '<textarea class="why" placeholder="Who notices if it lands?" aria-label="Why it matters">' + esc(r.why || '') + '</textarea></div>' +
+        '<input type="checkbox" class="chk" ' + (r.done ? 'checked' : '') + ' aria-label="Done"></div>';
+    }).join('');
+    Array.prototype.forEach.call($('rocks').querySelectorAll('.rock'), function (el) {
+      var i = +el.getAttribute('data-i');
+      el.querySelector('.rt').addEventListener('change', function (e) { state.week.rocks[i] = Object.assign(state.week.rocks[i] || {}, { text: e.target.value }); saveWeek(); });
+      el.querySelector('.why').addEventListener('change', function (e) { state.week.rocks[i] = Object.assign(state.week.rocks[i] || {}, { why: e.target.value }); saveWeek(); });
+      el.querySelector('.chk').addEventListener('change', function (e) { state.week.rocks[i] = Object.assign(state.week.rocks[i] || {}, { done: e.target.checked }); el.classList.toggle('done', e.target.checked); saveWeek(); if (e.target.checked) toast('Landed'); });
+    });
+  }
+  function renderNot() {
+    var list = state.week.notDoing || [];
+    $('notlist').innerHTML = list.map(function (t, i) { return '<li><input type="text" value="' + esc(t) + '" data-i="' + i + '" aria-label="Not this week"><button class="x" data-i="' + i + '" aria-label="Remove">×</button></li>'; }).join('') || '<li class="lede" style="font-size:14.5px">Nothing here yet. The membership go-live is still slipping because side asks keep getting a yes.</li>';
+    Array.prototype.forEach.call($('notlist').querySelectorAll('input'), function (inp) { inp.addEventListener('change', function (e) { state.week.notDoing[+e.target.getAttribute('data-i')] = e.target.value; saveWeek(); }); });
+    Array.prototype.forEach.call($('notlist').querySelectorAll('.x'), function (b) { b.addEventListener('click', function (e) { state.week.notDoing.splice(+e.currentTarget.getAttribute('data-i'), 1); saveWeek(); renderNot(); }); });
+  }
+  $('add-not').addEventListener('click', function () { state.week.notDoing = state.week.notDoing || []; state.week.notDoing.push(''); renderNot(); var last = $('notlist').querySelector('li:last-child input'); if (last) last.focus(); });
+
+  function hadThisWeek(personId) {
+    var since = WEEK.mon.toISOString();
+    return state.log.find(function (l) { return l.type === 'conversation' && l.person === personId && l.ts >= since; });
+  }
+  function decStatus(id) { var r = state.decisions[id]; return r && r.status || 'open'; }
+  function personCard(p, compact) {
+    var c = contactFor(p), had = hadThisWeek(p.id);
+    var meta = '';
+    if (c) meta = '<span>last <b>' + (c.last ? fmt(c.last) : 'none in 30 days') + '</b></span><span>next <b>' + (c.next ? fmt(c.next) : 'not booked') + '</b></span><span>' + c.count + ' in 30 days</span>';
+    else meta = '<span>' + esc(p.cadence) + '</span>';
+    var prompt = 'Prep me for a conversation with ' + p.name + ' (' + p.role + '). What I need from them: ' + p.you + ' What they need from ICT: ' + p.needs + ' Pull their open Ask Zeus cases, their IT Operations board items and anything in my inbox from them this fortnight, then give me the three points to make and the one ask.';
+    return '<details class="person" ' + (compact ? '' : '') + '><summary><span class="name">' + esc(p.name) + (had ? ' <span class="chip ok">had it</span>' : '') + '</span><span class="role">' + esc(p.role) + '</span><span class="meta">' + meta + '</span></summary>' +
+      '<div class="body"><dl><dt>They need</dt><dd>' + esc(p.needs) + '</dd><dt>You need</dt><dd>' + esc(p.you) + '</dd></dl>' +
+      '<div class="convo"><div class="t">This week’s conversation</div><p>' + esc(p.convo) + '</p><p class="opener">“' + esc(p.opener) + '”</p></div>' +
+      '<div class="impact"><b>Impact on people.</b> ' + esc(p.impact) + '</div>' +
+      (had ? '<p class="mono" style="color:var(--muted)">' + fmt(new Date(had.ts)) + ': ' + esc(had.text) + '</p>' : '<textarea class="outcome" placeholder="One line: what was agreed, by when" aria-label="Outcome"></textarea>') +
+      '<div class="row" style="margin-top:8px">' + (had ? '' : '<button class="btn primary small had" data-p="' + p.id + '">Had it</button>') +
+      '<button class="btn small prep" data-prompt="' + esc(prompt) + '">Copy prep prompt for Claude</button>' +
+      '<button class="btn small prep" data-prompt="' + esc('Draft a message from me to ' + p.name + ' in my voice (email-voice skill) that opens: ' + p.opener + ' Keep it to five lines with one clear ask and a date.') + '">Copy draft prompt</button></div></div></details>';
+  }
+  function wireCards(root) {
+    Array.prototype.forEach.call(root.querySelectorAll('.had'), function (b) {
+      b.addEventListener('click', function (e) {
+        var card = e.currentTarget.closest('.person'); var txt = card.querySelector('.outcome').value.trim();
+        if (!txt) { toast('Write the outcome first, one line'); card.querySelector('.outcome').focus(); return; }
+        var id = e.currentTarget.getAttribute('data-p'); var p = PEOPLE.find(function (x) { return x.id === id; });
+        addLog({ type: 'conversation', person: id, who: p.name, text: txt }); renderPeople(); renderWeekConvos(); toast('Logged');
+      });
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('.prep'), function (b) { b.addEventListener('click', function (e) { copy(e.currentTarget.getAttribute('data-prompt'), 'Prompt copied. Paste it into a Claude session on the Birdlife repo.'); }); });
+  }
+  function renderPeople() {
+    var groups = []; PEOPLE.forEach(function (p) { if (groups.indexOf(p.group) < 0) groups.push(p.group); });
+    $('people').innerHTML = groups.map(function (g) {
+      return '<div class="group"><h2>' + esc(g) + '</h2>' + PEOPLE.filter(function (p) { return p.group === g; }).map(function (p) { return personCard(p); }).join('') + '</div>';
+    }).join('');
+    wireCards($('people'));
+    var pending = PEOPLE.filter(function (p) { return !hadThisWeek(p.id); }).length;
+    $('n-people').textContent = pending ? pending : '';
+  }
+  function renderWeekConvos() {
+    var ranked = PEOPLE.filter(function (p) { return !hadThisWeek(p.id); }).sort(function (a, b) { return b.rank - a.rank; }).slice(0, 4);
+    $('week-convos').innerHTML = ranked.map(function (p) { return personCard(p, true); }).join('') || '<p class="lede">Every conversation on the list has been had this week. Write the status update.</p>';
+    wireCards($('week-convos'));
+  }
+  var decFilter = 'open';
+  function decCard(d) {
+    var rec = state.decisions[d.id] || {}, st = rec.status || 'open', age = daysSince(d.since);
+    var cls = st !== 'open' ? 'ok' : d.mine ? 'mine' : age > 120 ? 'late' : age > 30 ? 'owed' : '';
+    var chip = st === 'closed' ? '<span class="chip ok">closed</span>' : st === 'forced' ? '<span class="chip acc">on an agenda</span>' : d.mine ? '<span class="chip acc">yours</span>' : age > 120 ? '<span class="chip late">' + age + ' days</span>' : '<span class="chip owed">' + age + ' days</span>';
+    return '<div class="dec ' + cls + '" data-id="' + d.id + '"><div class="head"><h3>' + esc(d.title) + ' ' + chip + '</h3><span class="age">owner <b>' + esc(d.owner) + '</b> · since ' + esc(d.since) + '</span></div>' +
+      '<p class="cost">' + esc(d.cost) + '</p><p class="close"><b>Closes it:</b> ' + esc(d.close) + '</p>' +
+      '<div class="row"><select aria-label="Status"><option value="open"' + (st === 'open' ? ' selected' : '') + '>Open</option><option value="forced"' + (st === 'forced' ? ' selected' : '') + '>On an agenda with a date</option><option value="closed"' + (st === 'closed' ? ' selected' : '') + '>Closed</option></select>' +
+      '<input type="text" placeholder="Note: who, when, what was decided" value="' + esc(rec.note || '') + '" aria-label="Note">' +
+      '<button class="btn small prep" data-prompt="' + esc('Write the option A / option B decision note for: ' + d.title + '. Owner: ' + d.owner + '. Why it matters: ' + d.cost + ' Proposed close: ' + d.close + ' One page, my voice, decide-by date at the top.') + '">Copy decision-note prompt</button></div></div>';
+  }
+  function renderDecisions() {
+    var list = DECISIONS.filter(function (d) { var st = decStatus(d.id); return decFilter === 'all' || (decFilter === 'mine' ? d.mine && st !== 'closed' : st !== 'closed'); });
+    list.sort(function (a, b) { return (b.mine - a.mine) || (a.since < b.since ? -1 : 1); });
+    $('decisions').innerHTML = list.map(decCard).join('') || '<p class="lede">Nothing open under this filter.</p>';
+    Array.prototype.forEach.call($('decisions').querySelectorAll('.dec'), function (el) {
+      var id = el.getAttribute('data-id');
+      function save() { var d = DECISIONS.find(function (x) { return x.id === id; }); var prev = decStatus(id); var rec = { status: el.querySelector('select').value, note: el.querySelector('input').value };
+        saveDecision(id, rec); if (rec.status !== prev) addLog({ type: 'decision', person: null, who: d.title, text: rec.status === 'closed' ? 'Closed. ' + rec.note : rec.status === 'forced' ? 'On an agenda. ' + rec.note : 'Reopened. ' + rec.note });
+        renderDecisions(); renderWeekDecision(); renderThesis(); toast('Saved'); }
+      el.querySelector('select').addEventListener('change', save);
+      el.querySelector('input').addEventListener('change', save);
+    });
+    wireCards($('decisions'));
+    var open = DECISIONS.filter(function (d) { return decStatus(d.id) === 'open'; }).length;
+    $('n-dec').textContent = open || '';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-filter]'), function (b) {
+    b.addEventListener('click', function (e) { decFilter = e.currentTarget.getAttribute('data-filter');
+      Array.prototype.forEach.call(document.querySelectorAll('[data-filter]'), function (x) { x.setAttribute('aria-pressed', x === e.currentTarget ? 'true' : 'false'); }); renderDecisions(); });
+  });
+  function renderWeekDecision() {
+    var open = DECISIONS.filter(function (d) { return decStatus(d.id) === 'open'; });
+    var pick = open.filter(function (d) { return d.mine; }).sort(function (a, b) { return a.since < b.since ? -1 : 1; })[0] || open[0];
+    $('week-decision').innerHTML = pick ? decCard(pick) + '<p class="lede" style="font-size:14px">Chosen because it is yours and the oldest. Change its status on the Decisions tab once it is on an agenda with a date.</p>' : '<p class="lede">The register is clear.</p>';
+    wireCards($('week-decision'));
+    var el = $('week-decision').querySelector('.dec'); if (el) { el.querySelector('select').disabled = true; el.querySelector('input').disabled = true; }
+  }
+  function qsList(target, qs, answers) {
+    $(target).innerHTML = qs.map(function (q) { return '<li><div class="q">' + esc(q.q) + '</div><textarea data-q="' + q.id + '" aria-label="' + esc(q.q) + '">' + esc(answers[q.id] || '') + '</textarea></li>'; }).join('');
+  }
+  function collect(target) { var o = {}; Array.prototype.forEach.call($(target).querySelectorAll('textarea'), function (t) { o[t.getAttribute('data-q')] = t.value; }); return o; }
+  function renderPlanReview() {
+    qsList('plan-qs', PLAN_QS, state.week.plan || {}); qsList('review-qs', REVIEW_QS, state.week.review || {});
+    $('plan-saved').textContent = state.week.planAt ? 'saved ' + new Date(state.week.planAt).toLocaleString() : '';
+    $('review-saved').textContent = state.week.reviewAt ? 'saved ' + new Date(state.week.reviewAt).toLocaleString() : '';
+  }
+  $('save-plan').addEventListener('click', function () { state.week.plan = collect('plan-qs'); state.week.planAt = new Date().toISOString(); saveWeek(); renderPlanReview(); toast('Plan saved'); });
+  $('save-review').addEventListener('click', function () {
+    state.week.review = collect('review-qs'); state.week.reviewAt = new Date().toISOString();
+    var rocks = (state.week.rocks || []).filter(function (r) { return r && r.text; }); var done = rocks.filter(function (r) { return r.done; }).length;
+    state.week.score = rocks.length ? done + ' of ' + rocks.length : 'no things set';
+    saveWeek(); renderPlanReview(); toast('Review saved. ' + state.week.score + ' landed.');
+  });
+  function renderLog() {
+    var l = state.log.slice(0, 40);
+    $('log').innerHTML = l.length ? l.map(function (e) { return '<div class="logline"><span class="when">' + fmt(new Date(e.ts)) + ' ' + new Date(e.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span><span><b>' + esc(e.who) + '</b> ' + (e.type === 'decision' ? '<span class="chip grey">decision</span> ' : '') + esc(e.text) + '</span></div>'; }).join('') : '<p class="lede">Empty. The first entry is one conversation with an outcome line.</p>';
+  }
+  function renderHistory() {
+    var w = state.weeks || [];
+    $('history').innerHTML = w.length ? w.map(function (x) {
+      var rocks = (x.rocks || []).filter(function (r) { return r && r.text; });
+      return '<div class="hist"><div class="h">' + esc(x.id) + ' · ' + esc(x.score || (rocks.length ? rocks.filter(function (r) { return r.done; }).length + ' of ' + rocks.length : 'no things set')) + '</div>' +
+        rocks.map(function (r) { return '<p>' + (r.done ? '✓ ' : '– ') + esc(r.text) + '</p>'; }).join('') +
+        (x.review && x.review.stop ? '<p><i>Stop:</i> ' + esc(x.review.stop) + '</p>' : '') + '</div>';
+    }).join('') : '<p class="lede">Past weeks appear here once a week has been saved with the shared store connected.</p>';
+  }
+  function renderCharter() { $('charter').innerHTML = CHARTER.map(function (c) { return '<div><h3>' + esc(c.h) + '</h3><p>' + esc(c.p) + '</p></div>'; }).join('');
+    $('traps').innerHTML = TRAPS.map(function (t) { return '<div class="trap"><b>' + esc(t.b) + '</b><p>' + esc(t.p) + '</p></div>'; }).join(''); }
+  function renderSplit() {
+    var v = state.week.split || {};
+    $('split').innerHTML = SPLIT.map(function (s) { var a = v[s.id] != null ? +v[s.id] : s.target; var over = a > s.target + 5 && s.id !== 'delivery' && s.id !== 'people';
+      return '<div class="bar"><span>' + esc(s.l) + '</span><div><div class="track"><div class="target" style="width:' + s.target + '%"></div><div class="actual' + (over ? ' over' : '') + '" style="width:' + a + '%"></div></div><input type="range" min="0" max="80" value="' + a + '" data-s="' + s.id + '" aria-label="' + esc(s.l) + ' percent"></div><span class="pct">' + a + '% <span style="color:var(--muted)">/ ' + s.target + '</span></span></div>'; }).join('');
+    Array.prototype.forEach.call($('split').querySelectorAll('input[type="range"]'), function (r) {
+      r.addEventListener('input', function (e) { state.week.split = state.week.split || {}; state.week.split[e.target.getAttribute('data-s')] = +e.target.value; renderSplit(); });
+      r.addEventListener('change', function () { saveWeek(); });
+    });
+    var total = SPLIT.reduce(function (a, s) { return a + (v[s.id] != null ? +v[s.id] : s.target); }, 0);
+    $('split-note').textContent = 'Total ' + total + '%. Targets are a recommendation for a Senior Manager with a team of four and a live programme, not a rule. Thirty days of calendar suggests meetings alone run near 40% of the week.';
+  }
+  // tabs
+  Array.prototype.forEach.call(document.querySelectorAll('nav.tabs button'), function (b) {
+    b.addEventListener('click', function (e) {
+      var t = e.currentTarget.getAttribute('data-tab');
+      Array.prototype.forEach.call(document.querySelectorAll('nav.tabs button'), function (x) { x.setAttribute('aria-selected', x === e.currentTarget ? 'true' : 'false'); });
+      ['week', 'people', 'decisions', 'review', 'role'].forEach(function (k) { $('tab-' + k).hidden = k !== t; });
+      try { localStorage.setItem('compass:tab', t); } catch (x) {}
+    });
+  });
+  try { var t0 = localStorage.getItem('compass:tab'); if (t0) { var b0 = document.querySelector('nav.tabs button[data-tab="' + t0 + '"]'); if (b0) b0.click(); } } catch (e) {}
+
+  $('foot').innerHTML = 'Knowledge as of ' + SNAPSHOT.asOf + ' from the Ask Zeus queue, the IT Operations and Membership Build boards, thirty days of Granola meeting notes and the inbox. The authoritative copy of the stakeholder map, register and rituals is the <span class="mono">birdlife-compass</span> skill in the Birdlife repo; tell a session "update the compass" to change either. Nothing on this page writes to Salesforce, Asana or Outlook. Confidential to Mathew Hema.';
+
+  loadLocal();
+  renderTiles(); renderThesis(); renderRocks(); renderNot(); renderPeople(); renderWeekConvos(); renderDecisions(); renderWeekDecision(); renderPlanReview(); renderLog(); renderHistory(); renderCharter(); renderSplit();
+  connectDb(); connectMcp();
+})();
+</script>

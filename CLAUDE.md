@@ -24,6 +24,7 @@ the real IDs, picklist values, gotchas, and playbooks:
 | `birdlife-stripe` | Payments, refunds, BECS, WooCommerce→Salesforce flow |
 | `birdlife-zapier` | The 17 connected apps, when Zapier vs native connector |
 | `birdlife-cloudflare` | DNS, SPF/DKIM, WAF, caching, the two accounts |
+| `birdlife-compass` | The role coach: Monday plan, Friday review, stakeholder map, decision register, conversation prep, "challenge me" |
 
 If the account-synced versions of these skills are also present, they take
 precedence when newer; otherwise these repo copies are the source of truth. When
@@ -65,6 +66,9 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
   actions to approve-only direct execution.
 - `dashboard/ict-dashboard.html` — the ICT dashboard design template; the live copy
   is republished each weekday by the `ICT Dashboard` routine.
+- `compass/index.html` — the ICT Compass, Mathew's weekly operating desk (three
+  things, conversations to have, decision register, Friday review). Source of the
+  published artifact; the knowledge behind it lives in the `birdlife-compass` skill.
 - `routines/` — scheduled-routine definitions and backups (credentials redacted).
 
 ## Style
