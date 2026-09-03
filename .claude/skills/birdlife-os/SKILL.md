@@ -82,16 +82,24 @@ Schedule, Registers, Rules.
   observed on eCommerce and assumed identical on the other four.
 - NetSuite `ns_runCustomSuiteQL` returns `{data:[...], totalResults,
   numberOfPages}`. Always filter subsidiary id 2; never create saved searches.
+- `sample` (Jarvis): the framing must be folded into the FIRST user turn;
+  two consecutive user turns, a tool count over `limits().tools.maxCount`,
+  or `cache` other than false with tools all fail the call. The page shows
+  `[code] message` for page-bug codes so the cause is visible; a bare
+  "Transient hiccup" now means a genuine upstream_error.
 
 ### The action contract (what Jarvis on the page may do)
 Reads: live snapshot, single SOQL SELECT (always LIMIT, Cases always scoped
 RecordType.DeveloperName='Zeus'), Asana search. Writes, each behind an in-page
 Approve card showing the exact change, one record at a time, verified by
-re-read, with an internal audit comment on case writes: case internal note,
-case public reply (+optional status), case close (validated reason, Type if
-blank), case assign (ICT team only; duplicate User records resolved live by
-recent Zeus case ownership, ambiguity always put to the user), task comment,
-task complete, task move, Outlook reply DRAFT. Never: send email, bulk actions,
+re-read, with an internal audit comment on case writes: `case_comment`
+(public false = internal note, public true = reply, optional status),
+`case_close` (validated reason, Type if blank), `case_assign` (ICT team only;
+duplicate User records resolved live by recent Zeus case ownership, ambiguity
+always put to the user), `task_action` (comment, complete, move), `fix_track`,
+`email_draft_reply` (Outlook DRAFT). Tools are consolidated to 13 because the
+sample capability caps tools per call (`limits().tools.maxCount`); the page
+trims to the cap if it is ever lower. Never: send email, bulk actions,
 assignment outside the team, Entra/M365 admin, Salesforce config. Decide-as-
 Mathew mode states the call (money first, efficiencies second, then risk), the
 reason, reversibility, then executes via the card; a cancelled card is an
@@ -122,8 +130,8 @@ dive stays in the weekly Security dashboard artifact (linked from the tab).
 The Fixes tab is the improvement loop's working surface (process in
 `birdlife-improvement`). Seed catalogue lives in the page as `FIXES_SEED`
 (id, title, system, cat, sev 1-3, tier 1-3, effort, owner, why, people,
-steps, src); Jarvis adds live suggestions with `fix_propose`, reads with
-`fixes_catalog`, records progress with `fix_status`, and `fix_track` creates
+steps, src); Jarvis uses one `fixes` tool (action list, propose, status) to
+read, add live suggestions and record progress, and `fix_track` creates
 ONE Asana task in Backlog/Requests behind an approval card, verified by
 re-reading the board. Status and Jarvis additions are per-browser
 (localStorage); the durable record is the Asana task and, once done, the
