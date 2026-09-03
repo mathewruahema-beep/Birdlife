@@ -1,0 +1,329 @@
+<title>AI Field Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F1F3EE; --bg2:#E6EAE2; --ink:#16302B; --ink2:#4A5F59; --rule:#C9D1C7;
+  --link:#1F6F8B; --gold:#A8781F; --warn:#8A3B2E; --tableband:#E9EDE6;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1A18; --bg2:#182624; --ink:#E3E8E2; --ink2:#A5B3AD; --rule:#2F403C;
+    --link:#7CC3DB; --gold:#D9A94A; --warn:#E08A78; --tableband:#152220;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1A18; --bg2:#182624; --ink:#E3E8E2; --ink2:#A5B3AD; --rule:#2F403C;
+  --link:#7CC3DB; --gold:#D9A94A; --warn:#E08A78; --tableband:#152220;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55}
+a{color:var(--link);text-decoration-thickness:1px;text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wrap{max-width:42rem;margin:0 auto;padding:1.5rem 1.25rem 4rem}
+header{padding:1rem 0 1.5rem;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:var(--serif);font-weight:700;font-size:2.3rem;line-height:1.08;margin:.4rem 0 .6rem;text-wrap:balance;font-variation-settings:"opsz" 144}
+.lede{font-size:1.1rem;color:var(--ink2);margin:0 0 1rem;max-width:36rem}
+.meta{font-family:var(--mono);font-size:.78rem;color:var(--ink2);display:flex;flex-wrap:wrap;gap:.55rem 1.4rem;margin:0 0 .25rem}
+.thesis{margin:1.6rem 0 0;padding:1rem 1.1rem;background:var(--bg2);border-left:3px solid var(--gold);font-family:var(--serif);font-size:1.12rem;line-height:1.45;font-variation-settings:"opsz" 20}
+nav{margin:1.5rem 0 0;display:flex;flex-wrap:wrap;gap:.6rem .6rem;font-family:var(--mono);font-size:.76rem}
+nav a{color:var(--ink2);text-decoration:none;border:1px solid var(--rule);border-radius:2px;padding:.3rem .55rem;line-height:1.2}
+nav a:hover{color:var(--link);border-color:var(--link)}
+section{padding:2.25rem 0 1.25rem;border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+h2{font-family:var(--serif);font-weight:500;font-size:1.55rem;line-height:1.15;margin:.35rem 0 1rem;text-wrap:balance;font-variation-settings:"opsz" 72}
+h3{font-family:var(--sans);font-weight:600;font-size:1.02rem;margin:1.4rem 0 .4rem}
+p{margin:0 0 .9rem;max-width:38rem}
+ul,ol{padding-left:1.25rem;margin:0 0 1rem;max-width:38rem}
+li{margin:0 0 .6rem}
+li strong,p strong{font-weight:600}
+.habit{display:grid;grid-template-columns:2.2rem 1fr;gap:.75rem;margin:0 0 1.75rem;max-width:38rem}
+.habit .n{font-family:var(--serif);font-size:1.6rem;color:var(--gold);line-height:1;padding-top:.15rem;font-variation-settings:"opsz" 144}
+.habit h3{margin:0 0 .3rem}
+.habit p{margin:0 0 .5rem}
+.ex{font-family:var(--mono);font-size:.82rem;line-height:1.55;padding:.6rem .8rem;background:var(--bg2);border-radius:3px;margin:.4rem 0 .8rem;overflow-x:auto}
+.ex .w{color:var(--warn)} .ex .s{color:var(--link)}
+.tbl{overflow-x:auto;margin:0 0 1rem}
+table{border-collapse:collapse;width:100%;min-width:34rem;font-size:.95rem}
+th,td{text-align:left;vertical-align:top;padding:.65rem .7rem;border-bottom:1px solid var(--rule)}
+th{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);font-weight:500}
+td:first-child{font-family:var(--mono);font-size:.82rem;white-space:nowrap;color:var(--gold)}
+td:last-child{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--ink2)}
+tbody tr:nth-child(even){background:var(--tableband)}
+.stop li::marker{color:var(--warn)}
+.friday{counter-reset:q;list-style:none;padding:0}
+.friday li{counter-increment:q;display:grid;grid-template-columns:2rem 1fr;gap:.6rem;padding:.7rem 0;border-top:1px solid var(--rule)}
+.friday li::before{content:counter(q);font-family:var(--serif);color:var(--gold);font-size:1.2rem;line-height:1.2}
+footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.75rem;color:var(--ink2)}
+@media (max-width:480px){body{font-size:16px}h1{font-size:1.9rem}.wrap{padding:1rem 1rem 3rem}}
+
+/* daily block */
+.daily{padding:1.75rem 0 1.25rem;border-bottom:1px solid var(--rule)}
+.rep{margin:.9rem 0 1.5rem;padding:.9rem 1.1rem;background:var(--bg2);border-left:3px solid var(--gold)}
+.rep .eyebrow{margin-bottom:.25rem}
+.rep p{margin:0 0 .4rem}
+.rep .say{font-family:var(--mono);font-size:.8rem;color:var(--ink2)}
+ol.ten{list-style:none;padding:0;margin:0;counter-reset:h;max-width:none}
+ol.ten li{counter-increment:h;display:grid;grid-template-columns:2.2rem 1fr;gap:.75rem;padding:1rem 0;border-top:1px solid var(--rule);margin:0}
+ol.ten li::before{content:counter(h);font-family:var(--serif);font-size:1.6rem;line-height:1;color:var(--gold);padding-top:.1rem;font-variation-settings:"opsz" 144}
+ol.ten h3{margin:0 0 .3rem}
+ol.ten p{margin:0 0 .35rem}
+.try{font-size:.95rem}
+.try b{font-weight:600;color:var(--gold)}
+.src{font-family:var(--mono);font-size:.76rem;color:var(--ink2)}
+details{border-top:1px solid var(--rule);padding:.7rem 0}
+summary{cursor:pointer;font-family:var(--mono);font-size:.82rem;color:var(--ink2)}
+details ol{padding-left:1.25rem;margin:.6rem 0 0;font-size:.95rem}
+details li{margin:0 0 .35rem}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">BirdLife Australia ICT · Field guide</div>
+  <h1>Getting better with AI in the ICT role</h1>
+  <p class="lede">A short, linked guide for Mathew Hema: five habits, the phone playbook, the rules you will be held to, a thirty-day plan, the learning ladder, and the daily loop that makes it stick.</p>
+  <div class="meta"><span>Written 3 Sep 2026</span><span>Guide read time 10 min</span><span>Ten refreshes weekdays</span></div>
+  <p class="thesis">AI makes you faster only when you give it context, make it verify, and give it somewhere to remember. Without those three it makes you confidently wrong, faster.</p>
+  <nav>
+    <a href="#today">Today's ten</a><a href="#now">Where you are</a><a href="#habits">Five habits</a><a href="#remote">Remote playbook</a><a href="#rules">The rules</a><a href="#plan">30-day plan</a><a href="#ladder">Learning ladder</a><a href="#loop">Daily loop</a><a href="#people">People</a><a href="#friday">Friday check</a><a href="#stop">Stop doing</a>
+  </nav>
+</header>
+
+<section class="daily" id="today">
+  <div class="eyebrow">Daily · from your Gmail newsletters</div>
+  <h2>Today's ten</h2>
+  <div class="meta"><!--STAMP-START--><span>Thursday 3 September 2026</span><span>Read from 5 newsletters in Gmail</span><span>Refreshes weekdays 6:30am AEST</span><!--STAMP-END--></div>
+  <div class="rep">
+    <!--REP-START-->
+    <div class="eyebrow">AI rep of the day</div>
+    <p><strong>Rep 1 of 30: the four-part prompt.</strong> Take the next real ticket. Write the prompt as Context, Goal, Constraints, Done-when before you send it. Done when the assistant asks zero clarifying questions.</p>
+    <p class="say">Say "today's rep" in any session on the Birdlife repo to start. Say "done, score N, what changed" to log it.</p>
+    <!--REP-END-->
+  </div>
+  <ol class="ten">
+<!--TEN-START-->
+<li><h3>Judge a model by cost per completed task, not per token</h3>
+<p>Google kept Gemini 3.8 Flash's token price flat, yet Artificial Analysis found it costs about 40% more per finished task than Meta's Muse Spark 1.3 because it does more work to get there. A cheap worker who needs four tries costs more than a dear one who nails it once.</p>
+<p class="try"><b>Try today:</b> for one routine, count tasks completed correctly per run, not tokens. That is the number for the Board.</p>
+<p class="src">The Neuron, 3 Sep · <a href="https://artificialanalysis.ai/models/releases/comparisons/gemini-3-8-flash-vs-muse-spark-1-3">Artificial Analysis comparison</a></p></li>
+
+<li><h3>Mastery still comes from doing the reps</h3>
+<p>Agents finish tasks without teaching you anything, so expertise now has to be built on purpose. The core skills are deciding, specifying, steering and verifying. That is the whole case for the thirty-rep curriculum in one paragraph.</p>
+<p class="try"><b>Try today:</b> do rep 1 above on a live case, and score it honestly.</p>
+<p class="src">TLDR Dev, 2 Sep · <a href="https://addyo.substack.com/p/agentic-skill-decay">Addy Osmani, Agentic skill decay</a></p></li>
+
+<li><h3>Your tech literacy is your AI ceiling</h3>
+<p>AI raises the floor, but the ceiling stays low unless your technical vocabulary grows with your AI fluency. The fix is cheap: stop nodding along, and ask the model to explain one term at exactly the altitude you want.</p>
+<p class="try"><b>Try today:</b> pick one term you have been nodding at this month. Ask: "Explain OAuth2 certificate rotation like I run the company but not the codebase."</p>
+<p class="src">The Rundown, 3 Sep · <a href="https://app.therundown.ai/guides">Nate's Notebook</a></p></li>
+
+<li><h3>Make every AI session title a status light</h3>
+<p>When several sessions run at once, name each one so the tab tells you its state without opening it: a warning mark while it is working or needs you, a tick when done, and a project emoji. Your tab bar becomes a live board instead of a row of mystery chats.</p>
+<p class="try"><b>Try today:</b> rename your open Claude sessions to "⚠️ 🐦 Case 139005 triage" and "✅ 🐦 Guide".</p>
+<p class="src">The Neuron, 3 Sep · <a href="https://x.com/danshipper/status/2095245632533622862">Dan Shipper's convention</a></p></li>
+
+<li><h3>Trimming context can cost more, not less</h3>
+<p>GitHub found that shortening tool output made Copilot dearer when missing context forced it to reopen files and take extra turns. Savings came from compressing repetitive logs and dropping formatting noise, not from cutting the source-like material the agent needs.</p>
+<p class="try"><b>Try today:</b> in one routine prompt, remove repeated boilerplate but keep the real IDs and picklist values. Never trim the facts.</p>
+<p class="src">TLDR Dev, 3 Sep · <a href="https://github.blog/ai-and-ml/github-copilot/how-we-make-ai-coding-more-cost-efficient-without-sacrificing-task-quality/">GitHub engineering</a></p></li>
+
+<li><h3>Least privilege applies to agents too</h3>
+<p>Anthropic reported unauthorised access incidents in July and August caused by misconfigured third-party evaluation environments, and CrowdStrike launched a whole product category for watching what agents do on a network. The lesson for a small estate is older than AI: give an agent the narrowest access the task needs.</p>
+<p class="try"><b>Try today:</b> list which connectors each of your twelve routines holds. Remove any a routine does not use.</p>
+<p class="src">TLDR Dev and AI for Work, 2 Sep · <a href="https://www.anthropic.com/news/improving-alignment-security-efforts">Anthropic on alignment and security</a></p></li>
+
+<li><h3>Reserve human review for blast radius</h3>
+<p>AI generates more change than people can inspect, so mandatory review of everything turns seniors into a bottleneck. Move design and testing earlier, then keep human review for security boundaries, big architectural calls, large blast radius and low confidence.</p>
+<p class="try"><b>Try today:</b> your propose-then-write rule already does this. Write down which writes are low blast radius and could be pre-approved per session.</p>
+<p class="src">TLDR Dev, 3 Sep · <a href="https://martinfowler.com/rachels-ramblings/code-review.html">Rachel's ramblings, martinfowler.com</a></p></li>
+
+<li><h3>Route sensitive data away from cloud models</h3>
+<p>Perplexity's new hybrid agent detects PII and runs those parts of a task on local models while the rest goes to frontier models. Expect every vendor to copy it within a year. Until then the routing is your job.</p>
+<p class="try"><b>Try today:</b> check that no routine prompt or skill file carries member or donor PII. Case numbers yes, names and emails no.</p>
+<p class="src">AI for Work, 2 Sep · <a href="https://newsletter.aiforwork.co/p/enterprises-will-cheer-perplexity-s-hybrid-agent">Perplexity Hybrid Compute</a></p></li>
+
+<li><h3>Tell the agent when to stop</h3>
+<p>Meta's headline gain in Muse Spark 1.3 was not intelligence but restraint: 20% fewer tool calls and 25% fewer tokens because it asks when unsure and knows when it is done. Your prompts can buy the same restraint from any model.</p>
+<p class="try"><b>Try today:</b> add a hard cap and a stop condition to your next prompt, the way the overnight pre-draft caps at eight drafts.</p>
+<p class="src">The Neuron, 3 Sep · <a href="https://research.meta.ai/blog/introducing-muse-spark-1-3">Meta, Muse Spark 1.3</a></p></li>
+
+<li><h3>AI raises the quality floor more than it cuts the work</h3>
+<p>Tomasz Tunguz measured his writing and found AI did not reduce his 136 line edits per article. It raised the worst piece to the level of the average. Set the team's expectation to match: fewer bad days, not fewer days.</p>
+<p class="try"><b>Try today:</b> when you brief Andrew, Keith and Nina, promise consistency, not speed. Speed comes later, from the reps.</p>
+<p class="src">TLDR Dev, 3 Sep · <a href="https://tomtunguz.com/ai-productivity-doesnt-mean-what-i-think">Tomasz Tunguz</a></p></li>
+<!--TEN-END-->
+  </ol>
+  <h3>Previous days</h3>
+  <!--ARCHIVE-START-->
+<p class="src">First edition. Yesterday's ten will appear here from tomorrow, five days kept.</p>
+<!--ARCHIVE-END-->
+  <p class="src">Refreshed each weekday at 6:30am AEST by the routine "AI Daily Ten" from TLDR, The Rundown, The Neuron, AI for Work, The Deep View and Techpresso. Read-only on mail. Only this block changes; the guide below is static.</p>
+</section>
+
+<section id="now">
+  <div class="eyebrow">Status</div>
+  <h2>Where you actually are</h2>
+  <p>You are ahead of most ICT managers. The Birdlife repo already has a charter in CLAUDE.md, nine operator skills under version control with more on your claude.ai account, a phone console, four scheduled routines, and a three-tier honesty model for what the assistant executes versus prepares. That is an operating system, not a chatbot.</p>
+  <h3>The honest gaps</h3>
+  <ul>
+    <li><strong>Usage is reactive.</strong> Most sessions start from a ticket. The leverage is in work you have not asked for yet: pre-drafting, pattern spotting, reporting.</li>
+    <li><strong>Knowledge drifts.</strong> The repo skills and the account copies diverge. A gotcha fixed in one and not the other is a bug you will hit again.</li>
+    <li><strong>Nothing is measured.</strong> You cannot say how many cases a week the assistant closed or how much time a routine saved. Without a number the Board and CFO will treat this as a hobby.</li>
+    <li><strong>Tier 2 is the ceiling.</strong> Entra and Exchange admin work is prepared, not executed. The plan to change that is <code>docs/entra-admin-connector.md</code>. Until it lands, remote work stops at the point of admin action.</li>
+  </ul>
+</section>
+
+<section id="habits">
+  <div class="eyebrow">Habits</div>
+  <h2>Five habits that make the difference</h2>
+
+  <div class="habit"><div class="n">1</div><div>
+    <h3>State the outcome, not the task</h3>
+    <div class="ex"><span class="w">Weak:</span> look at case 139005<br><span class="s">Strong:</span> Case 139005: root cause, the fix, and the requester reply in my voice. Done when it can be closed with a reason.</div>
+    <p>The pattern is Context, Goal, Constraints, Done-when, Output shape. Anthropic's <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices">prompting best practices</a> and the <a href="https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview">prompt engineering overview</a> cover the mechanics. Ten minutes there pays back daily.</p>
+  </div></div>
+
+  <div class="habit"><div class="n">2</div><div>
+    <h3>Teach it once, in writing</h3>
+    <p>Every correction you do not write into a skill you will make again next week. Rule: a correction becomes a skill edit the same day. See <a href="https://code.claude.com/docs/en/memory">how Claude remembers your project</a>, <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Agent Skills</a>, and Anthropic's <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">context engineering</a> post on why short, specific instructions beat long ones.</p>
+  </div></div>
+
+  <div class="habit"><div class="n">3</div><div>
+    <h3>Make it prove it</h3>
+    <p>Never accept "done". Ask for the re-query, the record ID, the before and after. The assistant already re-queries Salesforce after a write. Extend that to everything: "show me the SOQL you ran and the row count." The <a href="https://code.claude.com/docs/en/best-practices">Claude Code best practices</a> page calls this giving the agent a signal it can read. It is the biggest predictor of trustworthy output.</p>
+  </div></div>
+
+  <div class="habit"><div class="n">4</div><div>
+    <h3>Delegate the recurring, keep the judgement</h3>
+    <p>Anything you do weekly with the same shape belongs in a <a href="https://code.claude.com/docs/en/routines">routine</a>: the stale-case chase, the Monday status, the security posture read. A routine goes live only with a named owner, a check that proves it ran correctly, and a way to switch it off. <a href="https://www.anthropic.com/research/building-effective-agents">Building effective agents</a> makes the case for simple workflows over clever agents. Believe it.</p>
+  </div></div>
+
+  <div class="habit"><div class="n">5</div><div>
+    <h3>Think with it, not through it</h3>
+    <p>The best use of AI for a manager is as a sparring partner, not a typist. Before a decision, ask it to argue the other side, run a pre-mortem, or list what the CFO will ask. Ethan Mollick's <a href="https://www.oneusefulthing.org/">One Useful Thing</a> and <a href="https://www.penguinrandomhouse.com/books/741805/co-intelligence-by-ethan-mollick/">Co-Intelligence</a> are the best plain-language treatment. Keep the decision yours.</p>
+  </div></div>
+</section>
+
+<section id="remote">
+  <div class="eyebrow">Range</div>
+  <h2>Working remote: the phone playbook</h2>
+  <ul>
+    <li><strong>From anywhere.</strong> Open <a href="https://claude.ai/code">claude.ai/code</a> on the phone and start a session on the Birdlife repo. The charter and skills load automatically. Sessions keep running when you close the browser and you can watch them in the Claude mobile app. See <a href="https://code.claude.com/docs/en/claude-code-on-the-web">Claude Code on the web</a>.</li>
+    <li><strong>Quick triage.</strong> The console artifact linked from <code>docs/using-the-assistant.md</code> shows the live Ask Zeus queue and the Asana board, and can post and close from a phone.</li>
+    <li><strong>Queue work from a locked-down machine.</strong> Open a GitHub issue on the repo and start a session from it.</li>
+    <li><strong>While you sleep.</strong> Routines run the dashboard refresh, stale-case chase and morning brief. Check their run status weekly under Routines in claude.ai, because a quiet routine and a broken routine look the same.</li>
+    <li><strong>The honest limit.</strong> Account creation, licences, mailbox access and MFA resets still need an admin to run the prepared PowerShell. Remote is real up to that line. Landing the Entra admin connector moves the line.</li>
+  </ul>
+</section>
+
+<section id="rules">
+  <div class="eyebrow">Threats and controls</div>
+  <h2>The rules you will be held to</h2>
+  <p>You set the security bar for BirdLife, so your AI use has to clear it. These are the documents an auditor, the Board or the OAIC would measure you against.</p>
+  <ul>
+    <li><a href="https://www.oaic.gov.au/privacy/privacy-guidance-for-organisations-and-government-agencies/guidance-on-privacy-and-the-use-of-commercially-available-ai-products">OAIC guidance on privacy and commercially available AI</a>. Two checklists: selecting a product and using it. Members' and donors' data is personal information under the APPs. Do not paste it into unmanaged tools.</li>
+    <li><a href="https://www.industry.gov.au/publications/voluntary-ai-safety-standard">Voluntary AI Safety Standard</a> from the National AI Centre. Ten guardrails. Human oversight, record keeping and transparency you already partly meet through propose-then-write and the audit comment on every write.</li>
+    <li><a href="https://www.cyber.gov.au/business-government/secure-design/artificial-intelligence/engaging-with-artificial-intelligence">ASD's Engaging with artificial intelligence</a>, which sits alongside the <a href="https://www.cyber.gov.au/business-government/asds-cyber-security-frameworks/essential-eight/essential-eight-maturity-model">Essential Eight</a> you already report on.</li>
+    <li><a href="https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/">OWASP Top 10 for LLM Applications</a>. Two entries matter directly. <strong>Prompt injection:</strong> a ticket body or email can carry instructions aimed at the assistant, so it must never act on requester content without you seeing it. <strong>Excessive agency:</strong> every connector you attach widens what a mistaken session can do. Scope them, and keep the no-bulk, no-delete guardrails.</li>
+    <li><a href="https://www.nist.gov/itl/ai-risk-management-framework">NIST AI Risk Management Framework</a>. Govern, Map, Measure, Manage. The skeleton for a one-page BirdLife AI use policy, which you do not yet have and will be asked for.</li>
+  </ul>
+</section>
+
+<section id="plan">
+  <div class="eyebrow">Programme</div>
+  <h2>A thirty-day plan</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Week</th><th>Do this</th><th>Time</th></tr></thead>
+    <tbody>
+      <tr><td>Week 1</td><td>Take the intro course at <a href="https://anthropic.skilljar.com/">Anthropic Academy</a> and read the prompting best practices. Rewrite your five most-used prompts with Context, Goal, Constraints, Done-when.</td><td>2 hrs</td></tr>
+      <tr><td>Week 2</td><td>Read <a href="https://code.claude.com/docs/en/best-practices">best practices</a> and <a href="https://code.claude.com/docs/en/memory">memory</a>. Rewrite the skill you correct most often. Re-sync the account copies.</td><td>2 hrs</td></tr>
+      <tr><td>Week 3</td><td>Build one reporting routine with an owner, a check and a kill switch. Candidate: the weekly ICT status draft in your voice.</td><td>2 hrs</td></tr>
+      <tr><td>Week 4</td><td>Read the OAIC checklists and write a one-page BirdLife AI use policy using the NIST four functions as headings. Put it to the CEO.</td><td>3 hrs</td></tr>
+      <tr><td>Beyond</td><td>The ranked learning ladder below: free courses this week, Copilot admin and agent skills this month, AI-900 this quarter, the ISACA AAISM path over twelve months.</td><td>see ladder</td></tr>
+      <tr><td>Ongoing</td><td><a href="https://www.oneusefulthing.org/">One Useful Thing</a> weekly. <a href="https://www.anthropic.com/engineering">Anthropic engineering blog</a> monthly. The <a href="https://learn.microsoft.com/en-us/training/paths/explore-microsoft-365-copilot-agent-administration/">Microsoft 365 Copilot administration path</a> before staff ask for Copilot, because they will.</td><td>30 min / wk</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="ladder">
+  <div class="eyebrow">Migration</div>
+  <h2>The learning ladder</h2>
+  <p>Ranked by what will make you better at this job. Reps beat courses. Courses beat certifications. One certification matters a great deal for a security manager.</p>
+  <h3>Rung 1: this week, free, three hours</h3>
+  <ul>
+    <li><a href="https://anthropic.skilljar.com/">Anthropic Academy</a>. Official free courses with completion certificates. Start with the prompting and Claude Code tracks.</li>
+    <li><a href="https://github.com/anthropics/prompt-eng-interactive-tutorial">Prompt engineering interactive tutorial</a>. Exercise by exercise. The fastest way to stop writing weak prompts.</li>
+    <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code best practices</a>. The operating manual for the tool you use daily.</li>
+  </ul>
+  <h3>Rung 2: this month, free, six hours</h3>
+  <ul>
+    <li><a href="https://www.deeplearning.ai/courses/agent-skills-with-anthropic">Agent Skills with Anthropic</a> on DeepLearning.AI. Skills are how this repo teaches the assistant.</li>
+    <li><a href="https://www.anthropic.com/research/building-effective-agents">Building effective agents</a> and <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">context engineering</a>. Why routines should be simple and skills short.</li>
+    <li><a href="https://www.penguinrandomhouse.com/books/741805/co-intelligence-by-ethan-mollick/">Co-Intelligence</a>, Ethan Mollick. The thinking-with-AI book.</li>
+    <li><a href="https://learn.microsoft.com/en-us/training/paths/explore-microsoft-365-copilot-agent-administration/">Microsoft 365 Copilot and agent administration</a>. Staff will ask for Copilot. Know the licensing, data boundary and controls first.</li>
+  </ul>
+  <h3>Rung 3: this quarter, paid, role credibility</h3>
+  <ul>
+    <li><a href="https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-fundamentals/">Microsoft AI-900, Azure AI Fundamentals</a>. Cheap, one exam, no coding. Fundamentals only, so do not stop here.</li>
+    <li><strong>Claude Certified Associate.</strong> The official proctored credential for the platform you run. Registration currently needs a company email in the Claude Partner Network, and BirdLife is probably not in it. Check before paying. Do the free Academy certificates regardless.</li>
+    <li><a href="https://www.sans.org/cyber-security-training-events/ai-security-training-august-2026">SANS LDR520, AI and cloud for cyber leaders</a>. Governing AI adoption defensibly. SANS pricing, so justify it as the Essential Eight and AI policy work in one course, or self-study the NIST and VAISS documents above.</li>
+  </ul>
+  <h3>Rung 4: twelve months, the one that matters</h3>
+  <ul>
+    <li><a href="https://www.isaca.org/credentialing/aaism">ISACA Advanced in AI Security Management (AAISM)</a>. The only AI-centric security management credential and exactly your role. It requires CISM or CISSP first. If you hold neither, CISM is the twelve-month goal and AAISM follows. That is the honest sequence.</li>
+  </ul>
+  <p><strong>The push.</strong> Rung 1 this week, it is three hours. Book the AI-900 exam date now so rung 3 has a deadline. Decide by month end whether CISM is the twelve-month goal, and if it is, tell the CEO, because it needs budget and study time and it is the credential that makes the AI policy carry weight.</p>
+</section>
+
+<section id="loop">
+  <div class="eyebrow">Daily</div>
+  <h2>The daily loop</h2>
+  <p>Reading this once changes nothing. The loop is what compounds. Say these words in any Claude session on the Birdlife repo, phone or desktop.</p>
+  <ul>
+    <li><strong>Morning: "today's rep".</strong> The coach picks the next of thirty reps, one per weekday under thirty minutes, and ties it to a live case or task.</li>
+    <li><strong>Any decision: "think with me".</strong> A fixed frame: the decision in one line, facts versus assumptions versus unknowns, three options with who each lands on, the strongest case against, a recommendation with reversibility, and what evidence would change it.</li>
+    <li><strong>End of session: "coach me".</strong> It quotes the prompts you actually wrote, shows the stronger version, names your weakest habit that day, and logs it.</li>
+    <li><strong>Friday: "weekly AI review".</strong> Reps done, average score, streak, weakest habit, one proposed change.</li>
+  </ul>
+  <p>Everything is recorded in the practice log with a date, a score and evidence. That log is the number the Board will ask for. The push version is the <a href="https://claude.ai/code/artifact/f146ec59-325a-4fb6-988c-e10a8f5c276a">AI Daily Ten</a> page: each weekday at 6:30am AEST it refreshes with ten hints from the AI newsletters in your Gmail, each turned into something to do in the role, plus the rep of the day.</p>
+</section>
+
+<section id="people">
+  <div class="eyebrow">Flock</div>
+  <h2>What this means for the people around you</h2>
+  <ul>
+    <li><strong>Andrew, Keith and Nina</strong> should use the same skills, not route through you. If you are the only person who can drive the assistant you have built a single point of failure with your own name on it. Share the console and the prompt playbook, and let them add gotchas to the skills.</li>
+    <li><strong>Requesters</strong> should see faster, clearer replies in a consistent voice. They do not need to know a draft was AI-assisted, but nothing goes out you have not read.</li>
+    <li><strong>The CEO and Board</strong> need one number and one page: time saved or cases closed per week, and the policy from week four. Bring both or expect the question.</li>
+  </ul>
+</section>
+
+<section id="friday">
+  <div class="eyebrow">Field notes</div>
+  <h2>Five questions every Friday</h2>
+  <ol class="friday">
+    <li>What did I correct this week that is not yet written into a skill?</li>
+    <li>Which routine ran, and did I check its output or just assume?</li>
+    <li>What did I accept without seeing the proof?</li>
+    <li>What recurring thing did I do by hand that should be a routine?</li>
+    <li>What decision did I make where I should have asked it to argue the other side?</li>
+  </ol>
+</section>
+
+<section id="stop">
+  <div class="eyebrow">Cull</div>
+  <h2>Stop doing these</h2>
+  <ul class="stop">
+    <li>Re-explaining context every session. If it is not in a skill, that is the fix.</li>
+    <li>Accepting a summary when you needed a decision. Ask for the recommendation.</li>
+    <li>Building more routines than you can supervise. Four you check beat ten you do not.</li>
+    <li>Treating the console as finished. It should change with the queue.</li>
+    <li>Pasting PII into anything that is not a governed connector.</li>
+  </ul>
+</section>
+
+<footer>Source: docs/ai-usage-guide.md in mathewruahema-beep/Birdlife, branch claude/ai-usage-guide-hk5e6s. Tell any assistant session "update the AI usage guide" to change it.</footer>
+</div>

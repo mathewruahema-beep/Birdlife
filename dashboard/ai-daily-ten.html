@@ -1,0 +1,127 @@
+<title>AI Daily Ten</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F1F3EE; --bg2:#E6EAE2; --ink:#16302B; --ink2:#4A5F59; --rule:#C9D1C7;
+  --link:#1F6F8B; --gold:#A8781F; --warn:#8A3B2E;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1A18; --bg2:#182624; --ink:#E3E8E2; --ink2:#A5B3AD; --rule:#2F403C;
+    --link:#7CC3DB; --gold:#D9A94A; --warn:#E08A78;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1A18; --bg2:#182624; --ink:#E3E8E2; --ink2:#A5B3AD; --rule:#2F403C;
+  --link:#7CC3DB; --gold:#D9A94A; --warn:#E08A78;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55}
+a{color:var(--link);text-decoration-thickness:1px;text-underline-offset:3px}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wrap{max-width:42rem;margin:0 auto;padding:1.5rem 1.25rem 4rem}
+header{padding:1rem 0 1.25rem;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:var(--serif);font-weight:700;font-size:2.3rem;line-height:1.08;margin:.4rem 0 .5rem;text-wrap:balance;font-variation-settings:"opsz" 144}
+.meta{font-family:var(--mono);font-size:.78rem;color:var(--ink2);display:flex;flex-wrap:wrap;gap:.4rem 1.25rem}
+h2{font-family:var(--serif);font-weight:500;font-size:1.45rem;line-height:1.15;margin:1.6rem 0 .8rem;text-wrap:balance;font-variation-settings:"opsz" 72}
+p{margin:0 0 .8rem;max-width:38rem}
+.rep{margin:1.25rem 0 0;padding:.9rem 1.1rem;background:var(--bg2);border-left:3px solid var(--gold)}
+.rep .eyebrow{margin-bottom:.2rem}
+.rep p{margin:0 0 .35rem}
+.rep .say{font-family:var(--mono);font-size:.8rem;color:var(--ink2)}
+ol.ten{list-style:none;padding:0;margin:0;counter-reset:h}
+ol.ten li{counter-increment:h;display:grid;grid-template-columns:2.4rem 1fr;gap:.6rem;padding:.9rem 0;border-top:1px solid var(--rule)}
+ol.ten li::before{content:counter(h);font-family:var(--serif);font-size:1.6rem;line-height:1;color:var(--gold);padding-top:.1rem;font-variation-settings:"opsz" 144}
+ol.ten h3{font-family:var(--sans);font-weight:600;font-size:1.02rem;margin:0 0 .25rem}
+ol.ten p{margin:0 0 .3rem}
+.try{font-size:.95rem}
+.try b{font-weight:600;color:var(--gold)}
+.src{font-family:var(--mono);font-size:.76rem;color:var(--ink2)}
+details{border-top:1px solid var(--rule);padding:.6rem 0}
+summary{cursor:pointer;font-family:var(--mono);font-size:.82rem;color:var(--ink2)}
+details ol{padding-left:1.25rem;margin:.5rem 0 0;font-size:.95rem}
+details li{margin:0 0 .3rem}
+footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.75rem;color:var(--ink2);line-height:1.6}
+@media (max-width:480px){body{font-size:16px}h1{font-size:1.9rem}.wrap{padding:1rem 1rem 3rem}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">BirdLife Australia ICT · Daily</div>
+  <h1>AI Daily Ten</h1>
+  <div class="meta"><!--STAMP-START--><span>Thursday 3 September 2026</span><span>Read from 5 newsletters in Gmail</span><span>Refreshes weekdays 6:30am AEST</span><!--STAMP-END--></div>
+  <div class="rep">
+    <!--REP-START-->
+    <div class="eyebrow">AI rep of the day</div>
+    <p><strong>Rep 1 of 30: the four-part prompt.</strong> Take the next real ticket. Write the prompt as Context, Goal, Constraints, Done-when before you send it. Done when the assistant asks zero clarifying questions.</p>
+    <p class="say">Say "today's rep" in any session on the Birdlife repo to start. Say "done, score N, what changed" to log it.</p>
+    <!--REP-END-->
+  </div>
+</header>
+
+<h2>Today's ten</h2>
+<ol class="ten">
+<!--TEN-START-->
+<li><h3>Judge a model by cost per completed task, not per token</h3>
+<p>Google kept Gemini 3.8 Flash's token price flat, yet Artificial Analysis found it costs about 40% more per finished task than Meta's Muse Spark 1.3 because it does more work to get there. A cheap worker who needs four tries costs more than a dear one who nails it once.</p>
+<p class="try"><b>Try today:</b> for one routine, count tasks completed correctly per run, not tokens. That is the number for the Board.</p>
+<p class="src">The Neuron, 3 Sep · <a href="https://artificialanalysis.ai/models/releases/comparisons/gemini-3-8-flash-vs-muse-spark-1-3">Artificial Analysis comparison</a></p></li>
+
+<li><h3>Mastery still comes from doing the reps</h3>
+<p>Agents finish tasks without teaching you anything, so expertise now has to be built on purpose. The core skills are deciding, specifying, steering and verifying. That is the whole case for the thirty-rep curriculum in one paragraph.</p>
+<p class="try"><b>Try today:</b> do rep 1 above on a live case, and score it honestly.</p>
+<p class="src">TLDR Dev, 2 Sep · <a href="https://addyo.substack.com/p/agentic-skill-decay">Addy Osmani, Agentic skill decay</a></p></li>
+
+<li><h3>Your tech literacy is your AI ceiling</h3>
+<p>AI raises the floor, but the ceiling stays low unless your technical vocabulary grows with your AI fluency. The fix is cheap: stop nodding along, and ask the model to explain one term at exactly the altitude you want.</p>
+<p class="try"><b>Try today:</b> pick one term you have been nodding at this month. Ask: "Explain OAuth2 certificate rotation like I run the company but not the codebase."</p>
+<p class="src">The Rundown, 3 Sep · <a href="https://app.therundown.ai/guides">Nate's Notebook</a></p></li>
+
+<li><h3>Make every AI session title a status light</h3>
+<p>When several sessions run at once, name each one so the tab tells you its state without opening it: a warning mark while it is working or needs you, a tick when done, and a project emoji. Your tab bar becomes a live board instead of a row of mystery chats.</p>
+<p class="try"><b>Try today:</b> rename your open Claude sessions to "⚠️ 🐦 Case 139005 triage" and "✅ 🐦 Guide".</p>
+<p class="src">The Neuron, 3 Sep · <a href="https://x.com/danshipper/status/2095245632533622862">Dan Shipper's convention</a></p></li>
+
+<li><h3>Trimming context can cost more, not less</h3>
+<p>GitHub found that shortening tool output made Copilot dearer when missing context forced it to reopen files and take extra turns. Savings came from compressing repetitive logs and dropping formatting noise, not from cutting the source-like material the agent needs.</p>
+<p class="try"><b>Try today:</b> in one routine prompt, remove repeated boilerplate but keep the real IDs and picklist values. Never trim the facts.</p>
+<p class="src">TLDR Dev, 3 Sep · <a href="https://github.blog/ai-and-ml/github-copilot/how-we-make-ai-coding-more-cost-efficient-without-sacrificing-task-quality/">GitHub engineering</a></p></li>
+
+<li><h3>Least privilege applies to agents too</h3>
+<p>Anthropic reported unauthorised access incidents in July and August caused by misconfigured third-party evaluation environments, and CrowdStrike launched a whole product category for watching what agents do on a network. The lesson for a small estate is older than AI: give an agent the narrowest access the task needs.</p>
+<p class="try"><b>Try today:</b> list which connectors each of your twelve routines holds. Remove any a routine does not use.</p>
+<p class="src">TLDR Dev and AI for Work, 2 Sep · <a href="https://www.anthropic.com/news/improving-alignment-security-efforts">Anthropic on alignment and security</a></p></li>
+
+<li><h3>Reserve human review for blast radius</h3>
+<p>AI generates more change than people can inspect, so mandatory review of everything turns seniors into a bottleneck. Move design and testing earlier, then keep human review for security boundaries, big architectural calls, large blast radius and low confidence.</p>
+<p class="try"><b>Try today:</b> your propose-then-write rule already does this. Write down which writes are low blast radius and could be pre-approved per session.</p>
+<p class="src">TLDR Dev, 3 Sep · <a href="https://martinfowler.com/rachels-ramblings/code-review.html">Rachel's ramblings, martinfowler.com</a></p></li>
+
+<li><h3>Route sensitive data away from cloud models</h3>
+<p>Perplexity's new hybrid agent detects PII and runs those parts of a task on local models while the rest goes to frontier models. Expect every vendor to copy it within a year. Until then the routing is your job.</p>
+<p class="try"><b>Try today:</b> check that no routine prompt or skill file carries member or donor PII. Case numbers yes, names and emails no.</p>
+<p class="src">AI for Work, 2 Sep · <a href="https://newsletter.aiforwork.co/p/enterprises-will-cheer-perplexity-s-hybrid-agent">Perplexity Hybrid Compute</a></p></li>
+
+<li><h3>Tell the agent when to stop</h3>
+<p>Meta's headline gain in Muse Spark 1.3 was not intelligence but restraint: 20% fewer tool calls and 25% fewer tokens because it asks when unsure and knows when it is done. Your prompts can buy the same restraint from any model.</p>
+<p class="try"><b>Try today:</b> add a hard cap and a stop condition to your next prompt, the way the overnight pre-draft caps at eight drafts.</p>
+<p class="src">The Neuron, 3 Sep · <a href="https://research.meta.ai/blog/introducing-muse-spark-1-3">Meta, Muse Spark 1.3</a></p></li>
+
+<li><h3>AI raises the quality floor more than it cuts the work</h3>
+<p>Tomasz Tunguz measured his writing and found AI did not reduce his 136 line edits per article. It raised the worst piece to the level of the average. Set the team's expectation to match: fewer bad days, not fewer days.</p>
+<p class="try"><b>Try today:</b> when you brief Andrew, Keith and Nina, promise consistency, not speed. Speed comes later, from the reps.</p>
+<p class="src">TLDR Dev, 3 Sep · <a href="https://tomtunguz.com/ai-productivity-doesnt-mean-what-i-think">Tomasz Tunguz</a></p></li>
+<!--TEN-END-->
+</ol>
+
+<h2>Previous days</h2>
+<!--ARCHIVE-START-->
+<p class="src">First edition. Yesterday's ten will appear here from tomorrow, five days kept.</p>
+<!--ARCHIVE-END-->
+
+<footer>Produced each weekday from the AI newsletters in Mathew's Gmail (TLDR, The Rundown, The Neuron, AI for Work, The Deep View, Techpresso) by the routine "AI Daily Ten". Read-only on mail. Template: dashboard/ai-daily-ten.html in mathewruahema-beep/Birdlife. Kill switch: disable the routine in claude.ai, Routines. Companion to the <a href="https://claude.ai/code/artifact/3dd8818e-d1c8-4b81-877f-6945e62ddc1d">AI Field Guide</a>.</footer>
+</div>

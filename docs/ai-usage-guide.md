@@ -173,10 +173,11 @@ Reading this once changes nothing. The loop is what compounds:
    habit, one proposed change.
 
 Everything is recorded in [`ai-practice/log.md`](ai-practice/log.md) with a date,
-a score and evidence. That log is the number the Board will ask for. The push
-version, one sentence on the 7am Teams heartbeat, is proposed in
-[`../routines/ai-daily-rep-passport.md`](../routines/ai-daily-rep-passport.md)
-and waits on your go-ahead.
+a score and evidence. That log is the number the Board will ask for.
+
+**The push version:** the top of the [field guide page](https://claude.ai/code/artifact/3dd8818e-d1c8-4b81-877f-6945e62ddc1d)
+refreshes each weekday at 6:30am AEST from the AI newsletters in your Gmail:
+ten hints turned into things you can do in the role, plus the rep of the day. Routine definition in [`../routines/ai-daily-ten.md`](../routines/ai-daily-ten.md).
 
 ---
 

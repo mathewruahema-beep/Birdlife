@@ -68,6 +68,8 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
   actions to approve-only direct execution.
 - `dashboard/ict-dashboard.html` — the ICT dashboard design template; the live copy
   is republished each weekday by the `ICT Dashboard` routine.
+- `dashboard/ai-field-guide.html` — the AI Field Guide page template; its daily block
+  is refreshed each weekday from Gmail newsletters by the `AI Daily Ten` routine.
 - `routines/` — scheduled-routine definitions and backups (credentials redacted).
 
 ## Style

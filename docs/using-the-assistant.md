@@ -50,6 +50,9 @@ automatically on ticket-shaped requests, or explicitly with
 - *BirdLife ICT stale case chaser (report-only)* — Mondays, flags stale cases.
 - *Morning brief + ICT* — weekdays 5am AEST.
 - *BirdLife security dashboard monthly refresh* — 1st of the month.
+- *AI Daily Ten* — weekdays 6:30am AEST, ten AI hints from your Gmail newsletters
+  plus the rep of the day, at the top of the AI Field Guide (`routines/ai-daily-ten.md`).
+  Gmail must be attached to it in claude.ai, Routines.
 Definitions and backups live in `routines/`.
 
 **4. GitHub.** Open an issue on this repo describing the problem and start a Claude

@@ -1,7 +1,8 @@
 # Passport: AI rep of the day (amendment, not a new routine)
 
-**Status: proposed, awaiting Mathew's go-ahead.** The routine budget is 12 of 12,
-so this rides on an existing routine rather than adding one.
+**Status: superseded 3 September 2026.** The rep of the day now ships on the AI
+Daily Ten page produced by `ai-daily-ten.md`, so no change to the weekday
+dashboards heartbeat is needed. Kept for the record.
 
 ## Host
 
