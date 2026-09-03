@@ -267,7 +267,7 @@
   nav.tabs .inner { display: flex; width: 100%; max-width: 640px; }
   nav.tabs button {
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-    color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
     padding: 7px 0; position: relative;
   }
   nav.tabs button.active { color: var(--accent); text-shadow: var(--glow); }
@@ -311,6 +311,24 @@
     color: var(--accent); font-weight: 600; text-transform: uppercase;
   }
   details.transcript div { margin-top: 10px; font-size: 16px; font-weight: 500; white-space: pre-wrap; }
+
+  /* ---------- Actions hub ---------- */
+  .ahub-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0 14px; }
+  .ahub-head h3 { margin: 0; font-family: var(--display); font-size: 12px; letter-spacing: 0.2em; color: var(--accent); font-weight: 600; }
+  .copybtn {
+    padding: 8px 14px; color: var(--accent); font-weight: 700; font-size: 12px;
+    letter-spacing: 0.12em; text-transform: uppercase; border: 1px solid var(--line);
+    background: var(--accent-soft); white-space: nowrap;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+  .agroup { margin-bottom: 14px; }
+  .agroup .gtitle {
+    font-weight: 700; font-size: 15px; letter-spacing: 0.02em; margin: 0 2px 6px;
+    display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+  }
+  .agroup .gtitle .when { font-family: var(--mono); font-size: 10px; color: var(--muted); white-space: nowrap; }
+  .agroup .gtitle button { color: inherit; font-weight: 700; text-align: left; }
+  .ameta { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
 
   #toast {
     position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%);
@@ -379,6 +397,11 @@
       </div>
     </section>
 
+    <!-- ACTIONS -->
+    <section class="view" id="view-actions" hidden>
+      <div id="actionhub"></div>
+    </section>
+
     <!-- ASK -->
     <section class="view" id="view-ask" hidden>
       <div id="chatlog"></div>
@@ -395,6 +418,7 @@
     <div class="inner">
       <button data-tab="notes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>Notes</button>
       <button data-tab="record" class="active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg>Record</button>
+      <button data-tab="actions"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11 13.5 15 9.5"/><rect x="4" y="4" width="16" height="16" rx="2"/></svg>Actions</button>
       <button data-tab="ask"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5Z"/><path d="M9 11h6M9 14h3"/></svg>Ask</button>
     </div>
   </nav>
@@ -404,7 +428,10 @@
 <div id="sheet" hidden>
   <div class="sheetbar">
     <button id="dBack">‹ Back</button>
-    <button id="dDelete">Delete</button>
+    <div style="display:flex;gap:4px">
+      <button id="dCopy">Copy</button>
+      <button id="dDelete">Delete</button>
+    </div>
   </div>
   <h2 id="dTitle"></h2>
   <p id="dMeta"></p>
@@ -517,7 +544,7 @@
   });
   function setTab(tab) {
     currentTab = tab;
-    ["notes", "record", "ask"].forEach((t) => {
+    ["notes", "record", "actions", "ask"].forEach((t) => {
       $("view-" + t).hidden = t !== tab;
       document.querySelector(`nav.tabs button[data-tab="${t}"]`).classList.toggle("active", t === tab);
     });
@@ -560,6 +587,7 @@
     wrap.innerHTML = html;
     wrap.querySelectorAll(".notecard").forEach((el) => el.addEventListener("click", () => openSheet(el.dataset.id)));
     $("btnTyped").addEventListener("click", () => { startReview("", 0, "typed"); setTab("record"); });
+    renderActions();
   }
 
   function noteCardHTML(n) {
@@ -574,11 +602,62 @@
 
   $("search").addEventListener("input", renderNotes);
 
+  // ---------- actions hub ----------
+  function renderActions() {
+    const hub = $("actionhub");
+    if (!hub) return;
+    const groups = notes
+      .map((n) => ({ note: n, open: (n.actions || []).filter((a) => !a.done), doneCount: (n.actions || []).filter((a) => a.done).length }))
+      .filter((g) => g.open.length || g.doneCount);
+    const openTotal = groups.reduce((s, g) => s + g.open.length, 0);
+    if (!groups.length) {
+      hub.innerHTML = `<p class="emptynote">No action items yet. Run <strong>AI ANALYSIS</strong> on a note and every action lands here.</p>`;
+      return;
+    }
+    let html = `<div class="ahub-head"><h3>${openTotal} open action${openTotal === 1 ? "" : "s"}</h3><button class="copybtn" id="btnCopyPlan">Copy plan</button></div>`;
+    for (const g of groups) {
+      html += `<div class="agroup"><div class="gtitle"><button data-open="${esc(g.note.id)}">${esc(g.note.title || "Untitled note")}</button><span class="when">${esc(fmtDate(g.note.createdAt))}</span></div>`;
+      html += `<div class="dsec">`;
+      if (g.open.length) {
+        html += g.open.map((a) => {
+          const idx = g.note.actions.indexOf(a);
+          return `<div class="action"><input type="checkbox" data-note="${esc(g.note.id)}" data-i="${idx}"><label>${esc(actionLabel(a))}</label></div>`;
+        }).join("");
+      }
+      if (g.doneCount) html += `<div class="ameta">${g.doneCount} completed</div>`;
+      html += `</div></div>`;
+    }
+    hub.innerHTML = html;
+    hub.querySelectorAll(".gtitle button").forEach((b) => b.addEventListener("click", () => openSheet(b.dataset.open)));
+    hub.querySelectorAll(".action input").forEach((cb) => {
+      cb.addEventListener("change", () => {
+        const n = notes.find((x) => x.id === cb.dataset.note);
+        if (!n) return;
+        const i = Number(cb.dataset.i);
+        const actions = n.actions.map((a, j) => (j === i ? { ...a, done: cb.checked } : a));
+        patchNote(n.id, { actions });
+      });
+    });
+    const cp = $("btnCopyPlan");
+    if (cp) cp.addEventListener("click", () => {
+      const md = `# Action plan — ${new Date().toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}\n` +
+        groups.filter((g) => g.open.length).map((g) =>
+          `\n## ${g.note.title || "Untitled note"} (${fmtDate(g.note.createdAt)})\n` +
+          g.open.map((a) => `- [ ] ${actionLabel(a)}`).join("\n")
+        ).join("\n") + "\n";
+      copyText(md, "Action plan copied");
+    });
+  }
+
   // ---------- detail sheet ----------
   function findNote(id) { return id === "__example__" ? EXAMPLE : notes.find((n) => n.id === id); }
   function openSheet(id) { openNoteId = id; renderSheet(); $("sheet").hidden = false; window.scrollTo(0, 0); }
   function closeSheet() { openNoteId = null; $("sheet").hidden = true; }
   $("dBack").addEventListener("click", closeSheet);
+  $("dCopy").addEventListener("click", () => {
+    const n = findNote(openNoteId);
+    if (n) copyText(noteMarkdown(n), "Note copied as minutes");
+  });
   $("dDelete").addEventListener("click", async () => {
     const n = findNote(openNoteId);
     if (!n || n.example) { closeSheet(); return; }
@@ -595,13 +674,17 @@
     const ul = (arr) => `<ul style="margin:0;padding-left:20px;font-size:16px;font-weight:500">${arr.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>`;
     let html = "";
     if (n.summary) html += `<div class="dsec"><h4>Summary</h4><p>${esc(n.summary)}</p></div>`;
+    if (n.outline && n.outline.length) html += `<div class="dsec"><h4>Full notes</h4>${ul(n.outline)}</div>`;
     if (n.keyPoints && n.keyPoints.length) html += `<div class="dsec"><h4>Key points</h4>${ul(n.keyPoints)}</div>`;
     if (n.decisions && n.decisions.length) html += `<div class="dsec"><h4>Decisions</h4>${ul(n.decisions)}</div>`;
     if (n.actions && n.actions.length) {
       html += `<div class="dsec"><h4>Action items</h4>` + n.actions.map((a, i) =>
-        `<div class="action${a.done ? " done" : ""}"><input type="checkbox" id="act${i}" data-i="${i}" ${a.done ? "checked" : ""} ${n.example ? "disabled" : ""}><label for="act${i}">${esc(a.text)}</label></div>`
+        `<div class="action${a.done ? " done" : ""}"><input type="checkbox" id="act${i}" data-i="${i}" ${a.done ? "checked" : ""} ${n.example ? "disabled" : ""}><label for="act${i}">${esc(actionLabel(a))}</label></div>`
       ).join("") + `</div>`;
     }
+    if (n.openQuestions && n.openQuestions.length) html += `<div class="dsec"><h4>Open questions</h4>${ul(n.openQuestions)}</div>`;
+    if (n.risks && n.risks.length) html += `<div class="dsec"><h4>Risks &amp; blockers</h4>${ul(n.risks)}</div>`;
+    if (n.quotes && n.quotes.length) html += `<div class="dsec"><h4>On record</h4>${ul(n.quotes)}</div>`;
     if (n.tangents && n.tangents.length) html += `<div class="dsec"><h4>Off topic / parked</h4>${ul(n.tangents)}</div>`;
     if (n.tags && n.tags.length) html += `<div class="chips" style="margin:2px 4px 14px">${n.tags.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>`;
     if (n.transcript) html += `<div class="dsec"><details class="transcript" ${n.summary ? "" : "open"}><summary>Transcript</summary><div>${esc(n.transcript)}</div></details></div>`;
@@ -718,6 +801,50 @@
     startReview(finalText.trim(), dur, "voice");
   }
 
+  // ---------- shared note formatting ----------
+  const actionLabel = (a) => {
+    const extra = [a.owner, a.due].filter(Boolean).join(" · ");
+    return a.text + (extra ? `  (${extra})` : "");
+  };
+  const liHTML = (arr) => arr.map((t) => `<li>${esc(t)}</li>`).join("");
+
+  function aiSectionsHTML(n) {
+    let out = `<h4>Summary${n.type ? ` · ${esc(n.type)}` : ""}</h4><p>${esc(n.summary)}</p>`;
+    if (n.outline?.length) out += `<h4>Full notes</h4><ul>${liHTML(n.outline)}</ul>`;
+    if (n.decisions?.length) out += `<h4>Decisions</h4><ul>${liHTML(n.decisions)}</ul>`;
+    if (n.actions?.length) out += `<h4>Action items</h4><ul>${liHTML(n.actions.map(actionLabel))}</ul>`;
+    if (n.openQuestions?.length) out += `<h4>Open questions</h4><ul>${liHTML(n.openQuestions)}</ul>`;
+    if (n.risks?.length) out += `<h4>Risks &amp; blockers</h4><ul>${liHTML(n.risks)}</ul>`;
+    if (n.quotes?.length) out += `<h4>On record</h4><ul>${liHTML(n.quotes)}</ul>`;
+    if (n.tangents?.length) out += `<h4>Off topic / parked</h4><ul>${liHTML(n.tangents)}</ul>`;
+    if (n.tags?.length) out += `<div class="chips" style="margin-top:10px">${n.tags.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>`;
+    return out;
+  }
+
+  function noteMarkdown(n) {
+    const sec = (h, arr, map) => (arr && arr.length ? `\n## ${h}\n` + arr.map(map || ((t) => `- ${t}`)).join("\n") + "\n" : "");
+    return `# ${n.title || "Untitled note"}\n${fmtDate(n.createdAt)}${n.durationSec ? " · " + fmtDur(n.durationSec) : ""}${n.type ? " · " + n.type : ""}\n` +
+      (n.summary ? `\n${n.summary}\n` : "") +
+      sec("Notes", n.outline) +
+      sec("Decisions", n.decisions) +
+      sec("Action items", n.actions, (a) => `- [${a.done ? "x" : " "}] ${actionLabel(a)}`) +
+      sec("Open questions", n.openQuestions) +
+      sec("Risks & blockers", n.risks) +
+      sec("On record", n.quotes, (q) => `- "${q}"`) +
+      sec("Off topic / parked", n.tangents);
+  }
+
+  async function copyText(text, doneMsg) {
+    try { await navigator.clipboard.writeText(text); toast(doneMsg); }
+    catch {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        document.execCommand("copy"); ta.remove(); toast(doneMsg);
+      } catch { toast("Copy failed in this browser."); }
+    }
+  }
+
   // ---------- review & AI notes ----------
   let reviewData = null;
 
@@ -754,44 +881,62 @@
     const btn = $("btnAI");
     btn.disabled = true; btn.textContent = "Analysing…";
     $("aiMsg").hidden = true;
+    const deep = transcript.length > 3000;
+    if (deep) btn.textContent = "Deep analysis…";
     try {
       const strArr = (v, cap) => (Array.isArray(v) ? v.map((t) => String(t)).filter(Boolean).slice(0, cap) : []);
       const j = await sampleFn.json(
-        `You are analysing a RAW speech-to-text transcript. Expect noise: mis-heard words, cut-off fragments, ` +
-        `filler, several unlabelled speakers talking over each other, background chatter, and off-topic tangents. ` +
-        `Use context to infer what was actually meant; silently skip filler, crosstalk and irrelevant background ` +
-        `fragments; correct obvious mis-recognitions from context. Never invent content the transcript doesn't support — ` +
-        `if something is too garbled to interpret, leave it out. Follow the discussion's MAIN thread even when it ` +
-        `wanders off topic and comes back.\n\n` +
+        `You are an expert minute-taker and chief of staff, producing the definitive written record of a ` +
+        `RAW speech-to-text transcript. Expect noise: mis-heard words, cut-off fragments, filler, several ` +
+        `unlabelled speakers talking over each other, background chatter, and off-topic tangents. Use context ` +
+        `to infer what was actually meant; silently drop filler and crosstalk; correct obvious mis-recognitions ` +
+        `from context. Follow the discussion's MAIN thread even when it wanders off topic and comes back.\n\n` +
+        `Non-negotiable quality rules:\n` +
+        `1. COMPLETENESS — the outline must cover EVERY topic actually discussed, in order. A reader who was ` +
+        `not there should lose nothing by reading your notes instead of the transcript.\n` +
+        `2. FIDELITY — preserve every number, dollar amount, percentage, date, deadline, person's name and ` +
+        `system name EXACTLY as said. Never round, rename or paraphrase them.\n` +
+        `3. NO INVENTION — nothing the transcript doesn't support. If a passage is too garbled to interpret, ` +
+        `omit it rather than guess.\n` +
+        `4. DECISIONS carry their rationale when one was given ("X, because Y").\n` +
+        `5. ACTION ITEMS are imperative and specific, with owner and due date when stated, null when not.\n\n` +
         `Reply with ONLY this JSON object:\n` +
         `{"title": string (max 8 words, plain),\n` +
-        ` "summary": string (3-5 sentences covering the main thread and outcome),\n` +
-        ` "key_points": string[] (up to 8 substantive points, in the order discussed; empty for a trivial note),\n` +
-        ` "decisions": string[] (explicit decisions actually made; empty if none),\n` +
-        ` "action_items": string[] (imperative, include the owner if one was named; empty if none),\n` +
+        ` "type": "meeting" | "call" | "idea" | "task" | "memo",\n` +
+        ` "summary": string (3-6 sentences: main thread, outcome, what happens next),\n` +
+        ` "outline": string[] (the full notes — one line per point as "Topic — what was said/agreed", in order ` +
+        `discussed, covering everything; for a short simple note a few lines is fine),\n` +
+        ` "decisions": string[] (decisions actually made, with rationale when given; empty if none),\n` +
+        ` "action_items": [{"task": string, "owner": string|null, "due": string|null}] (empty if none),\n` +
+        ` "open_questions": string[] (raised but not answered; empty if none),\n` +
+        ` "risks": string[] (risks, blockers or concerns raised; empty if none),\n` +
+        ` "quotes": string[] (verbatim lines worth keeping on record — commitments, figures, exact wording ` +
+        `that matters; empty if none),\n` +
         ` "tangents": string[] (one line each for off-topic threads worth remembering; empty if none),\n` +
         ` "tags": string[] (1-4 short lowercase topic words)}\n\n` +
-        `Transcript:\n"""\n${transcript.slice(0, 40000)}\n"""`
+        `Transcript:\n"""\n${transcript.slice(0, 40000)}\n"""`,
+        { modelTier: deep ? "complex" : "default" }
       );
       const ai = {
         title: String(j?.title || "").slice(0, 120),
+        type: ["meeting", "call", "idea", "task", "memo"].includes(j?.type) ? j.type : "",
         summary: String(j?.summary || ""),
-        keyPoints: strArr(j?.key_points, 8),
-        decisions: strArr(j?.decisions, 10),
-        actions: strArr(j?.action_items, 15).map((t) => ({ text: t, done: false })),
-        tangents: strArr(j?.tangents, 8),
+        outline: strArr(j?.outline, 60),
+        decisions: strArr(j?.decisions, 20),
+        actions: (Array.isArray(j?.action_items) ? j.action_items : []).slice(0, 25).map((t) =>
+          typeof t === "object" && t !== null
+            ? { text: String(t.task || ""), owner: t.owner ? String(t.owner) : "", due: t.due ? String(t.due) : "", done: false }
+            : { text: String(t), owner: "", due: "", done: false }
+        ).filter((a) => a.text),
+        openQuestions: strArr(j?.open_questions, 15),
+        risks: strArr(j?.risks, 15),
+        quotes: strArr(j?.quotes, 12),
+        tangents: strArr(j?.tangents, 10),
         tags: strArr(j?.tags, 4).map((t) => t.toLowerCase()),
       };
       reviewData.ai = ai;
       if (ai.title && !$("rvTitle").value.trim()) $("rvTitle").value = ai.title;
-      const li = (arr) => arr.map((t) => `<li>${esc(t)}</li>`).join("");
-      let out = `<h4>Summary</h4><p>${esc(ai.summary)}</p>`;
-      if (ai.keyPoints.length) out += `<h4>Key points</h4><ul>${li(ai.keyPoints)}</ul>`;
-      if (ai.decisions.length) out += `<h4>Decisions</h4><ul>${li(ai.decisions)}</ul>`;
-      if (ai.actions.length) out += `<h4>Action items</h4><ul>${li(ai.actions.map((a) => a.text))}</ul>`;
-      if (ai.tangents.length) out += `<h4>Off topic / parked</h4><ul>${li(ai.tangents)}</ul>`;
-      if (ai.tags.length) out += `<div class="chips" style="margin-top:10px">${ai.tags.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>`;
-      $("aiOut").innerHTML = out;
+      $("aiOut").innerHTML = aiSectionsHTML(ai);
       $("aiPreview").hidden = false;
       btn.textContent = "↻ Regenerate";
     } catch (e) {
@@ -812,10 +957,14 @@
       id: uid(),
       title: $("rvTitle").value.trim() || (ai && ai.title) || transcript.split(/\s+/).slice(0, 6).join(" "),
       transcript,
+      type: (ai && ai.type) || "",
       summary: (ai && ai.summary) || "",
-      keyPoints: (ai && ai.keyPoints) || [],
+      outline: (ai && ai.outline) || [],
       decisions: (ai && ai.decisions) || [],
       actions: (ai && ai.actions) || [],
+      openQuestions: (ai && ai.openQuestions) || [],
+      risks: (ai && ai.risks) || [],
+      quotes: (ai && ai.quotes) || [],
       tangents: (ai && ai.tangents) || [],
       tags: (ai && ai.tags) || [],
       createdAt: new Date().toISOString(),
@@ -836,10 +985,11 @@
     let budget = 26000;
     const parts = [];
     for (const n of notes) {
-      const actions = (n.actions || []).map((a) => `- ${a.done ? "[done] " : "[open] "}${a.text}`).join("\n");
+      const actions = (n.actions || []).map((a) => `- ${a.done ? "[done] " : "[open] "}${actionLabel(a)}`).join("\n");
       const decisions = (n.decisions || []).map((d) => `- decided: ${d}`).join("\n");
-      const points = (n.keyPoints || []).map((p) => `- ${p}`).join("\n");
-      const chunk = `### ${n.title || "Untitled"} (${fmtDate(n.createdAt)})\n${n.summary ? n.summary + "\n" : ""}${points ? points + "\n" : ""}${decisions ? decisions + "\n" : ""}${actions ? actions + "\n" : ""}Transcript: ${String(n.transcript || "").slice(0, 1200)}\n`;
+      const points = (n.outline || n.keyPoints || []).map((p) => `- ${p}`).join("\n");
+      const extras = [...(n.openQuestions || []).map((q) => `- open question: ${q}`), ...(n.risks || []).map((r) => `- risk: ${r}`)].join("\n");
+      const chunk = `### ${n.title || "Untitled"} (${fmtDate(n.createdAt)})\n${n.summary ? n.summary + "\n" : ""}${points ? points + "\n" : ""}${decisions ? decisions + "\n" : ""}${actions ? actions + "\n" : ""}${extras ? extras + "\n" : ""}Transcript: ${String(n.transcript || "").slice(0, 800)}\n`;
       if (budget - chunk.length < 0) break;
       budget -= chunk.length;
       parts.push(chunk);
