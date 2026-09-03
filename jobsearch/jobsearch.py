@@ -465,6 +465,210 @@ def src_jooble(profile):
     return out
 
 
+def src_themuse(profile):
+    """The Muse public API, remote-flex roles in IT and management categories."""
+    out = []
+    for cat in ("IT", "Management", "Project Management", "Computer and IT"):
+        for page in range(1, 4):
+            data = get_json("https://www.themuse.com/api/public/jobs",
+                            params={"page": page, "category": cat, "location": "Flexible / Remote"})
+            for j in data.get("results", []):
+                locs = ", ".join(l.get("name", "") for l in j.get("locations") or [])
+                out.append(raw(j.get("name"), (j.get("company") or {}).get("name"), (j.get("refs") or {}).get("landing_page"),
+                               locs or "Remote", j.get("publication_date"), j.get("contents"), "themuse", "",
+                               [c.get("name") for c in j.get("categories") or []] + [l.get("name") for l in j.get("levels") or []],
+                               remote_only=False))
+            if not data.get("results"):
+                break
+            time.sleep(0.3)
+    return out
+
+
+def src_jobspresso(profile):
+    r = requests.get("https://jobspresso.co/?feed=job_feed", headers=UA, timeout=TIMEOUT)
+    r.raise_for_status()
+    root = ET.fromstring(r.content)
+    out = []
+    ns = {"job_listing": "https://jobspresso.co"}
+    for item in root.iter("item"):
+        company = ""
+        for child in item:
+            if child.tag.endswith("company"):
+                company = child.text or ""
+        loc = ""
+        for child in item:
+            if child.tag.endswith("location"):
+                loc = child.text or ""
+        out.append(raw(item.findtext("title"), company, item.findtext("link"), loc or "Remote", item.findtext("pubDate"),
+                       item.findtext("description"), "jobspresso"))
+    return out
+
+
+def src_hackernews(profile):
+    """Latest 'Ask HN: Who is hiring?' thread via the Algolia API, remote comments only."""
+    data = get_json("https://hn.algolia.com/api/v1/search_by_date",
+                    params={"query": "Ask HN: Who is hiring", "tags": "story,author_whoishiring", "hitsPerPage": 3})
+    out = []
+    for hit in data.get("hits", [])[:1]:
+        thread = get_json(f"https://hn.algolia.com/api/v1/items/{hit['objectID']}")
+        for c in thread.get("children", []):
+            text = strip_html(c.get("text") or "")
+            if not text or "remote" not in text.lower():
+                continue
+            first = text.split("\n", 1)[0]
+            parts = [p.strip() for p in first.split("|")]
+            company = parts[0] if parts else "HN poster"
+            title = next((p for p in parts[1:] if any(k in p.lower() for k in ("manager", "head", "director", "lead", "cio", "cto", "security", "it "))), parts[1] if len(parts) > 1 else "Role (see comment)")
+            out.append(raw(title[:120], company[:80], f"https://news.ycombinator.com/item?id={c.get('id')}", first[:200],
+                           c.get("created_at"), text, "hackernews", "", [], remote_only=True))
+    return out
+
+
+def src_workable(profile):
+    out = []
+    for acct in profile["sources"].get("workable_boards", []):
+        try:
+            r = requests.post(f"https://apply.workable.com/api/v3/accounts/{acct}/jobs", headers={**UA, "Content-Type": "application/json"},
+                              json={"query": "", "location": [], "department": [], "worktype": [], "remote": [], "workplace": []}, timeout=TIMEOUT)
+            r.raise_for_status()
+            data = r.json()
+        except Exception as e:
+            print(f"  workable/{acct}: {e}", file=sys.stderr)
+            continue
+        for j in data.get("results", []):
+            loc = ", ".join(filter(None, [(j.get("location") or {}).get("city"), (j.get("location") or {}).get("country")]))
+            if not (j.get("remote") or (j.get("workplace") or "").lower() == "remote" or REMOTE_SIGNAL.search(loc)):
+                continue
+            out.append(raw(j.get("title"), acct, f"https://apply.workable.com/{acct}/j/{j.get('shortcode')}/", loc or "Remote",
+                           j.get("published"), j.get("description") or "", f"workable:{acct}", "", [], remote_only=False))
+        time.sleep(0.3)
+    return out
+
+
+def src_smartrecruiters(profile):
+    out = []
+    for comp in profile["sources"].get("smartrecruiters_boards", []):
+        try:
+            data = get_json(f"https://api.smartrecruiters.com/v1/companies/{comp}/postings", params={"limit": 100})
+        except Exception as e:
+            print(f"  smartrecruiters/{comp}: {e}", file=sys.stderr)
+            continue
+        for j in data.get("content", []):
+            loc = (j.get("location") or {})
+            loc_s = ", ".join(filter(None, [loc.get("city"), loc.get("country")]))
+            if not (loc.get("remote") or REMOTE_SIGNAL.search(loc_s) or REMOTE_SIGNAL.search(j.get("name") or "")):
+                continue
+            out.append(raw(j.get("name"), comp, f"https://jobs.smartrecruiters.com/{comp}/{j.get('id')}", loc_s or "Remote",
+                           j.get("releasedDate"), "", f"smartrecruiters:{comp}", "", [], remote_only=False))
+        time.sleep(0.3)
+    return out
+
+
+def src_recruitee(profile):
+    out = []
+    for comp in profile["sources"].get("recruitee_boards", []):
+        try:
+            data = get_json(f"https://{comp}.recruitee.com/api/offers/")
+        except Exception as e:
+            print(f"  recruitee/{comp}: {e}", file=sys.stderr)
+            continue
+        for j in data.get("offers", []):
+            loc = j.get("location") or ""
+            if not (j.get("remote") or REMOTE_SIGNAL.search(loc)):
+                continue
+            out.append(raw(j.get("title"), comp, j.get("careers_url"), loc or "Remote", j.get("published_at") or j.get("created_at"),
+                           j.get("description") or "", f"recruitee:{comp}", "", [], remote_only=False))
+        time.sleep(0.3)
+    return out
+
+
+def src_bamboohr(profile):
+    out = []
+    for comp in profile["sources"].get("bamboohr_boards", []):
+        try:
+            data = get_json(f"https://{comp}.bamboohr.com/careers/list")
+        except Exception as e:
+            print(f"  bamboohr/{comp}: {e}", file=sys.stderr)
+            continue
+        for j in data.get("result", []):
+            loc = j.get("location") or {}
+            loc_s = ", ".join(filter(None, [loc.get("city"), loc.get("state"), loc.get("country")]))
+            if not (j.get("isRemote") or REMOTE_SIGNAL.search(loc_s)):
+                continue
+            out.append(raw(j.get("jobOpeningName"), comp, f"https://{comp}.bamboohr.com/careers/{j.get('id')}", loc_s or "Remote",
+                           j.get("datePosted"), "", f"bamboohr:{comp}", "", [j.get("departmentLabel")], remote_only=False))
+        time.sleep(0.3)
+    return out
+
+
+def src_findwork(profile):
+    token = os.environ.get("FINDWORK_TOKEN")
+    if not token:
+        raise RuntimeError("set FINDWORK_TOKEN (free at findwork.dev/developers) to enable")
+    out = []
+    for q in profile["targets"]["search_queries"][:8]:
+        data = requests.get("https://findwork.dev/api/jobs/", params={"search": q, "remote": "true", "sort_by": "date"},
+                            headers={**UA, "Authorization": f"Token {token}"}, timeout=TIMEOUT)
+        data.raise_for_status()
+        for j in data.json().get("results", []):
+            out.append(raw(j.get("role"), j.get("company_name"), j.get("url"), j.get("location") or "Remote", j.get("date_posted"),
+                           j.get("text"), "findwork", "", j.get("keywords") or []))
+        time.sleep(0.3)
+    return out
+
+
+# --- Experimental: undocumented endpoints of boards without a public API. ---
+# SEEK and LinkedIn terms of use prohibit automated access. These run only when
+# EXPERIMENTAL_BOARDS=1 is set, at low volume, for personal use. Your call.
+
+def _experimental_guard(name):
+    if os.environ.get("EXPERIMENTAL_BOARDS") != "1":
+        raise RuntimeError(f"{name} is experimental (undocumented endpoint, terms-of-use risk); set EXPERIMENTAL_BOARDS=1 to run it")
+
+
+def src_seek(profile):
+    _experimental_guard("seek")
+    out = []
+    for q in profile["targets"]["search_queries"][:12]:
+        data = get_json("https://www.seek.com.au/api/chalice-search/v4/search",
+                        params={"siteKey": "AU-Main", "sourcesystem": "houston", "where": "All Australia", "page": 1,
+                                "keywords": q, "workarrangement": "1", "pageSize": 30, "locale": "en-AU"})
+        for j in data.get("data", []):
+            wa = ", ".join(x.get("label", {}).get("text", "") for x in (j.get("workArrangements") or {}).get("data", []))
+            loc = ", ".join(filter(None, [j.get("location"), j.get("area"), wa or "Remote"]))
+            out.append(raw(j.get("title"), (j.get("advertiser") or {}).get("description"), f"https://www.seek.com.au/job/{j.get('id')}",
+                           loc, j.get("listingDate"), j.get("teaser") or "", "seek", j.get("salary") or "", [j.get("workType")], remote_only=False))
+        time.sleep(1.0)
+    return out
+
+
+def src_linkedin(profile):
+    _experimental_guard("linkedin")
+    out = []
+    for q in profile["targets"]["search_queries"][:12]:
+        r = requests.get("https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search",
+                         params={"keywords": q, "location": "Australia", "f_WT": "2", "f_TPR": "r1209600", "start": 0},
+                         headers=UA, timeout=TIMEOUT)
+        if r.status_code != 200:
+            print(f"  linkedin: HTTP {r.status_code} for '{q}'", file=sys.stderr)
+            time.sleep(2.0)
+            continue
+        for block in re.findall(r"<li>(.*?)</li>", r.text, flags=re.S):
+            def pick(pat):
+                m = re.search(pat, block, flags=re.S)
+                return strip_html(m.group(1)).strip() if m else ""
+            title = pick(r'class="base-search-card__title">(.*?)</h3>')
+            company = pick(r'class="base-search-card__subtitle">(.*?)</h4>')
+            loc = pick(r'class="job-search-card__location">(.*?)</span>')
+            url = re.search(r'href="(https://[^"]+/jobs/view/[^"]+)"', block)
+            date = re.search(r'datetime="(\d{4}-\d{2}-\d{2})"', block)
+            if title and url:
+                out.append(raw(title, company, url.group(1).split("?")[0], loc or "Australia (Remote)", date.group(1) if date else None,
+                               "", "linkedin", "", [], remote_only=True))
+        time.sleep(2.0)
+    return out
+
+
 SOURCES = {
     "remotive": src_remotive,
     "himalayas": src_himalayas,
@@ -476,9 +680,20 @@ SOURCES = {
     "greenhouse": src_greenhouse,
     "lever": src_lever,
     "ashby": src_ashby,
+    "themuse": src_themuse,
+    "jobspresso": src_jobspresso,
+    "hackernews": src_hackernews,
+    "workable": src_workable,
+    "smartrecruiters": src_smartrecruiters,
+    "recruitee": src_recruitee,
+    "bamboohr": src_bamboohr,
     "adzuna": src_adzuna,
     "jooble": src_jooble,
+    "findwork": src_findwork,
+    "seek": src_seek,
+    "linkedin": src_linkedin,
 }
+KEYED_OR_EXPERIMENTAL = {"adzuna", "jooble", "findwork", "seek", "linkedin"}
 
 
 # ----------------------------------------------------------------------------
@@ -515,6 +730,29 @@ def search_links(profile: dict) -> list[tuple[str, str, str]]:
         ("Robert Half AU (technology)", "all", "https://www.roberthalf.com/au/en/jobs/all/technology?remote=true"),
         ("Talent.com AU", "all", "https://au.talent.com/jobs?k=IT+Manager+remote&l=Australia"),
         ("NotFor-Profit People (AU NFP)", "all", "https://notforprofitpeople.com.au/jobs/?search=technology"),
+        ("Remote.co (IT)", "all", "https://remote.co/remote-jobs/it/"),
+        ("NoDesk", "all", "https://nodesk.co/remote-jobs/"),
+        ("Jobspresso", "all", "https://jobspresso.co/remote-work/"),
+        ("FlexJobs (IT management)", "all", "https://www.flexjobs.com/remote-jobs/computer-it"),
+        ("Welcome to the Jungle / Otta", "all", "https://app.welcometothejungle.com/jobs?location=Australia"),
+        ("Built In (remote)", "all", "https://builtin.com/jobs/remote/operations"),
+        ("The Muse (remote IT)", "all", "https://www.themuse.com/search/location/flexible-remote/category/it"),
+        ("PowerToFly (remote)", "all", "https://powertofly.com/jobs/?location=Remote&keywords=IT+manager"),
+        ("RemoteOK (management)", "all", "https://remoteok.com/remote-management-jobs"),
+        ("Himalayas (APAC)", "all", "https://himalayas.app/jobs/regions/asia-pacific"),
+        ("Working Nomads (management)", "all", "https://www.workingnomads.com/remote-management-jobs"),
+        ("Hacker News Who is hiring", "all", "https://news.ycombinator.com/submitted?id=whoishiring"),
+        ("CareerOne (AU)", "all", "https://www.careerone.com.au/jobs?keywords=IT+manager&location=Remote"),
+        ("Adzuna AU (remote IT manager)", "all", "https://www.adzuna.com.au/search?q=IT+manager+remote"),
+        ("ACS jobs board (Australian Computer Society)", "all", "https://jobs.acs.org.au/jobs/?keywords=manager"),
+        ("APS Jobs (Australian Government)", "all", "https://www.apsjobs.gov.au/s/job-search?keywords=ICT%20manager"),
+        ("TradeMe Jobs (NZ)", "all", "https://www.trademe.co.nz/a/jobs/it/search?search_string=IT+manager"),
+        ("Toptal (fractional/contract)", "fractional", "https://www.toptal.com/talent/apply"),
+        ("Recruitment: Peoplebank", "all", "https://www.peoplebank.com.au/jobs?q=IT+Manager"),
+        ("Recruitment: Paxus", "all", "https://www.paxus.com.au/jobs?keywords=IT+Manager"),
+        ("Recruitment: Talent International", "all", "https://www.talentinternational.com/jobs/?search=IT+Manager"),
+        ("Recruitment: Michael Page AU (technology)", "all", "https://www.michaelpage.com.au/jobs/information-technology?remote=true"),
+        ("Recruitment: Hudson AU (technology)", "all", "https://au.hudson.com/jobs/?q=IT+Manager"),
         ("Pro Bono Australia jobs", "all", "https://probonoaustralia.com.au/jobs/?search_keywords=technology"),
     ]
     return links
@@ -587,6 +825,8 @@ def cmd_search(args):
             rows = fn(profile)
             all_raw += rows
             report.append((name, "ok", len(rows), f"{time.time() - t0:.1f}s"))
+        except RuntimeError as e:
+            report.append((name, "skipped", 0, str(e)[:110]))
         except Exception as e:
             report.append((name, "FAILED", 0, str(e)[:110]))
     kept = []
@@ -882,6 +1122,8 @@ def cmd_prepare(args):
         (out / name).write_text(body, encoding="utf-8")
     if j["status"] == "sourced":
         j["status"] = "shortlisted"
+    j["pack"] = {"cover_letter": pack.get("cover-letter.md", ""), "tailoring": pack.get("tailoring-notes.md", ""),
+                 "screening": pack.get("screening-answers.md", ""), "updated": TODAY.isoformat()}
     j["next_action"] = j.get("next_action") or "Review pack, tailor resume, submit"
     j["notes"] = (j.get("notes", "") + f"\n[{TODAY.isoformat()}] Application pack prepared at {out.relative_to(HERE)}").strip()
     save_jobs(store)
@@ -896,11 +1138,15 @@ def cmd_prepare(args):
 
 def board_payload(store: dict) -> list[dict]:
     keep = ("id", "title", "company", "url", "source", "location_raw", "remote_policy", "posted", "salary", "score",
-            "reasons", "status", "notes", "next_action", "next_due", "applied_on", "first_seen", "last_seen", "tags")
+            "reasons", "status", "notes", "next_action", "next_due", "applied_on", "first_seen", "last_seen", "tags",
+            "contact_email", "apply_via")
     rows = []
     for j in store["jobs"]:
         row = {k: j.get(k, "") for k in keep}
-        row["summary"] = (j.get("description") or "")[:600]
+        row["description"] = (j.get("description") or "")[:6000]
+        row["summary"] = row["description"][:600]
+        row["pack"] = j.get("pack") or {}
+        row["checklist"] = j.get("checklist") or {}
         rows.append(row)
     return rows
 
@@ -914,6 +1160,12 @@ def write_board(store: dict) -> None:
                          ensure_ascii=False).replace("</", "<\\/")
     new = re.sub(r'(<script id="seed" type="application/json">).*?(</script>)', lambda m: m.group(1) + payload + m.group(2),
                  html_text, flags=re.S)
+    prof = load_profile()
+    prof_payload = json.dumps({k: prof[k] for k in ("candidate", "targets", "location_policy", "scoring", "experience",
+                                                     "highlights", "capabilities", "technical", "credentials")},
+                              ensure_ascii=False).replace("</", "<\\/")
+    new = re.sub(r'(<script id="profile" type="application/json">).*?(</script>)', lambda m: m.group(1) + prof_payload + m.group(2),
+                 new, flags=re.S)
     BOARD_PATH.write_text(new, encoding="utf-8")
 
 
@@ -948,11 +1200,13 @@ def cmd_import(args):
         if not r.get("id"):
             continue
         cur = by_id.get(r["id"])
-        fields = ("status", "notes", "next_action", "next_due", "applied_on")
+        fields = ("status", "notes", "next_action", "next_due", "applied_on", "contact_email", "apply_via", "pack", "checklist")
         if cur:
             for k in fields:
-                if k in r:
+                if k in r and r[k] not in ("", None, {}):
                     cur[k] = r[k]
+            if r.get("description") and len(r["description"]) > len(cur.get("description") or ""):
+                cur["description"] = r["description"]
         else:
             r.setdefault("description", r.get("summary", ""))
             r.setdefault("reasons", [])

@@ -15,7 +15,7 @@ repository before it grows. See "Things to decide" at the bottom.
 | File | Purpose |
 |---|---|
 | `profile.json` | Your profile, derived from the resume: target titles, search queries, location policy, scoring weights, experience, highlights. Edit this to steer the search. No phone number is stored. |
-| `jobsearch.py` | The command line tool. Pulls 12 sources, filters, scores, tracks, prepares packs, regenerates the board. |
+| `jobsearch.py` | The command line tool. Pulls 22 sources, filters, scores, tracks, prepares packs, regenerates the board. |
 | `board.html` | The kanban board. Open it locally (browser storage) or use the published copy (shared database, works on your phone). |
 | `data/jobs.json` | The pipeline. Every role seen, its score, status, notes and next action. |
 | `data/jobs.csv`, `data/board-export.json` | Produced by `export`. |
@@ -57,36 +57,55 @@ python jobsearch.py add --title "Head of IT" --company "Acme" --url "https://...
 
 ## Sources
 
-Pulled automatically by `search` (all free, no keys):
+`search` pulls all of these. Every source is isolated: one failing does not stop the rest,
+and the source report at the end of each run tells you what worked.
+
+Free, no key, on by default:
 
 | Source | What it gives you |
 |---|---|
-| Remotive | Remote roles with a stated candidate location, searched per query in `profile.json` |
-| Himalayas | Remote roles with country and time zone restrictions |
-| Jobicy | Remote roles filtered by geo: `australia`, `apac`, `anywhere` |
-| Arbeitnow | Remote flag on each posting, mostly European employers hiring worldwide |
+| Remotive | Remote roles with a stated candidate location, searched per query |
+| Himalayas | Remote roles with country and time zone restrictions (8 pages) |
+| Jobicy | Remote roles by geo: `australia`, `apac`, `anywhere` |
+| Arbeitnow | Remote-flagged postings, mostly European employers hiring worldwide |
 | RemoteOK | Remote roles with location text and salary |
-| We Work Remotely | RSS feeds for devops/sysadmin, management, and other categories, with region |
+| We Work Remotely | RSS for devops/sysadmin, management, and other categories, with region |
 | Working Nomads | Remote roles with location and category |
-| Greenhouse boards | Company career sites on Greenhouse, listed in `profile.json`, remote-filtered |
-| Lever boards | Same for Lever |
-| Ashby boards | Same for Ashby |
+| The Muse | Remote-flex roles in IT, management and project management |
+| Jobspresso | Curated remote board, RSS feed |
+| Hacker News "Who is hiring" | Latest monthly thread, remote comments only |
+| Greenhouse boards | 49 company career sites (GitLab, Remote, Canonical, Deel, PagerDuty, SafetyCulture, Culture Amp, Employment Hero, Octopus Deploy, Zapier, Automattic, Cloudflare, Elastic, HashiCorp, MongoDB, Datadog, Twilio, Okta, Grafana, Postman, Dovetail, Go1, Rokt, Envato, Immutable, Deputy, Airwallex, Atlassian, Xero, Linktree, SiteMinder, Nearmap, security vendors and more), remote-filtered |
+| Lever boards | 13 company sites (Canva, 1Password, Doist, Atlassian, Brighte, Pushpay, Mable and more) |
+| Ashby boards | 9 company sites (Linktree, Deel, Remote, Dovetail, Clipchamp, Secure Code Warrior and more) |
+| Workable boards | 5 company sites (UpGuard, Whispir, Bigtincan, Brighte, Mable) |
+| SmartRecruiters boards | Visa, Bosch, Ubisoft as examples; add your own |
+| Recruitee and BambooHR boards | Supported, empty by default; add company slugs |
 
-Enabled with a free key in the environment:
+Some of the board tokens are educated guesses. A wrong token fails for that company only
+and is printed in the run log. Prune the noise after your first run and add the companies
+you care about: the token is the last path segment of the company's careers URL.
+
+Free key in the environment:
 
 | Source | Key |
 |---|---|
-| Adzuna (AU and NZ aggregator, covers SEEK/Indeed style postings) | `ADZUNA_APP_ID`, `ADZUNA_APP_KEY` from developer.adzuna.com |
+| Adzuna (AU and NZ aggregator, indexes most Australian postings) | `ADZUNA_APP_ID`, `ADZUNA_APP_KEY` from developer.adzuna.com |
 | Jooble (AU aggregator) | `JOOBLE_API_KEY` from jooble.org/api/about |
+| Findwork (remote tech board) | `FINDWORK_TOKEN` from findwork.dev/developers |
 
-No public API, so `links` prints ready-made searches for them: SEEK AU and NZ, LinkedIn,
-Indeed AU, EthicalJobs, Jora, Glassdoor, Remote Rocketship, Jobgether, Dynamite Jobs,
-InfoSec Job Board, Wellfound, Hays, Robert Half, Talent.com, NotFor-Profit People,
-Pro Bono Australia, and the fractional CIO networks.
+Experimental, off by default. SEEK and LinkedIn have no public job-search API. The tool
+can read the undocumented endpoints their own websites use (`seek` and `linkedin` sources),
+at low volume, when you set `EXPERIMENTAL_BOARDS=1`. Both sites' terms of use prohibit
+automated access, the endpoints change without notice, and LinkedIn rate-limits guest
+requests hard. It is your decision. Without the flag they are reported as skipped and the
+`links` command gives you the same searches to run by hand in one click.
 
-Add more Greenhouse, Lever or Ashby company boards by putting the board token in
-`profile.json` under `sources`. The token is the last path segment of the company's
-careers URL (for example `job-boards.greenhouse.io/remotecom` gives `remotecom`).
+`links` prints 81 ready-made searches for boards with no API: SEEK AU and NZ, LinkedIn,
+Indeed AU, EthicalJobs, Jora, Glassdoor, CareerOne, Adzuna, ACS jobs, APS Jobs, TradeMe,
+Remote.co, NoDesk, FlexJobs, Welcome to the Jungle, Built In, PowerToFly, Remote Rocketship,
+Jobgether, Dynamite Jobs, InfoSec Job Board, Wellfound, the fractional CIO networks, Toptal,
+and the Australian IT recruiters (Hays, Robert Half, Peoplebank, Paxus, Talent International,
+Michael Page, Hudson).
 
 ## How filtering works
 
@@ -121,16 +140,41 @@ profile. Read every pack before sending it. The tool never submits an applicatio
 Two copies of the same page:
 
 - **Local**: `board.html`. Regenerated by `search`, `set`, `add`, `prepare` and `board` with the
-  current pipeline embedded. State you change in the browser is kept in that browser's storage.
-  Export JSON from the board and run `python jobsearch.py import data/board-export.json` to pull
-  those changes back into `data/jobs.json`.
+  current pipeline and your profile embedded. State you change in the browser is kept in that
+  browser's storage. Export JSON from the board and run
+  `python jobsearch.py import data/board-export.json` to pull those changes back into `data/jobs.json`.
 - **Published**: the claude.ai artifact linked in the session that built this. It uses a shared
   database, so changes made on the phone show up on the laptop and future Claude sessions can read
-  and update it. Paste the output of `export` into its Import dialog after each `search` run.
+  and update it. It also has the two abilities the local copy cannot: Claude writes the application
+  in the page, and Gmail drafts are created from it. Paste the output of `export` into its Import
+  dialog after each `search` run.
 
 Columns are the six statuses. Drag cards or use the arrows. Click a card to edit notes, next
-action and due date. The header shows active roles, applications this week, interviews, offers,
-and anything due today or overdue.
+action, due date and the posting text. **Re-score from posting** in that dialog runs the same
+location policy and scoring as the command line, so roles you add on the phone get a real score.
+
+### Applying from the board
+
+**Apply** on a card opens the application workspace:
+
+1. Paste the full posting text (left side). Set how you will apply and the contact email if
+   there is one.
+2. **Write with Claude** produces the cover letter, screening answers and resume tailoring notes
+   from your profile and that posting, in the page, under a rule that it may only use facts in
+   the profile. **Use template** does the same from fixed text without AI. Edit in place; every
+   tab has a Copy button. The pack is saved on the card so it is there on any device.
+3. **Draft in Gmail** creates a draft in your Gmail addressed to the contact, subject
+   "Application: {title} - Mathew Hema", body the cover letter. You attach the tailored resume
+   and send from Gmail. Nothing is sent by the page.
+4. **Open posting and mark applied** opens the job in a new tab for board or ATS applications
+   and moves the card to Applied with a follow-up due in seven days. **Mark applied** does the
+   same without opening the link.
+5. The checklist (eligibility confirmed, letter reviewed, resume tailored, answers ready,
+   submitted, follow-up set) is saved per role and shown on the card as `pack n/6`.
+
+Claude writing and Gmail drafting spend your own claude.ai usage and use your own Gmail
+connector; the page asks for consent on first use. The header dots show which of the three
+abilities (shared database, Claude writing, Gmail drafts) are live in the copy you have open.
 
 ## Things to decide
 
