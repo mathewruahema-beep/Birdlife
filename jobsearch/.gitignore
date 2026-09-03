@@ -1,2 +1,3 @@
 applications/*/
 !applications/.gitkeep
+__pycache__/
