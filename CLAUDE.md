@@ -68,9 +68,10 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
 - `docs/using-the-assistant.md` — remote access channels and the prompt playbook.
 - `docs/entra-admin-connector.md` — the plan to promote Tier 2 Entra/Exchange
   actions to approve-only direct execution.
-- `dashboard/ict-dashboard.html` — the ICT dashboard design template; the live copy
-  is republished each weekday by the `ICT Dashboard` routine.
 - `routines/` — scheduled-routine definitions and backups (credentials redacted).
+- The daily working surface is the **BirdLife Australia console** (Jarvis), source
+  at `os/claude-os-overview.html`; the old `console/` and `dashboard/` template
+  files were retired 3 Sep 2026 (recoverable from git history).
 
 ## Style
 

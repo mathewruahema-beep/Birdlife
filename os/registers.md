@@ -12,14 +12,11 @@ to 15 (13 recurring active + 2 one-shots). Nine routines retired with full
 definitions backed up in `routines/routines-backup-2026-09-02.json`; two updated
 in place as merge survivors; one created (the weekly audit).
 
-**Budget note, decision open:** the budget is 12 recurring active routines and
-the estate now sits at 13, because the audit routine itself took the 13th slot.
-Nearest consolidation candidates: the two Friday status drafts (Membership Build
-Friday draft and ICT Weekly Status Update) could merge, or the Top 10 morning
-email draft could absorb the overnight pre-draft's reporting. Mathew to pick one
-or raise the budget to 13.
+**Budget: RESOLVED 3 Sep 2026, 12 of 12.** Mathew retired the Top 10 morning
+email draft (it overlapped the console's Catch me up); backup in
+`routines/routines-backup-2026-09-03.json`.
 
-### Active recurring (13)
+### Active recurring (12)
 
 | Routine | Trigger | Schedule (AEST) | Notes |
 |---|---|---|---|
@@ -27,7 +24,6 @@ or raise the budget to 13.
 | Dashboards weekend + weekly security (single job) | `trig_01CUkTdAFSisnzyU6pwgkH4k` | Sat, Sun 7:04am | Merge survivor. Sunday fire also refreshes the Security Dashboard (moved from Monday 12am) |
 | Claude OS weekly audit | `trig_01V3i4b5zekjZuuFTF6Ymu9G` | Mon 6am | Created 2 Sep. Observe-and-record only; needs no connectors (repo and trigger list come from the environment) |
 | ICT overnight pre-draft (approve-first) | `trig_01EbMkfD4UcGUKLkUB1mNQ8V` | weekdays 5:30am | Write-capable, capped: internal comments only, max 8 |
-| BirdLife Top 10 morning email draft | `trig_016BES4jwEodCfNdSTBYfSow` | weekdays 6am | |
 | Refund fix watch, daily blast radius scan | `trig_01VdzVKqN12nyemiu976mNca` | daily 8:15am | |
 | Membership boards date sync (Build to Model) | `trig_01K4kh1m8foc2oYAv9Gs8xqo` | daily 7:30am | |
 | Offboarding detector, daily scan and approval pack | `trig_016nQBEZNDReT1DyrEbbqeSU` | daily 8am | |
@@ -43,6 +39,12 @@ or raise the budget to 13.
 |---|---|---|
 | DST fix for dashboards and Morning brief | `trig_01YY3yjtTASm7MvUCh8ceW11` | 5 Oct 2026. Scope changed by this consolidation: it must now adjust the merged weekday and weekend jobs and the audit routine, not the retired triggers |
 | Renew entra-admin-mcp certificate | `trig_01Vp14cTKJCLnC7psjiRZnUC` | 25 Jul 2027 (cert expires 26 Aug 2027) |
+
+### Retired 3 Sep 2026 (definition in `routines/routines-backup-2026-09-03.json`)
+
+| Routine | Trigger | Disposition |
+|---|---|---|
+| BirdLife Top 10 morning email draft | `trig_016BES4jwEodCfNdSTBYfSow` | Retired on Mathew's call: overlapped the console's Catch me up. Closed the budget decision at 12 of 12. Its prompt still carried the Owner.Name scoping bug |
 
 ### Retired 2 Sep 2026 (definitions in `routines/routines-backup-2026-09-02.json`)
 
@@ -133,6 +135,15 @@ BirdLife-Security-Dashboard.html, plus the `_dashboard-run-log.txt` heartbeat.
 
 All artifact URLs are private. Do not publish any via GitHub Pages or any
 public host; they name internal systems.
+
+**Cleanup review, 3 Sep 2026 (Mathew's conditions applied):** the department
+suite and the ICT Operations/Monitoring dashboards were reviewed for retirement
+conditional on the console covering their content. It does not: the suite carries
+department metrics (Salesforce/Stripe/NetSuite) absent from the console, and the
+Ops/Monitoring Teams files are the team's shared view while the console is
+private to Mathew. Both therefore KEPT. To retire them later: either accept the
+loss, or share the console with the team (each viewer needs their own connector
+grants) and fold the missing checks in. Security dashboard kept (governance).
 
 ## 5. Credential watchlist
 

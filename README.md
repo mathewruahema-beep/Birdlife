@@ -300,10 +300,9 @@ console/index.html                   the ICT Console — interactive prompt buil
 .claude/skills/                      the nine birdlife-* operator-knowledge skills (versioned)
 docs/using-the-assistant.md          remote access channels + prompt playbook
 README.md                            findings, admin runbook, routine consolidation
-dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
 ```
 
-The HTML is kept for reference and as the design template the morning routine
-rebuilds against. It is not itself the live artefact — the routine republishes to
-the artifact URL each weekday.
+The console and dashboard template files were retired on 3 Sep 2026 (git history
+keeps them); the live dashboards are fetched and republished in place by the
+routines, and the daily working surface is the BirdLife Australia console.
