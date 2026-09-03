@@ -1,7 +1,9 @@
 # Getting better with AI: a working guide
 
 For Mathew Hema, Senior Manager ICT. Written 3 September 2026. Read time about ten
-minutes. Every link was checked on the day of writing.
+minutes. Every link was checked on the day of writing. A phone-readable copy is
+published at https://claude.ai/code/artifact/3dd8818e-d1c8-4b81-877f-6945e62ddc1d
+(private to Mathew; republish it from this file when the guide changes).
 
 The thesis in one line: AI makes you faster only when you give it context, make it
 verify, and give it somewhere to remember. Without those three it makes you
