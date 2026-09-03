@@ -1,0 +1,987 @@
+<meta charset="utf-8">
+<title>Quiet Storm</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1A0F1E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500;1,9..144,700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Dark-first: the stage. Deep plum velvet, warm gold, a lavender target so it never fights the gold. */
+:root{
+  --bg:#1A0F1E; --surface:#26172C; --surface2:#33213A; --ink:#F3E9EC; --ink2:#CDB9C4; --muted:#9A8496; --line:#432D4B;
+  --accent:#D9B36A; --accent-ink:#F0D48E; --accent-soft:#3A2C1E;
+  --target:#A896E8; --target-soft:#2C2447;
+  --good:#5CC494; --warn:#F0A05A; --crit:#EC6B6B;
+  --good-soft:#1B3A2C; --warn-soft:#3F2A18; --crit-soft:#3F1F22;
+  --glow:rgba(217,179,106,.16);
+  --shadow:0 1px 2px rgba(0,0,0,.45),0 12px 32px rgba(0,0,0,.35);
+  --radius:12px;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:"Figtree","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --bg:#F4ECEF; --surface:#FFFFFF; --surface2:#EDE2E7; --ink:#2A1830; --ink2:#5A4462; --muted:#8C7A90; --line:#DCCCD5;
+    --accent:#A8843C; --accent-ink:#6E5320; --accent-soft:#F3E6CC;
+    --target:#6A55B8; --target-soft:#E4DDF6;
+    --good:#2C8C63; --warn:#C8721F; --crit:#C43C3C;
+    --good-soft:#DDF0E7; --warn-soft:#FBE7D6; --crit-soft:#F8DCDC;
+    --glow:rgba(168,132,60,.14);
+    --shadow:0 1px 2px rgba(42,24,48,.06),0 10px 28px rgba(42,24,48,.08);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F4ECEF; --surface:#FFFFFF; --surface2:#EDE2E7; --ink:#2A1830; --ink2:#5A4462; --muted:#8C7A90; --line:#DCCCD5;
+  --accent:#A8843C; --accent-ink:#6E5320; --accent-soft:#F3E6CC;
+  --target:#6A55B8; --target-soft:#E4DDF6;
+  --good:#2C8C63; --warn:#C8721F; --crit:#C43C3C;
+  --good-soft:#DDF0E7; --warn-soft:#FBE7D6; --crit-soft:#F8DCDC;
+  --glow:rgba(168,132,60,.14);
+  --shadow:0 1px 2px rgba(42,24,48,.06),0 10px 28px rgba(42,24,48,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);background-image:radial-gradient(ellipse 70% 45% at 50% -8%,var(--glow),transparent 70%);background-repeat:no-repeat;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;touch-action:manipulation}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--target);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance;line-height:1.15}
+h1{font-size:32px;font-style:italic;font-weight:500;letter-spacing:-.01em}
+h1 b,h2 b{font-style:normal;font-weight:700}
+h2{font-size:22px}
+h3{font-size:17px}
+p{margin:0}
+a{color:var(--target)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+.ink2{color:var(--ink2)}
+.small{font-size:13px}
+
+#app{max-width:1080px;margin:0 auto;padding:0 16px 48px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0 10px;flex-wrap:wrap}
+.brand-name{font-family:var(--display);font-size:28px;font-weight:500;font-style:italic;letter-spacing:-.01em;color:var(--accent-ink)}
+.brand-sub{display:block;font-size:12px;color:var(--muted);margin-top:-2px}
+.live{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 6px;box-shadow:var(--shadow)}
+.live .mic{border:none;border-radius:999px;padding:8px 14px;background:var(--surface2);font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px}
+.live .mic.on{background:var(--accent-soft);color:var(--accent-ink)}
+.live .mic .dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+.live .mic.on .dot{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.live-note{display:flex;align-items:baseline;gap:8px;min-width:130px}
+.live-note .n{font-family:var(--display);font-size:24px;font-weight:700;min-width:44px}
+.live-note .c{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:60px}
+.live-bar{position:relative;width:110px;height:6px;border-radius:3px;background:var(--surface2);overflow:hidden}
+.live-bar::after{content:"";position:absolute;left:50%;top:0;width:1px;height:100%;background:var(--line)}
+.live-bar .pin{position:absolute;top:0;width:8px;height:6px;border-radius:3px;background:var(--accent);left:50%;transform:translateX(-50%);transition:left .08s linear}
+.live-bar .pin.ok{background:var(--good)}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow-x:auto}
+.tabs button{border:none;background:none;padding:12px 14px;min-height:44px;font-weight:500;color:var(--ink2);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs button.active{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.tabs button:hover{color:var(--ink)}
+
+.grid{display:grid;gap:16px}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.grid.three{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+.panel.raised{box-shadow:var(--shadow)}
+.panel.accent{border-color:var(--accent);background:linear-gradient(180deg,var(--accent-soft),var(--surface) 60%)}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.row.between{justify-content:space-between}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 16px;min-height:44px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{background:var(--surface2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#1B1408}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.danger{color:var(--crit);border-color:var(--crit)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sm{padding:6px 12px;min-height:38px;font-size:13px}
+select,input[type=number],input[type=text],textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+textarea{width:100%;min-height:120px;font-family:var(--mono);font-size:12px}
+label.field{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--ink2)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--surface2);color:var(--ink2)}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.crit{background:var(--crit-soft);color:var(--crit)}
+.pill.accent{background:var(--accent-soft);color:var(--accent-ink)}
+.pill.target{background:var(--target-soft);color:var(--target)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.metric{padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.metric .v{font-family:var(--display);font-size:28px;font-weight:600;line-height:1.1;margin:4px 0 2px;font-variant-numeric:tabular-nums}
+.metric .v small{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:400;margin-left:3px}
+.metric .d{font-size:12px;color:var(--muted)}
+.metric .delta{font-family:var(--mono);font-size:12px}
+.delta.up{color:var(--good)} .delta.down{color:var(--crit)} .delta.flat{color:var(--muted)}
+.bars{display:flex;gap:3px;margin-top:8px}
+.bars i{flex:1;height:5px;border-radius:2px;background:var(--surface2)}
+.bars i.on{background:var(--accent)}
+
+.coach{display:flex;gap:14px;align-items:flex-start}
+.coach .avatar{flex:none;width:40px;height:40px;border-radius:50%;background:var(--accent);color:#1A0F1E;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:18px}
+.coach .bubble{background:var(--surface2);border-radius:12px;padding:12px 14px;font-size:15px}
+.coach .bubble p+p{margin-top:8px}
+
+.plan{display:flex;flex-direction:column;gap:8px}
+.plan .item{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.plan .item.done{opacity:.6}
+.plan .item .why{font-size:12px;color:var(--muted)}
+.plan .item .go{margin-left:auto}
+.check{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;flex:none}
+.check.on{background:var(--good);border-color:var(--good);color:#fff}
+
+.exlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.ex{border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;background:var(--surface);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:border-color .15s}
+.ex:hover{border-color:var(--accent)}
+.ex .name{font-weight:600;font-size:15px}
+.ex .desc{font-size:13px;color:var(--ink2)}
+.ex .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.ex .best{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+/* runner */
+.runner{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:860px){.runner{grid-template-columns:1.4fr 1fr}}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:14px;min-height:320px}
+.targets{display:flex;align-items:flex-end;justify-content:center;gap:6px;min-height:120px;padding:10px 0}
+.tn{display:flex;flex-direction:column;align-items:center;gap:4px;width:52px;transition:transform .12s}
+.tn .k{width:44px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)}
+.tn.active .k{background:var(--target);border-color:var(--target)}
+.tn.hit .k{background:var(--good);border-color:var(--good)}
+.tn.miss .k{background:var(--crit-soft);border-color:var(--crit)}
+.tn .l{font-family:var(--mono);font-size:12px;color:var(--ink2)}
+.tn.active .l{color:var(--ink);font-weight:600}
+.bignote{display:flex;align-items:baseline;justify-content:center;gap:16px}
+.bignote .t{font-family:var(--display);font-size:64px;font-weight:600;line-height:1;color:var(--accent-ink)}
+.bignote .s{font-family:var(--mono);font-size:14px;color:var(--muted)}
+.needle{position:relative;height:28px;border-radius:14px;background:var(--surface2);overflow:hidden}
+.needle .zone{position:absolute;left:37.5%;width:25%;top:0;height:100%;background:var(--good-soft)}
+.needle .mid{position:absolute;left:50%;top:0;width:2px;height:100%;background:var(--line)}
+.needle .pin{position:absolute;top:4px;width:20px;height:20px;border-radius:50%;background:var(--accent);left:50%;transform:translateX(-50%);transition:left .07s linear;border:2px solid var(--surface);box-shadow:0 0 12px var(--glow)}
+.needle .pin.ok{background:var(--good)}
+.needle .pin.off{opacity:.25}
+.needle .lab{position:absolute;bottom:-18px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.status{font-size:14px;color:var(--ink2);min-height:22px}
+.status b{color:var(--ink)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--mono)}
+.reps{display:flex;gap:4px;flex-wrap:wrap}
+.reps span{font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:4px;background:var(--surface2)}
+.reps span.g{background:var(--good-soft);color:var(--good)}
+.reps span.w{background:var(--warn-soft);color:var(--warn)}
+.reps span.c{background:var(--crit-soft);color:var(--crit)}
+
+/* keyboard */
+.kb{width:100%;height:auto;display:block}
+.kb .w{fill:var(--surface);stroke:var(--line)}
+.kb .b{fill:var(--ink)}
+.kb .rng{fill:var(--accent);opacity:.35}
+.kb .rngb{fill:var(--accent);opacity:.55}
+.kb .ref{fill:var(--target);opacity:.18}
+.kb .cur{fill:var(--good)}
+.kb text{font-family:var(--mono);font-size:9px;fill:var(--muted)}
+.kb .pass{stroke:var(--target);stroke-width:1.5;stroke-dasharray:3 2}
+
+/* charts */
+.chart{position:relative}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .ax{stroke:var(--line);stroke-width:1}
+.chart .grid{stroke:var(--line);stroke-width:1;stroke-dasharray:2 3;opacity:.7}
+.chart .ln{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.chart .area{fill:var(--accent);opacity:.12}
+.chart .pt{fill:var(--surface);stroke:var(--accent);stroke-width:2}
+.chart .pt.last{fill:var(--accent)}
+.chart .base{stroke:var(--target);stroke-width:1.5;stroke-dasharray:4 3}
+.chart text{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+.chart .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:6px;transform:translate(-50%,-120%);white-space:nowrap;display:none}
+.chart .hit{fill:transparent;cursor:crosshair}
+
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:600;color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+td.mono{font-family:var(--mono);font-size:12px}
+.tablewrap{overflow-x:auto}
+
+.steps{display:flex;gap:6px;margin-bottom:12px}
+.steps i{flex:1;height:4px;border-radius:2px;background:var(--surface2)}
+.steps i.on{background:var(--accent)} .steps i.done{background:var(--good)}
+.timer{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.big{font-family:var(--display);font-size:44px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.warnbox{background:var(--warn-soft);border:1px solid var(--warn);border-radius:8px;padding:10px 12px;font-size:13px}
+.note{font-size:13px;color:var(--ink2);border-left:3px solid var(--accent);padding-left:10px}
+.sr-only{position:absolute;left:-9999px}
+.trace{width:100%;height:90px;display:block;border-radius:8px;background:var(--surface2)}
+.lanes{position:relative;height:200px;border-radius:10px;background:var(--surface2);overflow:hidden}
+.lanes .tgt{position:absolute;left:0;right:0;height:14px;background:var(--target);opacity:.5;transform:translateY(-50%)}
+.lanes .you{position:absolute;left:0;right:0;height:3px;background:var(--accent);transform:translateY(-50%)}
+.lanes .lbl{position:absolute;right:8px;font-family:var(--mono);font-size:11px;color:var(--ink2);transform:translateY(-50%)}
+.hit-flash{animation:flash .4s ease-out}
+@keyframes flash{from{background:var(--good-soft)}to{background:var(--surface2)}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.footer{margin-top:32px;font-size:12px;color:var(--muted)}
+@media(max-width:600px){#app{padding:0 12px 40px}.top{padding:14px 0 8px}.live{width:100%;justify-content:space-between}.live-bar{display:none}.bignote .t{font-size:52px}h1{font-size:26px}.panel{padding:16px}}
+</style>
+
+<div id="app">
+  <header class="top">
+    <div class="brand"><span class="brand-name">Quiet Storm</span><span class="brand-sub">Smooth baritone and bass coaching</span></div>
+    <div class="live">
+      <button class="mic" id="micBtn" aria-pressed="false"><span class="dot"></span><span id="micLabel">Mic off</span></button>
+      <div class="live-note"><span class="n" id="liveNote">--</span><span class="c" id="liveCents"></span></div>
+      <div class="live-bar" aria-hidden="true"><span class="pin" id="livePin"></span></div>
+    </div>
+  </header>
+  <nav class="tabs" id="tabs">
+    <button data-page="home">Today</button>
+    <button data-page="assess">Assess</button>
+    <button data-page="train">Train</button>
+    <button data-page="play">Play</button>
+    <button data-page="progress">Progress</button>
+    <button data-page="settings">Settings</button>
+  </nav>
+  <main id="main"></main>
+  <p class="footer">Pitch detection runs in your browser. Nothing you sing leaves this device. The phrases and runs are original patterns written in the smooth R&amp;B tradition; no recordings are used. Benchmarks are this coach's calibration for amateur to semi-professional low voices, not an examination standard.</p>
+</div>
+
+<script>
+/* ============================ STATE ============================ */
+const KEY='quietstorm.v1';
+const NOTE_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const defaultState=()=>({
+  profile:{name:'',voiceType:'baritone',createdAt:Date.now()},
+  settings:{a4:440,intensity:'firm',guide:true,gate:0.012,theme:'system'},
+  assessments:[],
+  sessions:[],
+  bests:{}
+});
+let S=load();
+function load(){try{const raw=localStorage.getItem(KEY);if(raw){const s=JSON.parse(raw);return Object.assign(defaultState(),s,{settings:Object.assign(defaultState().settings,s.settings||{})});}}catch(e){}return defaultState();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+/* ============================ MUSIC MATH ============================ */
+const midiFromFreq=f=>69+12*Math.log2(f/S.settings.a4);
+const freqFromMidi=m=>S.settings.a4*Math.pow(2,(m-69)/12);
+const noteName=m=>{const r=Math.round(m);return NOTE_NAMES[((r%12)+12)%12]+(Math.floor(r/12)-1);};
+const centsOff=m=>Math.round((m-Math.round(m))*100);
+const fmtCents=c=>(c>0?'+':'')+c+'c';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const median=a=>{if(!a.length)return NaN;const s=[...a].sort((x,y)=>x-y);const m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2;};
+const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:NaN;
+const sd=a=>{if(a.length<2)return NaN;const m=mean(a);return Math.sqrt(mean(a.map(x=>(x-m)*(x-m))));};
+const fmtDate=t=>new Date(t).toLocaleDateString(undefined,{day:'numeric',month:'short'});
+const fmtDateY=t=>new Date(t).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'2-digit'});
+const dayKey=t=>{const d=new Date(t);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
+
+/* Reference ranges for the two voice types. Midi: C2=36, E2=40, A2=45, E4=64, A4=69 */
+const VOICE={
+  bass:{label:'Bass',low:40,high:64,primo:57,secondo:62,comfort:[43,60],note:'Bass sits E2 to E4 in full voice. Your money notes are the bottom fifth; the top needs the most care through D4 to E4.'},
+  baritone:{label:'Baritone',low:45,high:69,primo:60,secondo:65,comfort:[47,64],note:'Baritone sits A2 to A4 in full voice. The passaggio around C4 to F4 is where baritones either learn to turn the voice or start shouting.'}
+};
+function voice(){return VOICE[S.profile.voiceType]||VOICE.baritone;}
+function lastAssessment(){return S.assessments[S.assessments.length-1]||null;}
+function rangeNow(){const a=lastAssessment();if(a&&a.low&&a.high)return {low:a.low,high:a.high};const v=voice();return {low:v.low,high:v.high};}
+
+/* ============================ AUDIO ============================ */
+let actx=null, analyser=null, micStream=null, buf=null, detector=null, rafId=null, micOn=false, wakeLock=null;
+const live={freq:0,midi:NaN,cents:0,clarity:0,rms:0,voiced:false,t:0};
+const listeners=new Set();
+const recentMidi=[];
+
+class PitchDetector{
+  constructor(sr,size){this.sr=sr;this.size=size;this.minF=50;this.maxF=1200;this.maxTau=Math.min(size-1,Math.floor(sr/this.minF));this.minTau=Math.max(2,Math.floor(sr/this.maxF));this.nsdf=new Float32Array(this.maxTau+1);}
+  detect(b){
+    const n=b.length;let rms=0;for(let i=0;i<n;i++)rms+=b[i]*b[i];rms=Math.sqrt(rms/n);
+    if(rms<S.settings.gate)return{freq:0,clarity:0,rms};
+    const nsdf=this.nsdf,maxTau=this.maxTau;
+    for(let tau=0;tau<=maxTau;tau++){let acf=0,m=0;const lim=n-tau;for(let i=0;i<lim;i++){const x=b[i],y=b[i+tau];acf+=x*y;m+=x*x+y*y;}nsdf[tau]=m>0?2*acf/m:0;}
+    let tau=1;while(tau<=maxTau&&nsdf[tau]>0)tau++;
+    const maxima=[];let pos=false,bi=-1,bv=0;
+    for(;tau<=maxTau;tau++){
+      if(nsdf[tau]>0&&nsdf[tau-1]<=0){pos=true;bi=tau;bv=nsdf[tau];}
+      else if(pos){if(nsdf[tau]<=0){maxima.push([bi,bv]);pos=false;}else if(nsdf[tau]>bv){bv=nsdf[tau];bi=tau;}}
+    }
+    if(pos)maxima.push([bi,bv]);
+    if(!maxima.length)return{freq:0,clarity:0,rms};
+    let highest=0;for(const m of maxima)if(m[1]>highest)highest=m[1];
+    const thr=0.86*highest;
+    let chosen=null;for(const m of maxima){if(m[0]>=this.minTau&&m[1]>=thr){chosen=m;break;}}
+    if(!chosen)return{freq:0,clarity:0,rms};
+    let [t,v]=chosen;
+    if(t>0&&t<maxTau){const a=nsdf[t-1],c=nsdf[t+1],d=a-2*v+c;if(d!==0){const sh=0.5*(a-c)/d;if(Math.abs(sh)<1){t+=sh;v=v-0.25*(a-c)*sh;}}}
+    return{freq:this.sr/t,clarity:v,rms};
+  }
+}
+
+async function startMic(){
+  if(micOn)return true;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==='suspended')await actx.resume();
+    micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    const src=actx.createMediaStreamSource(micStream);
+    analyser=actx.createAnalyser();analyser.fftSize=2048;analyser.smoothingTimeConstant=0;
+    src.connect(analyser);
+    buf=new Float32Array(analyser.fftSize);
+    detector=new PitchDetector(actx.sampleRate,analyser.fftSize);
+    micOn=true;updateMicBtn();loop();
+    try{if(navigator.wakeLock&&!wakeLock){wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{wakeLock=null;});}}catch(e){}
+    return true;
+  }catch(e){
+    micOn=false;updateMicBtn();
+    const msg=(e&&e.name==='NotAllowedError')?'Microphone blocked. If you are viewing this inside another page, open it in its own browser tab and allow the microphone. If it is a local file, open it in Chrome or Edge.':'Could not open the microphone: '+(e&&e.message||e);
+    toast(msg,true);return false;
+  }
+}
+function stopMic(){if(rafId)cancelAnimationFrame(rafId);rafId=null;if(wakeLock){try{wakeLock.release();}catch(e){}wakeLock=null;}if(micStream)micStream.getTracks().forEach(t=>t.stop());micStream=null;micOn=false;live.voiced=false;live.freq=0;live.midi=NaN;updateMicBtn();renderLive();}
+function updateMicBtn(){const b=document.getElementById('micBtn');b.classList.toggle('on',micOn);b.setAttribute('aria-pressed',micOn?'true':'false');document.getElementById('micLabel').textContent=micOn?'Mic live':'Mic off';}
+function loop(){
+  rafId=requestAnimationFrame(loop);
+  analyser.getFloatTimeDomainData(buf);
+  const r=detector.detect(buf);
+  const now=performance.now();
+  live.rms=r.rms;live.clarity=r.clarity;live.t=now;
+  const voiced=r.freq>0&&r.clarity>=0.88&&r.freq>=50&&r.freq<=1200;
+  if(voiced){
+    const m=midiFromFreq(r.freq);
+    recentMidi.push(m);if(recentMidi.length>5)recentMidi.shift();
+    const sm=median(recentMidi);
+    live.freq=r.freq;live.midi=sm;live.cents=centsOff(sm);live.voiced=true;
+  }else{recentMidi.length=0;live.voiced=false;live.freq=0;live.midi=NaN;}
+  renderLive();
+  for(const fn of listeners)fn(live);
+}
+function renderLive(){
+  const n=document.getElementById('liveNote'),c=document.getElementById('liveCents'),p=document.getElementById('livePin');
+  if(live.voiced){n.textContent=noteName(live.midi);c.textContent=fmtCents(live.cents)+' '+live.freq.toFixed(0)+'Hz';p.style.left=(50+clamp(live.cents,-50,50))+'%';p.classList.toggle('ok',Math.abs(live.cents)<=15);}
+  else{n.textContent=micOn?'...':'--';c.textContent=micOn?'listening':'';p.style.left='50%';p.classList.remove('ok');}
+}
+document.getElementById('micBtn').addEventListener('click',()=>micOn?stopMic():startMic());
+document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'&&micOn&&navigator.wakeLock&&!wakeLock){try{wakeLock=await navigator.wakeLock.request('screen');}catch(e){}}});
+
+/* Tones */
+function ensureCtx(){actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();return actx;}
+function playNote(midi,dur=0.8,when=0,gain=0.25){
+  const c=ensureCtx();const t0=c.currentTime+when;const f=freqFromMidi(midi);
+  const o1=c.createOscillator(),o2=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
+  o1.type='triangle';o1.frequency.value=f;o2.type='sine';o2.frequency.value=f*2;
+  lp.type='lowpass';lp.frequency.value=Math.min(4000,f*6);
+  const g2=c.createGain();g2.gain.value=0.25;
+  o1.connect(lp);o2.connect(g2);g2.connect(lp);lp.connect(g);g.connect(c.destination);
+  g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(gain,t0+0.02);g.gain.setValueAtTime(gain,t0+dur*0.7);g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  o1.start(t0);o2.start(t0);o1.stop(t0+dur+0.05);o2.stop(t0+dur+0.05);
+}
+function click(when=0,accent=false){
+  const c=ensureCtx();const t0=c.currentTime+when;const o=c.createOscillator(),g=c.createGain();
+  o.type='square';o.frequency.value=accent?1600:1100;o.connect(g);g.connect(c.destination);
+  g.gain.setValueAtTime(accent?0.12:0.07,t0);g.gain.exponentialRampToValueAtTime(0.0001,t0+0.04);o.start(t0);o.stop(t0+0.05);
+}
+
+/* ============================ EXERCISES ============================ */
+/* pattern: array of [semitoneOffset, beats]. dir: +1 ladder up, -1 ladder down. metric: which metric the score feeds */
+const EX=[
+  {id:'trill',cat:'Warm-up',name:'Lip trill sirens',desc:'Loose lips, steady air. Slide from the bottom of your range to the top and back on a lip trill. If the trill stops, the air stopped.',type:'free',minutes:2,coach:'Two minutes, no skipping. The trill is honest: it dies the second you push from the throat.'},
+  {id:'hum',cat:'Warm-up',name:'Hum 5-4-3-2-1',desc:'Closed-mouth hum, descending five notes. Feel the buzz in the lips and nose, not the throat.',type:'pattern',pattern:[[7,1],[5,1],[4,1],[2,1],[0,2]],dir:-1,tempo:96,metric:'agility',coach:'Descending first: it keeps you out of the throat while the voice wakes up.'},
+  {id:'ng',cat:'Warm-up',name:'Ng sirens',desc:'Sing "ng" as in "sing" and siren through your range. Great for finding the top without weight.',type:'free',minutes:1.5,coach:'The ng keeps the larynx settled. Use it to find where the top wants to sit.'},
+  {id:'scale5',cat:'Technique',name:'Five-note scale, Mah',desc:'1-2-3-4-5-4-3-2-1 on "Mah". The bread and butter. Ladders up a semitone each rep until you hit your ceiling.',type:'pattern',pattern:[[0,1],[2,1],[4,1],[5,1],[7,1],[5,1],[4,1],[2,1],[0,2]],dir:1,tempo:120,metric:'agility',coach:'Clean means every note centred, not just the top. Most people rush the way down.'},
+  {id:'lowext',cat:'Low register',name:'Descending low extension, Voh',desc:'5-4-3-2-1 on "Voh", laddering down a semitone each rep. Keep the tone speaking, not breathy. This is how bass notes grow.',type:'pattern',pattern:[[7,1],[5,1],[4,1],[2,1],[0,2]],dir:-1,tempo:90,metric:'low',coach:'Low notes are not made by pushing down. Keep the sound forward and let the volume drop. Fry is a fail.'},
+  {id:'octarp',cat:'Technique',name:'Octave arpeggio, Nah',desc:'1-3-5-8-5-3-1 on "Nah". Crosses the passaggio on the way up. Laddering up.',type:'pattern',pattern:[[0,1],[4,1],[7,1],[12,1],[7,1],[4,1],[0,2]],dir:1,tempo:110,metric:'high',coach:'The octave is where the jaw tightens. Drop it before the top note, not on it.'},
+  {id:'slide',cat:'Passaggio',name:'Octave slide, Noo',desc:'Slide 1 to 8 and back on "Noo" in one breath, no break, no flip. The slide exposes every register seam.',type:'pattern',pattern:[[0,2],[12,2],[0,2]],dir:1,tempo:70,metric:'high',glide:true,coach:'If it flips into falsetto, the vowel opened too early. Keep "oo" narrow through the seam.'},
+  {id:'stacc',cat:'Technique',name:'Staccato arpeggio, Ha',desc:'1-3-5-8-5-3-1 short and bouncy on "Ha". Trains onset precision and the abdominal bounce.',type:'pattern',pattern:[[0,1],[4,1],[7,1],[12,1],[7,1],[4,1],[0,1]],dir:1,tempo:140,metric:'agility',staccato:true,coach:'Each note starts on pitch or it is wrong. No scooping in from below.'},
+  {id:'leaps',cat:'Ear',name:'Fifths and octaves, Lah',desc:'1-5-1-8-1 on "Lah". Leaps test whether you hear the note before you sing it.',type:'pattern',pattern:[[0,1],[7,1],[0,1],[12,1],[0,2]],dir:1,tempo:100,metric:'accuracy',coach:'Hear it first. If you have to hunt for the fifth, you are not practising, you are guessing.'},
+  {id:'chrom',cat:'Ear',name:'Chromatic crawl, Nee',desc:'Semitones 1-2-3-4-5-4-3-2-1 on "Nee". The hardest tuning test in the book. Guide tones off is the real exam.',type:'pattern',pattern:[[0,1],[1,1],[2,1],[3,1],[4,1],[3,1],[2,1],[1,1],[0,2]],dir:1,tempo:84,metric:'accuracy',coach:'Semitones are where sloppy ears get found out. Aim small.'},
+  {id:'sustain',cat:'Tone',name:'Sustained tone, Ah',desc:'Hold one comfortable note as long and as still as you can. Measures duration and pitch wobble.',type:'sustain',metric:'sustain',coach:'Still means still. A wobble is the breath running out before the note does.'},
+  {id:'messa',cat:'Tone',name:'Messa di voce, Oh',desc:'One note: start soft, swell to loud, return to soft, pitch never moves. The professional test of breath control.',type:'sustain',messa:true,metric:'stability',coach:'Getting louder without going sharp is the whole exercise. Watch the cents, not the volume.'},
+  {id:'legato',cat:'Smooth',name:'Legato slides, Oo',desc:'1 to 3 to 5 and back on "oo", sliding between notes with no gap and no bump. The whole style is built on an unbroken line.',type:'pattern',pattern:[[0,1.5],[4,1.5],[7,1.5],[4,1.5],[0,2]],dir:1,tempo:72,glide:true,coach:'Smooth is a breath decision, not a mouth decision. The air never stops between notes, so the sound never does.'},
+  {id:'run',cat:'Smooth',name:'Pentatonic run, Oo',desc:'8-7-5-4-3-1 down the minor pentatonic, fast, on "oo". Every note in a run has to land, or it is a smear.',type:'pattern',pattern:[[12,.5],[10,.5],[7,.5],[5,.5],[3,.5],[0,1.5]],dir:1,tempo:92,metric:'agility',coach:'Runs are sung from the ear, not the throat. If you cannot sing it slow and clean, fast is a bluff.'},
+  {id:'phrase',cat:'Smooth',name:'Quiet storm phrase, Ooh',desc:'An original eight-note phrase in the smooth tradition: a lean into the sixth, a turn, and a soft landing on the root. Sing it like you mean it.',type:'pattern',pattern:[[7,1],[9,.5],[7,.5],[4,1],[5,.5],[4,.5],[2,1],[0,2]],dir:1,tempo:80,coach:'Taste is timing. Land the last note late and soft, never early and loud.'},
+  {id:'vibrato',cat:'Smooth',name:'Vibrato check, Ah',desc:'Hold a note with your natural vibrato. Measures the rate, the width and how even it is. The smooth sound is an even, unforced 5 to 7 cycles a second.',type:'sustain',vib:true,coach:'Vibrato is what a free voice does on its own. If you are making it happen, it will sound made.'},
+  {id:'croon',cat:'Smooth',name:'Croon, quiet sustain, Oh',desc:'Hold a note softly, with full tone, not breathy. The hardest thing a big voice learns is to be quiet and still sound like itself.',type:'sustain',quiet:true,coach:'Quiet is not weak. Keep the resonance and drop the volume. If it goes breathy, the cords let go.'},
+  {id:'hiss',cat:'Breath',name:'Hiss timer, Sss',desc:'One breath, one steady "sss", as long as you can. Pure breath management, no pitch.',type:'hiss',metric:'breath',coach:'Steady hiss beats a loud hiss. Aim for consistency, then length.'},
+];
+const exById=id=>EX.find(e=>e.id===id);
+
+/* ============================ METRICS AND LEVELS ============================ */
+const METRICS=[
+  {id:'low',label:'Lowest note',unit:'',fmt:v=>noteName(v),hib:false,desc:'Lowest note held cleanly for 0.4s',bands:[[0,1],[-2,2],[-4,3],[-6,4]],rel:'low'},
+  {id:'high',label:'Highest note',unit:'',fmt:v=>noteName(v),hib:true,desc:'Highest full-voice note held cleanly for 0.4s',bands:[[0,1],[2,2],[4,3],[6,4]],rel:'high'},
+  {id:'accuracy',label:'Pitch accuracy',unit:'c',fmt:v=>v.toFixed(1),hib:false,desc:'Mean error in cents when matching a played note. Lower is better.',bands:[[40,1],[25,2],[15,3],[8,4]]},
+  {id:'stability',label:'Stability',unit:'c',fmt:v=>v.toFixed(1),hib:false,desc:'Pitch wobble (standard deviation, cents) on a held note. Lower is better.',bands:[[25,1],[16,2],[10,3],[6,4]]},
+  {id:'sustain',label:'Sustain',unit:'s',fmt:v=>v.toFixed(1),hib:true,desc:'Longest single note held on pitch.',bands:[[8,1],[12,2],[18,3],[25,4]]},
+  {id:'agility',label:'Agility',unit:'%',fmt:v=>Math.round(v),hib:true,desc:'Percent of time on target in a five-note scale run.',bands:[[40,1],[60,2],[75,3],[90,4]]},
+  {id:'breath',label:'Breath',unit:'s',fmt:v=>v.toFixed(1),hib:true,desc:'Longest steady hiss on one breath.',bands:[[12,1],[20,2],[30,3],[40,4]]},
+];
+const metricById=id=>METRICS.find(m=>m.id===id);
+function points(id,v){
+  const m=metricById(id);if(v==null||isNaN(v))return 0;const V=voice();
+  if(m.rel==='low'){const d=v-V.low;let p=0;for(const [th,pt] of m.bands)if(d<=th)p=pt;return p;}
+  if(m.rel==='high'){const d=v-V.high;let p=0;for(const [th,pt] of m.bands)if(d>=th)p=pt;return p;}
+  let p=0;for(const [th,pt] of m.bands){if(m.hib?v>=th:v<=th)p=pt;}return p;
+}
+function levelOf(a){
+  if(!a)return null;const ids=['low','high','accuracy','stability','sustain','agility','breath'];
+  const ps=ids.map(id=>points(id,a[id])).filter(p=>!isNaN(p));const avg=mean(ps);
+  const name=avg>=3.4?'Advanced':avg>=2.5?'Solid':avg>=1.5?'Developing':'Foundation';
+  return{avg,name};
+}
+function lastValue(id){
+  /* latest measurement from assessments or sessions */
+  let best=null;
+  for(const a of S.assessments)if(a[id]!=null)best={v:a[id],t:a.date};
+  for(const s of S.sessions){if(s.metric===id&&s.value!=null&&(!best||s.date>best.t))best={v:s.value,t:s.date};}
+  return best;
+}
+function bestValue(id){
+  const m=metricById(id);let best=null;
+  const consider=(v,t)=>{if(v==null||isNaN(v))return;if(best==null||(m.hib?v>best.v:v<best.v))best={v,t};};
+  for(const a of S.assessments)consider(a[id],a.date);
+  for(const s of S.sessions)if(s.metric===id)consider(s.value,s.date);
+  return best;
+}
+function delta(id,from,to){const m=metricById(id);if(from==null||to==null)return null;const d=to-from;const good=m.hib?d>0:d<0;return{d,good,flat:Math.abs(d)<1e-6};}
+
+/* ============================ COACH ============================ */
+const brutal=()=>S.settings.intensity==='brutal';
+function coachVerdict(a){
+  const lv=levelOf(a);const V=voice();const out=[];
+  const name=S.profile.name?S.profile.name.split(' ')[0]:'';
+  out.push(`${name?name+', ':''}baseline is in. Level: <b>${lv.name}</b>. ${brutal()?'Nothing here is fixed yet, so do not get attached to it.':'That is a starting point, not a verdict.'}`);
+  const weak=['accuracy','stability','sustain','agility','breath','low','high'].map(id=>({id,p:points(id,a[id])})).sort((x,y)=>x.p-y.p);
+  const w=weak[0],w2=weak[1];
+  const say={
+    accuracy:`Pitch accuracy is your weakest number at ${a.accuracy.toFixed(1)} cents average error. Every other skill is capped by the ear. Leaps and the chromatic crawl, daily, guide tones off within a week.`,
+    stability:`Your held notes wobble (${a.stability.toFixed(1)} cents SD). That is breath, not larynx. Sustained tone and messa di voce until the needle stops moving.`,
+    sustain:`${a.sustain.toFixed(1)} seconds of sustain is short. Singers who phrase well hold 20 plus. Hiss timer, then sustained tone, every session.`,
+    agility:`${Math.round(a.agility)}% on target in the scale run. You are landing near the notes, not on them. Slow the five-note scale down until it is clean, then earn the tempo back.`,
+    breath:`Breath is ${a.breath.toFixed(1)} seconds on a hiss. That is the engine for everything. Ten hisses a day, standing, ribs wide.`,
+    low:`Bottom is ${noteName(a.low)}. For a ${V.label.toLowerCase()} the working floor is ${noteName(V.low)}. Low notes grow with the descending Voh ladder, quiet and forward, never pushed.`,
+    high:`Top is ${noteName(a.high)} in full voice. Target for a ${V.label.toLowerCase()} is ${noteName(V.high)}. Octave slides and arpeggios through the passaggio at ${noteName(V.primo)} to ${noteName(V.secondo)}.`
+  };
+  out.push(say[w.id]);
+  if(w2.p<=2)out.push('Second priority: '+say[w2.id].charAt(0).toLowerCase()+say[w2.id].slice(1));
+  const strong=weak[weak.length-1];
+  if(strong.p>=3)out.push(`Strongest: ${metricById(strong.id).label.toLowerCase()}. Good. We will use it as the fun part of each session so you keep showing up.`);
+  out.push('The smooth sound is legato, breath and taste on top of all of this. One Smooth exercise goes into every daily plan; the technique work is what makes it possible.');
+  out.push(brutal()?'Reassess in 14 days. If the numbers have not moved, the practice did not happen.':'Reassess in 14 days. Fifteen minutes a day beats an hour on Sunday.');
+  return out;
+}
+function coachAfter(ex,res){
+  const lines=[];
+  if(res.onTarget!=null){
+    const p=res.onTarget;
+    if(p>=90)lines.push(brutal()?'Clean. So it was too easy. Guide tones off, tempo up ten, one semitone further.':'Clean run. Next time: guide tones off and one semitone further.');
+    else if(p>=75)lines.push('Good, not clean. Your misses cluster at the turn of the pattern. Sit the jaw and do not reach.');
+    else if(p>=60)lines.push('Landing near the notes, not on them. Halve the tempo, sing it clean, then bring the speed back.');
+    else lines.push(brutal()?'That was noise with a pattern in it. Slow down until every note is centred. Speed is earned.':'Too many misses to learn from. Slow it right down and make each note centre before the next.');
+  }
+  if(res.bias!=null&&Math.abs(res.bias)>=12)lines.push(res.bias<0?`You sat flat by ${Math.abs(res.bias)} cents on average. Flat means under-supported: more air energy, less throat.`:`You sat sharp by ${res.bias} cents on average. Sharp means pushing: release the neck and let the pitch settle.`);
+  if(ex.glide&&res.continuity!=null)lines.push(res.continuity>=85?`Line held: voiced ${Math.round(res.continuity)}% of the phrase. That is legato.`:`The line broke: voiced only ${Math.round(res.continuity)}% of the phrase. The breath stopped between notes, so the sound did. One breath, one line.`);
+  if(res.vib){const v=res.vib;if(v.rate<1||v.extent<12)lines.push(`Straight tone, ${v.extent.toFixed(0)} cents of movement. Fine for a verse. A chorus wants a little warmth; let the note relax and it will come.`);else if(v.rate<4.5)lines.push(`Vibrato at ${v.rate.toFixed(1)} Hz is a wobble, not a vibrato. That is unsteady support. Faster air, steadier ribs.`);else if(v.rate>7.5)lines.push(`${v.rate.toFixed(1)} Hz is a tremolo: the throat is doing it. Release the neck and let it slow.`);else lines.push(`${v.rate.toFixed(1)} Hz, ${v.extent.toFixed(0)} cents wide${v.even<=0.25?', even':', uneven'}. ${v.even<=0.25?'That is the smooth sound. Keep it unforced.':'The rate drifts. Do not push it; it should feel like the note breathing.'}`);}
+  if(ex.quiet&&res.level!=null)lines.push(res.level>0.07?'That was a belt, not a croon. Halve the volume and keep the resonance.':res.stability<=10?'Quiet, full and still. That is the hardest trick in the book.':'Quiet, but the pitch drifted. Soft singing still needs the same air pressure, just less of it.');
+  if(res.ceiling)lines.push(`Ceiling today: ${noteName(res.ceiling)}. Beat it tomorrow.`);
+  if(res.floor)lines.push(`Floor today: ${noteName(res.floor)}. The floor moves slowly. Keep it quiet and forward.`);
+  if(res.duration!=null){
+    if(ex.metric==='sustain')lines.push(res.duration>=20?`${res.duration.toFixed(1)}s held. That is a phrase-carrying breath.`:`${res.duration.toFixed(1)}s. Before the note wobbles you are already out of air. Hiss timer next.`);
+    if(ex.metric==='breath')lines.push(res.duration>=30?`${res.duration.toFixed(1)}s hiss. The engine is there. Now spend it on tone.`:`${res.duration.toFixed(1)}s hiss. Ribs stay wide on the exhale. Do this standing, three times.`);
+    if(ex.metric==='stability')lines.push(res.stability<=8?`${res.stability.toFixed(1)}c wobble through the swell. That is control.`:`${res.stability.toFixed(1)}c wobble. The pitch moved when the volume did. Swell slower.`);
+  }
+  if(!lines.length)lines.push('Logged. Consistency is the metric nobody measures. Come back tomorrow.');
+  return lines;
+}
+function todaysPlan(){
+  const a=lastAssessment();if(!a)return null;
+  const weak=['accuracy','stability','sustain','agility','breath','low','high'].map(id=>({id,p:points(id,a[id])})).sort((x,y)=>x.p-y.p);
+  const map={accuracy:['leaps','chrom'],stability:['messa','sustain'],sustain:['sustain','hiss'],agility:['scale5','stacc'],breath:['hiss','sustain'],low:['lowext','hum'],high:['slide','octarp']};
+  const seed=dayKey(Date.now()).split('-').reduce((x,y)=>x+parseInt(y),0);
+  const items=[];
+  items.push({ex:'trill',why:'Warm-up, always'});
+  const w1=map[weak[0].id][seed%2],w2=map[weak[1].id][(seed>>1)%2];
+  items.push({ex:w1,why:'Weakest: '+metricById(weak[0].id).label.toLowerCase()});
+  if(w2!==w1)items.push({ex:w2,why:'Second: '+metricById(weak[1].id).label.toLowerCase()});
+  const strong=weak[weak.length-1];const s1=map[strong.id][seed%2];
+  if(s1!==w1&&s1!==w2)items.push({ex:s1,why:'Strength: keep it sharp'});
+  const style=['legato','run','phrase','vibrato','croon'][seed%5];if(style!==w1&&style!==w2)items.push({ex:style,why:'Style: the smooth sound'});
+  items.push({ex:'game:hunt',why:'Note Hunt, because it should be fun'});
+  const today=dayKey(Date.now());
+  for(const it of items){it.done=S.sessions.some(s=>dayKey(s.date)===today&&(s.exerciseId===it.ex));}
+  return items;
+}
+function streak(){
+  const days=new Set([...S.sessions.map(s=>dayKey(s.date)),...S.assessments.map(a=>dayKey(a.date))]);
+  let n=0;const d=new Date();if(!days.has(dayKey(d)))d.setDate(d.getDate()-1);
+  while(days.has(dayKey(d))){n++;d.setDate(d.getDate()-1);}return n;
+}
+function logSession(rec){rec.date=Date.now();S.sessions.push(rec);if(rec.metric&&rec.value!=null){const m=metricById(rec.metric);const b=S.bests[rec.metric];if(b==null||(m.hib?rec.value>b:rec.value<b))S.bests[rec.metric]=rec.value;}save();}
+
+/* ============================ UI HELPERS ============================ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let toastT=null;
+function toast(msg,bad){let t=$('#toast');if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:90vw;padding:10px 16px;border-radius:10px;font-size:13px;z-index:9;box-shadow:var(--shadow)';document.body.appendChild(t);}t.style.background=bad?'var(--crit)':'var(--ink)';t.style.color='var(--bg)';t.textContent=msg;t.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>t.style.display='none',bad?7000:2500);}
+function coachBubble(lines){return `<div class="coach"><div class="avatar" aria-hidden="true">C</div><div class="bubble">${lines.map(l=>`<p>${l}</p>`).join('')}</div></div>`;}
+function pointsBars(p){return `<div class="bars">${[1,2,3,4].map(i=>`<i class="${i<=p?'on':''}"></i>`).join('')}</div>`;}
+
+function keyboardSVG(opts){
+  /* C2 (36) to C5 (72) */
+  const lo=36,hi=72,W=720,H=70;const whites=[];let x=0;
+  for(let m=lo;m<=hi;m++){const pc=m%12;const isB=[1,3,6,8,10].includes(pc);if(!isB){whites.push({m,x});x+=20;}}
+  const wx=m=>{const w=whites.find(o=>o.m===m);if(w)return w.x;const prev=whites.filter(o=>o.m<m).pop();return prev.x+14;};
+  let s=`<svg class="kb" viewBox="0 0 ${W} ${H+16}" role="img" aria-label="Keyboard from C2 to C5 showing your range">`;
+  for(const w of whites)s+=`<rect class="w" x="${w.x}" y="0" width="20" height="${H}" rx="2"/>`;
+  const V=voice();
+  const paint=(a,b,cls,y,h)=>{if(a==null||b==null)return;a=Math.round(a);b=Math.round(b);const x1=wx(Math.max(lo,a)),x2=wx(Math.min(hi,b))+(([1,3,6,8,10].includes(Math.min(hi,b)%12))?12:20);s+=`<rect class="${cls}" x="${x1}" y="${y}" width="${Math.max(0,x2-x1)}" height="${h}" rx="3"/>`;};
+  paint(V.low,V.high,'ref',H-14,10);
+  if(opts.low!=null&&opts.high!=null)paint(opts.low,opts.high,'rng',H-26,10);
+  if(opts.best&&opts.best.low!=null)paint(opts.best.low,opts.best.high,'rngb',H-38,6);
+  for(let m=lo;m<=hi;m++){const pc=m%12;if([1,3,6,8,10].includes(pc))s+=`<rect class="b" x="${wx(m)}" y="0" width="12" height="${H*0.6}" rx="2"/>`;}
+  for(const p of [V.primo,V.secondo]){const x=wx(p)+([1,3,6,8,10].includes(p%12)?6:10);s+=`<line class="pass" x1="${x}" y1="2" x2="${x}" y2="${H-2}"/>`;}
+  for(const w of whites)if(w.m%12===0)s+=`<text x="${w.x+3}" y="${H+12}">${noteName(w.m)}</text>`;
+  if(opts.cur!=null&&!isNaN(opts.cur)){const m=Math.round(opts.cur);if(m>=lo&&m<=hi){const x=wx(m)+([1,3,6,8,10].includes(m%12)?6:10);s+=`<circle class="cur" cx="${x}" cy="${H-8}" r="5"/>`;}}
+  s+='</svg>';return s;
+}
+
+function lineChart(id,series,opts){
+  /* series: [{t,v}] ; opts: {unit,fmt,baseline,hib} */
+  const W=520,H=170,pl=44,pr=14,pt=14,pb=28;
+  if(!series.length)return `<div class="chart muted small">No data yet.</div>`;
+  const vs=series.map(p=>p.v);let lo=Math.min(...vs),hi=Math.max(...vs);
+  if(opts.baseline!=null){lo=Math.min(lo,opts.baseline);hi=Math.max(hi,opts.baseline);}
+  if(hi-lo<1e-9){hi=lo+1;lo=lo-1;}const pad=(hi-lo)*0.15;lo-=pad;hi+=pad;
+  const xs=series.length===1?[pl+(W-pl-pr)/2]:series.map((p,i)=>pl+i*(W-pl-pr)/(series.length-1));
+  const y=v=>pt+(H-pt-pb)*(1-(v-lo)/(hi-lo));
+  let ticks=[lo+pad,(lo+hi)/2,hi-pad];if(opts.integer)ticks=[...new Set(ticks.map(Math.round))];
+  let s=`<div class="chart" id="${id}"><svg viewBox="0 0 ${W} ${H}">`;
+  for(const t of ticks)s+=`<line class="grid" x1="${pl}" x2="${W-pr}" y1="${y(t)}" y2="${y(t)}"/><text x="${pl-6}" y="${y(t)+3}" text-anchor="end">${opts.fmt(t)}</text>`;
+  s+=`<line class="ax" x1="${pl}" x2="${W-pr}" y1="${H-pb}" y2="${H-pb}"/>`;
+  if(opts.baseline!=null)s+=`<line class="base" x1="${pl}" x2="${W-pr}" y1="${y(opts.baseline)}" y2="${y(opts.baseline)}"/><text x="${W-pr}" y="${y(opts.baseline)-4}" text-anchor="end">baseline</text>`;
+  if(series.length>1){
+    const d=series.map((p,i)=>(i?'L':'M')+xs[i].toFixed(1)+' '+y(p.v).toFixed(1)).join(' ');
+    s+=`<path class="area" d="${d} L${xs[xs.length-1].toFixed(1)} ${H-pb} L${xs[0].toFixed(1)} ${H-pb} Z"/><path class="ln" d="${d}"/>`;
+  }
+  series.forEach((p,i)=>{s+=`<circle class="pt ${i===series.length-1?'last':''}" cx="${xs[i]}" cy="${y(p.v)}" r="4"/>`;});
+  const labIdx=series.length<=4?series.map((_,i)=>i):[0,series.length-1];
+  for(const i of labIdx)s+=`<text x="${xs[i]}" y="${H-pb+14}" text-anchor="${i===0?'start':i===series.length-1?'end':'middle'}">${fmtDate(series[i].t)}</text>`;
+  series.forEach((p,i)=>{const w=series.length>1?(xs[1]-xs[0]):60;s+=`<rect class="hit" x="${xs[i]-w/2}" y="0" width="${w}" height="${H}" data-i="${i}"/>`;});
+  s+=`</svg><div class="tip"></div></div>`;
+  setTimeout(()=>{const el=document.getElementById(id);if(!el)return;const tip=el.querySelector('.tip');const svg=el.querySelector('svg');
+    el.querySelectorAll('.hit').forEach(r=>{const i=+r.dataset.i;const show=()=>{const p=series[i];const bb=svg.getBoundingClientRect();tip.style.display='block';tip.style.left=(xs[i]/W*bb.width)+'px';tip.style.top=(y(p.v)/H*bb.height)+'px';tip.textContent=fmtDateY(p.t)+'  '+opts.fmt(p.v)+opts.unit;};
+      r.addEventListener('mouseenter',show);r.addEventListener('touchstart',show,{passive:true});r.addEventListener('mouseleave',()=>tip.style.display='none');});},0);
+  return s;
+}
+
+/* ============================ ROUTER ============================ */
+let page='home';let activeRunner=null;
+function go(p,arg){if(activeRunner){activeRunner.stop();activeRunner=null;}listeners.clear();page=p;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));const m=$('#main');m.innerHTML='';PAGES[p](m,arg);window.scrollTo({top:0});}
+document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.page);});
+
+const PAGES={};
+
+/* ---------------------------- HOME ---------------------------- */
+PAGES.home=(m)=>{
+  const a=lastAssessment();const V=voice();
+  if(!a){
+    m.innerHTML=`
+    <div class="grid two">
+      <div class="panel accent stack">
+        <span class="eyebrow">Start here</span>
+        <h1>Your voice needs a number before it can get a <b>better</b> one.</h1>
+        <p class="ink2">Ten minutes. Seven measurements. The coach then builds every session from your weakest number, and you re-test every two weeks so the graph, not your mood, says whether you improved.</p>
+        <div class="row">
+          <button class="btn primary" id="startAssess">Run the baseline assessment</button>
+          <button class="btn" id="goTrain">Just warm up first</button>
+        </div>
+        <p class="small muted">Use headphones if you can, a quiet room, and stand up. Set your voice type in Settings first (currently <b>${V.label}</b>).</p><p class="small muted">On a phone: open this page in Chrome or Samsung Internet, allow the microphone when asked, then use the browser menu and <b>Add to Home screen</b> so it opens like an app.</p>
+      </div>
+      <div class="panel stack">
+        <span class="eyebrow">Example scorecard</span>
+        <p class="small muted">What your baseline will look like. These are example figures for a developing baritone, not yours.</p>
+        <div class="metrics">
+          ${[['Range','G2 to F4',22,'semitones'],['Pitch accuracy','21.4','c','mean error'],['Stability','12.8','c','wobble'],['Sustain','14.2','s','held'],['Agility','68','%','on target'],['Breath','24','s','hiss']].map(([l,v,u,d])=>`<div class="metric"><span class="eyebrow">${l}</span><div class="v">${v}<small>${u}</small></div><div class="d">${d}</div></div>`).join('')}
+        </div>
+        ${coachBubble(['Level: <b>Developing</b>. Ear first, then breath. Leaps and the chromatic crawl daily, guide tones off within a week.'])}
+      </div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <span class="eyebrow">${V.label} reference</span>
+      <p class="small ink2" style="margin:6px 0 10px">${V.note} Dashed lines mark the passaggio (${noteName(V.primo)} and ${noteName(V.secondo)}). Blue band: full-voice working range for your voice type.</p>
+      ${keyboardSVG({})}
+    </div>`;
+    $('#startAssess').onclick=()=>go('assess');$('#goTrain').onclick=()=>go('train');
+    return;
+  }
+  const lv=levelOf(a);const first=S.assessments[0];const plan=todaysPlan();const st=streak();
+  const days=Math.floor((Date.now()-a.date)/864e5);
+  const cards=['low','high','accuracy','stability','sustain','agility','breath'].map(id=>{
+    const mt=metricById(id);const cur=lastValue(id);const base=first[id];const d=cur?delta(id,base,cur.v):null;
+    let dl='';if(d&&S.assessments.length+S.sessions.length>1){dl=d.flat?`<span class="delta flat">no change</span>`:`<span class="delta ${d.good?'up':'down'}">${d.d>0?'+':''}${mt.unit===''?d.d+' st':mt.fmt(Math.abs(d.d))*(d.d<0?-1:1)+mt.unit} vs baseline</span>`;}
+    return `<div class="metric"><span class="eyebrow">${mt.label}</span><div class="v">${cur?mt.fmt(cur.v):'--'}<small>${mt.unit}</small></div><div class="d">${dl||mt.desc}</div>${pointsBars(points(id,cur?cur.v:null))}</div>`;
+  }).join('');
+  m.innerHTML=`
+  <div class="grid two">
+    <div class="panel raised stack">
+      <div class="row between"><span class="eyebrow">Today's session</span><span class="pill ${st>=3?'good':''}">${st} day streak</span></div>
+      <div class="plan">${plan.map(it=>{const ex=it.ex.startsWith('game:')?{name:'Note Hunt',minutes:1}:exById(it.ex);const label=ex.minutes?ex.minutes+' min':'3 to 5 min';return `<div class="item ${it.done?'done':''}"><span class="check ${it.done?'on':''}">${it.done?'✓':''}</span><div><div>${ex.name} <span class="muted small">${label}</span></div><div class="why">${it.why}</div></div><button class="btn sm go" data-ex="${it.ex}">${it.done?'Again':'Go'}</button></div>`;}).join('')}</div>
+      <p class="small muted">About 18 minutes. Warm-up, your two weakest numbers, one strength, one Smooth exercise, one game. The plan changes daily.</p>
+    </div>
+    <div class="panel stack">
+      <div class="row between"><span class="eyebrow">Level</span><span class="pill accent">${lv.name}</span></div>
+      ${coachBubble(coachHome(a,days,st))}
+      <div class="row"><button class="btn ${days>=14?'primary':''}" id="reassess">${days>=14?'Reassess now (due)':'Reassess ('+(14-days)+' days to go)'}</button><button class="btn ghost" id="seeProgress">See progress</button></div>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <div class="row between"><span class="eyebrow">Range on the keyboard</span><span class="small muted">Amber: your latest range. Darker amber: your best. Blue: ${V.label.toLowerCase()} reference. Dashed: passaggio.</span></div>
+    <div style="margin-top:10px">${keyboardSVG({low:a.low,high:a.high,best:{low:bestValue('low')&&bestValue('low').v,high:bestValue('high')&&bestValue('high').v}})}</div>
+  </div>
+  <div class="metrics" style="margin-top:16px">${cards}</div>`;
+  m.querySelectorAll('.go').forEach(b=>b.onclick=()=>{const id=b.dataset.ex;if(id==='game:hunt')go('play');else go('train',id);});
+  $('#reassess').onclick=()=>go('assess');$('#seeProgress').onclick=()=>go('progress');
+};
+function coachHome(a,days,st){
+  const lines=[];const weak=['accuracy','stability','sustain','agility','breath','low','high'].map(id=>({id,p:points(id,lastValue(id)?lastValue(id).v:a[id])})).sort((x,y)=>x.p-y.p)[0];
+  const mt=metricById(weak.id);
+  if(st===0)lines.push(brutal()?'No session yesterday. The voice does not bank practice. Start with the trill and stop negotiating.':'Fresh start today. Trill first, then the weak spot.');
+  else if(st<3)lines.push(`Day ${st+1}. Consistency is the only thing that moves these numbers.`);
+  else lines.push(`${st} days straight. Now make the sessions harder, not longer.`);
+  lines.push(`Priority: <b>${mt.label.toLowerCase()}</b>. ${mt.desc}`);
+  if(days>=14)lines.push('Reassessment is due. Run it before you train today so the comparison is fair.');
+  return lines;
+}
+
+/* ---------------------------- ASSESS ---------------------------- */
+PAGES.assess=(m)=>{
+  const steps=['Mic check','Low range','High range','Sustain','Pitch match','Agility','Breath','Result'];
+  let i=0;const R={};let stepStop=null;
+  const V=voice();
+  const rangeRef=rangeNow();
+  function header(){return `<div class="steps">${steps.map((s,k)=>`<i class="${k<i?'done':k===i?'on':''}"></i>`).join('')}</div><div class="row between"><span class="eyebrow">Baseline assessment, step ${i+1} of ${steps.length}</span><span class="small muted">${steps[i]}</span></div>`;}
+  function frame(inner,controls){m.innerHTML=`<div class="runner"><div class="stage">${header()}${inner}</div><div class="stack">${controls}</div></div>`;}
+  function needleHTML(){return `<div class="bignote"><span class="t" id="bn">--</span><span class="s" id="bs"></span></div><div class="needle"><div class="zone"></div><div class="mid"></div><span class="pin off" id="pin"></span><span class="lab" style="left:4px">-50c</span><span class="lab" style="right:4px">+50c</span></div><div style="height:16px"></div>`;}
+  function bindNeedle(target){listeners.add(l=>{const bn=$('#bn'),bs=$('#bs'),pin=$('#pin');if(!bn)return;if(l.voiced){const c=target!=null?Math.round((l.midi-target)*100):l.cents;bn.textContent=noteName(l.midi);bs.textContent=fmtCents(c)+'  '+l.freq.toFixed(0)+' Hz';pin.style.left=(50+clamp(c,-50,50))+'%';pin.classList.remove('off');pin.classList.toggle('ok',Math.abs(c)<=25);}else{bn.textContent='--';bs.textContent='';pin.classList.add('off');pin.classList.remove('ok');}});}
+  function next(){listeners.clear();if(stepStop){stepStop();stepStop=null;}i++;render();}
+  function render(){
+    const s=steps[i];
+    if(s==='Mic check'){
+      frame(`<h2>Say a comfortable "ah" and watch the needle move.</h2><p class="ink2">Stand up. Headphones on if you have them, so the reference tones do not bleed into the mic. Aim for a quiet room. The detector needs a clean tone, so no background music.</p>${needleHTML()}<div class="status" id="st">Waiting for the mic.</div>`,
+        `<div class="panel stack"><span class="eyebrow">What this measures</span><p class="small ink2">Seven numbers: lowest and highest clean note, pitch accuracy, stability, sustain, agility and breath. Together they set your level and drive every session plan.</p><p class="small ink2">Takes about ten minutes. Be honest with the range steps: a note that cracks or goes to fry does not count, and the detector will usually agree.</p><button class="btn primary" id="micGo">Turn on the mic</button><button class="btn" id="nx" disabled>Next</button></div>`);
+      $('#micGo').onclick=async()=>{if(await startMic()){$('#st').innerHTML='Mic live. Sing an <b>ah</b>.';}};
+      let ok=0;bindNeedle(null);listeners.add(l=>{if(l.voiced){ok++;if(ok>15){$('#nx').disabled=false;$('#st').innerHTML='<b>Signal is clean.</b> Go to the next step.';}}});
+      $('#nx').onclick=next;
+    }
+    else if(s==='Low range'||s==='High range'){
+      const low=s==='Low range';
+      frame(`<h2>${low?'Slide down, then step down. Find your lowest clean note.':'Slide up in full voice. Find your highest clean note.'}</h2><p class="ink2">${low?'Sing "oh" from a comfortable note and walk down a semitone at a time. Hold each for a second. Stop when the tone turns to fry or air. Quiet is fine. Fry is not a note.':'Sing "ah" or "oh" and walk up a semitone at a time. Full voice only: if it flips to falsetto, that note does not count. Do not strain. Thirty seconds is plenty.'}</p>${needleHTML()}<div class="row"><div class="metric" style="flex:1"><span class="eyebrow">${low?'Lowest held':'Highest held'}</span><div class="v" id="ext">--</div><div class="d" id="extd">Hold 0.4s with clean tone to register</div></div><div class="metric" style="flex:1"><span class="eyebrow">Reference</span><div class="v">${noteName(low?V.low:V.high)}</div><div class="d">${V.label} working ${low?'floor':'ceiling'}</div></div></div><div class="status" id="st"></div>`,
+        `<div class="panel stack"><span class="eyebrow">Rules</span><p class="small ink2">A note registers when it is held for 0.4 seconds with clarity above 0.9. Cracks, fry, and falsetto flips usually fail clarity, which is the point.</p><button class="btn" id="cue">Play a starting note (${noteName(low?rangeRef.low+7:rangeRef.high-7)})</button><button class="btn primary" id="nx" disabled>Lock it in</button></div>`);
+      $('#cue').onclick=()=>playNote(low?rangeRef.low+7:rangeRef.high-7,1.2);
+      let ext=null,holdStart=0,holdNote=null;bindNeedle(null);
+      listeners.add(l=>{
+        if(!l.voiced||l.clarity<0.9){holdStart=0;holdNote=null;return;}
+        const r=Math.round(l.midi);
+        if(holdNote!==r){holdNote=r;holdStart=l.t;return;}
+        if(l.t-holdStart>=400){
+          if(ext==null||(low?r<ext:r>ext)){ext=r;R[low?'low':'high']=r;$('#ext').textContent=noteName(r);$('#extd').textContent=freqFromMidi(r).toFixed(0)+' Hz';$('#nx').disabled=false;
+            const d=low?V.low-r:r-V.high;$('#st').innerHTML=d>=0?`<b>${noteName(r)}</b>. That is ${d===0?'right on':d+' semitones past'} the ${V.label.toLowerCase()} reference.`:`<b>${noteName(r)}</b>. ${Math.abs(d)} semitones short of the reference. Keep going if there is more.`;}
+        }
+      });
+      $('#nx').onclick=next;
+    }
+    else if(s==='Sustain'){
+      const tgt=Math.round(((R.low||rangeRef.low)+(R.high||rangeRef.high))/2)-2;
+      frame(`<h2>Hold ${noteName(tgt)} on "ah" as long and as still as you can.</h2><p class="ink2">Take a full breath. Start at a medium volume and keep it there. The timer runs while you stay within 70 cents of where you started. Do up to three attempts; the best one counts.</p>${needleHTML()}<div class="row"><div class="metric" style="flex:1"><span class="eyebrow">This attempt</span><div class="v" id="dur">0.0<small>s</small></div><div class="d" id="wob">wobble --</div></div><div class="metric" style="flex:1"><span class="eyebrow">Best</span><div class="v" id="best">--</div><div class="d" id="bestd"></div></div></div><div class="status" id="st">Play the note, breathe, then sing.</div>`,
+        `<div class="panel stack"><span class="eyebrow">Scoring</span><p class="small ink2">Sustain: seconds held. Stability: standard deviation of pitch in cents after the first half second, so the onset does not count against you. Under 10 cents is good, under 6 is professional.</p><button class="btn" id="cue">Play ${noteName(tgt)}</button><button class="btn primary" id="nx" disabled>Lock it in</button></div>`);
+      $('#cue').onclick=()=>playNote(tgt,1.5);
+      const st=sustainTracker(tgt,{onUpdate:(d,w)=>{$('#dur').innerHTML=d.toFixed(1)+'<small>s</small>';$('#wob').textContent='wobble '+(isNaN(w)?'--':w.toFixed(1)+'c');},onEnd:(res)=>{if(!R.sustain||res.duration>R.sustain){R.sustain=res.duration;R.stability=res.stability;$('#best').innerHTML=res.duration.toFixed(1)+'<small>s</small>';$('#bestd').textContent='wobble '+res.stability.toFixed(1)+'c';}$('#nx').disabled=false;$('#st').innerHTML=`Attempt logged: <b>${res.duration.toFixed(1)}s</b>, wobble ${res.stability.toFixed(1)}c. Breathe and go again, or lock it in.`;}});
+      bindNeedle(tgt);listeners.add(st.onPitch);stepStop=st.stop;
+      $('#nx').onclick=next;
+    }
+    else if(s==='Pitch match'){
+      frame(`<h2>Match the note you hear. Eight rounds.</h2><p class="ink2">Each round plays a note in your range for one second. Sing it back on "ah" and hold for two seconds. Do not slide in from below; hear it, then sing it.</p>${needleHTML()}<div class="row"><div class="metric" style="flex:1"><span class="eyebrow">Round</span><div class="v" id="rnd">0<small>/8</small></div><div class="d" id="rndd">Press start</div></div><div class="metric" style="flex:1"><span class="eyebrow">Mean error so far</span><div class="v" id="err">--</div><div class="d">cents, lower is better</div></div></div><div class="reps" id="reps"></div><div class="status" id="st"></div>`,
+        `<div class="panel stack"><span class="eyebrow">Scoring</span><p class="small ink2">Your error is the median distance in cents from the played note during the singing window. A wrong note is capped at 100 cents. Under 10 is excellent, 10 to 20 good, over 35 means the ear is the first job.</p><button class="btn primary" id="start">Start</button><button class="btn" id="nx" disabled>Lock it in</button></div>`);
+      const lo=(R.low||rangeRef.low)+2,hi=(R.high||rangeRef.high)-2;
+      $('#start').onclick=()=>{$('#start').disabled=true;runPitchMatch(8,lo,hi,{onRound:(k,t)=>{$('#rnd').innerHTML=k+'<small>/8</small>';$('#rndd').textContent='Listen, then sing';bindNeedle(t);},onResult:(k,err,missed)=>{const sp=document.createElement('span');sp.className=err<=15?'g':err<=35?'w':'c';sp.textContent=missed?'miss':Math.round(err)+'c';$('#reps').appendChild(sp);},onDone:(res)=>{R.accuracy=res.mean;$('#err').textContent=res.mean.toFixed(1);$('#nx').disabled=false;$('#st').innerHTML=`Mean error <b>${res.mean.toFixed(1)} cents</b>. ${res.mean<=15?'Good ear.':res.mean<=35?'Serviceable. Leaps and the chromatic crawl will tighten it.':'The ear is the first job. Everything else waits on it.'}`;},onErr:(m)=>{$('#err').textContent=m.toFixed(1);}});};
+      $('#nx').onclick=next;
+    }
+    else if(s==='Agility'){
+      const root=Math.round(((R.low||rangeRef.low)+(R.high||rangeRef.high))/2)-4;
+      frame(`<h2>Five-note scale on "mah", three times, at 110 bpm.</h2><p class="ink2">You will hear the pattern once, then click in and sing it with soft guide tones. Three reps from ${noteName(root)}. Aim for the centre of every note, up and down.</p><div class="targets" id="targets"></div>${needleHTML()}<div class="row"><div class="metric" style="flex:1"><span class="eyebrow">On target</span><div class="v" id="ot">--<small>%</small></div><div class="d">frames within 25 cents</div></div><div class="metric" style="flex:1"><span class="eyebrow">Reps</span><div class="reps" id="reps" style="margin-top:8px"></div></div></div><div class="status" id="st"></div>`,
+        `<div class="panel stack"><span class="eyebrow">Scoring</span><p class="small ink2">Percent of your voiced time that sat within 25 cents of the target note, ignoring the first 120 ms of each note. Above 90 is clean, 75 to 90 good, under 60 means slow it down.</p><button class="btn primary" id="start">Start</button><button class="btn" id="nx" disabled>Lock it in</button></div>`);
+      const ex=exById('scale5');
+      $('#start').onclick=()=>{$('#start').disabled=true;const r=patternRunner(ex,{root,tempo:110,ladder:false,maxReps:3,guide:true,onRep:(k,rep)=>{const sp=document.createElement('span');sp.className=rep.onTarget>=75?'g':rep.onTarget>=60?'w':'c';sp.textContent=Math.round(rep.onTarget)+'%';$('#reps').appendChild(sp);$('#ot').innerHTML=Math.round(r.summary().onTarget)+'<small>%</small>';},onDone:(res)=>{R.agility=res.onTarget;$('#ot').innerHTML=Math.round(res.onTarget)+'<small>%</small>';$('#nx').disabled=false;$('#st').innerHTML=`<b>${Math.round(res.onTarget)}% on target.</b> ${res.bias!=null&&Math.abs(res.bias)>=12?(res.bias<0?'You sat flat: under-supported.':'You sat sharp: pushing.'):'No strong flat or sharp bias.'}`;},onStatus:t=>{$('#st').innerHTML=t;}});bindNeedle(null);listeners.add(r.onPitch);stepStop=r.stop;r.start();};
+      $('#nx').onclick=next;
+    }
+    else if(s==='Breath'){
+      frame(`<h2>One breath. One steady "sss". As long as you can.</h2><p class="ink2">Stand tall, breathe low and wide, then hiss at a steady, medium level. The timer runs while the hiss is continuous. Three attempts, best counts.</p><div class="big" id="dur">0.0s</div><canvas class="trace" id="trace" width="600" height="90"></canvas><div class="row"><div class="metric" style="flex:1"><span class="eyebrow">Best</span><div class="v" id="best">--</div></div></div><div class="status" id="st">Breathe, then hiss.</div>`,
+        `<div class="panel stack"><span class="eyebrow">Scoring</span><p class="small ink2">Seconds of continuous hiss above the noise gate. 20 is a fair start, 30 is good, 40 plus is a well-managed breath.</p><button class="btn primary" id="nx" disabled>Lock it in</button></div>`);
+      const h=hissTracker({onUpdate:(d)=>{$('#dur').textContent=d.toFixed(1)+'s';},onEnd:(d)=>{if(!R.breath||d>R.breath){R.breath=d;$('#best').textContent=d.toFixed(1)+'s';}$('#nx').disabled=false;$('#st').innerHTML=`Attempt: <b>${d.toFixed(1)}s</b>. Again, or lock it in.`;},canvas:$('#trace')});
+      listeners.add(h.onPitch);stepStop=h.stop;
+      $('#nx').onclick=next;
+    }
+    else if(s==='Result'){
+      const a={date:Date.now(),low:R.low,high:R.high,accuracy:R.accuracy,stability:R.stability,sustain:R.sustain,agility:R.agility,breath:R.breath,voiceType:S.profile.voiceType};
+      const missing=['low','high','accuracy','stability','sustain','agility','breath'].filter(k=>a[k]==null);
+      if(missing.length){m.innerHTML=`<div class="panel stack"><h2>Assessment incomplete.</h2><p class="ink2">Missing: ${missing.map(k=>metricById(k).label.toLowerCase()).join(', ')}. Nothing was saved. Run it again and lock in every step.</p><button class="btn primary" id="again">Start again</button></div>`;$('#again').onclick=()=>go('assess');return;}
+      S.assessments.push(a);for(const id of ['low','high','accuracy','stability','sustain','agility','breath']){const mt=metricById(id);const b=S.bests[id];if(b==null||(mt.hib?a[id]>b:a[id]<b))S.bests[id]=a[id];}save();
+      const lv=levelOf(a);const prev=S.assessments.length>1?S.assessments[S.assessments.length-2]:null;
+      m.innerHTML=`<div class="grid two"><div class="panel raised stack"><div class="row between"><span class="eyebrow">Scorecard, ${fmtDateY(a.date)}</span><span class="pill accent">${lv.name}</span></div><h1>${noteName(a.low)} to ${noteName(a.high)}, ${a.high-a.low} semitones.</h1><div class="metrics">${['accuracy','stability','sustain','agility','breath'].map(id=>{const mt=metricById(id);let d='';if(prev){const dd=delta(id,prev[id],a[id]);d=`<span class="delta ${dd.flat?'flat':dd.good?'up':'down'}">${dd.d>0?'+':''}${mt.fmt(dd.d)}${mt.unit} vs last</span>`;}return `<div class="metric"><span class="eyebrow">${mt.label}</span><div class="v">${mt.fmt(a[id])}<small>${mt.unit}</small></div><div class="d">${d||mt.desc}</div>${pointsBars(points(id,a[id]))}</div>`;}).join('')}</div>${keyboardSVG({low:a.low,high:a.high})}</div><div class="panel stack"><span class="eyebrow">Coach</span>${coachBubble(coachVerdict(a))}<div class="row"><button class="btn primary" id="home">See today's plan</button><button class="btn" id="prog">Progress</button></div></div></div>`;
+      $('#home').onclick=()=>go('home');$('#prog').onclick=()=>go('progress');
+    }
+  }
+  render();
+};
+
+/* ============================ TRACKERS ============================ */
+function sustainTracker(target,cb){
+  let ref=null,start=0,last=0,cents=[],early=[],levels=[],active=false,stopped=false;
+  function end(){if(!active)return;active=false;const dur=(last-start)/1000;const stable=cents.filter((c,i)=>early[i]>=500);const res={duration:dur,stability:stable.length>5?sd(stable):sd(cents)||0,level:mean(levels)||0,vib:vibrato(cents,early)};if(dur>=1)cb.onEnd(res);cents=[];early=[];levels=[];ref=null;}
+  return{
+    onPitch(l){if(stopped)return;const now=l.t;
+      if(l.voiced){
+        if(!active){active=true;start=now;ref=l.midi;last=now;cents=[];early=[];levels=[];return;}
+        if(now-start<400){ref=(ref*3+l.midi)/4;}
+        const c=(l.midi-ref)*100;
+        if(Math.abs(c)>70){end();return;}
+        last=now;cents.push(c);early.push(now-start);levels.push(l.rms);
+        const stable=cents.filter((x,i)=>early[i]>=500);
+        cb.onUpdate((now-start)/1000,stable.length>5?sd(stable):NaN);
+      }else if(active&&now-last>200){end();}
+    },
+    stop(){stopped=true;end();}
+  };
+}
+function vibrato(cents,times){
+  /* cents: pitch deviation series; times: ms since onset. Detrend with a 500 ms moving average, then count crossings. */
+  const idx=times.map((t,i)=>i).filter(i=>times[i]>=500);if(idx.length<40)return null;
+  const c=idx.map(i=>cents[i]),t=idx.map(i=>times[i]);const n=c.length;
+  const det=new Array(n);for(let i=0;i<n;i++){let s=0,k=0;for(let j=i;j>=0&&t[i]-t[j]<=500;j--){s+=c[j];k++;}for(let j=i+1;j<n&&t[j]-t[i]<=500;j++){s+=c[j];k++;}det[i]=c[i]-s/k;}
+  const sm=det.map((v,i)=>median([det[Math.max(0,i-1)],v,det[Math.min(n-1,i+1)]]));
+  let sign=0;const ups=[];for(let i=0;i<n;i++){const v=sm[i];if(sign<=0&&v>3){if(sign<0)ups.push(t[i]);sign=1;}else if(sign>=0&&v<-3){sign=-1;}}
+  const dur=(t[n-1]-t[0])/1000;if(ups.length<3||dur<1)return{rate:0,extent:Math.sqrt(mean(sm.map(v=>v*v)))*1.414,even:1};
+  const periods=[];for(let i=1;i<ups.length;i++)periods.push(ups[i]-ups[i-1]);
+  const rate=1000/mean(periods);const extent=Math.sqrt(mean(sm.map(v=>v*v)))*1.414;const even=sd(periods)/mean(periods);
+  return{rate,extent,even};
+}
+function hissTracker(cb){
+  let start=0,last=0,active=false,stopped=false,levels=[];const cv=cb.canvas;const ctx=cv?cv.getContext('2d'):null;
+  function draw(){if(!ctx)return;const cs=getComputedStyle(document.documentElement);ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle=cs.getPropertyValue('--accent').trim()||'#B9822F';ctx.lineWidth=2;ctx.beginPath();const n=levels.length;for(let i=0;i<n;i++){const x=i/Math.max(1,n-1)*cv.width;const y=cv.height-Math.min(1,levels[i]*12)*cv.height;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();}
+  function end(){if(!active)return;active=false;const d=(last-start)/1000;if(d>=1)cb.onEnd(d);levels=[];}
+  return{onPitch(l){if(stopped)return;const now=l.t;const on=l.rms>Math.max(0.006,S.settings.gate*0.6);
+      if(on){if(!active){active=true;start=now;levels=[];}last=now;levels.push(l.rms);cb.onUpdate((now-start)/1000);if(levels.length%3===0)draw();}
+      else if(active&&now-last>300)end();},stop(){stopped=true;end();}};
+}
+function runPitchMatch(n,lo,hi,cb){
+  let k=0;const errs=[];let prev=null;
+  function round(){
+    k++;let t;do{t=lo+Math.floor(Math.random()*(hi-lo+1));}while(t===prev);prev=t;
+    cb.onRound(k,t);playNote(t,1.0);
+    const samples=[];let fn;
+    setTimeout(()=>{fn=l=>{if(l.voiced)samples.push((l.midi-t)*100);};listeners.add(fn);
+      setTimeout(()=>{listeners.delete(fn);let err,missed=false;
+        if(samples.length<8){err=100;missed=true;}else{const med=median(samples);err=Math.min(100,Math.abs(med));if(Math.abs(med)>150)missed=true;}
+        errs.push(err);cb.onResult(k,err,missed);cb.onErr(mean(errs));
+        if(k<n)setTimeout(round,700);else cb.onDone({mean:mean(errs),errs});
+      },2500);},1100);
+  }
+  round();
+}
+function patternRunner(ex,o){
+  /* o: root, tempo, ladder(bool), dir, maxReps, guide, range{low,high}, onRep, onDone, onStatus */
+  const beat=60/o.tempo;const pat=ex.pattern;const totalBeats=pat.reduce((a,p)=>a+p[1],0);
+  let root=o.root,rep=0,phase='idle',t0=0,notes=[],frames=[],singFrames=[],reps=[],stopped=false,timers=[];
+  const ctx=ensureCtx();
+  function schedule(fn,ms){timers.push(setTimeout(fn,ms));}
+  function buildNotes(){let b=0;notes=pat.map(p=>{const n={midi:root+p[0],start:b*beat,end:(b+p[1])*beat};b+=p[1];return n;});}
+  function drawTargets(activeIdx,marks){const el=document.getElementById('targets');if(!el)return;const lo=Math.min(...notes.map(n=>n.midi)),hi=Math.max(...notes.map(n=>n.midi));el.innerHTML=notes.map((n,i)=>`<div class="tn ${i===activeIdx?'active':''} ${marks&&marks[i]?marks[i]:''}"><div class="k" style="height:${20+(n.midi-lo)/(Math.max(1,hi-lo))*70}px"></div><span class="l">${noteName(n.midi)}</span></div>`).join('');}
+  function listenPhase(){
+    phase='listen';buildNotes();drawTargets(-1);o.onStatus&&o.onStatus(`Listen. Rep ${rep+1} from <b>${noteName(root)}</b>.`);
+    notes.forEach(n=>playNote(n.midi,ex.staccato?Math.min(0.25,(n.end-n.start)*0.8):(n.end-n.start)*0.95,n.start,0.22));
+    schedule(countIn,(totalBeats*beat)*1000+300);
+  }
+  function countIn(){
+    phase='count';o.onStatus&&o.onStatus('Ready...');
+    for(let i=0;i<4;i++)click(i*beat,i===0);
+    const el=document.getElementById('targets');
+    schedule(singPhase,4*beat*1000);
+  }
+  function singPhase(){
+    phase='sing';t0=performance.now();frames=[];singFrames=[];o.onStatus&&o.onStatus('<b>Sing.</b>');
+    if(o.guide)notes.forEach(n=>playNote(n.midi,ex.staccato?0.2:(n.end-n.start)*0.9,n.start,0.07));
+    let b=0;for(const p of pat){click(b*beat,b===0);b+=p[1];}
+    schedule(endRep,(totalBeats*beat)*1000+150);
+  }
+  function endRep(){
+    phase='idle';
+    const per=notes.map(()=>({on:0,tot:0,errs:[]}));
+    for(const f of frames){const i=f.i;if(i<0)continue;per[i].tot++;per[i].errs.push(f.c);if(Math.abs(f.c)<=25)per[i].on++;}
+    const tot=per.reduce((a,p)=>a+p.tot,0),on=per.reduce((a,p)=>a+p.on,0);
+    const all=frames.filter(f=>f.i>=0).map(f=>f.c);
+    const r={root,onTarget:tot?on/tot*100:0,bias:all.length?Math.round(mean(all)):null,voiced:tot,continuity:singFrames.length?mean(singFrames)*100:0,marks:per.map(p=>p.tot<3?'miss':p.on/p.tot>=0.6?'hit':'miss')};
+    reps.push(r);drawTargets(-1,r.marks);rep++;o.onRep&&o.onRep(rep,r);
+    if(stopped)return;
+    if(o.maxReps&&rep>=o.maxReps){finish();return;}
+    if(o.ladder){
+      const dir=o.dir||ex.dir||1;const nextRoot=root+dir;const top=nextRoot+Math.max(...pat.map(p=>p[0])),bot=nextRoot+Math.min(...pat.map(p=>p[0]));
+      const rg=o.range||rangeNow();
+      if((dir>0&&top>rg.high+1)||(dir<0&&bot<rg.low-1)){finish(true);return;}
+      if(r.voiced<5){o.onStatus&&o.onStatus('No voice detected. Holding this key. Sing louder or check the mic.');}else root=nextRoot;
+    }
+    schedule(listenPhase,900);
+  }
+  function summary(){const done=reps.filter(r=>r.voiced>=5);const res={onTarget:done.length?mean(done.map(r=>r.onTarget)):0,bias:done.length?Math.round(mean(done.map(r=>r.bias||0))):null,continuity:done.length?mean(done.map(r=>r.continuity)):null,reps:reps.length};
+    if(o.ladder&&done.length){const dir=o.dir||ex.dir||1;const roots=done.map(r=>r.root);if(dir>0)res.ceiling=Math.max(...roots)+Math.max(...pat.map(p=>p[0]));else res.floor=Math.min(...roots)+Math.min(...pat.map(p=>p[0]));}
+    return res;}
+  function finish(hitEdge){stop();o.onDone&&o.onDone(Object.assign(summary(),{hitEdge:!!hitEdge}));}
+  function stop(){stopped=true;timers.forEach(clearTimeout);timers=[];phase='idle';}
+  return{
+    start(){stopped=false;listenPhase();},
+    stop,summary,
+    onPitch(l){if(phase!=='sing')return;const el=(performance.now()-t0)/1000;let i=notes.findIndex(n=>el>=n.start&&el<n.end);const active=i;
+      const tg=document.getElementById('targets');if(tg){const kids=tg.children;for(let k=0;k<kids.length;k++)kids[k].classList.toggle('active',k===active);}
+      if(i>=0&&(ex.glide?el-notes[i].start<(notes[i].end-notes[i].start)*0.55:el-notes[i].start<0.12))i=-1;
+      if(active>=0)singFrames.push(l.voiced?1:0);
+      if(l.voiced&&i>=0){const c=(l.midi-notes[i].midi)*100;frames.push({i,c});}
+      const pin=document.getElementById('pin'),bn=document.getElementById('bn'),bs=document.getElementById('bs');
+      if(pin&&active>=0){if(l.voiced){const c=Math.round((l.midi-notes[active].midi)*100);pin.style.left=(50+clamp(c,-50,50))+'%';pin.classList.remove('off');pin.classList.toggle('ok',Math.abs(c)<=25);if(bn){bn.textContent=noteName(l.midi);bs.textContent=fmtCents(c)+' vs '+noteName(notes[active].midi);}}else{pin.classList.add('off');if(bn){bn.textContent='--';bs.textContent='target '+noteName(notes[active].midi);}}}
+    },
+    get root(){return root;}
+  };
+}
+
+/* ---------------------------- TRAIN ---------------------------- */
+PAGES.train=(m,exId)=>{
+  if(exId){return runExercise(m,exById(exId));}
+  const cats=[...new Set(EX.map(e=>e.cat))];
+  const bestFor=e=>{const ss=S.sessions.filter(s=>s.exerciseId===e.id);if(!ss.length)return '';if(e.type==='pattern'){const b=Math.max(...ss.map(s=>s.onTarget||0));const edge=e.dir>0?ss.map(s=>s.ceiling).filter(Boolean):ss.map(s=>s.floor).filter(Boolean);return `best ${Math.round(b)}%${edge.length?' · '+(e.dir>0?'ceiling ':'floor ')+noteName(e.dir>0?Math.max(...edge):Math.min(...edge)):''}`;}if(e.vib){const v=ss.filter(s=>s.vib&&s.vib.rate>=1).map(s=>s.vib);return v.length?`last ${v[v.length-1].rate.toFixed(1)} Hz, ${v[v.length-1].extent.toFixed(0)}c`:'straight tone so far';}if(e.metric==='stability'||e.quiet){const b=Math.min(...ss.map(s=>s.value));return `best ${b.toFixed(1)}c wobble`;}if(e.type==='sustain'||e.type==='hiss'){const b=Math.max(...ss.map(s=>s.value||0));return `best ${b.toFixed(1)}s`;}return `${ss.length} done`;};
+  m.innerHTML=`<div class="row between" style="margin-bottom:14px"><div><h1>Exercises</h1><p class="ink2">Pattern exercises ladder a semitone each rep until they hit your range. Guide tones are ${S.settings.guide?'on':'off'} (Settings). Off is the real test.</p></div></div>`+
+    cats.map(c=>`<div style="margin-bottom:22px"><span class="eyebrow">${c}</span><div class="exlist" style="margin-top:8px">${EX.filter(e=>e.cat===c).map(e=>`<div class="ex" role="button" tabindex="0" data-id="${e.id}"><div class="name">${e.name}</div><div class="desc">${e.desc}</div><div class="meta">${e.type==='pattern'?`<span class="pill">${e.tempo} bpm</span><span class="pill">${e.dir>0?'ladders up':'ladders down'}</span>`:''}${e.metric?`<span class="pill target">${metricById(e.metric).label}</span>`:''}${e.minutes?`<span class="pill">${e.minutes} min</span>`:''}</div><div class="best">${bestFor(e)}</div></div>`).join('')}</div></div>`).join('');
+  m.querySelectorAll('.ex').forEach(el=>{const open=()=>go('train',el.dataset.id);el.onclick=open;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};});
+};
+function runExercise(m,ex){
+  const rg=rangeNow();
+  const needle=`<div class="bignote"><span class="t" id="bn">--</span><span class="s" id="bs"></span></div><div class="needle"><div class="zone"></div><div class="mid"></div><span class="pin off" id="pin"></span><span class="lab" style="left:4px">-50c</span><span class="lab" style="right:4px">+50c</span></div><div style="height:16px"></div>`;
+  const back=`<button class="btn ghost" id="back">← All exercises</button>`;
+  const bindLive=(target)=>listeners.add(l=>{const bn=$('#bn'),bs=$('#bs'),pin=$('#pin');if(!bn)return;if(l.voiced){const c=target!=null?Math.round((l.midi-target)*100):l.cents;bn.textContent=noteName(l.midi);bs.textContent=fmtCents(c)+'  '+l.freq.toFixed(0)+' Hz';pin.style.left=(50+clamp(c,-50,50))+'%';pin.classList.remove('off');pin.classList.toggle('ok',Math.abs(c)<=25);}else{bn.textContent='--';bs.textContent='';pin.classList.add('off');}});
+  function finishPanel(lines,extra){$('#side').innerHTML=`<div class="panel stack"><span class="eyebrow">Coach</span>${coachBubble(lines)}${extra||''}<div class="row"><button class="btn primary" id="again">Again</button><button class="btn" id="home">Today's plan</button></div></div>`;$('#again').onclick=()=>go('train',ex.id);$('#home').onclick=()=>go('home');}
+
+  if(ex.type==='pattern'){
+    const defRoot=ex.dir>0?rg.low+3:rg.high-9;
+    m.innerHTML=`<div class="runner"><div class="stage">${back}<div><span class="eyebrow">${ex.cat}</span><h2>${ex.name}</h2><p class="ink2">${ex.desc}</p></div><div class="targets" id="targets">${previewTargets(ex,defRoot)}</div>${needle}<div class="status" id="st">Set the starting note and tempo, then start. Ladders ${ex.dir>0?'up':'down'} until it reaches your range edge (${noteName(rg.low)} to ${noteName(rg.high)}).</div><div class="reps" id="reps"></div></div>
+    <div class="stack" id="side"><div class="panel stack"><div class="row"><label class="field">Start note<select id="root">${Array.from({length:rg.high-rg.low+1},(_,i)=>rg.low+i).map(v=>`<option value="${v}" ${v===defRoot?'selected':''}>${noteName(v)}</option>`).join('')}</select></label><label class="field">Tempo<input type="number" id="tempo" value="${ex.tempo}" min="50" max="200" step="2" style="width:80px"></label><label class="field">Guide tones<select id="guide"><option value="1" ${S.settings.guide?'selected':''}>On</option><option value="0" ${!S.settings.guide?'selected':''}>Off (harder)</option></select></label></div><div class="row"><button class="btn primary" id="start">Start</button><button class="btn" id="stop" disabled>Stop and score</button></div><p class="note">${ex.coach}</p></div></div></div>`;
+    $('#back').onclick=()=>go('train');$('#root').onchange=()=>{$('#targets').innerHTML=previewTargets(ex,+$('#root').value);};
+    let r=null;
+    $('#start').onclick=async()=>{if(!(await startMic()))return;$('#start').disabled=true;$('#stop').disabled=false;$('#reps').innerHTML='';
+      r=patternRunner(ex,{root:+$('#root').value,tempo:+$('#tempo').value,ladder:true,guide:$('#guide').value==='1',range:rg,
+        onRep:(k,rep)=>{const sp=document.createElement('span');sp.className=rep.voiced<5?'':rep.onTarget>=75?'g':rep.onTarget>=60?'w':'c';sp.textContent=noteName(rep.root)+' '+(rep.voiced<5?'--':Math.round(rep.onTarget)+'%');$('#reps').appendChild(sp);},
+        onStatus:t=>{const s=$('#st');if(s)s.innerHTML=t;},
+        onDone:(res)=>{$('#stop').disabled=true;const guided=$('#guide').value==='1';
+          const rec={exerciseId:ex.id,onTarget:res.onTarget,bias:res.bias,reps:res.reps,guided,continuity:res.continuity};
+          if(ex.metric==='agility'||ex.metric==='accuracy'){rec.metric=ex.metric==='accuracy'?null:'agility';rec.value=res.onTarget;}
+          if(ex.metric==='high'&&res.ceiling){rec.ceiling=res.ceiling;rec.metric='high';rec.value=res.ceiling;}
+          if(ex.metric==='low'&&res.floor){rec.floor=res.floor;rec.metric='low';rec.value=res.floor;}
+          if(res.reps>0)logSession(rec);
+          const lines=coachAfter(ex,res);if(guided&&res.onTarget>=80)lines.push('You scored that with guide tones. Turn them off next time or it does not count as an ear test.');
+          finishPanel(lines,`<dl class="kv"><dt>On target</dt><dd>${Math.round(res.onTarget)}%</dd>${res.continuity!=null&&ex.glide?`<dt>Line held</dt><dd>${Math.round(res.continuity)}%</dd>`:''}<dt>Bias</dt><dd>${res.bias==null?'--':fmtCents(res.bias)}</dd><dt>Reps</dt><dd>${res.reps}</dd>${res.ceiling?`<dt>Ceiling</dt><dd>${noteName(res.ceiling)}</dd>`:''}${res.floor?`<dt>Floor</dt><dd>${noteName(res.floor)}</dd>`:''}</dl>`);}
+      });
+      activeRunner=r;listeners.add(r.onPitch);r.start();};
+    $('#stop').onclick=()=>{if(r){const res=Object.assign(r.summary(),{});r.stop();activeRunner=null;$('#stop').disabled=true;r._done||(function(){const guided=$('#guide').value==='1';const rec={exerciseId:ex.id,onTarget:res.onTarget,bias:res.bias,reps:res.reps,guided};if(ex.metric==='agility'){rec.metric='agility';rec.value=res.onTarget;}if(ex.metric==='high'&&res.ceiling){rec.metric='high';rec.value=res.ceiling;rec.ceiling=res.ceiling;}if(ex.metric==='low'&&res.floor){rec.metric='low';rec.value=res.floor;rec.floor=res.floor;}if(res.reps>0)logSession(rec);const lines=res.reps>0?coachAfter(ex,res):['Stopped before a full rep. Nothing logged.'];finishPanel(lines);})();}};
+  }
+  else if(ex.type==='sustain'){
+    const tgt=Math.round((rg.low+rg.high)/2)-2;
+    m.innerHTML=`<div class="runner"><div class="stage">${back}<div><span class="eyebrow">${ex.cat}</span><h2>${ex.name}</h2><p class="ink2">${ex.desc}${ex.messa?' Swell over about four seconds, hold, then fade over four. The score is the pitch wobble while the volume changes.':''}${ex.vib?' Hold for at least four seconds so the rate can be measured. Do not manufacture it.':''}${ex.quiet?' Aim for a level that would not wake someone in the next room.':''}</p></div>${needle}<div class="row"><div class="metric" style="flex:1"><span class="eyebrow">This attempt</span><div class="v" id="dur">0.0<small>s</small></div><div class="d" id="wob">wobble --</div></div><div class="metric" style="flex:1"><span class="eyebrow">Best this session</span><div class="v" id="best">--</div><div class="d" id="bestd"></div></div></div><canvas class="trace" id="trace" width="600" height="90"></canvas><div class="status" id="st">Pick a note, play it, breathe, sing.</div></div>
+    <div class="stack" id="side"><div class="panel stack"><div class="row"><label class="field">Note<select id="root">${Array.from({length:rg.high-rg.low+1},(_,i)=>rg.low+i).map(v=>`<option value="${v}" ${v===tgt?'selected':''}>${noteName(v)}</option>`).join('')}</select></label><button class="btn" id="cue">Play it</button></div><div class="row"><button class="btn primary" id="start">Start listening</button><button class="btn" id="stop" disabled>Finish</button></div><p class="note">${ex.coach}</p></div></div></div>`;
+    $('#back').onclick=()=>go('train');$('#cue').onclick=()=>playNote(+$('#root').value,1.5);
+    let best=null,tr=null;const cv=$('#trace'),cx=cv.getContext('2d');let pts=[];
+    function draw(){const cs=getComputedStyle(document.documentElement);cx.clearRect(0,0,cv.width,cv.height);cx.strokeStyle=cs.getPropertyValue('--line').trim();cx.beginPath();cx.moveTo(0,45);cx.lineTo(600,45);cx.stroke();cx.strokeStyle=cs.getPropertyValue('--accent').trim();cx.lineWidth=2;cx.beginPath();pts.forEach((c,i)=>{const x=i/Math.max(1,pts.length-1)*600,y=45-clamp(c,-50,50)*0.8;i?cx.lineTo(x,y):cx.moveTo(x,y);});cx.stroke();}
+    $('#start').onclick=async()=>{if(!(await startMic()))return;$('#start').disabled=true;$('#stop').disabled=false;const target=+$('#root').value;pts=[];
+      tr=sustainTracker(target,{onUpdate:(d,w)=>{$('#dur').innerHTML=d.toFixed(1)+'<small>s</small>';$('#wob').textContent='wobble '+(isNaN(w)?'--':w.toFixed(1)+'c');},onEnd:(res)=>{const better=!best||(ex.messa||ex.quiet?res.stability<best.stability:ex.vib?(res.vib&&(!best.vib||res.duration>best.duration)):res.duration>best.duration);if(better){best=res;$('#best').innerHTML=(ex.vib&&res.vib?res.vib.rate.toFixed(1)+'<small>Hz</small>':ex.messa||ex.quiet?res.stability.toFixed(1)+'<small>c</small>':res.duration.toFixed(1)+'<small>s</small>');$('#bestd').textContent=ex.vib&&res.vib?res.vib.extent.toFixed(0)+'c wide, '+res.duration.toFixed(1)+'s':ex.messa||ex.quiet?res.duration.toFixed(1)+'s held':'wobble '+res.stability.toFixed(1)+'c';}$('#st').innerHTML=`Attempt: <b>${res.duration.toFixed(1)}s</b>, wobble ${res.stability.toFixed(1)}c${res.vib&&res.vib.rate>=1?', vibrato '+res.vib.rate.toFixed(1)+' Hz at '+res.vib.extent.toFixed(0)+'c':''}${ex.quiet?', level '+(res.level>0.07?'loud':'quiet'):''}. Breathe. Again, or finish.`;}});
+      listeners.add(tr.onPitch);listeners.add(l=>{if(l.voiced){pts.push((l.midi-target)*100);if(pts.length>300)pts.shift();if(pts.length%2===0)draw();}});bindLive(target);activeRunner=tr;};
+    $('#stop').onclick=()=>{if(tr)tr.stop();activeRunner=null;$('#stop').disabled=true;listeners.clear();
+      if(!best){finishPanel(['No complete attempt. A note needs at least a second on pitch to count.']);return;}
+      const rec={exerciseId:ex.id,metric:ex.vib?null:(ex.messa||ex.quiet)?'stability':'sustain',value:ex.vib?null:(ex.messa||ex.quiet)?best.stability:best.duration,duration:best.duration,stability:best.stability,level:best.level,vib:best.vib};logSession(rec);
+      finishPanel(coachAfter(ex,{duration:ex.vib||ex.quiet?null:best.duration,stability:best.stability,level:best.level,vib:ex.vib?best.vib:null}),`<dl class="kv"><dt>Held</dt><dd>${best.duration.toFixed(1)}s</dd><dt>Wobble</dt><dd>${best.stability.toFixed(1)}c</dd>${best.vib&&ex.vib?`<dt>Vibrato</dt><dd>${best.vib.rate.toFixed(1)} Hz, ${best.vib.extent.toFixed(0)}c</dd>`:''}</dl>`);};
+  }
+  else if(ex.type==='hiss'){
+    m.innerHTML=`<div class="runner"><div class="stage">${back}<div><span class="eyebrow">${ex.cat}</span><h2>${ex.name}</h2><p class="ink2">${ex.desc}</p></div><div class="big" id="dur">0.0s</div><canvas class="trace" id="trace" width="600" height="90"></canvas><div class="row"><div class="metric" style="flex:1"><span class="eyebrow">Best this session</span><div class="v" id="best">--</div></div><div class="metric" style="flex:1"><span class="eyebrow">All-time best</span><div class="v">${S.bests.breath?S.bests.breath.toFixed(1)+'s':'--'}</div></div></div><div class="status" id="st">Breathe low, then hiss.</div></div>
+    <div class="stack" id="side"><div class="panel stack"><div class="row"><button class="btn primary" id="start">Start listening</button><button class="btn" id="stop" disabled>Finish</button></div><p class="note">${ex.coach}</p></div></div></div>`;
+    $('#back').onclick=()=>go('train');let best=0,h=null;
+    $('#start').onclick=async()=>{if(!(await startMic()))return;$('#start').disabled=true;$('#stop').disabled=false;
+      h=hissTracker({onUpdate:d=>{$('#dur').textContent=d.toFixed(1)+'s';},onEnd:d=>{if(d>best){best=d;$('#best').textContent=d.toFixed(1)+'s';}$('#st').innerHTML=`Attempt: <b>${d.toFixed(1)}s</b>. Recover, then again.`;},canvas:$('#trace')});
+      listeners.add(h.onPitch);activeRunner=h;};
+    $('#stop').onclick=()=>{if(h)h.stop();activeRunner=null;$('#stop').disabled=true;listeners.clear();if(!best){finishPanel(['No hiss registered for more than a second. Check the mic level in Settings.']);return;}logSession({exerciseId:ex.id,metric:'breath',value:best,duration:best});finishPanel(coachAfter(ex,{duration:best}));};
+  }
+  else{ /* free timed */
+    const secs=Math.round(ex.minutes*60);
+    m.innerHTML=`<div class="runner"><div class="stage">${back}<div><span class="eyebrow">${ex.cat}</span><h2>${ex.name}</h2><p class="ink2">${ex.desc}</p></div><div class="big" id="clock">${fmtClock(secs)}</div>${needle}<div style="margin-top:6px">${keyboardSVG({low:rg.low,high:rg.high})}</div><div class="status" id="st">Sirens are not scored. The keyboard shows where you are; try to cover the whole amber band.</div></div>
+    <div class="stack" id="side"><div class="panel stack"><div class="row"><button class="btn primary" id="start">Start timer</button><button class="btn" id="stop" disabled>Done</button></div><p class="note">${ex.coach}</p></div></div></div>`;
+    $('#back').onclick=()=>go('train');let left=secs,iv=null,lo=null,hi=null;
+    $('#start').onclick=async()=>{await startMic();$('#start').disabled=true;$('#stop').disabled=false;iv=setInterval(()=>{left--;$('#clock').textContent=fmtClock(left);if(left<=0){clearInterval(iv);$('#stop').click();}},1000);
+      bindLive(null);listeners.add(l=>{if(l.voiced){lo=lo==null?l.midi:Math.min(lo,l.midi);hi=hi==null?l.midi:Math.max(hi,l.midi);}});
+      const kbTick=setInterval(()=>{const kb=m.querySelector('.kb');if(!kb){clearInterval(kbTick);return;}kb.outerHTML=keyboardSVG({low:rg.low,high:rg.high,cur:live.voiced?live.midi:null});},120);
+      activeRunner={stop(){clearInterval(iv);clearInterval(kbTick);}};};
+    $('#stop').onclick=()=>{if(activeRunner)activeRunner.stop();activeRunner=null;$('#stop').disabled=true;listeners.clear();const done=secs-left;logSession({exerciseId:ex.id,duration:done,covered:lo!=null?[Math.round(lo),Math.round(hi)]:null});
+      const lines=[];if(done<secs*0.8)lines.push(brutal()?`You stopped at ${fmtClock(done)} of ${fmtClock(secs)}. Warm-ups are the one thing you cannot shortcut.`:`${fmtClock(done)} of ${fmtClock(secs)}. Next time go the distance.`);else lines.push('Warm-up done.');
+      if(lo!=null)lines.push(`You covered ${noteName(lo)} to ${noteName(hi)}. ${hi-lo<12?'That is less than an octave. Sirens should sweep the whole range.':'Good sweep.'}`);
+      finishPanel(lines);};
+  }
+}
+function previewTargets(ex,root){const ms=ex.pattern.map(p=>root+p[0]);const lo=Math.min(...ms),hi=Math.max(...ms);return ms.map(m=>`<div class="tn"><div class="k" style="height:${20+(m-lo)/(Math.max(1,hi-lo))*70}px"></div><span class="l">${noteName(m)}</span></div>`).join('');}
+const fmtClock=s=>Math.floor(s/60)+':'+String(Math.max(0,s%60)).padStart(2,'0');
+
+/* ---------------------------- PLAY ---------------------------- */
+PAGES.play=(m)=>{
+  const rg=rangeNow();const best=S.bests.hunt||0;
+  m.innerHTML=`<div class="runner"><div class="stage"><div><span class="eyebrow">Game</span><h2>Note Hunt</h2><p class="ink2">Sixty seconds. A target note appears in your range. Hit it and hold within 20 cents for half a second. Faster hits score more. Misses cost nothing but time. Guide tone plays once per target, so you have to hear it and find it.</p></div>
+    <div class="lanes" id="lanes"><div class="tgt" id="tgt"></div><div class="you" id="you"></div></div>
+    <div class="row"><div class="metric" style="flex:1"><span class="eyebrow">Target</span><div class="v" id="tname">--</div><div class="d" id="tdesc"></div></div><div class="metric" style="flex:1"><span class="eyebrow">Score</span><div class="v" id="score">0</div><div class="d" id="hits">0 hits</div></div><div class="metric" style="flex:1"><span class="eyebrow">Time</span><div class="v" id="clock">60</div><div class="d">seconds</div></div></div><div class="status" id="st">Best: ${best} points.</div></div>
+    <div class="stack" id="side"><div class="panel stack"><div class="row"><label class="field">Difficulty<select id="diff"><option value="easy">Easy (±30c, replays note)</option><option value="normal" selected>Normal (±20c)</option><option value="hard">Hard (±12c, no guide tone)</option></select></label></div><button class="btn primary" id="start">Start</button><p class="note">This is the fun one. It is also the sneakiest ear test in the app, so do not skip it.</p></div></div></div>`;
+  $('#start').onclick=async()=>{if(!(await startMic()))return;$('#start').disabled=true;const diff=$('#diff').value;const tol=diff==='easy'?30:diff==='normal'?20:12;const guide=diff!=='hard';
+    const lo=rg.low+1,hi=rg.high-1;let target=null,tStart=0,inStart=0,score=0,hits=0,left=60,prev=null;
+    const yPos=mi=>(1-(mi-lo)/(hi-lo))*100;
+    function newTarget(){do{target=lo+Math.floor(Math.random()*(hi-lo+1));}while(target===prev);prev=target;tStart=performance.now();inStart=0;$('#tgt').style.top=yPos(target)+'%';$('#tname').textContent=noteName(target);$('#tdesc').textContent=freqFromMidi(target).toFixed(0)+' Hz';if(guide)playNote(target,0.7,0,0.2);}
+    const iv=setInterval(()=>{left--;$('#clock').textContent=left;if(left<=0)end();},1000);
+    function end(){clearInterval(iv);listeners.clear();activeRunner=null;const nb=score>best;if(nb)S.bests.hunt=score;logSession({exerciseId:'game:hunt',score,hits,diff});
+      $('#side').innerHTML=`<div class="panel stack"><span class="eyebrow">Coach</span>${coachBubble([`<b>${score} points, ${hits} hits.</b> ${nb?'New best.':'Best stays at '+best+'.'}`,hits>=12?'That is a quick ear. Go up a difficulty.':hits>=6?'Decent. The slow ones were the leaps: you hunted. Hear it first.':'You are searching for notes instead of hearing them. Leaps exercise, daily, then come back.'])}<div class="row"><button class="btn primary" id="again">Again</button><button class="btn" id="home">Today's plan</button></div></div>`;$('#again').onclick=()=>go('play');$('#home').onclick=()=>go('home');}
+    activeRunner={stop(){clearInterval(iv);}};
+    listeners.add(l=>{if(left<=0)return;if(l.voiced){$('#you').style.top=clamp(yPos(l.midi),0,100)+'%';$('#you').style.opacity=1;const c=Math.abs((l.midi-target)*100);
+        if(c<=tol){if(!inStart)inStart=l.t;else if(l.t-inStart>=500){const rt=l.t-tStart;const pts=Math.max(50,Math.round(300-rt/20));score+=pts;hits++;$('#score').textContent=score;$('#hits').textContent=hits+' hits';$('#st').innerHTML=`<b>${noteName(target)}</b> in ${(rt/1000).toFixed(1)}s, +${pts}`;$('#lanes').classList.remove('hit-flash');void $('#lanes').offsetWidth;$('#lanes').classList.add('hit-flash');newTarget();}}
+        else{inStart=0;if(diff==='easy'&&l.t-tStart>4000&&guide){tStart=l.t-2000;playNote(target,0.5,0,0.15);}}
+      }else{$('#you').style.opacity=.3;inStart=0;}});
+    newTarget();};
+};
+
+/* ---------------------------- PROGRESS ---------------------------- */
+PAGES.progress=(m)=>{
+  if(!S.assessments.length){m.innerHTML=`<div class="panel stack"><h2>No baseline yet.</h2><p class="ink2">Progress needs a starting number. Run the assessment first.</p><button class="btn primary" id="a">Run the baseline</button></div>`;$('#a').onclick=()=>go('assess');return;}
+  const first=S.assessments[0];
+  const seriesFor=id=>{const pts=[];for(const a of S.assessments)if(a[id]!=null)pts.push({t:a.date,v:a[id],src:'assessment'});for(const s of S.sessions)if(s.metric===id&&s.value!=null)pts.push({t:s.date,v:s.value,src:s.exerciseId});return pts.sort((a,b)=>a.t-b.t);};
+  const totalMin=Math.round(S.sessions.reduce((a,s)=>a+(s.duration||180),0)/60);
+  m.innerHTML=`<div class="row between" style="margin-bottom:14px"><div><h1>Progress</h1><p class="ink2">Every point is a measurement: assessments and scored exercises. Dashed blue line is your first baseline. Hover a point for the date.</p></div><div class="row"><span class="pill">${S.assessments.length} assessments</span><span class="pill">${S.sessions.length} sessions</span><span class="pill">~${totalMin} min logged</span></div></div>
+  <div class="grid two">${['accuracy','stability','sustain','agility','breath','high','low'].map(id=>{const mt=metricById(id);const ser=seriesFor(id);const cur=lastValue(id),b=bestValue(id);const d=cur?delta(id,first[id],cur.v):null;return `<div class="panel stack"><div class="row between"><div><span class="eyebrow">${mt.label}</span><div class="small muted">${mt.desc}</div></div><div style="text-align:right"><div class="mono" style="font-size:18px">${cur?mt.fmt(cur.v)+mt.unit:'--'}</div>${d?`<span class="delta ${d.flat?'flat':d.good?'up':'down'}">${d.flat?'no change':(d.d>0?'+':'')+(mt.unit===''?d.d+' st':mt.fmt(d.d)+mt.unit)+' vs baseline'}</span>`:''}</div></div>${lineChart('ch_'+id,ser,{unit:mt.unit,fmt:mt.fmt,baseline:first[id],integer:mt.unit===''})}<div class="small muted">Best: ${b?mt.fmt(b.v)+mt.unit+' on '+fmtDateY(b.t):'--'}</div></div>`;}).join('')}</div>
+  <div class="panel" style="margin-top:16px"><span class="eyebrow">Assessments</span><div class="tablewrap" style="margin-top:8px"><table><thead><tr><th>Date</th><th>Level</th><th>Range</th><th>Accuracy</th><th>Stability</th><th>Sustain</th><th>Agility</th><th>Breath</th></tr></thead><tbody>${S.assessments.slice().reverse().map(a=>`<tr><td>${fmtDateY(a.date)}</td><td>${levelOf(a).name}</td><td class="mono">${noteName(a.low)} to ${noteName(a.high)} (${a.high-a.low})</td><td class="mono">${a.accuracy.toFixed(1)}c</td><td class="mono">${a.stability.toFixed(1)}c</td><td class="mono">${a.sustain.toFixed(1)}s</td><td class="mono">${Math.round(a.agility)}%</td><td class="mono">${a.breath.toFixed(1)}s</td></tr>`).join('')}</tbody></table></div></div>
+  <div class="panel" style="margin-top:16px"><span class="eyebrow">Recent sessions</span><div class="tablewrap" style="margin-top:8px"><table><thead><tr><th>Date</th><th>Exercise</th><th>Result</th><th>Notes</th></tr></thead><tbody>${S.sessions.slice(-25).reverse().map(s=>{const ex=s.exerciseId==='game:hunt'?{name:'Note Hunt'}:exById(s.exerciseId)||{name:s.exerciseId};let r='',n='';if(s.onTarget!=null){r=Math.round(s.onTarget)+'% on target';n=(s.guided?'guided':'unguided')+(s.bias!=null?', bias '+fmtCents(s.bias):'')+(s.ceiling?', ceiling '+noteName(s.ceiling):'')+(s.floor?', floor '+noteName(s.floor):'');}else if(s.score!=null){r=s.score+' pts';n=s.hits+' hits, '+s.diff;}else if(s.vib!==undefined&&s.metric==null&&s.stability!=null){r=s.vib&&s.vib.rate>=1?s.vib.rate.toFixed(1)+' Hz, '+s.vib.extent.toFixed(0)+'c wide':'straight tone';n=s.duration.toFixed(1)+'s held, wobble '+s.stability.toFixed(1)+'c';}else if(s.metric==='stability'){r=s.value.toFixed(1)+'c wobble';n=s.duration.toFixed(1)+'s held';}else if(s.value!=null){r=s.value.toFixed(1)+'s';}else if(s.duration!=null){r=fmtClock(Math.round(s.duration));n=s.covered?'covered '+noteName(s.covered[0])+' to '+noteName(s.covered[1]):'';}return `<tr><td>${fmtDateY(s.date)}</td><td>${ex.name}</td><td class="mono">${r}</td><td class="small muted">${n}</td></tr>`;}).join('')||'<tr><td colspan="4" class="muted">No sessions yet.</td></tr>'}</tbody></table></div></div>`;
+};
+
+/* ---------------------------- SETTINGS ---------------------------- */
+PAGES.settings=(m)=>{
+  m.innerHTML=`<div class="grid two"><div class="panel stack"><h2>Profile</h2>
+    <label class="field">Name<input type="text" id="name" value="${esc(S.profile.name)}" placeholder="What the coach calls you"></label>
+    <label class="field">Voice type<select id="vt"><option value="baritone" ${S.profile.voiceType==='baritone'?'selected':''}>Baritone (A2 to A4 reference)</option><option value="bass" ${S.profile.voiceType==='bass'?'selected':''}>Bass (E2 to E4 reference)</option></select></label>
+    <p class="small ink2">Not sure? Run the assessment as baritone. If your clean floor is at or below F2 and the top struggles past E4, switch to bass. The reference band and passaggio markers change with this.</p>
+    <label class="field">Coach intensity<select id="int"><option value="firm" ${S.settings.intensity==='firm'?'selected':''}>Firm</option><option value="brutal" ${S.settings.intensity==='brutal'?'selected':''}>Brutal</option></select></label>
+    <label class="field">Guide tones in exercises by default<select id="guide"><option value="1" ${S.settings.guide?'selected':''}>On</option><option value="0" ${!S.settings.guide?'selected':''}>Off</option></select></label>
+    <div class="row"><label class="field">A4 tuning (Hz)<input type="number" id="a4" value="${S.settings.a4}" min="415" max="466" style="width:90px"></label><label class="field">Mic gate (0.005 quiet room, 0.03 noisy)<input type="number" id="gate" value="${S.settings.gate}" min="0.002" max="0.1" step="0.002" style="width:110px"></label></div>
+    <label class="field">Theme<select id="theme"><option value="system" ${S.settings.theme==='system'?'selected':''}>System</option><option value="light" ${S.settings.theme==='light'?'selected':''}>Light</option><option value="dark" ${S.settings.theme==='dark'?'selected':''}>Dark</option></select></label>
+    <button class="btn primary" id="saveBtn">Save</button></div>
+  <div class="stack"><div class="panel stack"><h2>Your data</h2><p class="small ink2">Everything lives in this browser's storage. Copy the export somewhere safe (a note, a file) to move it to another device or keep it after clearing the browser.</p><div class="row"><button class="btn" id="exp">Copy export</button><button class="btn" id="imp">Import from text below</button></div><textarea id="io" placeholder="Paste an export here to import"></textarea></div>
+  <div class="panel stack"><h2>How the numbers work</h2><div class="tablewrap"><table><thead><tr><th>Metric</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead><tbody>
+  <tr><td>Accuracy (mean cents)</td><td>≤40</td><td>≤25</td><td>≤15</td><td>≤8</td></tr><tr><td>Stability (cents SD)</td><td>≤25</td><td>≤16</td><td>≤10</td><td>≤6</td></tr><tr><td>Sustain (s)</td><td>≥8</td><td>≥12</td><td>≥18</td><td>≥25</td></tr><tr><td>Agility (% on target)</td><td>≥40</td><td>≥60</td><td>≥75</td><td>≥90</td></tr><tr><td>Breath (s)</td><td>≥12</td><td>≥20</td><td>≥30</td><td>≥40</td></tr><tr><td>Floor vs reference</td><td>at</td><td>2 st below</td><td>4 below</td><td>6 below</td></tr><tr><td>Ceiling vs reference</td><td>at</td><td>2 st above</td><td>4 above</td><td>6 above</td></tr></tbody></table></div><p class="small muted">Level is the average: Foundation under 1.5, Developing to 2.5, Solid to 3.4, Advanced above. The detector uses a normalised autocorrelation with a clarity threshold of 0.88, so breathy or cracked notes are ignored rather than mis-scored.</p></div>
+  <div class="panel stack"><h2>Danger</h2><button class="btn danger" id="reset">Delete all data</button></div></div></div>`;
+  $('#saveBtn').onclick=()=>{S.profile.name=$('#name').value.trim();S.profile.voiceType=$('#vt').value;S.settings.intensity=$('#int').value;S.settings.guide=$('#guide').value==='1';S.settings.a4=clamp(+$('#a4').value||440,415,466);S.settings.gate=clamp(+$('#gate').value||0.012,0.002,0.1);S.settings.theme=$('#theme').value;applyTheme();save();toast('Saved');};
+  $('#exp').onclick=async()=>{const txt=JSON.stringify(S);$('#io').value=txt;try{await navigator.clipboard.writeText(txt);toast('Export copied to clipboard');}catch(e){$('#io').select();toast('Select the text and copy it');}};
+  $('#imp').onclick=()=>{try{const s=JSON.parse($('#io').value);if(!s.assessments||!s.sessions)throw new Error('not an export');S=Object.assign(defaultState(),s);save();toast('Imported');go('home');}catch(e){toast('That is not a valid export',true);}};
+  $('#reset').onclick=()=>{if(confirm('Delete every assessment and session? This cannot be undone.')){S=defaultState();save();go('home');}};
+};
+function applyTheme(){const t=S.settings.theme;if(t==='system')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t);}
+
+applyTheme();go('home');
+</script>
