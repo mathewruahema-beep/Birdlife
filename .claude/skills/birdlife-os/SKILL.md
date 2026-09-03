@@ -33,7 +33,9 @@ https://claude.ai/code/artifact/2a9b7e57-dbc5-49e3-a4d7-c0a36bd236b2
 Source of truth: `os/claude-os-overview.html` in this repo. Stark HUD single-look
 design (dark, cyan/gold, explicit colours). Tabs: Command (default, the full
 picture: operations, project rollup, decisions, patterns), Today, Projects
-(Asana board by section), The system, Schedule, Registers, Rules.
+(Asana board by section), Money (money in/out and the reconciliation bridges),
+Security (posture, admins, deadlines — CONFIDENTIAL), The system, Schedule,
+Registers, Rules.
 
 ### Updating it
 1. Edit `os/claude-os-overview.html`, then republish with the Artifact tool
@@ -45,6 +47,8 @@ picture: operations, project rollup, decisions, patterns), Today, Projects
    - "Asana": search_tasks, add_comment, update_tasks
    - "Microsoft 365": outlook_email_search, chat_message_search,
      teams_list_chats, outlook_create_reply_draft
+   - "Stripe": stripe_api_read (READ ONLY — never declare stripe_api_write)
+   - "NetSuite": ns_runCustomSuiteQL
 2. Connector names are DISPLAY NAMES with spaces ("Salesforce Production", not
    "Salesforce-Production"; the hyphenated forms in routine mcp_connections are
    not what the mcp capability wants). A wrong name shows as "Add <name> in
@@ -69,6 +73,13 @@ picture: operations, project rollup, decisions, patterns), Today, Projects
   relationship fields nested (r.Owner.Name).
 - Asana `update_tasks` reports per-task `succeeded`/`failed`; check `failed`
   before claiming success. Section move = add_projects {project_id, section_id}.
+- Stripe `stripe_api_read` GetBalance returns amounts in CENTS:
+  `{available:[{amount,currency}], pending:[...]}` — divide by 100. Pass
+  `stripe_context` = the account id and `livemode: true`. There are FIVE
+  livemode accounts (see birdlife-stripe skill for the list); balance shape
+  observed on eCommerce and assumed identical on the other four.
+- NetSuite `ns_runCustomSuiteQL` returns `{data:[...], totalResults,
+  numberOfPages}`. Always filter subsidiary id 2; never create saved searches.
 
 ### The action contract (what Jarvis on the page may do)
 Reads: live snapshot, single SOQL SELECT (always LIMIT, Cases always scoped
@@ -83,6 +94,36 @@ assignment outside the team, Entra/M365 admin, Salesforce config. Decide-as-
 Mathew mode states the call (money first, efficiencies second, then risk), the
 reason, reversibility, then executes via the card; a cancelled card is an
 overrule.
+
+### Money tab and money_snapshot
+The Money tab is a LENS, not a ledger: Stripe, Salesforce and NetSuite rarely
+agree, and the gap between them IS the finding. It shows won opportunities and
+paid payments (last 7 days, Salesforce), live balances summed across all five
+Stripe livemode accounts, and the three broken bridges as standing facts: the
+SF→NetSuite manual monthly CSV, the unreconciled income backlog, and the two
+stale bank reconciliations. Jarvis has a `money_snapshot` tool that returns the
+live numbers plus those doctrine facts. Rules: stripe_api_read only, NEVER
+stripe_api_write on or from the page (livemode = real donor money); never
+assert a refund is reflected in Salesforce without verifying; number-field
+filters use `!= null AND != 0`, never bare `!= null`.
+
+### Security tab and security_snapshot
+CONFIDENTIAL content: admin names, deadline dates, gaps. Never paste it into
+tickets, chat or documents. Shows sysadmin list with last logins (birdbot
+service accounts flagged), inactive-admin and stale-user counts from live SF
+User queries, and the deadline board with days remaining. Jarvis has a
+`security_snapshot` tool; posture beyond Salesforce (Entra, CA, Intune) is not
+readable from the page and the snapshot says so instead of guessing. The deep
+dive stays in the weekly Security dashboard artifact (linked from the tab).
+
+### Reports (the console writes them, sessions polish them)
+Jarvis on the page writes reports from live snapshots on request. Library:
+"weekly ICT status", "money state", "security posture", "exec brief". Rules
+baked into the page instructions: pull fresh snapshots first, every action
+line carries an owner and a date, Mathew's email voice, one page unless asked.
+For a polished document (docx, board paper), the page report is the draft; a
+repo session with the document skills produces the file. Register C in
+`os/registers.md` tracks any recurring report as a routine like any other job.
 
 ### Console failure modes
 - Tile says "Add/Reconnect <connector>": connector name mismatch or lapsed
@@ -100,6 +141,11 @@ overrule.
   Department suite and Ops/Monitoring dashboards KEPT (console does not cover
   their content or their team audience); the retire-or-share decision is open
   in the registers.
+- 3 Sep 2026 (later): console gained Money and Security tabs, money_snapshot
+  and security_snapshot Jarvis tools, and the report library; capability
+  surface extended with Stripe (stripe_api_read) and NetSuite
+  (ns_runCustomSuiteQL). Five livemode Stripe accounts confirmed (the skill
+  previously knew one).
 
 ## The weekly audit
 

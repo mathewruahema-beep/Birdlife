@@ -275,6 +275,8 @@ footer .mono{font-size:11.5px}
   <button role="tab" data-view="command" aria-selected="true">Command</button>
   <button role="tab" data-view="today" aria-selected="false">Today</button>
   <button role="tab" data-view="board" aria-selected="false">Projects</button>
+  <button role="tab" data-view="money" aria-selected="false">Money</button>
+  <button role="tab" data-view="security" aria-selected="false">Security</button>
   <button role="tab" data-view="system" aria-selected="false">The system</button>
   <button role="tab" data-view="schedule" aria-selected="false">Schedule</button>
   <button role="tab" data-view="registers" aria-selected="false">Registers</button>
@@ -326,6 +328,28 @@ footer .mono{font-size:11.5px}
   <h2 class="vt">IT Operations Project Plan</h2>
   <p class="lede">The live board by section, through your Asana connector. Tap a task to load Jarvis; comment, complete and move run through the same Approve cards.</p>
   <div id="boardhost"><div class="degraded">Board loads inside the Claude viewer with the Asana connector allowed.</div></div>
+</div>
+
+<!-- ============ MONEY ============ -->
+<div class="view" id="view-money" hidden>
+  <div class="todaybar">
+    <h2 class="vt" style="margin:0">Money: the state of the data</h2>
+    <span class="asof" id="money-asof"></span>
+    <button class="refresh" id="money-refresh" hidden>Refresh</button>
+  </div>
+  <p class="lede">Money in and out across the estate, and, just as important, whether the systems agree. Stripe, Salesforce and NetSuite rarely match; the gap between them is the actual finding. Figures load on demand through your connectors.</p>
+  <div id="money-host"><div class="degraded"><b>Loads inside the Claude viewer.</b> Open the tab there and allow the Stripe and NetSuite connectors alongside the existing three.</div></div>
+</div>
+
+<!-- ============ SECURITY ============ -->
+<div class="view" id="view-security" hidden>
+  <div class="todaybar">
+    <h2 class="vt" style="margin:0">Security footprint</h2>
+    <span class="asof" id="sec-asof"></span>
+    <button class="refresh" id="sec-refresh" hidden>Refresh</button>
+  </div>
+  <p class="lede">The live posture where this page can truly see it (Salesforce), the hard deadlines counted from today, and an honest list of what is not readable from here. The full confidential read stays on the weekly Security dashboard.</p>
+  <div id="sec-host"><div class="degraded"><b>Loads inside the Claude viewer</b> with the Salesforce Production connector allowed.</div></div>
 </div>
 
 <!-- ============ SYSTEM ============ -->
@@ -585,13 +609,15 @@ function jAsk(q){ if(JarvisBus.ask) JarvisBus.ask(q); else if(JarvisBus.prefill)
 function jPre(q){ if(JarvisBus.prefill) JarvisBus.prefill(q); }
 
 // ---------- tabs ----------
-const VIEWS=["command","today","board","system","schedule","registers","rules"];
+const VIEWS=["command","today","board","money","security","system","schedule","registers","rules"];
 const tabs=[...document.querySelectorAll('nav.tabs button')];
 function showView(v){
   if(!VIEWS.includes(v)) return;
   tabs.forEach(b=>b.setAttribute('aria-selected', String(b.dataset.view===v)));
   VIEWS.forEach(id=>{$("#view-"+id).hidden = id!==v;});
   remember("tab",v);
+  if(v==="money" && typeof loadMoney==="function") loadMoney(false);
+  if(v==="security" && typeof loadSecurity==="function") loadSecurity(false);
 }
 tabs.forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 
@@ -1122,6 +1148,177 @@ renderCommand();
     .catch(()=>{});
 })();
 
+// ================= MONEY =================
+const STRIPE_SERVER="Stripe", NS_SERVER="NetSuite";
+const STRIPE_ACCOUNTS=[ // all livemode, observed 3 Sep 2026
+ {ctx:"acct_1PaqQkEdZ08H7Yxq",name:"eCommerce"},
+ {ctx:"acct_1DE94cH9l9pxYNgx",name:"Memberships"},
+ {ctx:"acct_1DffVqH1WeNbvypj",name:"Ausbirdfund"},
+ {ctx:"acct_1OKucyFMYRhNDz9n",name:"BLP"},
+ {ctx:"acct_1NfHuCCj2I4WmWMH",name:"eStore/AOC"}];
+let moneyState=null, moneyLoading=false, secState=null, secLoading=false;
+const aud=v=>"$"+(Math.round(v)).toLocaleString("en-AU");
+function moneyRow(icon,title,detail,ask,cls){
+  const row=el("div","trow actionable",`<div class="t1">${icon} ${esc(title)}</div><div class="t2">${detail}</div>`);
+  if(ask) row.addEventListener("click",()=>jPre(ask));
+  if(cls) row.querySelector(".t1").style.color="var(--"+cls+")";
+  return row;
+}
+async function loadMoney(force){
+  const host=$("#money-host");
+  if(!mcpNS){ return; }
+  if(moneyLoading || (moneyState && !force)) { if(moneyState) renderMoney(); return; }
+  moneyLoading=true;
+  host.innerHTML='<div class="degraded">Reading Stripe, Salesforce and NetSuite...</div>';
+  const M={at:Date.now(), stripe:[], stripeErr:null, sf:{}, sfErr:null, ns:{ok:false,err:null}};
+  const cacheOpt={cache:{staleTime:240000, gcTime:900000}};
+  if(force) cacheOpt.cache.refresh=true;
+  // Salesforce: two lenses on money in, 7 days
+  try{
+    const q1=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) n, SUM(Amount) amt FROM Opportunity WHERE IsWon = true AND CloseDate = LAST_N_DAYS:7"},cacheOpt);
+    const q2=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) n, SUM(npe01__Payment_Amount__c) amt FROM npe01__OppPayment__c WHERE npe01__Paid__c = true AND npe01__Payment_Date__c = LAST_N_DAYS:7"},cacheOpt);
+    const q3=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) c FROM stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1"},cacheOpt);
+    const r1=(q1.payload&&q1.payload.records&&q1.payload.records[0])||{}, r2=(q2.payload&&q2.payload.records&&q2.payload.records[0])||{}, r3=(q3.payload&&q3.payload.records&&q3.payload.records[0])||{};
+    M.sf={oppN:r1.n||0, oppAmt:r1.amt||0, payN:r2.n||0, payAmt:r2.amt||0, syncErr:r3.c};
+  }catch(e){ M.sfErr=mcpErrCopy(e,SF_SERVER); }
+  // Stripe: balances across all five livemode accounts (amounts arrive in cents)
+  for(const a of STRIPE_ACCOUNTS){
+    try{
+      const r=await mcpNS.callTool(STRIPE_SERVER,"stripe_api_read",
+        {stripe_api_operation_id:"GetBalance",parameters:{},stripe_context:a.ctx,livemode:true},cacheOpt);
+      const p=r.payload||{};
+      const sum=arr=>((arr||[]).reduce((t,x)=>t+(x.amount||0),0))/100;
+      M.stripe.push({name:a.name, available:sum(p.available), pending:sum(p.pending)});
+    }catch(e){ M.stripe.push({name:a.name, err:mcpErrCopy(e,STRIPE_SERVER)}); if(!M.stripeErr) M.stripeErr=e.code; }
+  }
+  // NetSuite: connectivity (truth for money OUT lives here but arrives by manual CSV)
+  try{
+    const r=await mcpNS.callTool(NS_SERVER,"ns_runCustomSuiteQL",{sqlQuery:"SELECT id, name FROM subsidiary"},cacheOpt);
+    M.ns.ok=!!(r.payload&&r.payload.data&&r.payload.data.length);
+  }catch(e){ M.ns.err=mcpErrCopy(e,NS_SERVER); }
+  moneyState=M; moneyLoading=false; renderMoney();
+}
+function renderMoney(){
+  const host=$("#money-host"), M=moneyState; if(!M) return;
+  $("#money-refresh").hidden=false;
+  $("#money-asof").textContent="as at "+new Date(M.at).toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"});
+  host.innerHTML="";
+  const tiles=el("div","tiles");
+  const tile=(v,l,cls)=>tiles.append(el("div","tile"+(cls?" "+cls:""),`<div class="v">${v}</div><div class="l">${esc(l)}</div>`));
+  if(M.sf.oppAmt!=null){ tile(aud(M.sf.oppAmt),"won opps, 7 days","ok"); tile(aud(M.sf.payAmt),"payments paid, 7 days","ok");
+    const gap=Math.abs((M.sf.oppAmt||0)-(M.sf.payAmt||0)); tile(aud(gap),"lens gap (the finding)",gap>50000?"warn":""); }
+  const stTotal=M.stripe.reduce((t,s)=>t+(s.pending||0)+(s.available||0),0);
+  tile(aud(stTotal),"in Stripe, all 5 accounts",stTotal>20000?"warn":"");
+  tile(M.sf.syncErr!=null?M.sf.syncErr:"?","Stripe→SF sync errors, 24h",M.sf.syncErr>0?"crit":"ok");
+  host.append(tiles);
+  const list=el("div","tlist",'<h3>Money in</h3>');
+  list.append(moneyRow("💰","Salesforce, two lenses on the last 7 days",
+    esc(aud(M.sf.oppAmt||0))+" across "+(M.sf.oppN||0)+" won opportunities vs "+esc(aud(M.sf.payAmt||0))+" across "+(M.sf.payN||0)+" paid payments. These are different date bases and will not match; a widening gap is the signal.",
+    "Explain the gap between won opportunities and paid payments this week, using the money snapshot. Which lens should I quote and why?"));
+  M.stripe.forEach(s=>{
+    list.append(moneyRow("🏦","Stripe "+s.name, s.err?esc(s.err):("available "+esc(aud(s.available))+" · pending "+esc(aud(s.pending))+" (livemode)"),
+      "In the Stripe "+s.name+" account, is the pending balance normal, and when does it pay out?"));
+  });
+  host.append(list);
+  const flows=el("div","tlist",'<h3>The bridges, where money data breaks</h3>');
+  flows.append(moneyRow("🔗","WooCommerce → Stripe → Salesforce",
+    (M.sf.syncErr>0?("<b>"+M.sf.syncErr+" sync errors in the last day.</b> "):"No sync errors in the last day. ")+"Known: SyncConnectedAccountsQueueable has been failing on an expired Stripe key since 12 Aug (rotation pending).",
+    "What is the state of the WooCommerce to Salesforce money sync, and what would clear the expired Stripe key issue for good?", M.sf.syncErr>0?"crit":null));
+  flows.append(moneyRow("📤","Salesforce → NetSuite: a MANUAL monthly CSV",
+    (M.ns.ok?"NetSuite answers live. ":"NetSuite: "+esc(M.ns.err||"not reachable")+". ")+"There is no integration; the bridge is a person exporting a CSV monthly. Unreconciled income was $671K and growing ~$87K/day at last measure, and the exception report Zap (371228125) sits in DRAFT.",
+    "Lay out the plan to fix the Salesforce to NetSuite money bridge: publish the exception report Zap, then what? Passports and owners."));
+  flows.append(moneyRow("🏛️","Bank reconciliation backlog",
+    "NAT Operations (11104): 378 unmatched. NAT ABF Donations (11103): 120 unmatched. Both last reconciled 31 March 2022. A standing control risk and a hard precondition of any Business Central move.",
+    "Draft the register-C email to Finance about the 11104 and 11103 bank reconciliation backlog: the risk, the ask, a named owner and a date.", "warn"));
+  host.append(flows);
+  const out=el("div","tlist",'<h3>Money out</h3>');
+  out.append(moneyRow("↩️","Refunds: the traceability gap",
+    "A Stripe refund is not reliably reflected in Salesforce; never assert one is without verifying. The daily refund fix watch routine monitors the blast radius.",
+    "Check the refund picture: query Stripe for refunds in the last 7 days on the eCommerce account and tell me whether Salesforce agrees."));
+  out.append(moneyRow("🧾","Payables and payroll live in NetSuite",
+    "AP (21101-21117 by branch), payroll via Infinet Cloud/ZonePayroll. Not wired into this page; ask for a session when you need the AP view.",
+    "What would it take to add an accounts-payable view to this console from NetSuite, and is it worth it?"));
+  host.append(out);
+  host.append(el("p","schednote","Scope: Stripe balances are live across all five livemode accounts; Salesforce figures are org-wide money objects (not Zeus-scoped, money is not the helpdesk); NetSuite is a connectivity check because its money truth arrives by manual CSV. Three systems, three answers; quote the lens, not just the number."));
+}
+$("#money-refresh")&&$("#money-refresh").addEventListener("click",()=>loadMoney(true));
+
+// ================= SECURITY =================
+const DEADLINES=[
+ ["Vevox SAML certificate","2026-09-08"],
+ ["Tenant MFA Conditional Access target","2026-09-15"],
+ ["NetSuite OAuth2 certificate (orphaned credential)","2026-09-17"],
+ ["Enterprise app access review","2026-09-19"],
+ ["Salesforce Transaction Security Policies (overdue since 13 Jul)","2026-07-13"],
+ ["entra-admin-mcp certificate","2027-08-26"]];
+async function loadSecurity(force){
+  const host=$("#sec-host");
+  if(!mcpNS) return;
+  if(secLoading || (secState && !force)){ if(secState) renderSecurity(); return; }
+  secLoading=true;
+  host.innerHTML='<div class="degraded">Reading the Salesforce posture...</div>';
+  const S={at:Date.now(), err:null};
+  const cacheOpt={cache:{staleTime:240000, gcTime:900000}}; if(force) cacheOpt.cache.refresh=true;
+  try{
+    const admins=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT Name, Username, LastLoginDate FROM User WHERE IsActive = true AND Profile.Name = 'System Administrator' ORDER BY LastLoginDate DESC NULLS LAST LIMIT 50"},cacheOpt);
+    const inact=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) c FROM User WHERE IsActive = false AND Profile.Name = 'System Administrator'"},cacheOpt);
+    const users=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) c FROM User WHERE IsActive = true AND UserType = 'Standard'"},cacheOpt);
+    const stale=await mcpNS.callTool(SF_SERVER,"soqlQuery",{q:"SELECT COUNT(Id) c FROM User WHERE IsActive = true AND UserType = 'Standard' AND LastLoginDate < LAST_N_DAYS:30"},cacheOpt);
+    S.admins=(admins.payload&&admins.payload.records)||[];
+    S.inactiveAdmins=(inact.payload.records[0]||{}).c;
+    S.activeUsers=(users.payload.records[0]||{}).c;
+    S.staleUsers=(stale.payload.records[0]||{}).c;
+  }catch(e){ S.err=mcpErrCopy(e,SF_SERVER); }
+  secState=S; secLoading=false; renderSecurity();
+}
+function renderSecurity(){
+  const host=$("#sec-host"), S=secState; if(!S) return;
+  $("#sec-refresh").hidden=false;
+  $("#sec-asof").textContent="as at "+new Date(S.at).toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"});
+  host.innerHTML="";
+  if(S.err){ host.append(el("div","degraded",esc(S.err))); return; }
+  const bots=S.admins.filter(a=>/birdbot/i.test(a.Username||""));
+  const ratio=S.activeUsers?Math.round(1000*S.admins.length/S.activeUsers)/10:null;
+  const tiles=el("div","tiles");
+  const tile=(v,l,cls)=>tiles.append(el("div","tile"+(cls?" "+cls:""),`<div class="v">${v}</div><div class="l">${esc(l)}</div>`));
+  tile(S.admins.length,"active sysadmins",(ratio&&ratio>5)?"warn":"");
+  tile(ratio!=null?ratio+"%":"?","admin ratio (target ≤5%)",(ratio&&ratio>5)?"crit":"ok");
+  tile(bots.length,"bot accounts holding sysadmin",bots.length?"warn":"ok");
+  tile(S.inactiveAdmins,"inactive admin records",S.inactiveAdmins>0?"warn":"ok");
+  tile(S.staleUsers,"active users quiet 30+ days",S.staleUsers>10?"warn":"");
+  host.append(tiles);
+  const adminsList=el("div","tlist",'<h3>Who holds System Administrator (Salesforce, live)</h3>');
+  S.admins.slice(0,12).forEach(a=>{
+    const days=a.LastLoginDate?Math.floor((Date.now()-new Date(a.LastLoginDate))/864e5):null;
+    adminsList.append(moneyRow(/birdbot/i.test(a.Username||"")?"🤖":"👤",a.Name,
+      esc(a.Username||"")+" · "+(days==null?"NEVER logged in":days===0?"logged in today":"last login "+days+"d ago"),
+      "Review the Salesforce admin account "+ (a.Username||a.Name) +": does it still need System Administrator, and what would least-privilege look like?",
+      days==null||days>60?"warn":null));
+  });
+  host.append(adminsList);
+  const dl=el("div","tlist",'<h3>Hard deadlines, counted from today</h3>');
+  const today=melbTodayISO();
+  DEADLINES.slice().sort((a,b)=>a[1].localeCompare(b[1])).forEach(([name,date])=>{
+    const days=Math.round((new Date(date)-new Date(today))/864e5);
+    const state=days<0?Math.abs(days)+" days OVERDUE":days===0?"TODAY":"in "+days+" days";
+    dl.append(moneyRow(days<0?"🔴":days<15?"🟠":"🟢",name,date+" · "+state,
+      "On the deadline \""+name+"\" ("+date+"): what exactly has to happen, who owns it, and draft the nudge.",
+      days<0?"crit":days<15?"warn":null));
+  });
+  host.append(dl);
+  const hon=el("div","tlist",'<h3>Not readable from this page (honesty list)</h3>');
+  hon.append(el("div","trow",'<div class="t2">Microsoft Secure Score, Entra MFA and Conditional Access state, Intune/BitLocker, Defender, WordPress 2FA, AWS root MFA, Google 2SV. These live on the weekly confidential Security dashboard (Sundays 7am) and in admin portals. Credential watchlist: the WooCommerce key rotation from August remains unverified.</div>'));
+  const link=el("div","rowacts");
+  const b=el("button",null,"open the confidential security dashboard");
+  b.addEventListener("click",()=>window.open("https://claude.ai/code/artifact/ff6c82e3-38d4-41de-b872-606521972498","_blank","noopener"));
+  const b2=el("button",null,"ask jarvis for the posture read");
+  b2.addEventListener("click",()=>jAsk("Give me the security footprint: the live Salesforce posture, the nearest deadlines, and the two things you would fix first. Use the security snapshot."));
+  link.append(b,b2); hon.append(link);
+  host.append(hon);
+  host.append(el("p","schednote","Confidential by nature: keep this tab's detail off screenshots and out of shared docs. The Salesforce numbers are live; everything else is baseline knowledge with its evidence dated."));
+}
+$("#sec-refresh")&&$("#sec-refresh").addEventListener("click",()=>loadSecurity(true));
+
 // ================= JARVIS =================
 let updateTicker=()=>{};
 (async function(){
@@ -1175,6 +1372,9 @@ let updateTicker=()=>{};
     "DECIDE AS MATHEW: when he asks you to decide, or what he would do, make the call the way he would: apply the weighting above plus the OS rules (propose then write, one job per outcome, no bulk, evidence over assumption). State the decision in one line, the single reason, and whether it is reversible. Then, if it is within your action tools, execute it through the approval card in the same turn; otherwise hand him the exact session ask. A cancelled card means he overruled you: accept it and say what you would watch instead. Never chain more than one write per approval.\n" +
     "Tools, when available: get_today_snapshot first for anything about the queue, board, inbox or Teams (it carries case numbers, task gids, the board sections map with gids, recent inbox emails with message ids, and recent Teams messages). salesforce_read for other Salesforce reads (one SOQL SELECT, always LIMIT, always RecordType.DeveloperName='Zeus' on Case queries). asana_search for board lookups. show to navigate the page.\n" +
     "ACTIONS you can execute, each behind an approval card the user must tap: case_internal_note, case_reply (public comment the requester can see, optionally set a new Status such as Waiting Response-External), case_close (close reason from the exact list; set Type if blank), case_assign (ONLY to Andrew Dunn, Keith Tsui, Nina Lewis or Mathew Hema; team members have duplicate User records, so if the tool returns candidate records, show them with usernames and recent-case counts, ask which, and call again with user_id, never pick one yourself), task_comment, task_complete, task_move (section gids from board.sections), and email_draft_reply (creates an Outlook reply DRAFT threaded on the original, never sends; Mathew reviews and sends from Outlook). Triage flow: for 'triage the queue to the team', go one case at a time, propose who gets it and why, and use case_assign per case, each with its own approval. Teams has NO send API: for a Teams reply, write the message text in a reply of its own so the copy button grabs it cleanly, and say to paste it into Teams. Before calling a write tool, state in one or two lines exactly what you are about to do. Draft replies warm and plain in Mathew's voice: direct, no corporate filler, commitments like 'I will come back to you either way', sign-off 'Thanks'. If the approval card is cancelled, accept it and stop. Report the verified result the tool returns, never assume success. Never bulk actions: one record at a time. SENDING email, assigning cases to anyone outside the four ICT team members, Entra or M365 admin, and Salesforce config are NOT yours: give the exact ask for a Claude session on mathewruahema-beep/Birdlife instead.\n" +
+    "MONEY: for any money question call money_snapshot first. Doctrine: Stripe, Salesforce and NetSuite rarely agree and the gap IS the finding; always name the lens a number came from (opportunity close date vs payment date vs Stripe settlement). Five livemode Stripe accounts exist (eCommerce, Memberships, Ausbirdfund, BLP, eStore/AOC). NEVER touch stripe_api_write or propose it; a mistaken write is real donor money. Money page tools are read only.\n" +
+    "SECURITY: for posture questions call security_snapshot first. Its content is confidential: keep it to this conversation, name overdue items bluntly, and treat a never-logged-in or bot sysadmin as a finding. What the page cannot see, say plainly and point to the Sunday security dashboard.\n" +
+    "REPORTS: you write Mathew's reports on request, register C voice, plain text ready to paste. Library: 'weekly ICT status' (queue and board movement, money line, security line, decisions made and open, next week), 'money state' (the three lenses, gaps, bridges, one action), 'security posture' (live posture, deadlines by urgency, two fixes), 'exec brief' (five sentences, money first). Method: pull the needed snapshots first, lead with the conclusion, concrete numbers with their lens named, every action gets an owner and a date, end before any sign-off. For a polished Word or PDF document, give Mathew the one-line session ask instead (a repo session has the docx skill).\n" +
     "Finding automations: use automation_signals plus live data. Propose at most 3, each with name, schedule, exact write posture and hard caps, connectors, which existing routine could absorb it (rule 2), and budget impact (rule 3, currently 13 of 12). End with the session ask to create the best one through the OS change control.\n" +
     "If something is not in the state pack or reachable by a tool, say so in one line and point at os/registers.md or a session; never guess.\n\nSTATE PACK:\n";
 
@@ -1294,6 +1494,33 @@ let updateTicker=()=>{};
          showView(tab);
          if(tab==="schedule" && input.day!==undefined){ const d=Math.max(0,Math.min(6,Number(input.day)||0)); renderDay(d); }
          return "Shown: "+tab;
+       }},
+      {name:"money_snapshot",
+       description:"Loads and returns the money state: Salesforce won opportunities and paid payments (7 days, two lenses that never match), Stripe balances across all five livemode accounts, Stripe-to-Salesforce sync errors, NetSuite reachability, and the standing bridge facts (manual CSV, unreconciled income, bank rec backlog, refund gap). Use for any question about money, revenue, payments, refunds or reconciliation.",
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         await loadMoney(false);
+         if(!moneyState) throw new Error("Money data did not load");
+         return clip({live:moneyState, facts:{
+           bridge:"Salesforce to NetSuite is a MANUAL monthly CSV; no integration exists in NetSuite",
+           unreconciled:"$671,117 across 2,878 records at 3 Jul 2026, growing ~$87K/day; exception report Zap 371228125 is in DRAFT",
+           bank_rec:"11104 NAT Operations 378 unmatched, 11103 ABF Donations 120 unmatched, both since 31 Mar 2022",
+           refund_gap:"Stripe refunds are not reliably reflected in Salesforce; verify, never assume",
+           regular_giving:"always the union of NPSP Recurring Donations AND AAkPay Recurring Payments; one object alone is wrong",
+           count_rule:"never trust != null counts on number fields in this org; use != null AND != 0"}},13000);
+       }},
+      {name:"security_snapshot",
+       description:"Loads and returns the security footprint: live Salesforce admin posture (who holds System Administrator, last logins, bot accounts, admin ratio, stale users), the hard deadline list with days remaining, and the not-readable-from-here list. Use for any security, posture, audit or deadline question. Content is confidential.",
+       async execute(input,context){
+         if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         await loadSecurity(false);
+         if(!secState || secState.err) throw new Error(secState&&secState.err||"Security data did not load");
+         const today=melbTodayISO();
+         return clip({live:{admins:secState.admins.map(a=>({name:a.Name,username:a.Username,last_login:a.LastLoginDate})),
+           inactive_admin_records:secState.inactiveAdmins, active_users:secState.activeUsers, stale_30d:secState.staleUsers},
+           deadlines:DEADLINES.map(([n,d])=>({item:n,date:d,days:Math.round((new Date(d)-new Date(today))/864e5)})),
+           not_readable:"Secure Score, Entra MFA/CA, Intune/BitLocker, Defender, WP 2FA, AWS root MFA, Google 2SV (weekly Security dashboard covers them)",
+           watchlist:"WooCommerce key rotation from August still unverified"},12000);
        }},
       // ---- write actions, each behind an approval card ----
       {name:"case_internal_note",
@@ -1511,7 +1738,10 @@ let updateTicker=()=>{};
    ["Find automations","Find automation candidates for us, using the automation signals and the live queue and board."],
    ["Work the worst case","Look at the live queue, pick the case most needing action, summarise it, and propose the move. If it warrants a reply or close, draft it and I will approve."],
    ["What runs tomorrow?","What runs tomorrow morning, in order?"],
-   ["Coach me","Coach me: look at the live queue, board, inbox and the patterns, and give me the three highest-leverage moves I should make this week as Senior Manager ICT. Be frank about what I am neglecting."]
+   ["Coach me","Coach me: look at the live queue, board, inbox and the patterns, and give me the three highest-leverage moves I should make this week as Senior Manager ICT. Be frank about what I am neglecting."],
+   ["Money state","Give me the money state: use the money snapshot, lead with the lens gap and the reconciliation bridges, and tell me what has moved since I last looked."],
+   ["Security posture","Give me the security posture: use the security snapshot, admins first, then the deadlines in date order with days remaining. Flag anything overdue in the first line."],
+   ["Weekly report","Write my weekly ICT status report: queue and board movement, money state, security posture, and the decisions I owe. Pull fresh snapshots first, one page, in my voice, each action with an owner and a date."]
   ].forEach(([label,q])=>{
     const c = el("button",null,esc(label));
     c.addEventListener("click",()=>ask(q));

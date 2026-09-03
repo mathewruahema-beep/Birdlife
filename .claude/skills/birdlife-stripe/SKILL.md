@@ -5,13 +5,22 @@ description: Operator knowledge for BirdLife Australia's Stripe account — the 
 
 # BirdLife Australia — Stripe
 
-## Account — verified live
+## Accounts — verified live (3 Sep 2026)
 
-| Fact | Value |
+There are **FIVE livemode accounts** on this connector, not one. Any balance,
+payout or reconciliation answer that reads only eCommerce is wrong. Pass the
+account id as `stripe_context` with `livemode: true` on every read.
+
+| Account | Account ID |
 |---|---|
-| Account | **BirdLife Australia - eCommerce** |
-| Account ID | `acct_1PaqQkEdZ08H7Yxq` |
-| Mode | **livemode: true** |
+| **BirdLife Australia - eCommerce** (primary, WooCommerce) | `acct_1PaqQkEdZ08H7Yxq` |
+| Memberships | `acct_1DE94cH9l9pxYNgx` |
+| Ausbirdfund | `acct_1DffVqH1WeNbvypj` |
+| BLP | `acct_1OKucyFMYRhNDz9n` |
+| eStore / AOC | `acct_1NfHuCCj2I4WmWMH` |
+
+GetBalance shape (observed on eCommerce; assumed identical on the others):
+`{available:[{amount,currency}], pending:[...]}` with amounts in **cents**.
 
 **This is a live production account handling real donor and member money (~A$11,108.70/month in WooCommerce sales).** Every write is a real financial event. Treat `stripe_api_write` as requiring explicit human confirmation, every time, with no exceptions for "small" amounts.
 
@@ -66,6 +75,6 @@ A Stripe support thread on the **payout webhook** was sitting in "they owe you" 
 4. Card numbers, tokens and customer PII do not go into documents, tickets or chat summaries.
 
 ## Operating rules
-1. State the account (`acct_1PaqQkEdZ08H7Yxq`, livemode) at the start of any payment investigation so there is no ambiguity.
+1. State the account (id from the five-account table above, livemode) at the start of any payment investigation so there is no ambiguity, and say why the other four accounts are or are not in scope.
 2. Any figure quoted from Stripe should be paired with the Salesforce and NetSuite view, because the three rarely agree and the gap is the actual answer.
 3. Never assert that a refund is reflected in Salesforce. Verify it.
