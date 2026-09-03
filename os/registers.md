@@ -96,6 +96,23 @@ created the same day outside the register and is now registered below.
   (section 6 of its prompt) to its own daily routine; that is the one
   pre-approved exception to growing the count.
 
+### Orphan check, 3 Sep 2026 (live `list_triggers` pull, 14 triggers)
+
+- All 14 live triggers (12 recurring, 2 one-shots) are registered above; no
+  unregistered routine, no ghost row. Nothing to delete.
+- ICT overnight pre-draft `trig_01EbMkfD4UcGUKLkUB1mNQ8V`: last run ABANDONED
+  3 Sep 5:32am AEST. Its step 5 still targets the retired case-workbench
+  console (branch `claude/ai-ict-assistant-birdlife-1sqen8`, `console/index.html`,
+  artifact `29a063d4`, now a tombstone) and republishes via the Artifact tool,
+  which routine sessions do not have (see artefact finding below). Fix
+  proposed: `update_trigger` to drop step 5 entirely (the live Today tab in the
+  Claude OS console replaced the baked snapshot) and turn failure notifications
+  on (currently push, email and slack all false, against the 12 Aug rule).
+- Weekend job `trig_01CUkTdAFSisnzyU6pwgkH4k`: last run ABANDONED 29 Aug,
+  before the 2 Sep rewrite; unproven until the 5 to 7 Sep verification window.
+- OS weekly audit, Membership Friday draft and ICT Weekly Status have never
+  fired yet (created 2 Sep); first fires are 4 Sep and 7 Sep.
+
 ## 2. Skill register
 
 Versioned in `.claude/skills/` here; mirrored to the claude.ai account so they
@@ -191,6 +208,40 @@ BirdLife-Security-Dashboard.html, plus the `_dashboard-run-log.txt` heartbeat.
 
 All artifact URLs are private. Do not publish any via GitHub Pages or any
 public host; they name internal systems.
+
+**Artefact audit, 3 Sep 2026 (gallery list of the 50 most recent, checked
+against this register and the live trigger list):**
+
+- FINDING: the three dashboard artifacts were last republished 11 to 13 Aug
+  (Operations 11 Aug, Monitoring 12 Aug, Security 13 Aug) and the department
+  suite on 13 Aug, despite hourly and weekend routines. Cause: the routine
+  session config (`session_request.config.allowed_tools`) does not include the
+  Artifact tool, so every "best effort" republish step is skipped on every run.
+  The Teams/SharePoint copies are the only copies those routines can rebuild.
+  Decision needed: accept that the artifact copies are frozen (and say so in
+  this table), or retire the three artifact URLs and point the register at the
+  SharePoint files only. "Rebuilt by" in the table above is therefore wrong for
+  the artifact copies until one of those happens.
+- The ICT Console row (`29a063d4`) is a tombstone redirect since 3 Sep; row kept
+  only so old links resolve. Do not treat it as a rebuild target.
+- Live, in use, NOT registered: Security Workbench `0e4c1fb6-95ec-4dc3-a761-166281e79d42`,
+  External ICT Console `cfac6ca4-ad47-4df1-bd9e-d49d7132fbc0`, Membership
+  Delivery Desk `c79983b4-5375-48b1-8d73-f405c4838f95` (all updated 3 Sep),
+  ICT Week in Review `c2f0dcff-9c8d-46e1-aaf8-393bf295499e` (28 Aug), Zeus
+  Recovery Map `50250230-8210-48c1-b24b-62e447572621` (DR plan, 2 Sep), After
+  Pardot `2f19424a-e08f-46d1-b1d7-63dab615bf0b` (31 Aug), and the five refund
+  pages of 29 to 30 Aug that back the Refund fix watch routine. Each needs a
+  row naming its owner job or a retire date.
+- Unreferenced by any routine, register row or board, untouched two weeks or
+  more (17): Gap Register, Zeus Field Kit, Woo Sync Identity Audit, Leaver
+  Offboarding, Azure Private Access, Systems Insights, Duplicate Defence,
+  Regular Giving Rescue Desk, Supporter Care on Zeus, BirdLife Companion, Mini
+  Program Playbook, Flightpath Change Board, AI Opportunity Radar, Dashboard
+  Refresh Build & Cost, Agent Aviary, Insights Model, ICT Board Reset. Full HTML
+  exported 3 Sep to OneDrive `Birdlife\Claude\Archive\artifact-archive-2026-09-03-*.html`
+  (17 files). Deletion is Mathew's manual step in the gallery; the tool has no
+  delete action.
+- Personal (non BirdLife) artifacts are out of scope and were not assessed.
 
 **Cleanup review, 3 Sep 2026 (Mathew's conditions applied):** the department
 suite and the ICT Operations/Monitoring dashboards were reviewed for retirement
