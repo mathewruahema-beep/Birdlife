@@ -1,30 +1,40 @@
 <title>Pocket PT</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=Barlow:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap">
 <style>
   :root{
-    --bg:#10151B; --surface:#1A2129; --surface2:#222B35; --line:#2C3742;
-    --ink:#EAEEF2; --muted:#94A1AC; --faint:#5C6873;
-    --accent:#F2A03D; --accent-ink:#161006;
-    --good:#45BFB4; --warn:#E8C547; --danger:#E4604E;
-    --radius:14px;
+    --bg:#050A12; --surface:rgba(9,22,38,.82); --surface2:#0D1F33; --line:#1B4A6B;
+    --ink:#DDF3FF; --muted:#7FB3CC; --faint:#3F6C86;
+    --accent:#3EE0FF; --accent-ink:#031019; --gold:#F2B233;
+    --good:#52F2B8; --warn:#F2B233; --danger:#FF5A4E;
+    --glow:0 0 14px rgba(62,224,255,.45);
+    --radius:6px;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
   html{color-scheme:dark}
   body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:'Barlow',system-ui,-apple-system,sans-serif; font-size:16px; line-height:1.45;
+    margin:0; color:var(--ink);
+    background:
+      radial-gradient(ellipse 90% 40% at 50% -8%, rgba(62,224,255,.20), transparent 60%),
+      radial-gradient(ellipse 60% 30% at 100% 100%, rgba(242,178,51,.08), transparent 60%),
+      linear-gradient(rgba(62,224,255,.045) 1px, transparent 1px) 0 0/100% 28px,
+      linear-gradient(90deg, rgba(62,224,255,.045) 1px, transparent 1px) 0 0/28px 100%,
+      var(--bg);
+    font-family:'Rajdhani',system-ui,-apple-system,sans-serif; font-size:17px; line-height:1.42;
     padding-bottom:calc(72px + env(safe-area-inset-bottom));
     min-height:100vh;
   }
-  h1,h2,h3{font-family:'Archivo','Barlow',sans-serif; text-wrap:balance; margin:0}
-  .num{font-family:'Archivo',sans-serif; font-variant-numeric:tabular-nums}
-  button{font:inherit; cursor:pointer; border:none; border-radius:12px}
+  body::after{content:''; position:fixed; inset:0; pointer-events:none; z-index:100;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 1px, transparent 1px 3px); opacity:.6}
+  h1,h2,h3{font-family:'Orbitron','Rajdhani',sans-serif; text-wrap:balance; margin:0}
+  .num{font-family:'Orbitron',sans-serif; font-variant-numeric:tabular-nums}
+  button{font:inherit; cursor:pointer; border:none; border-radius:4px}
   input,select{
-    font:inherit; color:var(--ink); background:var(--surface2);
-    border:1px solid var(--line); border-radius:10px; padding:10px 12px; width:100%;
+    font:inherit; color:var(--ink); background:rgba(5,10,18,.7);
+    border:1px solid var(--line); border-radius:4px; padding:10px 12px; width:100%;
   }
-  input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
-  label{display:block; font-size:13px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin:0 0 6px}
+  input:focus,select:focus{outline:none; border-color:var(--accent); box-shadow:var(--glow)}
+  button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  label{display:block; font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:0 0 6px}
   p{margin:0 0 8px}
 
   .wrap{max-width:520px; margin:0 auto; padding:16px 16px 8px}
@@ -32,132 +42,151 @@
   .screen.on{display:block}
 
   .hdr{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px}
-  .hdr .brand{font-family:'Archivo','Barlow',sans-serif; font-weight:900; font-size:20px; letter-spacing:.02em}
+  .hdr .brand{font-family:'Orbitron','Rajdhani',sans-serif; font-weight:900; font-size:18px; letter-spacing:.14em; text-shadow:0 0 12px rgba(62,224,255,.35)}
   .hdr .brand span{color:var(--accent)}
-  .streak{font-size:14px; color:var(--muted); font-weight:600}
-  .streak b{color:var(--accent); font-family:'Archivo'}
+  .streak{font-size:14px; color:var(--muted); font-weight:600; letter-spacing:.04em; text-transform:uppercase}
+  .streak b{color:var(--gold); font-family:'Orbitron',sans-serif; text-shadow:0 0 10px rgba(242,178,51,.5)}
 
-  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin-bottom:14px}
-  .card h3{font-size:14px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:10px}
-  .hero-card{background:linear-gradient(160deg,#2A2415, var(--surface) 65%); border-color:#3F3620}
+  .card{position:relative; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin-bottom:14px;
+    box-shadow:inset 0 0 0 1px rgba(62,224,255,.05), 0 0 0 1px rgba(0,0,0,.4), 0 8px 30px rgba(0,0,0,.45); backdrop-filter:blur(6px)}
+  .card::before{content:''; position:absolute; inset:-1px; pointer-events:none; border-radius:var(--radius);
+    background:
+      linear-gradient(var(--accent),var(--accent)) top left/16px 2px no-repeat,
+      linear-gradient(var(--accent),var(--accent)) top left/2px 16px no-repeat,
+      linear-gradient(var(--accent),var(--accent)) bottom right/16px 2px no-repeat,
+      linear-gradient(var(--accent),var(--accent)) bottom right/2px 16px no-repeat; opacity:.85}
+  .card h3{font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; opacity:.9}
+  .card h3::before{content:'▸ '; color:var(--gold)}
+  .hero-card{background:linear-gradient(160deg, rgba(62,224,255,.16), rgba(9,22,38,.85) 55%); border-color:#2A6F94}
 
-  .big{font-size:34px; font-weight:900; font-family:'Archivo','Barlow',sans-serif; line-height:1.1}
-  .sub{color:var(--muted); font-size:14.5px}
-  .call{font-size:17px; font-weight:500; line-height:1.4}
-  .call b{color:var(--accent)}
+  .big{font-size:34px; font-weight:900; font-family:'Orbitron',sans-serif; line-height:1.1; text-shadow:0 0 16px rgba(62,224,255,.35)}
+  .sub{color:var(--muted); font-size:15.5px}
+  .call{font-size:18px; font-weight:500; line-height:1.4}
+  .call b{color:var(--accent); text-shadow:0 0 10px rgba(62,224,255,.4)}
 
-  .btn{background:var(--accent); color:var(--accent-ink); font-weight:700; padding:14px 18px; width:100%; font-size:17px; letter-spacing:.02em}
-  .btn:active{transform:translateY(1px)}
-  .btn.ghost{background:var(--surface2); color:var(--ink); border:1px solid var(--line)}
-  .btn.small{width:auto; padding:9px 14px; font-size:14px}
-  .btn.good{background:var(--good); color:#06201D}
-  .btn.danger{background:transparent; color:var(--danger); border:1px solid var(--danger)}
+  .btn{background:linear-gradient(180deg,#63E9FF,#1FBFE6); color:var(--accent-ink); font-weight:700; padding:14px 18px; width:100%; font-size:16px; letter-spacing:.12em; text-transform:uppercase;
+    box-shadow:0 0 18px rgba(62,224,255,.35), inset 0 1px 0 rgba(255,255,255,.35); clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+  .btn:active{transform:translateY(1px); filter:brightness(.95)}
+  .btn.ghost{background:rgba(62,224,255,.06); color:var(--accent); border:1px solid var(--line); box-shadow:none; clip-path:none}
+  .btn.small{width:auto; padding:9px 14px; font-size:13px}
+  .btn.good{background:linear-gradient(180deg,#7DF7CF,#32D9A0); color:#03201A; box-shadow:0 0 18px rgba(82,242,184,.35)}
+  .btn.danger{background:transparent; color:var(--danger); border:1px solid var(--danger); box-shadow:none; clip-path:none}
   .row{display:flex; gap:10px}
   .row > *{flex:1; min-width:0}
   input,select,textarea{min-width:0; max-width:100%}
   .macros .macro{min-width:0; overflow:hidden}
 
-  /* scoreboard */
   .score{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px}
-  .score .tile{background:rgba(16,21,27,.55); border-radius:10px; padding:10px 8px; text-align:center; border:1px solid var(--line)}
-  .score .v{font-family:'Archivo','Barlow',sans-serif; font-weight:800; font-size:20px; font-variant-numeric:tabular-nums}
-  .score .v small{font-size:13px; color:var(--muted); font-weight:600}
-  .score .k{font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-top:2px}
-  .score .tile.ok .v{color:var(--good)}
-  .score .tile.behind .v{color:var(--warn)}
+  .score .tile{background:rgba(5,10,18,.55); border-radius:4px; padding:10px 8px; text-align:center; border:1px solid var(--line)}
+  .score .v{font-family:'Orbitron',sans-serif; font-weight:800; font-size:19px; font-variant-numeric:tabular-nums}
+  .score .v small{font-size:11px; color:var(--muted); font-weight:600}
+  .score .k{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-top:3px}
+  .score .tile.ok .v{color:var(--good); text-shadow:0 0 10px rgba(82,242,184,.5)}
+  .score .tile.behind .v{color:var(--warn); text-shadow:0 0 10px rgba(242,178,51,.5)}
 
-  /* whare (habits) */
   .wall{margin-top:12px}
   .wall:first-of-type{margin-top:0}
-  .wall .wt{font-family:'Archivo','Barlow',sans-serif; font-weight:800; font-size:13px; color:var(--accent); letter-spacing:.02em}
-  .wall .wt span{color:var(--faint); font-family:'Barlow'; font-weight:600; margin-left:6px}
-  .habit{display:flex; align-items:center; gap:12px; padding:9px 4px; border-bottom:1px solid var(--line)}
+  .wall .wt{font-family:'Orbitron',sans-serif; font-weight:700; font-size:11.5px; color:var(--gold); letter-spacing:.1em; text-transform:uppercase}
+  .wall .wt span{color:var(--faint); font-family:'Rajdhani'; font-weight:600; margin-left:8px; letter-spacing:.06em}
+  .habit{display:flex; align-items:center; gap:12px; padding:9px 4px; border-bottom:1px solid rgba(27,74,107,.6)}
   .wall .habit:last-child{border-bottom:none}
-  .habit .box{width:26px; height:26px; border-radius:8px; border:2px solid var(--faint); flex:none; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:900}
-  .habit.done .box{background:var(--good); border-color:var(--good); color:#06201D}
+  .habit .box{width:26px; height:26px; border-radius:3px; border:1.5px solid var(--faint); flex:none; display:flex; align-items:center; justify-content:center; color:transparent; font-weight:900}
+  .habit.done .box{background:var(--good); border-color:var(--good); color:#03201A; box-shadow:0 0 12px rgba(82,242,184,.5)}
   .habit.done .t{color:var(--muted); text-decoration:line-through}
   .habit .t{font-weight:500}
-  .habit .d{font-size:13px; color:var(--faint); margin-left:auto; white-space:nowrap}
+  .habit .d{font-size:13px; color:var(--faint); margin-left:auto; white-space:nowrap; letter-spacing:.04em}
 
-  .day{display:flex; gap:12px; align-items:center; padding:12px 4px; border-bottom:1px solid var(--line)}
+  .day{display:flex; gap:12px; align-items:center; padding:12px 4px; border-bottom:1px solid rgba(27,74,107,.6)}
   .day:last-child{border-bottom:none}
-  .day .tag{font-family:'Archivo','Barlow',sans-serif; font-weight:800; font-size:13px; color:var(--accent); width:38px; flex:none}
-  .day .meta{font-size:13px; color:var(--muted)}
+  .day .tag{font-family:'Orbitron',sans-serif; font-weight:700; font-size:11.5px; color:var(--accent); width:40px; flex:none; letter-spacing:.06em}
+  .day .meta{font-size:13.5px; color:var(--muted)}
   .day .go{margin-left:auto}
 
-  .exline{display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px dashed var(--line); font-size:15px}
+  .exline{display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px dashed rgba(27,74,107,.7); font-size:16px}
   .exline:last-child{border-bottom:none}
-  .exline .sr{color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap}
+  .exline .sr{color:var(--accent); font-family:'Orbitron',sans-serif; font-size:12.5px; font-variant-numeric:tabular-nums; white-space:nowrap}
 
   .macros{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:4px}
-  .macro{background:var(--surface2); border-radius:10px; padding:10px 8px; text-align:center}
-  .macro .v{font-family:'Archivo','Barlow',sans-serif; font-weight:800; font-size:19px; font-variant-numeric:tabular-nums}
-  .macro .k{font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-top:2px}
+  .macro{background:rgba(5,10,18,.55); border:1px solid var(--line); border-radius:4px; padding:10px 6px; text-align:center}
+  .macro .v{font-family:'Orbitron',sans-serif; font-weight:800; font-size:16.5px; font-variant-numeric:tabular-nums; color:var(--ink)}
+  .macro .k{font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-top:3px}
 
-  .meal{padding:10px 0; border-bottom:1px dashed var(--line)}
+  .meal{padding:10px 0; border-bottom:1px dashed rgba(27,74,107,.7)}
   .meal:last-child{border-bottom:none}
-  .meal b{display:block; font-size:14px}
-  .meal span{color:var(--muted); font-size:14.5px}
+  .meal b{display:block; font-size:14px; letter-spacing:.06em; text-transform:uppercase; color:var(--gold)}
+  .meal span{color:var(--muted); font-size:15.5px}
 
   .chart-box{margin:4px 0 6px}
-  .chart-box svg{display:block; width:100%; height:auto}
-  .logrow{display:flex; justify-content:space-between; gap:8px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:15px}
+  .chart-box svg{display:block; width:100%; height:auto; filter:drop-shadow(0 0 6px rgba(62,224,255,.35))}
+  .logrow{display:flex; justify-content:space-between; gap:8px; align-items:center; padding:8px 2px; border-bottom:1px solid rgba(27,74,107,.6); font-size:16px}
   .logrow:last-child{border-bottom:none}
   .logrow .when{color:var(--muted); flex:none}
   .logrow .del{color:var(--faint); background:none; padding:0 6px; font-size:15px}
-  .band{font-size:12.5px; font-weight:700; padding:2px 9px; border-radius:99px; letter-spacing:.03em}
-  .band.ok{background:rgba(69,191,180,.15); color:var(--good)}
-  .band.warn{background:rgba(232,197,71,.15); color:var(--warn)}
-  .band.bad{background:rgba(228,96,78,.15); color:var(--danger)}
+  .band{font-size:11.5px; font-weight:700; padding:2px 9px; border-radius:2px; letter-spacing:.08em; text-transform:uppercase}
+  .band.ok{background:rgba(82,242,184,.14); color:var(--good); border:1px solid rgba(82,242,184,.4)}
+  .band.warn{background:rgba(242,178,51,.14); color:var(--warn); border:1px solid rgba(242,178,51,.4)}
+  .band.bad{background:rgba(255,90,78,.14); color:var(--danger); border:1px solid rgba(255,90,78,.4)}
 
-  .check{display:flex; align-items:center; gap:10px; padding:10px 2px; border-bottom:1px solid var(--line)}
+  .check{display:flex; align-items:center; gap:10px; padding:10px 2px; border-bottom:1px solid rgba(27,74,107,.6)}
   .check:last-child{border-bottom:none}
   .check .t{font-weight:500; flex:1}
-  .check .t small{display:block; color:var(--faint); font-size:12.5px; font-weight:400}
+  .check .t small{display:block; color:var(--faint); font-size:13px; font-weight:400}
   .check .status{font-size:12.5px; white-space:nowrap}
 
-  #session{position:fixed; inset:0; background:var(--bg); z-index:50; display:none; overflow-y:auto}
+  #session{position:fixed; inset:0; background-color:var(--bg); z-index:50; display:none; overflow-y:auto;
+    background-image:radial-gradient(ellipse 90% 40% at 50% -8%, rgba(62,224,255,.22), transparent 60%),
+      linear-gradient(rgba(62,224,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(62,224,255,.045) 1px, transparent 1px);
+    background-size:100% 100%, 100% 28px, 28px 100%}
   #session.on{display:block}
-  .sess-head{display:flex; justify-content:space-between; align-items:center; padding:14px 16px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--bg); z-index:1}
-  .sess-head .t{font-family:'Archivo','Barlow',sans-serif; font-weight:800; font-size:15px}
-  .prog{height:5px; background:var(--surface2); border-radius:99px; overflow:hidden; margin:14px 0 6px}
-  .prog i{display:block; height:100%; background:var(--accent); border-radius:99px; transition:width .3s}
+  .sess-head{display:flex; justify-content:space-between; align-items:center; padding:14px 16px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(5,10,18,.9); backdrop-filter:blur(8px); z-index:1}
+  .sess-head .t{font-family:'Orbitron',sans-serif; font-weight:700; font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+  .prog{height:4px; background:rgba(62,224,255,.12); border-radius:0; overflow:hidden; margin:14px 0 6px}
+  .prog i{display:block; height:100%; background:var(--accent); box-shadow:0 0 10px var(--accent); transition:width .3s}
   .set-dots{display:flex; gap:8px; margin:10px 0 4px}
-  .set-dots i{width:12px; height:12px; border-radius:50%; background:var(--surface2); border:1px solid var(--line)}
-  .set-dots i.done{background:var(--good); border-color:var(--good)}
-  .set-dots i.cur{border-color:var(--accent); background:var(--surface)}
-  .cue{background:var(--surface2); border-left:3px solid var(--accent); border-radius:8px; padding:10px 12px; font-size:15px; color:var(--muted); margin:12px 0}
+  .set-dots i{width:14px; height:14px; background:rgba(62,224,255,.08); border:1px solid var(--line); clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+  .set-dots i.done{background:var(--good); border-color:var(--good); box-shadow:0 0 8px rgba(82,242,184,.6)}
+  .set-dots i.cur{background:var(--accent); box-shadow:0 0 8px var(--accent)}
+  .cue{background:rgba(62,224,255,.06); border-left:2px solid var(--gold); border-radius:0 4px 4px 0; padding:10px 12px; font-size:16px; color:var(--muted); margin:12px 0}
 
-  #rest{position:fixed; inset:0; background:rgba(10,13,17,.96); z-index:60; display:none; align-items:center; justify-content:center; flex-direction:column; gap:8px; text-align:center; padding:24px}
+  #rest{position:fixed; inset:0; background:rgba(3,7,12,.96); z-index:60; display:none; align-items:center; justify-content:center; flex-direction:column; gap:8px; text-align:center; padding:24px}
   #rest.on{display:flex}
-  #rest .t{font-size:15px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:700}
-  #rest .clock{font-family:'Archivo','Barlow',sans-serif; font-weight:900; font-size:96px; color:var(--accent); font-variant-numeric:tabular-nums; line-height:1}
+  #rest::before{content:''; position:absolute; width:260px; height:260px; border-radius:50%; border:2px solid rgba(62,224,255,.35); box-shadow:0 0 40px rgba(62,224,255,.25), inset 0 0 40px rgba(62,224,255,.15); animation:reactor 2.4s ease-in-out infinite}
+  #rest::after{content:''; position:absolute; width:300px; height:300px; border-radius:50%; border:1px dashed rgba(62,224,255,.3); animation:spin 18s linear infinite}
+  @keyframes reactor{0%,100%{transform:scale(1); opacity:.8} 50%{transform:scale(1.05); opacity:1}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #rest > *{position:relative; z-index:1}
+  #rest .t{font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); font-weight:700}
+  #rest .clock{font-family:'Orbitron',sans-serif; font-weight:900; font-size:88px; color:var(--accent); font-variant-numeric:tabular-nums; line-height:1; text-shadow:0 0 30px rgba(62,224,255,.7)}
   #rest .next{color:var(--muted); font-size:15px; max-width:280px}
 
-  nav{position:fixed; left:0; right:0; bottom:0; background:var(--surface); border-top:1px solid var(--line); display:flex; z-index:40; padding-bottom:env(safe-area-inset-bottom)}
-  nav button{flex:1; background:none; color:var(--faint); font-size:11.5px; font-weight:700; letter-spacing:.04em; padding:9px 2px 10px; border-radius:0; display:flex; flex-direction:column; align-items:center; gap:3px}
-  nav button .ic{font-size:20px; line-height:1}
-  nav button.on{color:var(--accent)}
+  nav{position:fixed; left:0; right:0; bottom:0; background:rgba(5,10,18,.88); backdrop-filter:blur(10px); border-top:1px solid var(--line); display:flex; z-index:40; padding-bottom:env(safe-area-inset-bottom);
+    box-shadow:0 -1px 0 rgba(62,224,255,.15), 0 -12px 30px rgba(0,0,0,.5)}
+  nav button{flex:1; background:none; color:var(--faint); font-size:10.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; padding:9px 2px 10px; border-radius:0; display:flex; flex-direction:column; align-items:center; gap:3px; position:relative}
+  nav button .ic{font-size:19px; line-height:1; filter:grayscale(1) brightness(1.6); opacity:.7}
+  nav button.on{color:var(--accent); text-shadow:0 0 8px rgba(62,224,255,.5)}
+  nav button.on .ic{filter:none; opacity:1}
+  nav button.on::before{content:''; position:absolute; top:0; left:20%; right:20%; height:2px; background:var(--accent); box-shadow:0 0 8px var(--accent)}
 
-  .note{font-size:13px; color:var(--faint); margin-top:8px}
+  .note{font-size:13.5px; color:var(--faint); margin-top:8px}
   .quote{font-size:17px; font-weight:500; font-style:italic}
-  .quote .who{display:block; font-style:normal; font-size:13px; color:var(--muted); margin-top:6px}
+  .quote .who{display:block; font-style:normal; font-size:12.5px; color:var(--muted); margin-top:6px; letter-spacing:.08em; text-transform:uppercase}
   .field{margin-bottom:14px}
-  textarea{width:100%; min-height:90px; font:13px monospace; color:var(--ink); background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:10px}
-  .pill{display:inline-block; background:var(--surface2); border:1px solid var(--line); color:var(--muted); border-radius:99px; padding:3px 10px; font-size:12.5px; font-weight:600; margin:0 6px 6px 0}
-  .sci{padding:9px 0; border-bottom:1px dashed var(--line); font-size:14.5px}
+  textarea{width:100%; min-height:90px; font:12.5px monospace; color:var(--ink); background:rgba(5,10,18,.7); border:1px solid var(--line); border-radius:4px; padding:10px}
+  .pill{display:inline-block; background:rgba(62,224,255,.06); border:1px solid var(--line); color:var(--muted); border-radius:2px; padding:3px 10px; font-size:12.5px; font-weight:600; letter-spacing:.06em; margin:0 6px 6px 0}
+  .sci{padding:9px 0; border-bottom:1px dashed rgba(27,74,107,.7); font-size:15.5px}
   .sci:last-child{border-bottom:none}
   .sci b{display:block; color:var(--ink)}
   .sci span{color:var(--muted)}
   .hrbox{display:flex; align-items:center; gap:10px; margin-top:12px; min-height:34px}
-  .hrbox .hr{font-family:'Archivo','Barlow',sans-serif; font-weight:900; font-size:26px; color:var(--danger); font-variant-numeric:tabular-nums}
-  .hrbox .zone{font-size:13px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted)}
-  .htable{width:100%; border-collapse:collapse; font-size:14px; font-variant-numeric:tabular-nums}
-  .htable th{font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); text-align:right; padding:4px 2px; font-weight:600}
+  .hrbox .hr{font-family:'Orbitron',sans-serif; font-weight:900; font-size:24px; color:var(--danger); font-variant-numeric:tabular-nums; text-shadow:0 0 12px rgba(255,90,78,.6)}
+  .hrbox .zone{font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+  .htable{width:100%; border-collapse:collapse; font-size:14.5px; font-variant-numeric:tabular-nums}
+  .htable th{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); text-align:right; padding:4px 2px; font-weight:700}
   .htable th:first-child,.htable td:first-child{text-align:left}
-  .htable td{padding:6px 2px; border-top:1px solid var(--line); text-align:right}
+  .htable td{padding:6px 2px; border-top:1px solid rgba(27,74,107,.6); text-align:right}
   .htable td.ok{color:var(--good)}
   .htable td.low{color:var(--warn)}
+  input[type=range]{accent-color:var(--accent); padding:0; border:none; background:none}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
 </style>
 
@@ -321,11 +350,12 @@
       <div class="row">
         <button class="btn ghost small" id="btnVoice"></button>
         <button class="btn ghost small" id="btnVoiceTest">Test voice</button>
+        <button class="btn ghost small" id="btnSample">Hear a line</button>
       </div>
       <div class="row" style="margin-top:10px">
         <button class="btn ghost small" id="btnPersona"></button>
       </div>
-      <p class="note">Deadpan Kiwi talks like a dry, self-aware mate with te reo Māori woven through, and still counts your missed sessions. Te reo words are respelled for the speech engine so they sound right. Straight coach is the plain version.</p>
+      <p class="note">Tap Style to cycle. <b>Deadpan Kiwi</b>: unhurried and bouncy, warm, casually deadpan, trails off at the end of a thought. <b>Gentle giant</b>: soft, slow, low, very polite, still not letting you off. <b>Straight coach</b>: plain. Both Kiwi styles carry te reo Māori and want the ★ New Zealand voice for the vowels. Pace and pitch below scale whichever delivery you pick.</p>
       <div class="field" style="margin-top:14px"><label for="voiceSel">Which voice</label>
         <select id="voiceSel"></select>
         <p class="note" id="voiceNote"></p></div>
@@ -448,7 +478,7 @@ function pickVoice(){
     const vs=speechSynthesis.getVoices();
     const chosen = S.voiceName && vs.find(v=>v.name===S.voiceName);
     if(chosen){ voiceReady=chosen; if(document.getElementById('voiceSel')) renderVoicePicker(); return; }
-    const pref = S.persona==='kiwi' ? ['en-NZ','en-AU'] : ['en-AU','en-NZ'];
+    const pref = S.persona==='straight' ? ['en-AU','en-NZ'] : ['en-NZ','en-AU'];
     const rich=v=>!v.localService || /neural|natural|wavenet|premium|enhanced|network/i.test(v.name);
     voiceReady = vs.find(v=>v.lang===pref[0]&&rich(v)) || vs.find(v=>v.lang===pref[0]) || vs.find(v=>v.lang===pref[1]&&rich(v)) || vs.find(v=>v.lang===pref[1]) || vs.find(v=>v.lang&&v.lang.indexOf('en-GB')===0) || vs.find(v=>v.lang&&v.lang.indexOf('en')===0) || null;
     if(document.getElementById('voiceSel')) renderVoicePicker();
@@ -466,18 +496,40 @@ const REO=[
 ];
 const REO_RX=REO.map(pr=>[new RegExp('(^|[^A-Za-zĀāĒēĪīŌōŪū])'+pr[0]+'(?![A-Za-zĀāĒēĪīŌōŪū])','gi'), pr[1]]);
 function forSpeech(t){ let s=t; REO_RX.forEach(pr=>{ s=s.replace(pr[0], (m,pre)=>pre+pr[1]); }); return s; }
+/* Delivery engine. Each persona has a delivery: base pace and pitch, how much it bounces from
+   sentence to sentence, how long the gaps between thoughts are, and whether the last thought
+   trails off. An ellipsis in a line is a longer beat. Utterances are chained with real pauses. */
+const DELIVERY={
+ kiwi:{rate:0.88, pitch:0.97, bounce:0.07, gap:[260,520], beat:700, trail:true},
+ gentle:{rate:0.84, pitch:0.88, bounce:0.025, gap:[380,700], beat:900, trail:true},
+ straight:{rate:1.0, pitch:1.0, bounce:0, gap:[120,180], beat:350, trail:false}
+};
+let speakToken=0;
 function speak(text, force){
   if(!S.voice && !force) return;
   try{
     speechSynthesis.cancel();
-    const kiwi=S.persona==='kiwi';
-    const parts=forSpeech(text).split(/(?<=[.!?])\s+/).filter(Boolean);
-    parts.forEach(pt=>{
-      const u=new SpeechSynthesisUtterance(pt);
-      u.rate=S.rate*(kiwi?0.94:1.0); u.pitch=S.pitch*(kiwi?0.96:1);
+    const D=DELIVERY[S.persona]||DELIVERY.kiwi;
+    const my=++speakToken;
+    const raw=forSpeech(text).replace(/\s*…\s*/g,' …|').split(/(?<=[.!?])\s+|\|/).map(s=>s.trim()).filter(Boolean);
+    const chunks=raw.map(s=>({t:s.replace(/…$/,'').trim(), beat:/…$/.test(s)}));
+    let i=0;
+    const next=()=>{
+      if(my!==speakToken || i>=chunks.length) return;
+      const c=chunks[i], last=i===chunks.length-1; i++;
+      if(!c.t){ setTimeout(next, D.beat); return; }
+      const u=new SpeechSynthesisUtterance(c.t);
+      const wob=()=>1+(Math.random()*2-1)*D.bounce;
+      u.rate=S.rate*D.rate*wob()*(last&&D.trail?0.92:1);
+      u.pitch=S.pitch*D.pitch*wob()*(last&&D.trail?0.94:1);
       if(voiceReady) u.voice=voiceReady;
+      let done=false;
+      const go=()=>{ if(done) return; done=true; setTimeout(next, c.beat?D.beat:D.gap[0]+Math.random()*(D.gap[1]-D.gap[0])); };
+      u.onend=go; u.onerror=go;
+      setTimeout(go, 1500+c.t.length*110);
       speechSynthesis.speak(u);
-    });
+    };
+    next();
   }catch(e){}
 }
 let AC=null;
@@ -733,34 +785,66 @@ const PERSONAS={
  },
  kiwi:{
   label:'Deadpan Kiwi · te reo',
-  allWalls:n=>'Tū meke, '+n+'. All four walls up. That’s a whare. Bit smug about it, are we? Ka pai. Be smug.',
-  cardio:(m,t)=> t==='hiit' ? 'Intervals done. Tino pai. Your heart just found out what it’s for.' : m+' minutes of zone two, logged. Ka pai. Not a marathon. But marathons are mostly walking with better marketing anyway.',
-  weight:(v,n)=>v+' kilos. Logged. It’s one day, e hoa. One day is not a story. Fifty days is a story. We’re writing the fifty.',
-  waist:(v,b)=>v+' centimetres. '+(b==='ok'?'On target. Ka pai. I’m not going to make a big thing of it. It is a big thing though.':b==='warn'?'That’s the raised-risk band, which is a polite way of saying the doctors have a name for it. Under ninety-four. That’s the number. Kia kaha, we’re going there.':'Āe. That’s the high-risk band. Not a lecture, just a fact, and facts are what we attack. This one’s first.'),
-  check:()=>'Logged. A health check. Most blokes would rather wrestle a possum. You did the check. Ka pai, e hoa.',
-  voiceOn:()=>'Kia ora. It’s me, the voice in your phone. Let’s go and do some mahi on that body, eh.',
-  voiceTest:n=>'Kia ora '+n+', e hoa. I’m your pocket coach. I call the exercises, count your sets, and run the rest clock. I’ll also notice when you don’t turn up. I’m very good at noticing. It’s basically my whole thing. Mauri ora.',
-  built:(n,d)=>'Ka pai, '+n+'. Program’s built. '+d+' strength sessions a week, a hundred and fifty minutes of zone two, and four walls every day. Whakapakari tinana. I’ll hold you to it. Gently. Like a large friendly dog holding a stick.',
-  start:(n,s,ex)=>'Kia ora, '+n+'. '+s+'. Mahi time. Warm-up first. Five minutes, properly. Not that thing where you swing one arm and call it a warm-up. Then '+ex+'.',
-  next:(why,e)=>(why==='warm'?'You’re warm. Ka pai. ':why==='skip'?'Skipping that one. Interesting choice, e hoa. Moving on. ':pick(['Done. Ka pai. ','That’s one. Majestic, honestly. ','Tino pai. Nobody saw that but me, and I was impressed. ','Good. Solid. Very solid. Like a fridge. ','Āe. That’s the one. ']))+'Next: '+e.n+'. '+e.s+' sets of '+cleanReps(e.r)+'. '+e.cue,
-  rest:s=>pick(['Taihoa. Rest, '+s+' seconds. Breathe. Look at the ceiling. Contemplate your choices.','Taihoa, e hoa. '+s+' seconds. Have a little stand there. You’ve earned a stand.','Rest, '+s+' seconds. Don’t look at your phone. Well, this is your phone. Look at it, but only at me.']),
-  ten:()=>pick(['Ten seconds. Get set. The ceiling’s had enough of you.','Ten seconds. Kia kaha. Pretend someone’s watching. Someone is. It’s me.']),
-  go:()=>pick(['Go!','Haere. Go go go.','Āe. Go.']),
-  finish:(n,sets,mins,hit,left)=>'Tū meke, '+n+'. '+sets+' sets in '+mins+' minutes. '+(hit?'That’s the week’s strength target. Ka pai. Have a little sit down. You’ve earned a sit down.':left+' to go this week. That’s not a suggestion, it’s more of a fact.')+' Kai and water within the hour. Protein first. Then be smug at somebody. Mauri ora.',
-  early:()=>'Ended early. It doesn’t count, and I say that with aroha. Tomorrow, then. I’ll be here. I’m always here. It’s a bit sad, really.',
-  hrOn:()=>'Heart rate’s connected. I can see your actual heart now. Bit intimate. Kia kaha. Let’s go.',
-  importOk:()=>'Watch data’s in. Ka pai. Now I can see what you actually did, as opposed to the version you told yourself. The two are usually different.',
-  importNone:()=>'No Samsung Health files in that one, e hoa. Pick the zip from Download personal data.',
+  allWalls:n=>'Oh… tū meke, '+n+'. All four walls up. That’s a whare, that is. Bit smug about it, are we?… Yeah. Ka pai. Be smug.',
+  cardio:(m,t)=> t==='hiit' ? 'Intervals, done. Tino pai… Your heart just found out what it’s for. Bit of a shock for it, probably.' : m+' minutes of zone two… logged. Ka pai. Not a marathon, no. But marathons are mostly just walking with better marketing, eh.',
+  weight:(v,n)=>v+' kilos… logged. It’s one day, e hoa. One day’s not a story… Fifty days, that’s a story. We’re writing the fifty.',
+  waist:(v,b)=>v+' centimetres. '+(b==='ok'?'On target… Ka pai. I’m not going to make a big thing of it… It is a big thing though.':b==='warn'?'Yeah… that’s the raised-risk band. Which is a polite way of saying the doctors have got a name for it. Under ninety-four, that’s the number… Kia kaha. We’re going there.':'Āe… so that’s the high-risk band. Not a lecture. Just a fact… and facts are what we attack. This one’s first.'),
+  check:()=>'Logged… A health check. Most blokes would rather wrestle a possum, honestly. You did the check. Ka pai, e hoa.',
+  voiceOn:()=>'Kia ora… it’s me. The voice in your phone. Let’s go and do some mahi on that body, eh… Yeah. Let’s do that.',
+  voiceTest:n=>'Kia ora, '+n+', e hoa… I’m your pocket coach. I call the exercises, I count your sets, I run the rest clock… I’ll also notice when you don’t turn up. I’m very good at noticing. It’s basically my whole thing… Mauri ora.',
+  built:(n,d)=>'Ka pai, '+n+'… program’s built. '+d+' strength sessions a week. Hundred and fifty minutes of zone two. Four walls, every day… Whakapakari tinana. I’ll hold you to it. Gently… like a large friendly dog holding a stick.',
+  start:(n,s,ex)=>'Kia ora, '+n+'… '+s+'. Mahi time. Warm-up first. Five minutes… properly. Not that thing where you swing one arm and call it a warm-up… Then '+ex+'.',
+  next:(why,e)=>(why==='warm'?'You’re warm. Ka pai… ':why==='skip'?'Skipping that one… interesting choice, e hoa. Moving on. ':pick(['Done. Ka pai… ','That’s one… majestic, honestly. ','Tino pai. Nobody saw that but me… and I was impressed. ','Good. Solid… very solid. Like a fridge. Yeah. ','Āe… that’s the one. ','Sweet as… ']))+'Next up, '+e.n+'. '+e.s+' sets of '+cleanReps(e.r)+'… '+e.cue,
+  rest:s=>pick(['Taihoa… rest, '+s+' seconds. Breathe. Look at the ceiling… contemplate your choices.','Taihoa, e hoa… '+s+' seconds. Have a little stand there. You’ve earned a stand.','Rest… '+s+' seconds. Don’t look at your phone… Well. This is your phone. Look at it, but only at me.','Right… '+s+' seconds. Just… stand there and be magnificent. Quietly.']),
+  ten:()=>pick(['Ten seconds… get set. The ceiling’s had enough of you.','Ten seconds… kia kaha. Pretend someone’s watching… Someone is. It’s me.','Ten… yeah, nah, that’s about it for the rest. Up you get.']),
+  go:()=>pick(['Go.','Haere… go go go.','Āe… go.','And… go.']),
+  finish:(n,sets,mins,hit,left)=>'Tū meke, '+n+'… '+sets+' sets in '+mins+' minutes. '+(hit?'And that’s… that’s the week’s strength target. Ka pai. Have a little sit down… you’ve earned a sit down.':'Yeah. '+left+' to go this week… that’s not a suggestion, that’s more of a… fact.')+' Kai and water within the hour, protein first… Then go and be smug at somebody. Mauri ora.',
+  early:()=>'Ended early… It doesn’t count, and I say that with aroha. Tomorrow, then… I’ll be here. I’m always here… It’s a bit sad, really.',
+  hrOn:()=>'Heart rate’s connected… I can see your actual heart now. Bit intimate… Kia kaha. Let’s go.',
+  importOk:()=>'Watch data’s in. Ka pai… Now I can see what you actually did. As opposed to… the version you told yourself. The two are usually different.',
+  importNone:()=>'Yeah, nah… no Samsung Health files in that one, e hoa. Pick the zip… from Download personal data.',
   pep:[
-   'Kia ora, {n}. Shoes on. Water bottle. Mahi time. We’re doing this properly today, and by properly I mean actually doing it.',
-   '{n}, e hoa. You’re fifty-six. That’s not old, that’s experienced. Now go and be experienced at squats.',
-   'Nobody’s coming to do it for you, {n}. Which sounds bleak. But think about it: nobody can stop you either. Freedom. Terrifying, sweaty freedom.',
-   'The hardest set is the first one. After that it’s just momentum and mild regret, and you’re already good at both. Kia kaha.',
-   'Kia kaha, {n}. Your mokopuna are going to need a koro who can get down on the floor and, crucially, get back up. That second bit’s the training.',
-   'You’ve finished every workout you’ve ever started, {n}. That’s a hundred percent record. Don’t ruin a hundred percent record. Haere mai. Start.',
-   'Look, I’m not going to yell. Yelling’s for people who don’t have a plan. We have a plan. It’s on the Train tab. Go and look at it with your legs.',
-   'Whakapakari tinana, {n}. Strengthen the body. It’s not a slogan, it’s the to-do list. One item. Go.'],
-  pepStatus:(ws)=> ws.missed>0 ? ' You’re '+ws.missed+' down this week, by the way. I noticed. I notice everything. Fix it today, e hoa.' : ws.sessions>=ws.target ? ' Week’s strength target is done. Ka pai. Don’t get weird about it. Go for a walk.' : ' '+(ws.target-ws.sessions)+' left this week. That’s a fact, not a vibe.'
+   'Kia ora, {n}… Shoes on. Water bottle. Mahi time. We’re doing this properly today… and by properly, I mean actually doing it.',
+   '{n}, e hoa… You’re fifty-six. That’s not old. That’s… experienced. Now go and be experienced at squats.',
+   'Nobody’s coming to do it for you, {n}… which sounds bleak. But think about it… nobody can stop you, either. Freedom. Terrifying, sweaty freedom.',
+   'The hardest set is the first one… After that it’s just momentum and mild regret. And you’re already good at both… Kia kaha.',
+   'Kia kaha, {n}… Your mokopuna are going to need a koro who can get down on the floor… and, crucially, get back up. That second bit’s the training.',
+   'You’ve finished every workout you’ve ever started, {n}… That’s a hundred percent record. Don’t ruin a hundred percent record… Haere mai. Start.',
+   'Look… I’m not going to yell. Yelling’s for people who don’t have a plan. We’ve got a plan… It’s on the Train tab. Go and look at it… with your legs.',
+   'Whakapakari tinana, {n}… strengthen the body. It’s not a slogan. It’s the to-do list… One item. Go.',
+   'Sweet as, {n}… here’s the thing. You don’t have to feel like it. Nobody feels like it… You just have to put the shoes on. The shoes do the rest. Well… you do the rest. But the shoes help.'],
+  pepStatus:(ws)=> ws.missed>0 ? ' Oh… and you’re '+ws.missed+' down this week, by the way. I noticed… I notice everything. Fix it today, e hoa.' : ws.sessions>=ws.target ? ' Week’s strength target’s done… Ka pai. Don’t get weird about it. Go for a walk.' : ' '+(ws.target-ws.sessions)+' left this week… That’s a fact. Not a vibe.'
+ },
+ gentle:{
+  label:'Gentle giant · te reo',
+  allWalls:n=>'Hey, '+n+'… all four walls are up. That’s really good, man. I’m proud of you… I don’t say that to everyone. I do, actually. But I mean it this time.',
+  cardio:(m,t)=> t==='hiit' ? 'Oh, you did the intervals… That’s a hard one. Your heart’s going to be a bit upset with you, but… in a good way. Ka pai.' : 'Okay… '+m+' minutes of zone two. Logged. That’s nice walking, man… Every minute goes in the bank. I keep the bank. It’s just a list, really.',
+  weight:(v,n)=>'Okay… '+v+' kilos. I’ve written it down. Please don’t be upset about one number, '+n+'… One number is just one number. We look at the line, not the dot.',
+  waist:(v,b)=>v+' centimetres… '+(b==='ok'?'That’s under ninety-four. That’s the good zone… I’m really happy for you. Quietly, though.':b==='warn'?'That’s… in the raised-risk band. I’m sorry, man. The doctors have a name for that band and it’s not a nice name… But it’s okay. Under ninety-four is the goal, and we walk there together. Kia kaha.':'Okay… so that one’s in the high-risk band. I’m not going to pretend it isn’t… That would be rude. But it’s just a number, and numbers move when we move. This one’s first.'),
+  check:()=>'Oh… you did a health check. That’s really responsible, man… A lot of guys don’t. I’m not judging them. I’m just… quietly pleased with you.',
+  voiceOn:()=>'Hey… it’s me. The voice in your phone. Sorry to bother you… Shall we go and do some mahi? I think we should. Kia ora.',
+  voiceTest:n=>'Hey, '+n+'… I’m your coach. I’ll tell you the exercises, I’ll count your sets, and I’ll run the rest clock… very calmly. And if you don’t turn up, I’ll notice… I won’t make a big thing of it. But I will notice. Mauri ora.',
+  built:(n,d)=>'Okay, '+n+'… I’ve made your program. '+d+' strength sessions a week. Hundred and fifty minutes of walking. Four walls every day… Whakapakari tinana. It’s a good plan, man. I’ll hold you to it… gently. But I will hold you to it.',
+  start:(n,s,ex)=>'Hey, '+n+'… '+s+' today. Let’s do the warm-up first. Five minutes… I know it’s boring. Boring is how we don’t get hurt… Then '+ex+'.',
+  next:(why,e)=>(why==='warm'?'Okay, you’re warm… That’s good. ':why==='skip'?'Oh… we’re skipping that one. That’s okay. I’ll remember it, though… Moving on. ':pick(['Nice one… ','Oh, that was good, man… ','Ka pai… very calm. ','That’s done. I liked that one… ','Okay… good. ']))+'Next is '+e.n+'. '+e.s+' sets of '+cleanReps(e.r)+'… '+e.cue,
+  rest:s=>pick(['Okay… rest now. '+s+' seconds. Just breathe, man… You don’t have to do anything. That’s the whole job.','Taihoa… '+s+' seconds. Have a little stand… I’ll watch the clock. You just be here.','Rest… '+s+' seconds. You did really well… I’m going to be quiet now.']),
+  ten:()=>pick(['Ten seconds, man… sorry. Get ready.','Ten seconds… I know. It goes fast when you’re resting. Up you get.']),
+  go:()=>pick(['Okay… go.','Go, man.','Off you go… gently.']),
+  finish:(n,sets,mins,hit,left)=>'Hey… that’s the session, '+n+'. '+sets+' sets in '+mins+' minutes. '+(hit?'And that’s the week’s target, too… I’m really happy for you. Go and have a sit down. You’ve earned it, man.':'There’s '+left+' more this week… I’m not nagging. I’m just saying it out loud so it exists.')+' Kai and water within the hour… protein first. Tū meke. Mauri ora.',
+  early:()=>'Oh… we’re stopping early. That’s okay. I’m not angry… I’m just going to write down that it didn’t count. Tomorrow, then, man… I’ll be right here.',
+  hrOn:()=>'Oh… I can see your heart rate now. That’s… quite personal. Thank you for trusting me with it… Let’s go.',
+  importOk:()=>'Your watch data’s in… Thanks, man. Now I can see what you actually did… It’s usually a bit different from what people remember. That’s okay. Everyone’s like that.',
+  importNone:()=>'Oh… there weren’t any Samsung Health files in that one. Sorry… Pick the zip from Download personal data. It’s the big one.',
+  pep:[
+   'Hey, {n}… I don’t want to bother you. But it’s time. Shoes on… water bottle. We’ll go slow. But we’ll go.',
+   '{n}, man… you’re fifty-six. That’s not old. I know guys who are rocks, and they’re older than that… Let’s go and do the squats.',
+   'Nobody’s going to do it for you, {n}… I would if I could. I genuinely would… But I don’t have legs. So it’s you.',
+   'The first set’s the hard one, man… After that, your body sort of remembers it knows how to do this… Kia kaha.',
+   'Kia kaha, {n}… your mokopuna are going to want a koro who can get down on the floor with them… and then get back up. We train the getting back up. That’s the important bit.',
+   'You’ve finished every workout you ever started, {n}… That’s a really good record. Let’s not… let’s not spoil it. Haere mai. Start.',
+   'I’m not going to yell, man… I don’t really yell. But I’ll be a bit sad if you don’t go… And I’ll say so. Quietly.',
+   'Whakapakari tinana, {n}… strengthen the body. That’s the whole list today. One thing… Go and do the one thing.'],
+  pepStatus:(ws)=> ws.missed>0 ? ' Oh… and you’re '+ws.missed+' down this week. I noticed. I’m not upset… I just think we should fix it today, man.' : ws.sessions>=ws.target ? ' You’ve done the week’s strength target… That’s really good. Go for a walk, though. Don’t just… stop.' : ' There’s '+(ws.target-ws.sessions)+' left this week… I’m just saying it so it exists.'
  }
 };
 function P(){ return PERSONAS[S.persona]||PERSONAS.kiwi; }
@@ -1038,17 +1122,17 @@ function drawWeightChart(){
   const X=i=>L+(W-L-R)*i/(data.length-1), Y=v=>T+(H-T-B)*(1-(v-y0)/(y1-y0));
   let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Bodyweight trend">';
   [lo, (lo+hi)/2, hi].forEach(v=>{
-    s+='<line x1="'+L+'" y1="'+Y(v)+'" x2="'+(W-R)+'" y2="'+Y(v)+'" stroke="#2C3742" stroke-width="1"/>';
-    s+='<text x="'+(L-6)+'" y="'+(Y(v)+4)+'" text-anchor="end" font-size="10" fill="#94A1AC" font-family="Barlow">'+v.toFixed(1)+'</text>';
+    s+='<line x1="'+L+'" y1="'+Y(v)+'" x2="'+(W-R)+'" y2="'+Y(v)+'" stroke="#163A55" stroke-width="1"/>';
+    s+='<text x="'+(L-6)+'" y="'+(Y(v)+4)+'" text-anchor="end" font-size="10" fill="#7FB3CC" font-family="Rajdhani">'+v.toFixed(1)+'</text>';
   });
-  s+='<polyline fill="none" stroke="#F2A03D" stroke-width="2" stroke-linejoin="round" points="'+data.map((d,i)=>X(i)+','+Y(d.kg)).join(' ')+'"/>';
+  s+='<polyline fill="none" stroke="#3EE0FF" stroke-width="2" stroke-linejoin="round" points="'+data.map((d,i)=>X(i)+','+Y(d.kg)).join(' ')+'"/>';
   data.forEach((d,i)=>{
     const last=i===data.length-1;
-    s+='<circle cx="'+X(i)+'" cy="'+Y(d.kg)+'" r="'+(last?5:3.5)+'" fill="'+(last?'#F2A03D':'#10151B')+'" stroke="#F2A03D" stroke-width="2"><title>'+fmtD(d.d)+': '+d.kg.toFixed(1)+' kg</title></circle>';
+    s+='<circle cx="'+X(i)+'" cy="'+Y(d.kg)+'" r="'+(last?5:3.5)+'" fill="'+(last?'#3EE0FF':'#050A12')+'" stroke="#3EE0FF" stroke-width="2"><title>'+fmtD(d.d)+': '+d.kg.toFixed(1)+' kg</title></circle>';
   });
   const first=data[0], lastD=data[data.length-1];
-  s+='<text x="'+X(0)+'" y="'+(H-6)+'" font-size="10" fill="#94A1AC" text-anchor="start" font-family="Barlow">'+fmtD(first.d)+'</text>';
-  s+='<text x="'+X(data.length-1)+'" y="'+(H-6)+'" font-size="10" fill="#94A1AC" text-anchor="end" font-family="Barlow">'+fmtD(lastD.d)+'</text>';
+  s+='<text x="'+X(0)+'" y="'+(H-6)+'" font-size="10" fill="#7FB3CC" text-anchor="start" font-family="Rajdhani">'+fmtD(first.d)+'</text>';
+  s+='<text x="'+X(data.length-1)+'" y="'+(H-6)+'" font-size="10" fill="#7FB3CC" text-anchor="end" font-family="Rajdhani">'+fmtD(lastD.d)+'</text>';
   s+='</svg>';
   const diff=lastD.kg-first.kg;
   box.innerHTML=s+'<p class="sub" style="margin:4px 0 0">'+(diff<=0?'':'+')+diff.toFixed(1)+' kg across '+data.length+' weigh-ins</p>';
@@ -1115,9 +1199,10 @@ function renderVoicePicker(){
 $('voiceSel').onchange=()=>{ S.voiceName=$('voiceSel').value; save(); pickVoice(); speak(P().voiceOn(), true); };
 $('rateIn').oninput=()=>{ S.rate=+$('rateIn').value; $('rateVal').textContent=S.rate.toFixed(2)+'×'; save(); };
 $('pitchIn').oninput=()=>{ S.pitch=+$('pitchIn').value; $('pitchVal').textContent=S.pitch.toFixed(2)+'×'; save(); };
-$('rateIn').onchange=$('pitchIn').onchange=()=>speak('Kia ora. Like this. Bit fast? Bit slow? Your call, e hoa.', true);
+$('rateIn').onchange=$('pitchIn').onchange=()=>speak('Kia ora… like this. Bit fast? Bit slow?… Your call, e hoa.', true);
 $('btnVoiceRefresh').onclick=()=>{ pickVoice(); renderVoicePicker(); speak(voiceReady?'This is the voice I found.':'', true); };
-$('btnPersona').onclick=()=>{ S.persona = S.persona==='kiwi' ? 'straight' : 'kiwi'; save(); pickVoice(); renderCoach(); speak(P().voiceOn(), true); };
+$('btnSample').onclick=()=>speak(pick(P().pep).replace(/\{n\}/g,S.profile?S.profile.name:'mate'), true);
+$('btnPersona').onclick=()=>{ S.persona = S.persona==='kiwi' ? 'gentle' : S.persona==='gentle' ? 'straight' : 'kiwi'; save(); pickVoice(); renderCoach(); speak(P().voiceOn(), true); };
 $('btnVoice').onclick=()=>{ S.voice=!S.voice; save(); renderCoach(); if(S.voice) speak(P().voiceOn()); };
 $('btnVoiceTest').onclick=()=>speak(P().voiceTest(S.profile?S.profile.name:''), true);
 $('btnCopy').onclick=()=>{ try{ $('exportBox').select(); document.execCommand('copy'); if(navigator.clipboard) navigator.clipboard.writeText($('exportBox').value); $('btnCopy').textContent='Copied ✓'; setTimeout(()=>$('btnCopy').textContent='Copy backup',1500);}catch(e){} };

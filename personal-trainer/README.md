@@ -5,7 +5,24 @@ runs in Samsung Internet or Chrome and can be added to the home screen. Everythi
 stored in the phone's browser storage; nothing is uploaded.
 
 Built for Mathew Hema (56, Māori male): the coach is demanding, the program follows
-the evidence for men over 50, and the daily structure is Te Whare Tapa Whā.
+the evidence for men over 50, and the daily structure is Te Whare Tapa Whā. The look
+is a HUD: arc-reactor cyan on near-black, gold secondary, translucent panels with corner
+brackets, Orbitron for numbers and Rajdhani for the interface.
+
+## Coach styles and voice
+
+Three styles, cycled from the Coach tab. Every spoken line comes from a persona table and
+is played through a delivery engine (base pace and pitch, sentence-to-sentence bounce,
+real pauses between thoughts, a trailing-off drop on the last thought; an ellipsis in a
+line is a longer beat):
+
+- **Deadpan Kiwi**: unhurried and bouncy, warm, casually deadpan, te reo Māori woven in.
+- **Gentle giant**: soft, slow, low, very polite, still not letting you off.
+- **Straight coach**: plain.
+
+Te reo words are respelled for the speech engine only (whānau is sent as far-no) so an
+English voice pronounces them properly; the screen keeps the correct spelling. The app
+prefers the phone's New Zealand English voice and ranks the network (neural) voices first.
 
 ## What it does
 
