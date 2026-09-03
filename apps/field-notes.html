@@ -172,6 +172,28 @@
     clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
   }
   #live:empty::before { content: "› Awaiting audio input…"; color: var(--muted); font-family: var(--mono); font-size: 13px; letter-spacing: 0.06em; }
+  #btnDim {
+    margin-top: 14px; padding: 8px 18px; color: var(--muted); font-weight: 700; font-size: 13px;
+    letter-spacing: 0.14em; text-transform: uppercase; border: 1px solid var(--line-dim);
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+  #btnDim[hidden] { display: none !important; }
+
+  /* ---------- Dim (stealth recording) overlay ---------- */
+  #dimmer {
+    position: fixed; inset: 0; background: #000; z-index: 300;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+  }
+  #dimmer[hidden] { display: none !important; }
+  #dimmer .dot {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--rec);
+    box-shadow: 0 0 14px rgba(255, 92, 77, 0.8);
+    animation: dimpulse 1.8s ease-in-out infinite;
+  }
+  @keyframes dimpulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+  @media (prefers-reduced-motion: reduce) { #dimmer .dot { animation: none; } }
+  #dimTimer { font-family: var(--mono); font-size: 15px; color: rgba(255, 92, 77, 0.65); letter-spacing: 0.1em; font-variant-numeric: tabular-nums; }
+  #dimmer .hint { color: rgba(216, 237, 247, 0.22); font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
 
   /* ---------- Review ---------- */
   #review { width: 100%; display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
@@ -192,9 +214,10 @@
     padding: 14px 16px;
     clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   }
-  .aiblock h4 { margin: 0 0 6px; font-family: var(--display); font-size: 10px; letter-spacing: 0.2em; color: var(--gold); font-weight: 600; }
+  .aiblock h4 { margin: 12px 0 4px; font-family: var(--display); font-size: 10px; letter-spacing: 0.2em; color: var(--gold); font-weight: 600; }
+  .aiblock h4:first-child { margin-top: 0; }
   .aiblock p { margin: 0; font-size: 15px; font-weight: 500; }
-  .aiblock ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; font-weight: 500; }
+  .aiblock ul { margin: 4px 0 0; padding-left: 20px; font-size: 15px; font-weight: 500; }
   .btnrow { display: flex; gap: 10px; }
   .btn {
     flex: 1; text-align: center; padding: 13px 16px; font-weight: 700; font-size: 14px;
@@ -334,6 +357,7 @@
           </div>
           <div id="timer">00:00</div>
           <p id="recHint">Tap to capture a conversation or a thought. Audio is transcribed live, on-device.</p>
+          <button id="btnDim" hidden>◐ Dim screen</button>
           <div id="live" style="width:100%"></div>
         </div>
       </div>
@@ -342,10 +366,7 @@
         <input id="rvTitle" placeholder="Untitled note">
         <textarea id="rvTranscript" placeholder="Transcript (you can edit or type here)"></textarea>
         <div class="aiblock" id="aiPreview" hidden>
-          <h4>AI Analysis</h4>
-          <p id="aiSummary"></p>
-          <ul id="aiActions"></ul>
-          <div class="chips" id="aiTags" style="margin-top:8px"></div>
+          <div id="aiOut"></div>
         </div>
         <p class="ainote" id="aiMsg" hidden></p>
         <div class="btnrow">
@@ -391,6 +412,13 @@
 </div>
 
 <div id="toast" hidden></div>
+
+<!-- STEALTH DIM OVERLAY -->
+<div id="dimmer" hidden>
+  <div class="dot"></div>
+  <div id="dimTimer">00:00</div>
+  <div class="hint">Recording · tap to wake</div>
+</div>
 
 <script>
 (() => {
@@ -564,13 +592,17 @@
     $("dDelete").hidden = !!n.example;
     $("dTitle").textContent = n.title || "Untitled note";
     $("dMeta").textContent = `${fmtDate(n.createdAt)}${n.durationSec ? " · " + fmtDur(n.durationSec) : ""}${n.example ? " · example" : ""}`;
+    const ul = (arr) => `<ul style="margin:0;padding-left:20px;font-size:16px;font-weight:500">${arr.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>`;
     let html = "";
     if (n.summary) html += `<div class="dsec"><h4>Summary</h4><p>${esc(n.summary)}</p></div>`;
+    if (n.keyPoints && n.keyPoints.length) html += `<div class="dsec"><h4>Key points</h4>${ul(n.keyPoints)}</div>`;
+    if (n.decisions && n.decisions.length) html += `<div class="dsec"><h4>Decisions</h4>${ul(n.decisions)}</div>`;
     if (n.actions && n.actions.length) {
       html += `<div class="dsec"><h4>Action items</h4>` + n.actions.map((a, i) =>
         `<div class="action${a.done ? " done" : ""}"><input type="checkbox" id="act${i}" data-i="${i}" ${a.done ? "checked" : ""} ${n.example ? "disabled" : ""}><label for="act${i}">${esc(a.text)}</label></div>`
       ).join("") + `</div>`;
     }
+    if (n.tangents && n.tangents.length) html += `<div class="dsec"><h4>Off topic / parked</h4>${ul(n.tangents)}</div>`;
     if (n.tags && n.tags.length) html += `<div class="chips" style="margin:2px 4px 14px">${n.tags.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>`;
     if (n.transcript) html += `<div class="dsec"><details class="transcript" ${n.summary ? "" : "open"}><summary>Transcript</summary><div>${esc(n.transcript)}</div></details></div>`;
     $("dBody").innerHTML = html;
@@ -595,11 +627,34 @@
 
   if (!SR) $("recHint").textContent = HINT_NO_SR;
 
+  // Screen wake lock: the app holds the screen awake by itself while recording,
+  // because the OS suspends the page (and transcription) the moment the phone locks.
+  let wakeLock = null;
+  const canWake = !!(navigator.wakeLock && navigator.wakeLock.request);
+  async function acquireWake() {
+    if (!canWake) return;
+    try { wakeLock = await navigator.wakeLock.request("screen"); } catch { wakeLock = null; }
+  }
+  function releaseWake() { try { wakeLock?.release(); } catch {} wakeLock = null; }
+
+  // If the page was hidden (lock button, app switch), transcription was suspended:
+  // on return, re-grab the wake lock and respawn the recognizer so capture resumes.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && recording) {
+      acquireWake();
+      if (rec) { try { rec.onend = null; rec.stop(); } catch {} rec = null; }
+      try { spinUpRecognizer(); } catch {}
+    }
+  });
+
   $("bigmic").addEventListener("click", () => {
     if (recording) stopRecording();
     else if (SR) startRecording();
     else startReview("", 0, "typed"); // no speech API: jump straight to a typed note
   });
+
+  $("btnDim").addEventListener("click", () => { $("dimmer").hidden = false; });
+  $("dimmer").addEventListener("click", () => { $("dimmer").hidden = true; });
 
   function startRecording() {
     finalText = ""; $("live").textContent = "";
@@ -608,8 +663,16 @@
     $("micring").classList.add("recording");
     $("micIcon").hidden = true; $("stopIcon").hidden = false;
     $("bigmic").setAttribute("aria-label", "Stop recording");
-    $("recHint").textContent = "Recording. Keep the screen on — transcription pauses if the phone locks.";
-    timerIv = setInterval(() => { $("timer").textContent = fmtDur((Date.now() - recStart) / 1000); }, 400);
+    $("recHint").textContent = canWake
+      ? "Recording. The screen stays awake automatically — use Dim for a near-dark screen."
+      : "Recording. Keep the screen on — transcription pauses if the phone locks.";
+    $("btnDim").hidden = false;
+    timerIv = setInterval(() => {
+      const t = fmtDur((Date.now() - recStart) / 1000);
+      $("timer").textContent = t;
+      $("dimTimer").textContent = t;
+    }, 400);
+    acquireWake();
     spinUpRecognizer();
   }
 
@@ -642,6 +705,9 @@
   function stopRecording() {
     recording = false;
     clearInterval(timerIv);
+    releaseWake();
+    $("dimmer").hidden = true;
+    $("btnDim").hidden = true;
     if (rec) { try { rec.onend = null; rec.stop(); } catch {} rec = null; }
     $("bigmic").classList.remove("recording");
     $("micring").classList.remove("recording");
@@ -662,7 +728,7 @@
     $("rvTitle").value = "";
     $("rvTranscript").value = transcript;
     $("aiPreview").hidden = true; $("aiMsg").hidden = true;
-    $("aiSummary").textContent = ""; $("aiActions").innerHTML = ""; $("aiTags").innerHTML = "";
+    $("aiOut").innerHTML = "";
     $("btnAI").hidden = !sampleFn;
     $("btnAI").disabled = false; $("btnAI").textContent = "✦ AI Analysis";
     if (source === "typed") $("rvTranscript").focus();
@@ -689,23 +755,43 @@
     btn.disabled = true; btn.textContent = "Analysing…";
     $("aiMsg").hidden = true;
     try {
+      const strArr = (v, cap) => (Array.isArray(v) ? v.map((t) => String(t)).filter(Boolean).slice(0, cap) : []);
       const j = await sampleFn.json(
-        `From the note transcript below, reply with ONLY this JSON object:\n` +
-        `{"title": string (max 8 words, plain, no quotes inside), "summary": string (2-4 sentences), ` +
-        `"action_items": string[] (imperative phrasing; empty array if none), "tags": string[] (1-4 short lowercase topic words)}\n\n` +
-        `Transcript:\n"""\n${transcript.slice(0, 20000)}\n"""`
+        `You are analysing a RAW speech-to-text transcript. Expect noise: mis-heard words, cut-off fragments, ` +
+        `filler, several unlabelled speakers talking over each other, background chatter, and off-topic tangents. ` +
+        `Use context to infer what was actually meant; silently skip filler, crosstalk and irrelevant background ` +
+        `fragments; correct obvious mis-recognitions from context. Never invent content the transcript doesn't support — ` +
+        `if something is too garbled to interpret, leave it out. Follow the discussion's MAIN thread even when it ` +
+        `wanders off topic and comes back.\n\n` +
+        `Reply with ONLY this JSON object:\n` +
+        `{"title": string (max 8 words, plain),\n` +
+        ` "summary": string (3-5 sentences covering the main thread and outcome),\n` +
+        ` "key_points": string[] (up to 8 substantive points, in the order discussed; empty for a trivial note),\n` +
+        ` "decisions": string[] (explicit decisions actually made; empty if none),\n` +
+        ` "action_items": string[] (imperative, include the owner if one was named; empty if none),\n` +
+        ` "tangents": string[] (one line each for off-topic threads worth remembering; empty if none),\n` +
+        ` "tags": string[] (1-4 short lowercase topic words)}\n\n` +
+        `Transcript:\n"""\n${transcript.slice(0, 40000)}\n"""`
       );
       const ai = {
         title: String(j?.title || "").slice(0, 120),
         summary: String(j?.summary || ""),
-        actions: Array.isArray(j?.action_items) ? j.action_items.map((t) => ({ text: String(t), done: false })) : [],
-        tags: Array.isArray(j?.tags) ? j.tags.map((t) => String(t).toLowerCase()).slice(0, 4) : [],
+        keyPoints: strArr(j?.key_points, 8),
+        decisions: strArr(j?.decisions, 10),
+        actions: strArr(j?.action_items, 15).map((t) => ({ text: t, done: false })),
+        tangents: strArr(j?.tangents, 8),
+        tags: strArr(j?.tags, 4).map((t) => t.toLowerCase()),
       };
       reviewData.ai = ai;
       if (ai.title && !$("rvTitle").value.trim()) $("rvTitle").value = ai.title;
-      $("aiSummary").textContent = ai.summary;
-      $("aiActions").innerHTML = ai.actions.map((a) => `<li>${esc(a.text)}</li>`).join("");
-      $("aiTags").innerHTML = ai.tags.map((t) => `<span class="chip">${esc(t)}</span>`).join("");
+      const li = (arr) => arr.map((t) => `<li>${esc(t)}</li>`).join("");
+      let out = `<h4>Summary</h4><p>${esc(ai.summary)}</p>`;
+      if (ai.keyPoints.length) out += `<h4>Key points</h4><ul>${li(ai.keyPoints)}</ul>`;
+      if (ai.decisions.length) out += `<h4>Decisions</h4><ul>${li(ai.decisions)}</ul>`;
+      if (ai.actions.length) out += `<h4>Action items</h4><ul>${li(ai.actions.map((a) => a.text))}</ul>`;
+      if (ai.tangents.length) out += `<h4>Off topic / parked</h4><ul>${li(ai.tangents)}</ul>`;
+      if (ai.tags.length) out += `<div class="chips" style="margin-top:10px">${ai.tags.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>`;
+      $("aiOut").innerHTML = out;
       $("aiPreview").hidden = false;
       btn.textContent = "↻ Regenerate";
     } catch (e) {
@@ -727,7 +813,10 @@
       title: $("rvTitle").value.trim() || (ai && ai.title) || transcript.split(/\s+/).slice(0, 6).join(" "),
       transcript,
       summary: (ai && ai.summary) || "",
+      keyPoints: (ai && ai.keyPoints) || [],
+      decisions: (ai && ai.decisions) || [],
       actions: (ai && ai.actions) || [],
+      tangents: (ai && ai.tangents) || [],
       tags: (ai && ai.tags) || [],
       createdAt: new Date().toISOString(),
       durationSec: Math.round(reviewData?.durationSec || 0),
@@ -748,7 +837,9 @@
     const parts = [];
     for (const n of notes) {
       const actions = (n.actions || []).map((a) => `- ${a.done ? "[done] " : "[open] "}${a.text}`).join("\n");
-      const chunk = `### ${n.title || "Untitled"} (${fmtDate(n.createdAt)})\n${n.summary ? n.summary + "\n" : ""}${actions ? actions + "\n" : ""}Transcript: ${String(n.transcript || "").slice(0, 1500)}\n`;
+      const decisions = (n.decisions || []).map((d) => `- decided: ${d}`).join("\n");
+      const points = (n.keyPoints || []).map((p) => `- ${p}`).join("\n");
+      const chunk = `### ${n.title || "Untitled"} (${fmtDate(n.createdAt)})\n${n.summary ? n.summary + "\n" : ""}${points ? points + "\n" : ""}${decisions ? decisions + "\n" : ""}${actions ? actions + "\n" : ""}Transcript: ${String(n.transcript || "").slice(0, 1200)}\n`;
       if (budget - chunk.length < 0) break;
       budget -= chunk.length;
       parts.push(chunk);
