@@ -8,6 +8,7 @@ This repository is two things:
    replies, and prepares admin fixes, using the operator knowledge versioned in
    `.claude/skills/`. **Start here → [`docs/using-the-assistant.md`](docs/using-the-assistant.md)**
    for access channels, the prompt playbook, and what it can execute vs prepare.
+   To get better at using it, read [`docs/ai-usage-guide.md`](docs/ai-usage-guide.md).
    The assistant's charter and guardrails are in [`CLAUDE.md`](CLAUDE.md).
 
 2. **Reporting and data-flow monitoring** for the **Ask Zeus** ICT helpdesk queue
