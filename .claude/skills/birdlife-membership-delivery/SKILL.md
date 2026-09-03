@@ -72,9 +72,12 @@ SF G1 Keith reference model (4 Sep)
  → SF G5 lifecycle automation (30 Oct)
  → SF G6 N5b dates exposed to integration (6 Nov)
  → MO G6 reverse channel (13 Nov)
- → WP G5b reminders (27 Nov)  → WP G6 test (27 Nov)   ← zero slack
+ → WP G5b reminders (27 Nov)  → WP G6 test (4 Dec, moved 3 Sep from 27 Nov to give the test a week)
  → WP G7 / MO G8 / SF G9 production (11 Dec)
 ```
+
+Re-dated 3 Sep 2026 with reasons on each task: O3, O4 and the AUTO letter to 11 Sep;
+requirements sign-off to 8 Sep; WP G6 test to 4 Dec.
 
 Parallel feeders: MO G0 housekeeping and MO G1 defects (4 Sep) → MO G2
 dependency hold (2 Oct) → MO G3 FLS (9 Oct) → MO G4 mapping one (16 Oct) →
