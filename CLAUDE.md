@@ -63,6 +63,10 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
 - `docs/using-the-assistant.md` — remote access channels and the prompt playbook.
 - `docs/entra-admin-connector.md` — the plan to promote Tier 2 Entra/Exchange
   actions to approve-only direct execution.
+- `docs/daily-improvement-schedule.md` — Mathew's daily improvement cadence (four
+  fixed slots, one role per weekday, weekly scorecard, dated plan). The 16:30
+  close-out slot writes `docs/improvement-log.md`; when a session is asked to
+  "close out the day", append that day's line and commit.
 - `dashboard/ict-dashboard.html` — the ICT dashboard design template; the live copy
   is republished each weekday by the `ICT Dashboard` routine.
 - `routines/` — scheduled-routine definitions and backups (credentials redacted).

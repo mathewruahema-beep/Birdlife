@@ -291,6 +291,9 @@ console/index.html                   the ICT Console — interactive prompt buil
                                      (published at https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e)
 .claude/skills/                      the nine birdlife-* operator-knowledge skills (versioned)
 docs/using-the-assistant.md          remote access channels + prompt playbook
+docs/daily-improvement-schedule.md   Mathew's daily improvement cadence: four fixed slots, weekly themes, scorecard, dated plan
+docs/improvement-log.md              one line per working day, written in the 16:30 close-out slot
+docs/cadence-board.html              source of the ICT Improvement Cadence board (https://claude.ai/code/artifact/0132d64d-f0c2-4ab3-87ab-eaeede193704)
 README.md                            findings, admin runbook, routine consolidation
 dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
