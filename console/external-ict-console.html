@@ -146,6 +146,13 @@
   .msg.bad { background: var(--red-soft); color: var(--red); }
   .msg:empty { display: none; }
   .empty { font-size: 14px; color: var(--muted); padding: 8px 0; }
+  .decide { grid-column: 1 / -1; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-top: 4px; }
+  .decide .ctx { font-size: 13.5px; color: var(--muted); white-space: pre-wrap; margin-bottom: 8px; }
+  .dlog { padding: 8px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+  .dlog:first-child { border-top: none; }
+  .dlog .call { font-weight: 700; }
+  .dlog .why { color: var(--muted); font-size: 13.5px; white-space: pre-wrap; }
+  .dlog .meta { font-size: 12.5px; color: var(--muted); }
   footer { margin-top: 26px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
   @media (prefers-reduced-motion: no-preference) { .btn, .tile, .chipbtn { transition: border-color .12s, opacity .12s; } }
 </style>
@@ -211,10 +218,14 @@
         <div class="field"><label for="if-kind">Kind</label>
           <select id="if-kind"><option value="task">Task</option><option value="decision">Decision</option><option value="risk">Risk</option></select></div>
         <div class="field"><label for="if-due">Due</label><input id="if-due" type="date"></div>
+        <div class="field wide" id="if-context-wrap" hidden><label for="if-context">Options and context</label><textarea id="if-context" placeholder="Option A: keep the file server, $4k/yr, nobody patches it. Option B: move to SharePoint, 3 days of my time, staff retraining. Client leans A because of cost."></textarea></div>
       </div>
       <div class="btnrow"><button class="btn" id="if-add">Add item</button></div>
       <div class="msg" id="if-msg"></div>
     </div>
+
+    <h2>Decision log <span class="hint" style="margin:0">the calls made, with the reason, so nobody relitigates them</span></h2>
+    <div class="card" id="decision-log"></div>
   </section>
 
   <!-- ============ ASK ============ -->
@@ -387,13 +398,13 @@
   // ============================================================
   // DESK: engagement register on the artifact db
   // ============================================================
-  var db = null, engagements = [], items = [], filter = 'all', editingId = null;
+  var db = null, sampleNs = null, engagements = [], items = [], filter = 'all', editingId = null, decideOpen = null;
   var EXAMPLE = [
     { id: 'ex1', name: 'M365 hardening and Essential Eight read', org: 'Example: a community health provider', role: 'Security review', tenant: 'example-health.org.au', contact: 'Practice manager', status: 'active', authorised: true, authNote: 'Signed SOW, read-only tenant access', dataNote: 'Client data stays in tenant', next: 'Run the tenant baseline check and send findings', due: todayStr(), example: true },
     { id: 'ex2', name: 'Fractional ICT manager', org: 'Example: a regional not-for-profit', role: 'ICT management', tenant: 'example-nfp.org.au', contact: 'CEO', status: 'active', authorised: false, authNote: '', dataNote: '', next: 'Get the engagement letter signed before touching the tenant', due: '', example: true }
   ];
   var EXAMPLE_ITEMS = [
-    { id: 'exi1', engagementId: 'ex1', title: 'Decision: block legacy authentication tenant-wide', kind: 'decision', due: todayStr(), done: false, example: true },
+    { id: 'exi1', engagementId: 'ex1', title: 'Decision: block legacy authentication tenant-wide', kind: 'decision', context: 'Option A: block now, two scanners stop sending mail until reconfigured. Option B: block in 30 days after the scanners are moved to OAuth.', due: todayStr(), done: false, example: true },
     { id: 'exi2', engagementId: 'ex2', title: 'Risk: no backup for SharePoint beyond the 93-day recycle bin', kind: 'risk', due: '', done: false, example: true }
   ];
   var storeDot = $('store-dot'), storeStatus = $('store-status');
@@ -467,11 +478,17 @@
     $('item-list').innerHTML = list.map(function (i) {
       var e = engById(i.engagementId);
       var kind = i.kind === 'decision' ? '<span class="chip t2">Decision</span> ' : i.kind === 'risk' ? '<span class="chip bad">Risk</span> ' : '';
+      var decideBtn = (i.kind === 'decision' && !i.done && !i.example) ? ' <button class="btn ghost small" data-decide="' + esc(i.id) + '" style="margin-top:6px">' + (decideOpen === i.id ? 'Close' : 'Decide') + '</button>' : '';
+      var wb = (decideOpen === i.id && !i.done) ? decideHtml(i) : '';
       return '<div class="item' + (i.done ? ' done' : '') + '">' +
         '<input type="checkbox" ' + (i.done ? 'checked' : '') + ' data-toggle="' + esc(i.id) + '" aria-label="Mark done"' + (i.example ? ' disabled' : '') + '>' +
-        '<div>' + kind + esc(i.title) + '<div class="who">' + (e ? esc(e.org.replace(/^Example: /, '')) + ' · ' + esc(e.name) : 'No engagement') + (i.example ? ' · <span class="chip ex">Example</span>' : '') + '</div></div>' +
-        '<div class="due' + (!i.done && isLate(i.due) ? ' late' : '') + '">' + (i.due ? fmtDate(i.due) : '') + '</div></div>';
+        '<div>' + kind + esc(i.title) + '<div class="who">' + (e ? esc(e.org.replace(/^Example: /, '')) + ' · ' + esc(e.name) : 'No engagement') + (i.example ? ' · <span class="chip ex">Example</span>' : '') + '</div>' + decideBtn + '</div>' +
+        '<div class="due' + (!i.done && isLate(i.due) ? ' late' : '') + '">' + (i.due ? fmtDate(i.due) : '') + '</div>' + wb + '</div>';
     }).join('');
+    $('item-list').querySelectorAll('[data-decide]').forEach(function (b) {
+      b.addEventListener('click', function () { decideOpen = (decideOpen === b.dataset.decide) ? null : b.dataset.decide; renderItems(); if (decideOpen) wireDecide(decideOpen); });
+    });
+    if (decideOpen) wireDecide(decideOpen);
     $('item-list').querySelectorAll('[data-toggle]').forEach(function (cb) {
       cb.addEventListener('change', function () {
         if (!db) return;
@@ -481,6 +498,62 @@
     });
   }
 
+  function decideHtml(i) {
+    var e = engById(i.engagementId);
+    return '<div class="decide">' +
+      (i.context ? '<div class="ctx">' + esc(i.context) + '</div>' : '<div class="ctx">No options recorded. Edit the item context below or just record the call.</div>') +
+      '<div class="field wide"><label for="dc-context">Options and context</label><textarea id="dc-context">' + esc(i.context || '') + '</textarea></div>' +
+      '<div class="btnrow" style="margin-top:6px">' + (sampleNs ? '<button class="btn ghost small" id="dc-reco">Get a frank recommendation</button>' : '') +
+      '<button class="btn ghost small" id="dc-copy">Copy as a request for Claude</button></div>' +
+      '<div class="answer" id="dc-answer"></div>' +
+      '<div class="field wide" style="margin-top:8px"><label for="dc-call">The call</label><input id="dc-call" placeholder="Option B. Move to SharePoint before the server warranty ends."></div>' +
+      '<div class="field wide" style="margin-top:6px"><label for="dc-why">Why, in one or two lines</label><input id="dc-why" placeholder="Unpatched server is the bigger risk than the retraining cost."></div>' +
+      '<div class="field" style="margin-top:6px"><label for="dc-who">Who made or approved it</label><input id="dc-who" placeholder="' + esc(e && e.contact ? e.contact : 'Client contact') + '"></div>' +
+      '<div class="btnrow"><button class="btn small" id="dc-record">Record the decision</button></div>' +
+      '<div class="msg" id="dc-msg"></div></div>';
+  }
+  function decisionPrompt(i) {
+    var e = engById(i.engagementId);
+    return PREAMBLE + 'Decision needed for ' + (e ? e.org + ' (' + e.name + ')' : 'an external client') + ': ' + i.title + '.\n\nOptions and context:\n' + ($('dc-context') ? $('dc-context').value.trim() : (i.context || '')) +
+      '\n\nGive me one recommendation, not a survey. State it in the first line, then the two strongest reasons, the main risk of that call, what it will do to the people using the system, and the one condition under which you would choose differently. Under 200 words. No em dashes.';
+  }
+  function wireDecide(id) {
+    var i = items.filter(function (x) { return x.id === id; })[0]; if (!i || !$('dc-record')) return;
+    $('dc-copy').addEventListener('click', function () { copyText(decisionPrompt(i), $('dc-copy'), 'Copied ✓'); });
+    if ($('dc-reco')) {
+      var ctl = null;
+      $('dc-reco').addEventListener('click', function () {
+        if (ctl) { ctl.abort(); return; }
+        var out = $('dc-answer'); out.textContent = 'Thinking…'; ctl = new AbortController(); $('dc-reco').textContent = 'Stop';
+        sampleNs(decisionPrompt(i), { signal: ctl.signal, modelTier: 'default', cache: false, onText: function (u) { out.textContent = u.text; } })
+          .then(function (r) { out.textContent = r.text; })
+          .catch(function (err) { out.textContent = (err && err.text) || ''; if (err && err.code !== 'cancelled') setMsg('dc-msg', 'bad', 'No recommendation (' + (err.code || 'error') + '). Copy the request into a Claude session instead.'); })
+          .then(function () { ctl = null; if ($('dc-reco')) $('dc-reco').textContent = 'Get a frank recommendation'; });
+      });
+    }
+    $('dc-record').addEventListener('click', function () {
+      var call = $('dc-call').value.trim(); if (!call) { setMsg('dc-msg', 'bad', 'Write the call first.'); return; }
+      if (!db) { setMsg('dc-msg', 'bad', 'Storage is not available in this view.'); return; }
+      var reco = $('dc-answer').textContent; if (reco === 'Thinking…') reco = '';
+      $('dc-record').disabled = true;
+      db.doc('items/' + id).update({ done: true, doneAt: new Date().toISOString(), context: $('dc-context').value.trim(), decision: call, rationale: $('dc-why').value.trim(),
+        decidedBy: $('dc-who').value.trim(), decidedAt: todayStr(), recommendation: reco.slice(0, 4000) })
+        .then(function () { decideOpen = null; })
+        .catch(function (err) { $('dc-record').disabled = false; setMsg('dc-msg', 'bad', 'Not recorded: ' + friendlyDb(err)); });
+    });
+  }
+  function renderDecisionLog() {
+    var list = items.filter(function (i) { return i.kind === 'decision' && i.done && i.decision; })
+      .sort(function (a, b) { return (b.decidedAt || '') < (a.decidedAt || '') ? -1 : 1; });
+    if (!list.length) { $('decision-log').innerHTML = '<div class="empty">No decisions recorded yet. Add a decision item above, then press Decide when the call is made.</div>'; return; }
+    $('decision-log').innerHTML = list.map(function (i) {
+      var e = engById(i.engagementId);
+      return '<div class="dlog"><div class="call">' + esc(i.decision) + '</div>' +
+        '<div class="meta">' + esc(i.title) + ' · ' + (e ? esc(e.org) : '') + ' · ' + fmtDate(i.decidedAt) + (i.decidedBy ? ' · ' + esc(i.decidedBy) : '') + '</div>' +
+        (i.rationale ? '<div class="why">' + esc(i.rationale) + '</div>' : '') + '</div>';
+    }).join('');
+  }
+
   function renderEngSelect() {
     var sel = $('if-eng'); var cur = sel.value;
     var opts = engagements.filter(function (e) { return e.status !== 'closed' && !e.example; });
@@ -488,7 +561,7 @@
     if (cur) sel.value = cur;
   }
 
-  function renderDesk() { renderTiles(); renderEngagements(); renderItems(); renderEngSelect(); }
+  function renderDesk() { renderTiles(); renderEngagements(); renderItems(); renderDecisionLog(); renderEngSelect(); }
 
   function friendlyDb(err) {
     if (!err) return 'unknown error';
@@ -532,6 +605,7 @@
       .then(function () { $('ef-form').hidden = true; editingId = null; $('ef-delete').dataset.armed = ''; $('ef-delete').textContent = 'Delete engagement'; })
       .catch(function (err) { setMsg('ef-msg', 'bad', 'Not deleted: ' + friendlyDb(err)); });
   });
+  $('if-kind').addEventListener('change', function () { $('if-context-wrap').hidden = $('if-kind').value !== 'decision'; });
   $('if-add').addEventListener('click', function () {
     var title = $('if-title').value.trim(), eng = $('if-eng').value;
     if (!title) { setMsg('if-msg', 'bad', 'Write the item first.'); return; }
@@ -539,8 +613,8 @@
     if (!db) { setMsg('if-msg', 'bad', 'Storage is not available in this view.'); return; }
     if (items.length >= 400) { setMsg('if-msg', 'bad', 'The item list is at its limit. Delete closed engagements to prune their items.'); return; }
     $('if-add').disabled = true;
-    db.collection('items').add({ engagementId: eng, title: title, kind: $('if-kind').value, due: $('if-due').value, done: false, createdAt: new Date().toISOString() })
-      .then(function () { $('if-add').disabled = false; $('if-title').value = ''; $('if-due').value = ''; setMsg('if-msg', 'ok', 'Added.'); setTimeout(function () { setMsg('if-msg', '', ''); }, 1500); })
+    db.collection('items').add({ engagementId: eng, title: title, kind: $('if-kind').value, due: $('if-due').value, context: $('if-context').value.trim(), done: false, createdAt: new Date().toISOString() })
+      .then(function () { $('if-add').disabled = false; $('if-title').value = ''; $('if-due').value = ''; $('if-context').value = ''; setMsg('if-msg', 'ok', 'Added.'); setTimeout(function () { setMsg('if-msg', '', ''); }, 1500); })
       .catch(function (err) { $('if-add').disabled = false; setMsg('if-msg', 'bad', 'Not added: ' + friendlyDb(err)); });
   });
 
@@ -554,7 +628,7 @@
       if (e.dataNote) out.push('- Data handling: ' + e.dataNote);
       if (e.next) out.push('- Next: ' + e.next + (e.due ? ' (due ' + e.due + ')' : ''));
       var its = items.filter(function (i) { return i.engagementId === e.id; });
-      if (its.length) { out.push('- Items:'); its.forEach(function (i) { out.push('  - [' + (i.done ? 'x' : ' ') + '] ' + i.kind + ': ' + i.title + (i.due ? ' (due ' + i.due + ')' : '')); }); }
+      if (its.length) { out.push('- Items:'); its.forEach(function (i) { out.push('  - [' + (i.done ? 'x' : ' ') + '] ' + i.kind + ': ' + i.title + (i.due ? ' (due ' + i.due + ')' : '') + (i.decision ? '\n    Decision (' + (i.decidedAt || '') + (i.decidedBy ? ', ' + i.decidedBy : '') + '): ' + i.decision + (i.rationale ? '. ' + i.rationale : '') : '')); }); }
       out.push('');
     });
     return out.join('\n');
@@ -659,6 +733,7 @@
   if (window.claude && typeof window.claude.use === 'function') {
     window.claude.use('sample').then(function (sample) {
       if (!sample) return;
+      sampleNs = sample; if (decideOpen) renderItems();
       var b = $('ask-here'); b.hidden = false;
       var ctl = null;
       b.addEventListener('click', function () {

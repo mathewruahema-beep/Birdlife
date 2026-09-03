@@ -137,7 +137,20 @@ can add an item or update a next action on the user's behalf. Fields:
   (active | paused | closed), `authorised` (bool), `authNote`, `dataNote`,
   `next`, `due` (YYYY-MM-DD), `createdAt`, `updatedAt`.
 - `items/{id}`: `engagementId`, `title`, `kind` (task | decision | risk), `due`,
-  `done` (bool), `createdAt`, `doneAt`.
+  `done` (bool), `createdAt`, `doneAt`. Decisions also carry `context` (the
+  options), and once decided `decision` (the call), `rationale`, `decidedBy`,
+  `decidedAt` and `recommendation` (what the in-page ask returned, if used).
+
+## Decisions are the user's
+
+The console's Decide flow gives one frank recommendation, then records the call
+the user actually made, with the reason and who approved it, in the Decision log.
+When the user asks for a recommendation: one call in the first line, the two
+strongest reasons, the main risk, what it does to the people using the system,
+and the one condition that would change the call. Never a survey of options.
+When the user has made a call, record it and move on; do not relitigate it
+unless a fact changes. The authorisation flag and the conflict rule are warnings
+the user sees, not gates the tool enforces.
 
 Keep the register lean: close engagements rather than deleting them, and delete
 closed engagements only when the user asks.
