@@ -40,8 +40,8 @@ p{margin:0 0 .9rem;max-width:38rem}
 ul,ol{padding-left:1.25rem;margin:0 0 1rem;max-width:38rem}
 li{margin:0 0 .6rem}
 li strong,p strong{font-weight:600}
-.habit{display:grid;grid-template-columns:2.2rem 1fr;gap:.75rem;margin:0 0 1.75rem;max-width:38rem}
-.habit .n{font-family:var(--serif);font-size:1.6rem;color:var(--gold);line-height:1;padding-top:.15rem;font-variation-settings:"opsz" 144}
+.habit{display:grid;grid-template-columns:3.25rem 1fr;gap:.9rem;margin:0 0 1.75rem;max-width:38rem}
+.habit .n{font-family:var(--serif);font-size:1.9rem;color:var(--gold);line-height:1;padding-top:.15rem;font-variation-settings:"opsz" 144}
 .habit h3{margin:0 0 .3rem}
 .habit p{margin:0 0 .5rem}
 .ex{font-family:var(--mono);font-size:.82rem;line-height:1.55;padding:.6rem .8rem;background:var(--bg2);border-radius:3px;margin:.4rem 0 .8rem;overflow-x:auto}
@@ -58,7 +58,7 @@ tbody tr:nth-child(even){background:var(--tableband)}
 .friday li{counter-increment:q;display:grid;grid-template-columns:2rem 1fr;gap:.6rem;padding:.7rem 0;border-top:1px solid var(--rule)}
 .friday li::before{content:counter(q);font-family:var(--serif);color:var(--gold);font-size:1.2rem;line-height:1.2}
 footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.75rem;color:var(--ink2)}
-@media (max-width:480px){body{font-size:16px}h1{font-size:1.9rem}.wrap{padding:1rem 1rem 3rem}}
+@media (max-width:480px){body{font-size:16px}h1{font-size:1.9rem}.wrap{padding:1rem 1rem 3rem}ol.ten li,.habit{grid-template-columns:2.75rem 1fr;gap:.7rem}}
 
 /* daily block */
 .daily{padding:1.75rem 0 1.25rem;border-bottom:1px solid var(--rule)}
@@ -67,8 +67,8 @@ footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--rule);font-
 .rep p{margin:0 0 .4rem}
 .rep .say{font-family:var(--mono);font-size:.8rem;color:var(--ink2)}
 ol.ten{list-style:none;padding:0;margin:0;counter-reset:h;max-width:none}
-ol.ten li{counter-increment:h;display:grid;grid-template-columns:2.2rem 1fr;gap:.75rem;padding:1rem 0;border-top:1px solid var(--rule);margin:0}
-ol.ten li::before{content:counter(h);font-family:var(--serif);font-size:1.6rem;line-height:1;color:var(--gold);padding-top:.1rem;font-variation-settings:"opsz" 144}
+ol.ten li{counter-increment:h;display:grid;grid-template-columns:3.25rem 1fr;gap:.9rem;padding:1.1rem 0;border-top:1px solid var(--rule);margin:0}
+ol.ten li::before{content:counter(h);font-family:var(--serif);font-size:1.9rem;line-height:1;color:var(--gold);padding-top:.05rem;font-variant-numeric:tabular-nums;font-variation-settings:"opsz" 144}
 ol.ten h3{margin:0 0 .3rem}
 ol.ten p{margin:0 0 .35rem}
 .try{font-size:.95rem}
