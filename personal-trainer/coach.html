@@ -177,6 +177,29 @@
   .sci:last-child{border-bottom:none}
   .sci b{display:block; color:var(--ink)}
   .sci span{color:var(--muted)}
+  .chips{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 10px}
+  .chip{background:rgba(62,224,255,.06); border:1px solid var(--line); color:var(--muted); border-radius:2px; padding:5px 11px; font-size:12.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase}
+  .chip.on{color:var(--accent); border-color:var(--accent); box-shadow:0 0 8px rgba(62,224,255,.3)}
+  .lm{display:flex; align-items:center; gap:10px; padding:7px 2px; border-bottom:1px solid rgba(27,74,107,.6); font-size:15.5px}
+  .lm:last-child{border-bottom:none}
+  .lm .d{font-size:12px; color:var(--faint); letter-spacing:.06em; text-transform:uppercase; width:56px; flex:none}
+  .lm .n{flex:1; min-width:0}
+  .lm .n small{display:block; color:var(--faint); font-size:12.5px}
+  .lm .add{background:rgba(62,224,255,.1); color:var(--accent); border:1px solid var(--line); width:34px; height:34px; border-radius:3px; font-size:20px; line-height:1; flex:none}
+  .lm input.secs{width:64px; flex:none; padding:6px 8px; text-align:right; font-family:'Orbitron',sans-serif; font-size:12px}
+  .lm .rm{background:none; color:var(--faint); padding:0 6px; font-size:16px; flex:none}
+  .lvl{display:inline-block; font-family:'Orbitron',sans-serif; font-size:10.5px; letter-spacing:.1em; color:var(--gold); border:1px solid rgba(242,178,51,.45); padding:2px 7px; border-radius:2px; margin-left:8px; vertical-align:middle}
+  label.chk{display:flex; align-items:center; gap:8px; text-transform:none; letter-spacing:0; font-size:15px; color:var(--ink); font-weight:500}
+  label.chk input{width:20px; height:20px; accent-color:var(--accent)}
+  #flow{position:fixed; inset:0; background-color:var(--bg); z-index:55; display:none; overflow-y:auto;
+    background-image:radial-gradient(ellipse 90% 40% at 50% -8%, rgba(82,242,184,.16), transparent 60%),
+      linear-gradient(rgba(62,224,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(62,224,255,.045) 1px, transparent 1px);
+    background-size:100% 100%, 100% 28px, 28px 100%}
+  #flow.on{display:block}
+  .flowclock{font-family:'Orbitron',sans-serif; font-weight:900; font-size:84px; color:var(--good); font-variant-numeric:tabular-nums; line-height:1; text-align:center; margin:14px 0 4px; text-shadow:0 0 28px rgba(82,242,184,.55)}
+  .flowclock.pre{color:var(--gold); text-shadow:0 0 28px rgba(242,178,51,.5)}
+  .flowphase{text-align:center; font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); font-weight:700}
+  .side{display:inline-block; font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); border:1px solid var(--line); padding:3px 9px; border-radius:2px; margin-top:6px}
   .hrbox{display:flex; align-items:center; gap:10px; margin-top:12px; min-height:34px}
   .hrbox .hr{font-family:'Orbitron',sans-serif; font-weight:900; font-size:24px; color:var(--danger); font-variant-numeric:tabular-nums; text-shadow:0 0 12px rgba(255,90,78,.6)}
   .hrbox .zone{font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
@@ -279,6 +302,48 @@
       <div class="sci"><b>Zone 2: 150 minutes a week minimum</b><span>Walking, cycling, rowing at a pace where you can talk but not sing. Cardiorespiratory fitness is the strongest single predictor of how long you live. Rest days are walk days.</span></div>
       <div class="sci"><b>Intervals: one session a week (from week 4)</b><span>4 × 4 minutes hard, 3 minutes easy between. This is the fastest known way to raise VO2max. Build the Zone 2 base for three weeks first.</span></div>
       <div class="sci"><b>Power and balance are built in</b><span>Swings, squat jumps, split squats and carries. Leg power and single-leg balance are what keep a 70-year-old off the floor. You are training for that now.</span></div>
+    </div>
+  </div>
+
+  <!-- MOVE -->
+  <div class="screen" id="scr-move">
+    <div class="card hero-card">
+      <h3>Mobility · yoga, Pilates, stretching</h3>
+      <p class="call" id="moveCall"></p>
+      <div class="score" id="moveStats"></div>
+    </div>
+    <div class="card">
+      <h3>Sessions</h3>
+      <div id="flowList"></div>
+      <p class="note">Each session levels up as you complete it: level 2 after 6 completions (holds ×1.25), level 3 after 12 (holds ×1.5). That is how flexibility is actually built: the same shapes, held a little longer, week after week.</p>
+    </div>
+    <div class="card" id="flowDetail"></div>
+    <div class="card">
+      <h3>Build your own session</h3>
+      <div class="field"><label for="bName">Session name</label><input id="bName" placeholder="e.g. Sunday hips"></div>
+      <div class="chips" id="bChips"></div>
+      <div id="bLib"></div>
+      <div style="margin-top:14px"><label>Your session <span id="bMins" style="color:var(--accent)"></span></label><div id="bItems"></div></div>
+      <button class="btn" id="btnSaveFlow" style="margin-top:12px">Save session</button>
+    </div>
+    <div class="card">
+      <h3>Add a move to the library</h3>
+      <div class="field"><label for="mName">Move name</label><input id="mName" placeholder="e.g. Foam roll quads"></div>
+      <div class="row">
+        <div class="field"><label for="mDisc">Type</label><select id="mDisc"><option value="yoga">Yoga</option><option value="pilates">Pilates</option><option value="stretch">Stretch</option></select></div>
+        <div class="field"><label for="mSecs">Seconds</label><input id="mSecs" type="number" value="40" min="10" max="600"></div>
+      </div>
+      <div class="field"><label class="chk"><input type="checkbox" id="mSides"> Done on both sides</label></div>
+      <div class="field"><label for="mCue">Coaching cue</label><input id="mCue" placeholder="What to feel, what to avoid"></div>
+      <button class="btn ghost" id="btnAddMove">Add to library</button>
+      <div id="customMoves" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <h3>Why this matters at 56</h3>
+      <div class="sci"><b>Stretch after you lift, not instead of lifting</b><span>Static holds of 30–60 seconds, two to three times a week, measurably increase range of motion in older adults. Hip flexors, hamstrings, chest and thoracic spine are where desk years live.</span></div>
+      <div class="sci"><b>Pilates is core control, and core control is a healthy back</b><span>Slow, precise, breathing-led. The Hundred, bird dog and dead bug train the deep stabilisers that stop your lower back doing the job your glutes should do.</span></div>
+      <div class="sci"><b>Yoga is balance and breath</b><span>Tree, warrior and single-leg work are fall prevention. Slow nasal breathing on the floor drops the stress response and helps the sleep score.</span></div>
+      <div class="sci"><b>Never bounce, never into pain</b><span>Mild pull, steady breath, ease off if it sharpens. Joint replacements or a disc history: get the physio to tick the list first.</span></div>
     </div>
   </div>
 
@@ -433,6 +498,32 @@
   </div>
 </div>
 
+<!-- FLOW OVERLAY (yoga / Pilates / stretch runner) -->
+<div id="flow">
+  <div class="sess-head">
+    <div class="t" id="flowTitle"></div>
+    <button class="btn ghost small" id="btnFlowQuit">End</button>
+  </div>
+  <div class="wrap">
+    <div class="prog"><i id="flowProg" style="width:0%"></i></div>
+    <div class="sub num" id="flowCount"></div>
+    <h2 style="font-size:28px; margin-top:6px" id="flowName"></h2>
+    <div id="flowSide"></div>
+    <div class="flowphase" id="flowPhase">Get into position</div>
+    <div class="flowclock pre num" id="flowClock">5</div>
+    <div class="cue" id="flowCue"></div>
+    <div class="row">
+      <button class="btn ghost small" id="btnFlowPause">Pause</button>
+      <button class="btn ghost small" id="btnFlowPlus">+15 s</button>
+      <button class="btn ghost small" id="btnFlowSkip">Skip</button>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>Coming up</h3>
+      <div id="flowNext"></div>
+    </div>
+  </div>
+</div>
+
 <!-- REST OVERLAY -->
 <div id="rest">
   <div class="t">Rest</div>
@@ -445,6 +536,7 @@
 <nav>
   <button data-scr="today" class="on"><span class="ic">☀️</span>Today</button>
   <button data-scr="train"><span class="ic">🏋️</span>Train</button>
+  <button data-scr="move"><span class="ic">🧘</span>Move</button>
   <button data-scr="fuel"><span class="ic">🍳</span>Fuel</button>
   <button data-scr="progress"><span class="ic">📈</span>Progress</button>
   <button data-scr="coach"><span class="ic">🎧</span>Coach</button>
@@ -463,6 +555,7 @@ S.habits=S.habits||{}; S.checks=S.checks||{};
 S.persona=S.persona||'kiwi';
 S.voiceName=S.voiceName||''; S.rate=S.rate||1; S.pitch=S.pitch||1;
 S.health=S.health||{}; ['steps','sleep','hr','imported'].forEach(k=>{ S.health[k]=S.health[k]||{} });
+S.flows=Array.isArray(S.flows)?S.flows:[]; S.custom=S.custom||{}; S.custom.moves=S.custom.moves||[]; S.custom.flows=S.custom.flows||[];
 
 const dayKey = d => { const x=new Date(d); x.setMinutes(x.getMinutes()-x.getTimezoneOffset()); return x.toISOString().slice(0,10) };
 const todayKey = () => dayKey(new Date());
@@ -886,7 +979,7 @@ const WALLS=[
 ];
 const HABIT_COUNT=WALLS.reduce((a,w)=>a+w.habits.length,0);
 function dayActive(k){
-  if(S.workouts.some(w=>w.d===k) || S.cardio.some(c=>c.d===k)) return true;
+  if(S.workouts.some(w=>w.d===k) || S.cardio.some(c=>c.d===k) || S.flows.some(f=>f.d===k)) return true;
   const h=S.habits[k]; if(!h) return false;
   return Object.keys(h).filter(x=>h[x]).length>=4;
 }
@@ -906,11 +999,12 @@ function weekStats(){
   const sessions=S.workouts.filter(w=>w.d>=ws).length;
   const z2=S.cardio.filter(c=>c.d>=ws).reduce((a,c)=>a+c.mins,0);
   const hiit=S.cardio.filter(c=>c.d>=ws && c.type==='hiit').length;
+  const mob=S.flows.filter(f=>f.d>=ws).length;
   const sched=SCHEDULES[S.profile.days];
   const todayDow=new Date().getDay();
   const dowMon=d=>(d+6)%7; // Monday=0
   const passed=sched.filter(d=>dowMon(d)<dowMon(todayDow)).length;
-  return {sessions:sessions, z2:z2, hiit:hiit, target:S.profile.days, missed:Math.max(0,passed-sessions)};
+  return {sessions:sessions, z2:z2, hiit:hiit, mob:mob, target:S.profile.days, missed:Math.max(0,passed-sessions)};
 }
 
 /* ============ render: shell ============ */
@@ -922,6 +1016,7 @@ function show(scr){
   window.scrollTo(0,0);
   if(scr==='today') renderToday();
   if(scr==='train') renderTrain();
+  if(scr==='move') renderMove();
   if(scr==='fuel') renderFuel();
   if(scr==='progress') renderProgress();
   if(scr==='coach') renderCoach();
@@ -947,7 +1042,7 @@ function coachCall(){
     const sess=plan[idx%plan.length];
     lines.push('Today is <b>'+sess.name+'</b>. '+sess.ex.length+' exercises, about '+estMins(sess)+' minutes. It is not optional, it is scheduled.');
   } else {
-    lines.push('<b>Rest day.</b> Rest is not sitting. 30 to 45 minutes of Zone 2 walking, then hit the four walls below. That is the job today.');
+    lines.push('<b>Rest day.</b> Rest is not sitting. 30 to 45 minutes of Zone 2 walking, a mobility session, then the four walls below. That is the job today.');
   }
   if(ws.missed>0) lines.push('You have missed <b>'+ws.missed+' session'+(ws.missed>1?'s':'')+'</b> this week already. Make one up today; I am not moving the target.');
   else if(last!==null && last>=4) lines.push('It has been <b>'+last+' days</b> since your last session. Excuses are cheap; sets are not.');
@@ -968,14 +1063,18 @@ function renderToday(){
   html+='<p class="call">'+call.html+'</p>';
   if(call.sessIdx>=0 && !call.doneToday) html+='<button class="btn" style="margin-top:8px" id="btnStartToday">Start today’s session ▶</button>';
   else if(!call.doneToday) html+='<button class="btn ghost" style="margin-top:8px" id="btnStartAny">Train anyway ▶</button>';
-  html+='<div class="score">'+
+  const rec=recommendFlow(call.sessIdx>=0, call.doneToday);
+  if(rec && !S.flows.some(f=>f.d===todayKey())) html+='<button class="btn good" style="margin-top:8px" id="btnStartFlowToday">'+(call.doneToday?'Post-lift stretch':'Mobility')+': '+rec.name+' · '+flowMins(rec)+' min ▶</button>';
+  html+='<div class="score" style="grid-template-columns:repeat(4,1fr)">'+
     '<div class="tile '+(ws.sessions>=ws.target?'ok':ws.missed>0?'behind':'')+'"><div class="v num">'+ws.sessions+'<small>/'+ws.target+'</small></div><div class="k">Strength</div></div>'+
-    '<div class="tile '+(ws.z2>=150?'ok':'')+'"><div class="v num">'+ws.z2+'<small>/150</small></div><div class="k">Zone 2 min</div></div>'+
+    '<div class="tile '+(ws.z2>=150?'ok':'')+'"><div class="v num">'+ws.z2+'<small>/150</small></div><div class="k">Zone 2</div></div>'+
     '<div class="tile '+(ws.hiit>=1?'ok':'')+'"><div class="v num">'+ws.hiit+'<small>/1</small></div><div class="k">Intervals</div></div>'+
+    '<div class="tile '+(ws.mob>=3?'ok':'')+'"><div class="v num">'+ws.mob+'<small>/3</small></div><div class="k">Mobility</div></div>'+
   '</div><p class="note" style="margin-bottom:0">This week, Monday to Sunday.</p>';
   $('todayCard').innerHTML=html;
   const bs=$('btnStartToday'); if(bs) bs.onclick=()=>startSession(call.sessIdx);
   const ba=$('btnStartAny'); if(ba) ba.onclick=()=>show('train');
+  const bf=$('btnStartFlowToday'); if(bf) bf.onclick=()=>startFlow(rec.key);
 
   const z=zone2Range();
   $('engineText').textContent = (ws.z2>=150
@@ -1078,12 +1177,12 @@ function renderProgress(){
 
   const total=S.workouts.length;
   const wk=S.workouts.filter(w=>daysAgo(w.d)<28).length;
-  const mins=S.workouts.reduce((a,w)=>a+(w.mins||0),0)+S.cardio.reduce((a,c)=>a+c.mins,0);
+  const mins=S.workouts.reduce((a,w)=>a+(w.mins||0),0)+S.cardio.reduce((a,c)=>a+c.mins,0)+S.flows.reduce((a,f)=>a+f.mins,0);
   $('histStats').innerHTML=
     '<div class="macro"><div class="v num">'+total+'</div><div class="k">Sessions</div></div>'+
     '<div class="macro"><div class="v num">'+wk+'</div><div class="k">Last 28 days</div></div>'+
     '<div class="macro"><div class="v num">'+Math.round(mins/60)+'h</div><div class="k">Total time</div></div>';
-  const all=S.workouts.map(w=>({d:w.d,label:w.name,mins:w.mins})).concat(S.cardio.map(c=>({d:c.d,label:c.type==='hiit'?'Intervals':'Zone 2',mins:c.mins})));
+  const all=S.workouts.map(w=>({d:w.d,label:w.name,mins:w.mins})).concat(S.cardio.map(c=>({d:c.d,label:c.type==='hiit'?'Intervals':'Zone 2',mins:c.mins})), S.flows.map(f=>({d:f.d,label:'🧘 '+f.name,mins:f.mins})));
   all.sort((a,b)=>a.d<b.d?1:-1);
   $('histList').innerHTML=all.slice(0,12).map(w=>
     '<div class="logrow"><span class="when">'+fmtD(w.d)+'</span><span style="flex:1">'+w.label+'</span><b class="num">'+w.mins+' min</b></div>'
@@ -1240,6 +1339,7 @@ function startSession(idx){
   const exs=[WARMUP].concat(s.ex);
   sess={name:s.name, ex:exs, ei:0, set:1, done:0, start:Date.now(), totalSets:exs.reduce((a,e)=>a+e.s,0)};
   $('session').classList.add('on');
+  keepAwake(true);
   $('sessTitle').textContent=s.name;
   window.scrollTo(0,0);
   renderHR();
@@ -1300,7 +1400,7 @@ $('btnQuit').onclick=()=>{
   finishSession(sess.done<=1);
 };
 function finishSession(abandoned){
-  endRest();
+  endRest(); keepAwake(false);
   $('session').classList.remove('on');
   if(!sess) return;
   const mins=Math.max(1,Math.round((Date.now()-sess.start)/60000));
@@ -1488,6 +1588,272 @@ function renderHealth(){
         '<td class="'+(sl===undefined?'':sl>=7?'ok':'low')+'">'+(sl===undefined?'–':sl.toFixed(1)+'h')+'</td><td>'+(h?h.min:'–')+'</td></tr>';
     }).join('')+'</table></div>'+
     '<p class="note">Resting HR is the lowest reading the watch saw that day. Watch it fall over months; that is your engine getting bigger.</p>';
+}
+
+
+/* ============ mobility: yoga, Pilates, stretching ============ */
+let wakeLock=null;
+async function keepAwake(on){
+  try{
+    if(on && !wakeLock && navigator.wakeLock){ wakeLock=await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release',()=>{ wakeLock=null; }); }
+    if(!on && wakeLock){ await wakeLock.release(); wakeLock=null; }
+  }catch(e){ wakeLock=null; }
+}
+function mv(id,n,disc,secs,sides,cue,breath){ return {id:id,n:n,disc:disc,secs:secs,sides:!!sides,cue:cue,breath:!!breath}; }
+const MOVES=[
+ // yoga
+ mv('catcow','Cat-Cow','yoga',60,0,'All fours. Inhale, drop the belly and look up. Exhale, round the spine and tuck the chin. Move with the breath, slowly.',1),
+ mv('child','Child’s Pose','yoga',45,0,'Knees wide, big toes together, sit back to your heels, arms long. Breathe into the back of the ribs.',1),
+ mv('ddog','Downward Dog','yoga',30,0,'Hands wide, hips high, knees bent as much as you need. Long spine beats straight legs.',0),
+ mv('lowlunge','Low Lunge','yoga',40,1,'Back knee down, front knee over the ankle, hips forward, chest tall. Feel the front of the back hip.',1),
+ mv('war2','Warrior II','yoga',30,1,'Front knee over the ankle, back foot flat, arms level with the floor, eyes over the front hand. Sink an inch lower.',0),
+ mv('triangle','Triangle','yoga',30,1,'Straight legs, hinge over the front leg, hand to shin, top arm to the sky. Chest open, not collapsed.',0),
+ mv('cobra','Cobra','yoga',30,0,'Lie face down, hands under the shoulders, lift the chest with the back muscles first, elbows soft. Glutes relaxed.',1),
+ mv('pigeon','Pigeon (or figure-4 on your back)','yoga',45,1,'Front shin across, hips square, fold forward over it. If the knee complains, do figure-4 lying on your back instead.',1),
+ mv('sfold','Seated Forward Fold','yoga',45,0,'Sit tall, hinge from the hips, hands to shins. A pull in the hamstrings, not a round in the back.',1),
+ mv('twist','Supine Twist','yoga',40,1,'On your back, knees to one side, arms wide, look the other way. Let the weight of the legs do the work.',1),
+ mv('legswall','Legs Up the Wall','yoga',120,0,'Hips close to the wall, legs up, arms by your sides, eyes closed. Slow nasal breathing. This is the recovery pose.',1),
+ mv('tree','Tree Pose','yoga',30,1,'Foot to calf or inner thigh, never the knee. Hands at the chest. Fix your eyes on one point. Wobbling is the training.',0),
+ mv('chair','Chair Pose','yoga',30,0,'Feet together, sit back like a chair is behind you, arms overhead. Weight in the heels.',0),
+ mv('bridgeY','Bridge Pose','yoga',30,0,'Feet hip-width, press through the heels, lift the hips, squeeze the glutes. Chin slightly tucked.',1),
+ // pilates
+ mv('tilt','Pelvic Tilts','pilates',45,0,'On your back, knees bent. Exhale, flatten the lower back into the floor. Inhale, release. Small and precise.',1),
+ mv('hundred','The Hundred','pilates',60,0,'Head and shoulders lifted, legs in tabletop, arms long and pumping. Breathe in for five pumps, out for five. Lower back stays down.',1),
+ mv('sls','Single-Leg Stretch','pilates',45,0,'Head lifted, one knee hugged in, the other leg long at 45 degrees. Switch slowly. Exhale on each switch.',1),
+ mv('legcirc','Leg Circles','pilates',30,1,'One leg to the ceiling, small circles from the hip. The pelvis does not move. That is the whole exercise.',0),
+ mv('sbridge','Shoulder Bridge','pilates',45,0,'Peel the spine up one bone at a time, hold, then lower one bone at a time. Slow is the point.',1),
+ mv('birddog','Bird Dog','pilates',45,0,'All fours. Opposite arm and leg reach long, hold two seconds, switch. Hips level, no wobble in the trunk.',1),
+ mv('sidelift','Side-Lying Leg Lifts','pilates',30,1,'Lie on your side, body in one line, top leg lifts slowly to hip height and lowers. Foot flexed, hips stacked.',0),
+ mv('swim','Swimming','pilates',30,0,'Face down, arms and legs long. Lift opposite arm and leg, flutter gently. Neck long, eyes to the floor.',1),
+ mv('rollback','Half Roll-Back','pilates',45,0,'Sit tall, knees bent, arms forward. Scoop the belly and roll back halfway, hold, return. Exhale on the way back.',1),
+ mv('sideplankK','Side Plank (knee down)','pilates',20,1,'Bottom knee on the floor, hips lifted, one long line from head to knee. Top hand to the ceiling.',0),
+ mv('spinetwist','Seated Spine Twist','pilates',45,0,'Sit tall, legs long or crossed, arms out. Exhale and rotate from the ribs, inhale back to centre. Hips stay square.',1),
+ // stretching
+ mv('hipflex','Hip Flexor Stretch (half-kneeling)','stretch',40,1,'Back knee down, tuck the tail, squeeze the back glute, shift forward an inch. Feel it at the front of the back hip, not the knee.',1),
+ mv('hammy','Hamstring Stretch (towel)','stretch',40,1,'On your back, towel around the foot, leg to the ceiling, other leg long on the floor. Knee soft. Steady breath.',1),
+ mv('calf','Calf Stretch on the wall','stretch',30,1,'Hands on the wall, back leg straight, heel down, lean in. Then bend the back knee slightly for the lower calf.',0),
+ mv('chest','Chest Doorway Stretch','stretch',40,0,'Forearms on the doorframe, elbows at shoulder height, step through until the chest opens. Ribs down.',1),
+ mv('thoracic','Thoracic Extension over a chair','stretch',45,0,'Sit, hands behind the head, lean back over the top of the backrest, breathe out and let the upper back open.',1),
+ mv('9090','90/90 Hip Stretch','stretch',40,1,'Sit with both knees at ninety degrees, front shin across, back shin behind. Lean over the front shin with a tall chest.',1),
+ mv('fig4','Glute Figure-4','stretch',40,1,'On your back, ankle on the opposite knee, pull the bottom thigh in. Push the top knee gently away.',1),
+ mv('quad','Standing Quad Stretch','stretch',30,1,'Hold a wall, foot to the glute, knees together, squeeze the glute. Feel it at the front of the thigh.',0),
+ mv('neck','Neck Side Stretch','stretch',20,1,'Ear towards the shoulder, opposite hand reaches to the floor. Gentle. The neck does not like force.',1),
+ mv('lat','Lat Stretch on a doorframe','stretch',30,1,'Grip the frame at hip height, sit the hips back and away, feel the side of the back open.',1),
+ mv('ankle','Ankle Circles','stretch',30,0,'Slow circles each way, big as you can. Stiff ankles are why squats feel bad and why people fall.',0),
+ mv('wrist','Wrist and Forearm Stretch','stretch',30,0,'Arm out, palm up, pull the fingers gently back. Then palm down. The keyboard years live here.',0)
+];
+function fl(key,name,disc,items,blurb){ return {key:key,name:name,disc:disc,items:items,blurb:blurb}; }
+const FLOWS=[
+ fl('morning','Morning Mobility','yoga',[['catcow'],['child'],['ddog'],['lowlunge'],['cobra'],['twist'],['tree']],'Seven minutes to unlock the hips and spine before the day gets hold of you.'),
+ fl('pilcore','Pilates Core','pilates',[['tilt'],['hundred'],['sls'],['legcirc'],['sbridge'],['birddog'],['sidelift'],['swim'],['rollback'],['sideplankK']],'Slow, precise, breathing-led core control. This is what protects the lower back under a barbell.'),
+ fl('postlift','Post-Lift Stretch','stretch',[['hipflex'],['hammy'],['chest'],['fig4'],['calf'],['lat']],'The few minutes after lifting that most people skip. Do it and tomorrow is easier.'),
+ fl('evening','Evening Wind-Down','yoga',[['child',60],['twist',45],['fig4',45],['sfold'],['legswall']],'Floor, breath, lights low. Drops the stress response and feeds the sleep score.'),
+ fl('desk','Desk Reset','stretch',[['neck'],['chest'],['thoracic'],['hipflex'],['9090'],['wrist']],'A few minutes for the parts of you the chair has been folding all day.'),
+ fl('balance','Balance and Stability','yoga',[['tree'],['chair'],['war2'],['birddog'],['bridgeY'],['triangle']],'Fall prevention, trained on purpose. Single-leg and standing shapes, held steady.')
+];
+const DISC_NAME={yoga:'Yoga',pilates:'Pilates',stretch:'Stretch',custom:'Yours'};
+function getMoves(){ return MOVES.concat(S.custom.moves); }
+function getFlows(){ return FLOWS.concat(S.custom.flows); }
+function moveById(id){ return getMoves().find(m=>m.id===id); }
+function flowByKey(k){ return getFlows().find(f=>f.key===k); }
+function flowDone(k){ return S.flows.filter(f=>f.key===k).length; }
+function flowLevel(k){ const n=flowDone(k); return n>=12?{lvl:3,mult:1.5,next:0}:n>=6?{lvl:2,mult:1.25,next:12-n}:{lvl:1,mult:1,next:6-n}; }
+function flowSteps(f){
+  const L=flowLevel(f.key), steps=[];
+  f.items.forEach(it=>{
+    const m=moveById(it[0]); if(!m) return;
+    const secs=Math.round((it[1]||m.secs)*L.mult);
+    if(m.sides){ steps.push({m:m,secs:secs,side:'Left side'}); steps.push({m:m,secs:secs,side:'Right side'}); }
+    else steps.push({m:m,secs:secs,side:''});
+  });
+  return steps;
+}
+function flowMins(f){ const st=flowSteps(f); return Math.max(1,Math.round(st.reduce((a,s)=>a+s.secs+5,0)/60)); }
+function recommendFlow(trainingDay, doneToday){
+  if(doneToday) return flowByKey('postlift');
+  if(trainingDay) return null;
+  const dow=new Date().getDay();
+  return flowByKey(dow===0?'evening':dow===6?'balance':dow===2?'pilcore':'morning');
+}
+
+/* ---- Move tab ---- */
+let flowDetailKey='morning';
+function renderMove(){
+  renderHdr();
+  const ws=weekStats(), total=S.flows.length, mins=S.flows.reduce((a,f)=>a+f.mins,0);
+  const rec=recommendFlow(false,false);
+  $('moveCall').innerHTML = ws.mob>=3 ? 'Three mobility sessions this week. <b>Ka pai.</b> Extra ones are free.' : (3-ws.mob)+' mobility session'+(3-ws.mob>1?'s':'')+' still to do this week. Today’s pick: <b>'+rec.name+'</b>. Ten minutes on the floor counts.';
+  $('moveStats').innerHTML=
+    '<div class="tile '+(ws.mob>=3?'ok':'')+'"><div class="v num">'+ws.mob+'<small>/3</small></div><div class="k">This week</div></div>'+
+    '<div class="tile"><div class="v num">'+total+'</div><div class="k">Sessions</div></div>'+
+    '<div class="tile"><div class="v num">'+Math.round(mins)+'</div><div class="k">Minutes</div></div>';
+  $('flowList').innerHTML=getFlows().map(f=>{
+    const L=flowLevel(f.key);
+    return '<div class="day"><span class="tag">'+(DISC_NAME[f.disc]||'Yours')+'</span><div style="min-width:0"><b>'+f.name+'</b><span class="lvl">LVL '+L.lvl+'</span><div class="meta">'+f.items.length+' moves · ~'+flowMins(f)+' min · done '+flowDone(f.key)+'×</div></div><button class="btn small ghost go" data-k="'+f.key+'">View</button></div>';
+  }).join('');
+  document.querySelectorAll('#flowList .go').forEach(b=>b.onclick=()=>{ flowDetailKey=b.dataset.k; renderFlowDetail(); });
+  if(!flowByKey(flowDetailKey)) flowDetailKey='morning';
+  renderFlowDetail();
+  renderBuilder();
+  renderCustomMoves();
+}
+function renderFlowDetail(){
+  const f=flowByKey(flowDetailKey), L=flowLevel(f.key), st=flowSteps(f);
+  const custom=S.custom.flows.some(c=>c.key===f.key);
+  $('flowDetail').innerHTML='<h3>'+f.name+' <span class="lvl">Level '+L.lvl+' · holds ×'+L.mult+'</span></h3>'+
+    (f.blurb?'<p class="sub">'+f.blurb+'</p>':'')+
+    f.items.map(it=>{ const m=moveById(it[0]); if(!m) return ''; const s=Math.round((it[1]||m.secs)*L.mult); return '<div class="exline"><span>'+m.n+'</span><span class="sr num">'+s+' s'+(m.sides?' × 2':'')+'</span></div>'; }).join('')+
+    '<p class="note">'+(L.next?L.next+' more completion'+(L.next>1?'s':'')+' to level '+(L.lvl+1)+'.':'Top level. Holds are 1.5× the base. You built this.')+'</p>'+
+    '<button class="btn good" style="margin-top:12px" id="btnStartFlow">Start '+f.name+' · '+flowMins(f)+' min ▶</button>'+
+    (custom?'<div class="row" style="margin-top:8px"><button class="btn danger small" id="btnDelFlow">Delete this session</button></div>':'');
+  $('btnStartFlow').onclick=()=>startFlow(f.key);
+  const d=$('btnDelFlow'); if(d) d.onclick=()=>{ if(confirm('Delete '+f.name+'? Your completion history stays.')){ S.custom.flows=S.custom.flows.filter(c=>c.key!==f.key); save(); flowDetailKey='morning'; renderMove(); } };
+}
+
+/* ---- builder ---- */
+let build={items:[]}, bFilter='all';
+function renderBuilder(){
+  $('bChips').innerHTML=['all','yoga','pilates','stretch','custom'].map(d=>'<button class="chip'+(bFilter===d?' on':'')+'" data-d="'+d+'">'+(d==='all'?'All':DISC_NAME[d])+'</button>').join('');
+  document.querySelectorAll('#bChips .chip').forEach(c=>c.onclick=()=>{ bFilter=c.dataset.d; renderBuilder(); });
+  const lib=getMoves().filter(m=> bFilter==='all' || (bFilter==='custom' ? S.custom.moves.some(c=>c.id===m.id) : m.disc===bFilter));
+  $('bLib').innerHTML=lib.map(m=>'<div class="lm"><span class="d">'+DISC_NAME[m.disc]+'</span><span class="n">'+m.n+'<small>'+m.secs+' s'+(m.sides?' each side':'')+'</small></span><button class="add" data-id="'+m.id+'" aria-label="Add '+m.n+'">+</button></div>').join('') || '<p class="sub">No moves in this group yet. Add one below.</p>';
+  document.querySelectorAll('#bLib .add').forEach(b=>b.onclick=()=>{ const m=moveById(b.dataset.id); build.items.push({id:m.id,secs:m.secs}); renderBuilder(); });
+  $('bItems').innerHTML=build.items.map((it,i)=>{ const m=moveById(it.id); return '<div class="lm"><span class="d">'+(i+1)+'</span><span class="n">'+m.n+(m.sides?'<small>each side</small>':'')+'</span><input class="secs" type="number" min="10" max="600" value="'+it.secs+'" data-i="'+i+'" aria-label="Seconds"><button class="rm" data-i="'+i+'" aria-label="Remove">✕</button></div>'; }).join('') || '<p class="sub">Tap + on a move above to add it. Order is the order you will do them.</p>';
+  document.querySelectorAll('#bItems .secs').forEach(inp=>inp.onchange=()=>{ build.items[+inp.dataset.i].secs=Math.max(10,+inp.value||10); renderBuilder(); });
+  document.querySelectorAll('#bItems .rm').forEach(b=>b.onclick=()=>{ build.items.splice(+b.dataset.i,1); renderBuilder(); });
+  const secs=build.items.reduce((a,it)=>{ const m=moveById(it.id); return a+it.secs*(m&&m.sides?2:1)+5; },0);
+  $('bMins').textContent = build.items.length ? '· ~'+Math.max(1,Math.round(secs/60))+' min' : '';
+}
+$('btnSaveFlow').onclick=()=>{
+  const name=$('bName').value.trim();
+  if(!name){ $('bName').focus(); return; }
+  if(!build.items.length){ speak('Add at least one move first.', true); return; }
+  const key='c'+Date.now();
+  S.custom.flows.push(fl(key,name,'custom',build.items.map(it=>[it.id,it.secs]),'Built by you.'));
+  save(); build={items:[]}; $('bName').value=''; flowDetailKey=key; renderMove();
+  speak(PF().built(name));
+};
+function renderCustomMoves(){
+  $('customMoves').innerHTML=S.custom.moves.map(m=>'<div class="lm"><span class="d">'+DISC_NAME[m.disc]+'</span><span class="n">'+m.n+'<small>'+m.secs+' s'+(m.sides?' each side':'')+' · '+m.cue+'</small></span><button class="rm" data-id="'+m.id+'" aria-label="Delete">✕</button></div>').join('');
+  document.querySelectorAll('#customMoves .rm').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id;
+    const used=S.custom.flows.filter(f=>f.items.some(it=>it[0]===id)).map(f=>f.name);
+    if(used.length && !confirm('This move is in: '+used.join(', ')+'. It will be skipped there. Delete anyway?')) return;
+    S.custom.moves=S.custom.moves.filter(m=>m.id!==id); build.items=build.items.filter(it=>it.id!==id); save(); renderMove();
+  });
+}
+$('btnAddMove').onclick=()=>{
+  const n=$('mName').value.trim(); if(!n){ $('mName').focus(); return; }
+  const m=mv('u'+Date.now(), n, $('mDisc').value, Math.max(10,+$('mSecs').value||40), $('mSides').checked, $('mCue').value.trim()||'Steady breath, no bouncing, ease off if it sharpens.', true);
+  S.custom.moves.push(m); save();
+  $('mName').value=''; $('mCue').value=''; $('mSides').checked=false; bFilter='custom';
+  renderMove(); speak(PF().moveAdded(n));
+};
+
+/* ---- flow runner ---- */
+const FLOW_LINES={
+ kiwi:{
+  start:(n,f)=>'Right, '+n+'… '+f+'. Nothing heavy. Just you, the floor, and some breathing… Get into position for the first one.',
+  move:(m,s,side)=>m+(side?', '+side.toLowerCase():'')+'. '+s+' seconds… '+'',
+  hold:()=>pick(['And… hold.','Settle in.','Breathe into it… there.','Hold. Nice and easy.']),
+  breathe:()=>pick(['In through the nose… and out, slowly.','Long breath out… let it go.','Breathe. You’re allowed.']),
+  switchSide:()=>pick(['Switch sides.','Other side, e hoa.','And the other side… yep.']),
+  five:()=>pick(['Five more.','Nearly there… five.','Five… stay with it.']),
+  done:(n,f,mins,L)=>'Tū meke, '+n+'… '+f+', done. '+mins+' minutes. '+(L.leveled?'And that’s level '+L.lvl+' unlocked… holds get a bit longer from here. That’s you building it.':L.next?L.next+' more and you level up… Ka pai.':'Top level. Look at you.')+' Mauri ora.',
+  early:()=>'Ended early… that’s fine. Even a little bit of floor time counts, I’m logging what you did.',
+  built:f=>'Saved. '+f+'… that’s yours now. Ka pai.',
+  moveAdded:m=>'Added '+m+' to the library… Build it into a session when you’re ready.'
+ },
+ gentle:{
+  start:(n,f)=>'Hey, '+n+'… we’re doing '+f+'. Nothing hard. Just breathing and moving… Get into position for the first one, man.',
+  move:(m,s,side)=>m+(side?', '+side.toLowerCase():'')+'. '+s+' seconds… ',
+  hold:()=>pick(['Okay… hold there.','Just stay… that’s it.','Nice. Breathe.']),
+  breathe:()=>pick(['In through the nose… and slowly out.','Long breath out, man… let it go.','Breathe… you’re doing really well.']),
+  switchSide:()=>pick(['Other side now… gently.','Switch sides, man.','And the other side… no rush.']),
+  five:()=>pick(['Five more… nearly there.','Five… you’re good.']),
+  done:(n,f,mins,L)=>'That’s '+f+', '+n+'… '+mins+' minutes. '+(L.leveled?'And you just got to level '+L.lvl+'… the holds get a little longer now. You built that, man.':L.next?L.next+' more and you go up a level… That’s really good.':'Top level… I’m proud of you.')+' Mauri ora.',
+  early:()=>'Oh… we’re stopping early. That’s okay, man. I’ll log what you did… Any floor time is good floor time.',
+  built:f=>'Saved '+f+'… That’s your own session now. That’s really cool.',
+  moveAdded:m=>'Okay… I added '+m+' to the library. Put it in a session whenever you like.'
+ },
+ straight:{
+  start:(n,f)=>n+'. '+f+'. Get into position for the first move.',
+  move:(m,s,side)=>m+(side?', '+side.toLowerCase():'')+'. '+s+' seconds. ',
+  hold:()=>'Hold.',
+  breathe:()=>'Breathe in through the nose. Out slowly.',
+  switchSide:()=>'Switch sides.',
+  five:()=>'Five seconds.',
+  done:(n,f,mins,L)=>f+' done, '+n+'. '+mins+' minutes. '+(L.leveled?'Level '+L.lvl+' unlocked. Holds are longer from here.':L.next?L.next+' more to the next level.':'Top level.'),
+  early:()=>'Ended early. Logged what you did.',
+  built:f=>f+' saved.',
+  moveAdded:m=>m+' added to the library.'
+ }
+};
+function PF(){ return FLOW_LINES[S.persona]||FLOW_LINES.kiwi; }
+let flow=null, flowTimer=null;
+function startFlow(key){
+  const f=flowByKey(key); if(!f) return;
+  const steps=flowSteps(f); if(!steps.length){ speak('That session has no moves in it.', true); return; }
+  flow={key:key, name:f.name, steps:steps, i:0, phase:'pre', t:5, paused:false, start:Date.now(), doneSecs:0};
+  $('flow').classList.add('on'); keepAwake(true);
+  $('flowTitle').textContent=f.name; window.scrollTo(0,0);
+  renderFlow();
+  speak(PF().start(S.profile.name,f.name)+' '+PF().move(steps[0].m.n, steps[0].secs, steps[0].side)+steps[0].m.cue);
+  clearInterval(flowTimer); flowTimer=setInterval(flowTick,1000);
+}
+function renderFlow(){
+  const s=flow.steps[flow.i];
+  $('flowProg').style.width=Math.round(100*flow.i/flow.steps.length)+'%';
+  $('flowCount').textContent='Move '+(flow.i+1)+' of '+flow.steps.length;
+  $('flowName').textContent=s.m.n;
+  $('flowSide').innerHTML=s.side?'<span class="side">'+s.side+'</span>':'';
+  $('flowPhase').textContent=flow.paused?'Paused':flow.phase==='pre'?'Get into position':'Hold · breathe';
+  const c=$('flowClock'); c.textContent=flow.t; c.className='flowclock num'+(flow.phase==='pre'?' pre':'');
+  $('flowCue').textContent=s.m.cue;
+  $('btnFlowPause').textContent=flow.paused?'Resume':'Pause';
+  $('flowNext').innerHTML=flow.steps.slice(flow.i+1,flow.i+4).map(x=>'<div class="exline"><span>'+x.m.n+(x.side?' · '+x.side:'')+'</span><span class="sr num">'+x.secs+' s</span></div>').join('') || '<p class="sub">Last one. Then the floor is yours.</p>';
+}
+function flowTick(){
+  if(!flow||flow.paused) return;
+  flow.t--;
+  const s=flow.steps[flow.i];
+  if(flow.phase==='pre'){
+    if(flow.t<=0){ flow.phase='hold'; flow.t=s.secs; beep(900,150); speak(PF().hold()); }
+  } else {
+    flow.doneSecs++;
+    if(s.m.breath && flow.t===Math.floor(s.secs/2) && s.secs>=30) speak(PF().breathe());
+    if(flow.t===5) { speak(PF().five()); }
+    if(flow.t<=3&&flow.t>0) beep(700,120);
+    if(flow.t<=0){ beep(1000,250); nextFlowStep(); return; }
+  }
+  renderFlow();
+}
+function nextFlowStep(skipped){
+  if(flow.i>=flow.steps.length-1){ finishFlow(false); return; }
+  const prev=flow.steps[flow.i]; flow.i++; const s=flow.steps[flow.i];
+  const sameMove=prev.m.id===s.m.id && s.side;
+  flow.phase='pre'; flow.t=sameMove?4:6;
+  renderFlow();
+  speak((sameMove?PF().switchSide()+' ':'')+PF().move(s.m.n, s.secs, sameMove?'':s.side)+(sameMove?'':s.m.cue));
+}
+$('btnFlowPause').onclick=()=>{ flow.paused=!flow.paused; renderFlow(); if(flow.paused) speechSynthesis.cancel(); };
+$('btnFlowPlus').onclick=()=>{ if(flow.phase==='hold'){ flow.t+=15; renderFlow(); } };
+$('btnFlowSkip').onclick=()=>nextFlowStep(true);
+$('btnFlowQuit').onclick=()=>{ if(flow.doneSecs>30 && !confirm('End here? The time you have done is still logged.')) return; finishFlow(flow.doneSecs<=30); };
+function finishFlow(abandoned){
+  clearInterval(flowTimer); keepAwake(false);
+  $('flow').classList.remove('on');
+  if(!flow) return;
+  const mins=Math.max(1,Math.round(flow.doneSecs/60));
+  if(!abandoned){
+    const before=flowLevel(flow.key).lvl;
+    S.flows.push({d:todayKey(), key:flow.key, name:flow.name, mins:mins});
+    save();
+    const L=flowLevel(flow.key); L.leveled=L.lvl>before;
+    speak(PF().done(S.profile.name, flow.name, mins, L));
+  } else speak(PF().early());
+  flow=null;
+  show('move');
 }
 
 /* ============ boot ============ */
