@@ -21,7 +21,7 @@ You are operating a 424-object, 4,600-report NPSP org that runs fundraising, mem
 | Case intake | `zeus@birdlife.org.au` — 53k email-origin cases, 115k closed all time |
 | Mathew's user | `005RF000003ahkfYAA`, profile System Administrator `00e5g000001jYQ6AAM`, role node **CEO**, alias `mhema` |
 
-**Licence position is a hard constraint: 70 full licences, 70/70 consumed.** There is zero headroom. A new staff member or a new integration user requires freeing one first. Never propose a solution that needs a new full licence without saying which licence gets released.
+**Licence position (live 4 Sep 2026): Salesforce 140 total, 68 used; Salesforce Platform 60 total, 20 used; Salesforce Integration (API only) 5 total, 3 used.** The earlier "70 of 70" figure in this skill was wrong or has since been lifted; re-read `UserLicense` before asserting headroom (`SELECT Name, TotalLicenses, UsedLicenses FROM UserLicense WHERE Status = 'Active'`). Still state the licence impact of any new user.
 
 ## Managed packages — know the namespace before you query
 
@@ -167,6 +167,67 @@ Statuses, close reasons and write mechanics are in `birdlife-ict-assistant`.
 Regular giving spans NPSP Recurring Donations (`npe03__Recurring_Donation__c`,
 1,778 active) AND AAkPay Recurring Payments (392 active). Any single-object
 figure is wrong; report the union and say so.
+
+## Case access model (verified live 4 Sep 2026)
+
+The org's pattern for every case-handling programme is a trio: a **queue**, a
+**Case record type**, and a **"Manage Cases - <Programme>" permission set**
+(Case read/create/edit, no delete, no view-all, one `OrgWideEmailAddress`
+grant). Examples: Fundraising, Great Cocky Count, KBA, Learning, People &
+Safety, Powerful Owl, Red Goshawk, Science & Conservation Planning, Swift
+Parrot Search, Taxonomy. Generic sets: `Manage Cases` (0PSRF0000000j3Z4AQ,
+21 Case field permissions incl. `Case_Closed_Reason__c` and
+`SC_Additional_Enquiry_Type__c` edit), `View Cases`, `Create Cases`.
+
+Ask Zeus has the queue and the record type but **no permission set**, and
+does not need one today: queue `Zeus` (00GRF000001s1Y12AI, Case only) has a
+single member, public group `Zeus` (00GRF000001s1RZ2AY), whose members are
+Andrew Dunn, Keith Tsui, Nina Lewis and Mathew Hema, all System
+Administrator. Anyone added to the Zeus group who is not a sysadmin would
+need `Manage Cases` or a new `Manage Cases - Zeus` set following the pattern.
+
+**Who the assistant writes as.** The "Salesforce Production" connector
+authenticates as Mathew (System Administrator, role CEO). Every console or
+routine write therefore lands in the audit trail as "Mathew Hema", with the
+`[via BirdLife Claude OS console]` internal comment as the distinguishing
+mark. Decision 4 Sep 2026 (Mathew): keep it that way; no separate Zeus
+identity. Revisit if attribution or least privilege becomes a requirement;
+the design for a `Zeus Assistant` user on `Minimum Access - Salesforce` plus
+a `Manage Cases - Zeus` set (Case R/C/E, Transfer Cases, API Enabled, the 21
+field permissions plus Status) is ready in this session's history.
+
+**Integration identities to know about:**
+- `integration.readonly@birdlife.org.au` (created by Mathew 13 Jul 2026) and
+  `admin365.keith@birdlifeaustralia.onmicrosoft.com` "Keith Readonly"
+  (created by Keith 13 Jul 2026) both carry `MCP Read Only Any License` (read
+  on 100 objects, created by Mathew for MCP use). But both sit on the
+  **Standard User profile, which grants edit on 49 objects and delete on
+  Account and Contact**, so neither is read-only. Fix: move both to
+  `Minimum Access - Salesforce` and add API Enabled through a permission set.
+- birdbot1/5/6 are System Administrators; birdbot2/3/4 are `Base Integration
+  Profile` on Salesforce Integration licences; all six carry `Manage Cases -
+  Fundraising`.
+- `Raisely - Connected User` profile has Modify All on Case.
+- Only one connected app is visible to SOQL (`Zapier`, admin-approved users
+  only); the Claude connector is not listed as a ConnectedApplication.
+
+## Tier 3, split honestly (what a session can execute under Mathew's account)
+
+The connector is the REST data API, not the Metadata or Tooling API. That
+draws the line inside "Salesforce configuration":
+
+| Executable through `createSobjectRecord` / `updateSobjectRecord` (Tier 1, approval card each) | Metadata or Tooling API only (still design-only, hand to Setup or a deploy) |
+|---|---|
+| `PermissionSet`, `ObjectPermissions`, `FieldPermissions`, `PermissionSetAssignment` | Validation rules, flows, Apex, triggers |
+| `Group` (public groups and queues), `GroupMember`, `QueueSobject` | Record types and their picklist values, page layouts, Lightning pages |
+| `User` create/deactivate, profile and role assignment | Profiles themselves, sharing rules, OWD |
+| `ListView` sharing, `Folder` ownership, report and dashboard folders | Field history tracking, custom fields and objects, Release Updates |
+| `OrgWideEmailAddress` grants via `SetupEntityAccess` | Email-to-Case settings, assignment rules, auto-response rules |
+
+Rule: a setup-object write is still a security change. Propose the exact
+records, name who gains what, get the go-ahead, write one record at a time,
+re-read, and log it in `os/registers.md` decisions. Never widen a profile;
+add a permission set instead.
 
 ## Landmines checklist — run through this before any change
 - Validation rule `Block_Reconciled_Changes` on `npe01__OppPayment__c` blocks manual correction of reconciled payments (created Nina Lewis, 8/12/2025).

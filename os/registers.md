@@ -149,6 +149,16 @@ BirdLife-Security-Dashboard.html, plus the `_dashboard-run-log.txt` heartbeat.
 All artifact URLs are private. Do not publish any via GitHub Pages or any
 public host; they name internal systems.
 
+**Decision, 4 Sep 2026 (Mathew):** the assistant writes to Salesforce cases
+under Mathew's own account; no separate Zeus identity is created. Every console
+and routine write is therefore attributed to "Mathew Hema" with the
+`[via BirdLife Claude OS console]` internal comment as the marker. Tier 3 was
+split: setup objects reachable by the REST API are executed under his account
+one record per approval (table in `birdlife-salesforce`); metadata stays
+design-only. The prepared alternative (Zeus Assistant user on Minimum Access
+plus a Manage Cases - Zeus set) is documented in the skill for later.
+Licence fact corrected: Salesforce 140 total, 68 used (not 70 of 70).
+
 **Cleanup review, 3 Sep 2026 (Mathew's conditions applied):** the department
 suite and the ICT Operations/Monitoring dashboards were reviewed for retirement
 conditional on the console covering their content. It does not: the suite carries
@@ -172,3 +182,4 @@ grants) and fold the missing checks in. Security dashboard kept (governance).
 | Vevox SAML certificates | Dashboard 21 Aug 2026 (passed), Vevox 8 Sep 2026 | Verify SSO still works; renew before 8 Sep |
 | Employment Hero sync Graph secret | Expires 5 Jan 2027 | Rotate when the Logic App is unblocked; add a reminder routine |
 | Salesforce test accounts `test101`, `test123` | Active with real credentials | Disable |
+| Salesforce `integration.readonly` and `Keith Readonly` (admin365.keith@…onmicrosoft.com) | Labelled read-only but on Standard User profile (edit on 49 objects, delete on Account/Contact) | Move to Minimum Access - Salesforce plus an API Enabled permission set; verify the MCP use still works |

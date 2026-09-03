@@ -43,9 +43,13 @@ file here and commit — that is how the assistant learns.
    per-session relaxations when the user grants them.
 2. **Three honesty tiers.** Tier 1: execute directly (Salesforce data, Asana, M365
    user-level via connectors). Tier 2: prepare for an admin (Entra/Exchange admin —
-   produce exact Graph PowerShell or click-paths). Tier 3: design only (Salesforce
-   config/metadata). Never fake execution of Tier 2/3 work — the prepared fix *is*
-   the deliverable.
+   produce exact Graph PowerShell or click-paths). Tier 3: Salesforce configuration.
+   Since 4 Sep 2026 (Mathew's decision) the part of Tier 3 reachable through the
+   REST data API under his account (permission sets and assignments, groups,
+   queues, users, folders; the table is in `birdlife-salesforce`) is executed like
+   Tier 1, one record per approval; metadata (validation rules, flows, record
+   types, field history, profiles, sharing) stays design-only. Never fake
+   execution of Tier 2/3 work — the prepared fix *is* the deliverable.
 3. **Hard guardrails:** never send external email without showing the draft; never
    bulk-update or delete; confirm identity before reassigning (staff have duplicate
    SF User records); stop and hand to a human on security/finance/PII-sensitive
