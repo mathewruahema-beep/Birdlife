@@ -1,0 +1,768 @@
+<title>Membership Delivery Desk</title>
+<meta name="theme-color" content="#2e6e5e">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper: #f7f8f6; --surface: #ffffff; --ink: #1c2a27; --muted: #5c6b66; --line: #e0e7e3;
+    --euc: #2e6e5e; --euc-ink: #245648; --euc-soft: #e7f0ec;
+    --wattle: #8a6a10; --wattle-soft: #f6eed6;
+    --red: #a33b2e; --red-soft: #f7e6e2;
+    --blue: #2d5a86; --blue-soft: #e4edf5;
+    --slate: #5a6570; --slate-soft: #e9ecef;
+    --mono-bg: #f1f4f2; --btn-ink: #ffffff; --shadow: 0 1px 2px rgba(28,42,39,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #12201d; --surface: #1a2c28; --ink: #e6ede9; --muted: #9db3ab; --line: #2b403a;
+      --euc: #6fc2ab; --euc-ink: #7fd0ba; --euc-soft: #21363080;
+      --wattle: #e0b54a; --wattle-soft: #3a301380; --red: #e08a7c; --red-soft: #3c221d80;
+      --blue: #8ab4dd; --blue-soft: #1d2f4080; --slate: #a3b4bd; --slate-soft: #24343c;
+      --mono-bg: #16261f; --btn-ink: #0e1a17; --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #12201d; --surface: #1a2c28; --ink: #e6ede9; --muted: #9db3ab; --line: #2b403a;
+    --euc: #6fc2ab; --euc-ink: #7fd0ba; --euc-soft: #21363080;
+    --wattle: #e0b54a; --wattle-soft: #3a301380; --red: #e08a7c; --red-soft: #3c221d80;
+    --blue: #8ab4dd; --blue-soft: #1d2f4080; --slate: #a3b4bd; --slate-soft: #24343c;
+    --mono-bg: #16261f; --btn-ink: #0e1a17; --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif; font-size: 16px; line-height: 1.5; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 90px; }
+  header { margin-bottom: 14px; }
+  .kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--euc); font-weight: 700; }
+  h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: clamp(26px, 6vw, 34px); margin: 4px 0 4px; line-height: 1.1; text-wrap: balance; }
+  h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 21px; margin: 26px 0 10px; line-height: 1.2; }
+  h2:first-child { margin-top: 6px; }
+  h3 { font-size: 15px; margin: 18px 0 8px; letter-spacing: .02em; }
+  .lede { color: var(--muted); margin: 0; max-width: 62ch; font-size: 15px; }
+  .live { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-top: 10px; flex-wrap: wrap; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--slate); flex: none; }
+  .dot.on { background: var(--euc); } .dot.bad { background: var(--red); }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12.5px; }
+  /* health strip */
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 6px; }
+  @media (min-width: 640px) { .tiles { grid-template-columns: repeat(6, 1fr); } }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 10px 8px; cursor: pointer; text-align: left; font: inherit; color: inherit; box-shadow: var(--shadow); }
+  .tile .k { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .tile .v { font-family: "Fraunces", Georgia, serif; font-size: 24px; line-height: 1.1; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .tile .s { font-size: 12.5px; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+  .tile.red .v { color: var(--red); } .tile.wat .v { color: var(--wattle); } .tile.euc .v { color: var(--euc); }
+  /* nav */
+  nav { display: flex; gap: 2px; margin: 16px 0 18px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  nav button { background: none; border: none; border-bottom: 2px solid transparent; font: 700 14px "Source Sans 3", sans-serif; letter-spacing: .04em; color: var(--muted); padding: 8px 11px 10px; cursor: pointer; white-space: nowrap; }
+  nav button[aria-selected="true"] { color: var(--euc-ink); border-bottom-color: var(--euc); }
+  nav button:focus-visible, .tile:focus-visible, button:focus-visible { outline: 2px solid var(--euc); outline-offset: 2px; }
+  /* rows */
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 0 0 10px; box-shadow: var(--shadow); }
+  .row { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px solid var(--line); cursor: pointer; }
+  .row:first-of-type { border-top: none; }
+  .row .when { flex: none; width: 74px; font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); padding-top: 3px; line-height: 1.3; }
+  .row .when b { display: block; color: var(--ink); font-weight: 500; }
+  .row .body { flex: 1; min-width: 0; }
+  .row .name { font-weight: 600; line-height: 1.3; }
+  .row .meta { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); vertical-align: 1px; margin-right: 4px; }
+  .chip.lane { font-family: "IBM Plex Mono", monospace; letter-spacing: 0; text-transform: none; font-size: 11.5px; }
+  .chip.overdue { background: var(--red-soft); color: var(--red); border-color: transparent; }
+  .chip.today { background: var(--wattle-soft); color: var(--wattle); border-color: transparent; }
+  .chip.soon { background: var(--blue-soft); color: var(--blue); border-color: transparent; }
+  .chip.done { background: var(--euc-soft); color: var(--euc-ink); border-color: transparent; }
+  .chip.held { background: var(--slate-soft); color: var(--slate); border-color: transparent; }
+  .chip.crit { background: var(--red); color: var(--btn-ink); border-color: transparent; }
+  .stripe { border-left: 3px solid transparent; padding-left: 10px; margin-left: -13px; }
+  .stripe.overdue { border-left-color: var(--red); } .stripe.today { border-left-color: var(--wattle); } .stripe.soon { border-left-color: var(--blue); }
+  .note { background: var(--euc-soft); border-radius: 8px; padding: 10px 12px; font-size: 14.5px; margin: 10px 0; }
+  .note.warn { background: var(--wattle-soft); } .note.bad { background: var(--red-soft); }
+  .person { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 14px 0 4px; }
+  .person h3 { margin: 0; }
+  .person .wip { font-size: 12.5px; color: var(--muted); }
+  .person .wip.hot { color: var(--red); font-weight: 700; }
+  /* path stepper */
+  .step { display: grid; grid-template-columns: 22px 1fr; gap: 10px; position: relative; padding: 0 0 14px; }
+  .step::before { content: ""; position: absolute; left: 10px; top: 20px; bottom: 0; width: 2px; background: var(--line); }
+  .step:last-child::before { display: none; }
+  .step .pin { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--slate); background: var(--surface); margin-top: 1px; }
+  .step.overdue .pin { border-color: var(--red); background: var(--red); } .step.today .pin, .step.soon .pin { border-color: var(--wattle); }
+  .step.done .pin { border-color: var(--euc); background: var(--euc); }
+  .step .slack { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .step .slack.tight { color: var(--red); font-weight: 500; }
+  /* lanes */
+  .lanehead { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .lanehead .who { font-size: 13px; color: var(--muted); }
+  .gates { display: flex; gap: 4px; flex-wrap: wrap; margin: 8px 0 4px; }
+  .g { font-family: "IBM Plex Mono", monospace; font-size: 12px; padding: 2px 7px; border-radius: 5px; border: 1px solid var(--line); color: var(--muted); }
+  .g.done { background: var(--euc-soft); color: var(--euc-ink); border-color: transparent; }
+  .g.overdue { background: var(--red-soft); color: var(--red); border-color: transparent; }
+  .g.today, .g.soon { background: var(--wattle-soft); color: var(--wattle); border-color: transparent; }
+  /* conversation cards */
+  .talk .head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .talk .why { font-size: 13.5px; color: var(--muted); margin: 2px 0 8px; }
+  .talk ul { margin: 6px 0 8px; padding-left: 20px; }
+  .talk li { margin: 3px 0; }
+  pre.draft { white-space: pre-wrap; font-family: inherit; font-size: 14.5px; background: var(--mono-bg); border-radius: 8px; padding: 10px 12px; margin: 8px 0; line-height: 1.45; }
+  .btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  button.b { font: 600 13.5px "Source Sans 3", sans-serif; padding: 7px 12px; border-radius: 7px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  button.b.p { background: var(--euc); color: var(--btn-ink); border-color: var(--euc); }
+  button.b.d { background: var(--red); color: var(--btn-ink); border-color: var(--red); }
+  button.b:disabled { opacity: .5; cursor: default; }
+  /* workbench */
+  .wb { border: 1px solid var(--euc); border-radius: 10px; padding: 12px 14px; margin: 6px 0 12px; background: var(--surface); }
+  .wb textarea, .wb input[type=date] { width: 100%; font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); margin: 6px 0; }
+  .wb textarea { min-height: 72px; resize: vertical; }
+  .wbmsg { font-size: 14px; margin-top: 8px; min-height: 1.2em; }
+  .wbmsg.ok { color: var(--euc-ink); font-weight: 600; } .wbmsg.bad { color: var(--red); font-weight: 600; }
+  .wb .sub { font-size: 13px; color: var(--muted); }
+  .wb a { color: var(--blue); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .scroll { overflow-x: auto; }
+  .small { font-size: 13px; color: var(--muted); }
+  .empty { color: var(--muted); font-style: italic; padding: 8px 0; }
+  a { color: var(--blue); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">BirdLife Australia · Membership Build · IT-INT-003 / 004 / 005</div>
+    <h1>Membership Delivery Desk</h1>
+    <p class="lede">The Asana board read as a delivery problem: what is on the critical path, who is holding what, which conversation to have today, and a status draft you can post without rewriting.</p>
+    <div class="live"><span class="dot" id="live-dot"></span><span id="live-status">Snapshot of the board taken 3 Sep 2026, 11:30 AEST. Open from the claude.ai link for live data.</span></div>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-p="p-today">Today</button>
+    <button role="tab" aria-selected="false" data-p="p-path">Critical path</button>
+    <button role="tab" aria-selected="false" data-p="p-lanes">Workstreams</button>
+    <button role="tab" aria-selected="false" data-p="p-talk">Conversations</button>
+    <button role="tab" aria-selected="false" data-p="p-standup">Standup</button>
+    <button role="tab" aria-selected="false" data-p="p-status">Weekly status</button>
+    <button role="tab" aria-selected="false" data-p="p-hygiene">Board hygiene</button>
+  </nav>
+
+  <section class="panel" id="p-today"></section>
+  <section class="panel" id="p-path" hidden></section>
+  <section class="panel" id="p-lanes" hidden></section>
+  <section class="panel" id="p-talk" hidden></section>
+  <section class="panel" id="p-standup" hidden></section>
+  <section class="panel" id="p-status" hidden></section>
+  <section class="panel" id="p-hygiene" hidden></section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  // ------------------------------------------------------------------
+  // Board identity (verified 3 Sep 2026)
+  // ------------------------------------------------------------------
+  var PROJECT = '1217455650909553';
+  var WORKSPACE = '443963187362944';
+  var ASANA_SERVER = 'Asana';
+  var SECTIONS = {
+    '1217455631026278': 'REQ', '1217455631435784': 'GOV', '1217455650938644': 'WP',
+    '1217455829990080': 'MO', '1217455830400453': 'SF'
+  };
+  var LANES = {
+    SF:  { name: 'Salesforce objects and migration', sow: 'IT-INT-005', who: 'Karishma Soni builds, Keith Tsui holds the reference model', release: 'G9' },
+    WP:  { name: 'WordPress and WooCommerce', sow: 'IT-INT-003', who: 'Blitzm (Ben McKeown, James O’Brien); Mathew owns acceptance', release: 'G7' },
+    MO:  { name: 'miniOrange integration and sync', sow: 'IT-INT-004', who: 'Devendra Dantal (miniOrange); Karishma owns the mappings', release: 'G8' },
+    GOV: { name: 'Programme governance and open items', sow: '', who: 'Mathew, with Keith, Nina and James on specific items', release: '' },
+    REQ: { name: 'Requirements review', sow: 'v2.3 baseline', who: 'Mathew, Karishma, Nina, James', release: '' }
+  };
+  var LANE_ORDER = ['SF', 'MO', 'WP', 'GOV', 'REQ'];
+  var PEOPLE = {
+    Mathew:   { full: 'Mathew Hema', role: 'Programme manager', me: true },
+    Karishma: { full: 'Karishma Soni', role: 'Senior Salesforce developer', standup: 'Friday standup', closer: 'G2 is the critical path and I would rather clear your plate than move the date. Tell me which of these you want me to take off you.' },
+    Keith:    { full: 'Keith Tsui', role: 'Salesforce admin, reference model', closer: 'If nothing is held, say so and Karishma builds from the 30 Jul guide. A no is a fine answer, silence is not.' },
+    Nina:     { full: 'Nina Lewis', role: 'Finance and Supporter Care, second signer', closer: 'Happy to walk you through it on a call rather than correspond about it.' },
+    James:    { full: 'James Vilinsky', role: 'Participation, reminder calendar owner', closer: 'I need a decision rather than a discussion on this one because the build cannot carry two reminder schedules.' }
+  };
+  var VENDORS = {
+    MO: { who: 'Devendra', full: 'Devendra Dantal (miniOrange)', closer: 'Please give me a defect reference for each so we can track them, and a firm date rather than an estimate for the line item fix. Membership mapping does not start until a single order writes correctly.' },
+    WP: { who: 'Ben', full: 'Ben McKeown (Blitzm)', closer: 'I want the written response accepted item by item before you estimate against it, so nobody is building against a moving target.' }
+  };
+  // Definition of done per gate, taken from the gate subtasks on the board (3 Sep 2026)
+  var DOD = {
+    'SF:G2': ['Building on the empty shell, not the unmanaged name-collision object (D3)', 'Membership object answers every §6.1 question, demonstrated on manual records', 'Family child object answers every §6.2 question, a new object (D5)', 'Contact ownership applied to the object design (decided 25 Aug)', 'FLS granted to the miniOrange integration user as part of the build, not after', 'Estimated and authorised separately (R2)', 'Written notice to Devendra and Blitzm that G2 is complete'],
+    'SF:G1': ['Keith: written confirmation of what metadata he holds for the removed unmanaged objects (D4)', 'First pass over carry-over register C1 to C12 plus Keith’s additions (A5)', 'Micah: written confirmation of the Taylor and Francis journal entitlement dependency (C1, 7,753 supporters)'],
+    'WP:G0': ['Enable login at checkout (I4)', 'Decide guest checkout position (B1)', 'Correct the 20% discount rule scope, currently 2 of 58 categories (E5/I2)', 'Remove the draft test product granting live memberships (A4/I1)', 'Correct or retire the second published membership page (I3)', 'Confirm WooCommerce Memberships and Subscriptions licence validity (A1)', 'Send James’s confirmed reminder calendar to Blitzm', 'Written completion confirmation to Blitzm'],
+    'WP:G1': ['Written response covers every §6 item: config, development or recommend-against', 'WooCommerce Memberships carries family structure and correct term (D2)', 'Positions recorded on E7 cessation date and E8 pause', 'Exposure statements for B3/C2/C4/E6/E7/E8/F2/F3, no serialised arrays', 'Ben’s 24 Aug field spreadsheet reconciled against the A5 field schedule', 'Descoped and config items recorded, IT-INT-003 reissued'],
+    'WP:G2': ['B3: adult status captured for individual and family joiners, readable outside the form', 'C2: a family order of three additional members produces three discrete records', 'Integration layer demonstrated reading the family records', 'Written confirmation to Devendra and Karishma that B3 and C2 are consumable'],
+    'MO:G0': ['Family-member mapping decision recorded: repoint or disable (N2)', 'Superseded integration document withdrawn (N7/I4)', 'Reverse endpoint access keys rotated and the three documents scrubbed (N8/I3)'],
+    'MO:G1': ['I1 write-back defect raised with miniOrange, reference number recorded', 'I2 silent field-access failure raised, reference number recorded', 'A1 put to miniOrange: can Object Data Sync map membership records, not just orders', 'A6 reverse-direction latency obtained as a number'],
+    'MO:G4': ['Write-back proof on a single order before any volume (test MO-05)', 'Dedicated salesforce_Membership_ID post-meta key, not the Opportunity key', 'STOP on failure: no mapping two until mapping one writes back'],
+    'GOV:REFUND': ['Refund posts as a negative Payment (met, order 42667)', 'Opportunity StageName a valid picklist value (not met, split to 11 Sep task)', 'Stripe refund id carried into Salesforce (not verified)', 'Membership record deactivated on refund', 'Partial refund does not behave as a full refund', 'Nina second-signs']
+  };
+
+  // ------------------------------------------------------------------
+  // Snapshot of the board as at 3 Sep 2026 11:30 AEST (replaced by live data when connected)
+  // g gid, n name, s section, a assignee, d due, x done, c completed, dp dependencies, ns subtasks, m milestone, md modified
+  // ------------------------------------------------------------------
+  var SNAPSHOT = {
+    asOf: '2026-09-03T01:30:00Z',
+    status: { title: 'Status 2 Sep 2026 · Staging reconnected, first orders syncing, Salesforce objects must be rebuilt from zero', color: 'yellow', created_at: '2026-09-02T01:09:16.690Z' },
+    tasks: [
+      { g: '1217455830645651', n: 'Review IT-INT-003 (Blitzm SOW) — scope groups A–H and baselined decisions', s: 'REQ', a: 'Mathew', d: '2026-08-25', x: true, c: '2026-08-24T23:02:00Z', md: '2026-08-24T23:02:00Z' },
+      { g: '1217455650985057', n: 'Review IT-INT-004 (miniOrange SOW) with Karishma — mappings and reverse channel', s: 'REQ', a: 'Karishma', d: '2026-09-01', md: '2026-08-31T18:30:33Z' },
+      { g: '1217455650883034', n: 'Validate the cross-vendor dependency chain and sequencing', s: 'REQ', a: 'Mathew', d: '2026-09-02', md: '2026-09-01T14:00:35Z' },
+      { g: '1217455650649557', n: 'Confirm the reminder calendar with James Vilinsky (7 windows, 3 channels)', s: 'REQ', a: 'James', d: '2026-08-27', x: true, c: '2026-08-24T23:02:33Z', md: '2026-08-24T23:02:33Z' },
+      { g: '1217455815019950', n: 'Review IT-INT-005 (Salesforce SOW) with Karishma and Keith — build scope and carry-over register', s: 'REQ', a: 'Karishma', d: '2026-08-25', x: true, c: '2026-08-26T05:06:19Z', md: '2026-08-26T05:06:19Z' },
+      { g: '1217455950256190', n: 'Requirements review sign-off — baseline v2.3 across all three documents', s: 'REQ', a: 'Mathew', d: '2026-09-04', m: true, md: '2026-08-30T23:28:06Z' },
+      { g: '1217455830612276', n: 'Brief Nina Lewis on the revenue and reporting exposures', s: 'REQ', a: 'Nina', d: '2026-09-03', md: '2026-09-02T14:00:46Z' },
+      { g: '1217455650908358', n: 'G6 · N5b — expiry and cessation dates exposed to the integration layer', s: 'SF', a: 'Karishma', d: '2026-11-06', dp: ['1217455830550800', '1217455650649557'], md: '2026-08-24T23:02:33Z' },
+      { g: '1217455631568603', n: 'G9 · Production release — Salesforce', s: 'SF', a: 'Nina', d: '2026-12-11', m: true, dp: ['1217455631390074'], md: '2026-08-26T04:39:18Z' },
+      { g: '1217455830550800', n: 'G5 · Lifecycle automation — transitions, pending state, configurable term (N3, N13)', s: 'SF', a: 'Karishma', d: '2026-10-30', dp: ['1217455631568570'], ns: 8, md: '2026-08-26T04:15:22Z' },
+      { g: '1217455815876230', n: 'G3 · Field-level access — written confirmation on every new field', s: 'SF', a: 'Karishma', d: '2026-09-25', dp: ['1217455732720445'], md: '2026-08-13T09:12:21Z' },
+      { g: '1217455631568570', n: 'G4 · Validation rules — family, voting, hardship, duplicate guard (N4, N6, N11)', s: 'SF', a: 'Karishma', d: '2026-10-23', dp: ['1217455732720445', '1217455830550779'], md: '2026-08-24T11:31:00Z' },
+      { g: '1217455732720445', n: 'G2 · Objects built from zero — Membership__c + Membership_Member__c per 30 Jul Build Guide (PROGRAMME CRITICAL PATH)', s: 'SF', a: 'Karishma', d: '2026-09-18', m: true, dp: ['1217455631496323'], ns: 6, md: '2026-09-03T01:11:27Z' },
+      { g: '1217455631496323', n: 'G1 · Reference model — confirm Keith holds metadata for the removed unmanaged objects + entitlement dependency with Micah', s: 'SF', a: 'Keith', d: '2026-09-04', ns: 3, md: '2026-09-03T01:15:17Z' },
+      { g: '1217455631390074', n: 'G8 · Test & acceptance — reports, joint E2E, dedupe, regression', s: 'SF', a: 'Mathew', d: '2026-12-04', dp: ['1217455650908358', '1217455830068334'], md: '2026-08-13T09:12:20Z' },
+      { g: '1217455830068334', n: 'G7 · Carry-over register + migration plan + decommission sequencing (N10, N8, N12)', s: 'SF', a: 'Karishma', d: '2026-11-27', dp: ['1217455830550800', '1217455830082815'], ns: 5, md: '2026-08-26T04:39:18Z' },
+      { g: '1217784003385623', n: 'Correct Solution Design §10.2 before Board — the reminder ladder is live', s: 'SF', a: 'Karishma', d: '2026-09-04', md: '2026-08-30T23:28:06Z' },
+      { g: '1218078515796900', n: 'Staging email deliverability set to System Only after the refresh (contains real production customer orders)', s: 'SF', a: 'Karishma', d: '2026-09-03', md: '2026-09-02T18:30:31Z' },
+      { g: '1218078515798021', n: 'Opportunity StageName picklist mapping — stop writing raw WooCommerce status strings', s: 'SF', a: 'Karishma', d: '2026-09-11', ns: 1, md: '2026-09-02T02:58:31Z' },
+      { g: '1217455816274798', n: 'G5 · Magazine and consistency — F2–F6, decisions on B4 and C4', s: 'WP', a: 'Mathew', d: '2026-10-23', dp: ['1217455650381734'], md: '2026-08-26T04:39:18Z' },
+      { g: '1217455631379933', n: 'G5b · Reminders — renewal, grace, date-derived, full coverage (H1–H4)', s: 'WP', a: 'Mathew', d: '2026-11-27', dp: ['1217455830324183', '1217455650721440', '1217455650649557'], md: '2026-08-26T04:39:18Z' },
+      { g: '1217455830550779', n: 'G2 · Cross-vendor unblock — B3 adult status + C2 discrete family member records', s: 'WP', a: 'Mathew', d: '2026-09-18', dp: ['1217455830189818'], ns: 5, md: '2026-08-30T23:28:07Z' },
+      { g: '1217455631050254', n: 'G6 · Test & acceptance — front-end cases + joint end-to-end', s: 'WP', a: 'Mathew', d: '2026-11-27', dp: ['1217455830550779', '1217455650381734', '1217455816274798', '1217455631379933'], md: '2026-08-26T04:39:18Z' },
+      { g: '1217455830189818', n: 'G1 · Approach agreed — written response accepted on every scope item', s: 'WP', a: 'Mathew', d: '2026-09-08', dp: ['1217455732136806', '1217455650846597'], ns: 6, md: '2026-08-30T23:28:07Z' },
+      { g: '1217455732136806', n: 'G0 · BirdLife remediation — clean environment before Blitzm estimates', s: 'WP', a: 'Mathew', d: '2026-09-04', ns: 8, md: '2026-08-30T23:28:06Z' },
+      { g: '1217455650381734', n: 'G4 · Member-facing gaps — hardship, zero-cost tiers, login, BECS (A2, A3, B2, D3)', s: 'WP', a: 'Mathew', d: '2026-10-16', dp: ['1217455830324183'], ns: 4, md: '2026-08-26T04:39:18Z' },
+      { g: '1217455830324183', n: 'G3 · Membership model — expiry, cessation, restriction, exposure (E2–E8)', s: 'WP', a: 'Mathew', d: '2026-10-09', dp: ['1217455830189818'], ns: 6, md: '2026-08-30T23:28:07Z' },
+      { g: '1217455650910871', n: 'G7 · Production release — WordPress/WooCommerce', s: 'WP', a: 'Nina', d: '2026-12-11', m: true, dp: ['1217455631050254'], md: '2026-08-26T04:39:18Z' },
+      { g: '1217455650910894', n: 'G5 · Mapping two (family members) — exactly three records from three members', s: 'MO', a: 'Karishma', d: '2026-10-30', dp: ['1217455732698674'], md: '2026-08-13T09:12:20Z' },
+      { g: '1217455950107304', n: 'G8 · Production release — integration', s: 'MO', a: 'Nina', d: '2026-12-11', m: true, dp: ['1217455650687580'], md: '2026-08-26T04:39:18Z' },
+      { g: '1217455650687580', n: 'G7 · Test & acceptance — SIG exclusion, reverse date test, regression, volume', s: 'MO', a: 'Mathew', d: '2026-12-04', dp: ['1217455650910894', '1217455650721440'], md: '2026-08-13T09:12:20Z' },
+      { g: '1217455732698674', n: 'G4 · Mapping one (membership) + write-back proof — STOP on failure', s: 'MO', a: 'Karishma', d: '2026-10-16', dp: ['1217455631529935'], ns: 6, md: '2026-08-25T00:24:29Z' },
+      { g: '1217455830662005', n: 'G0 · Housekeeping — family mapping decision, docs withdrawn, keys rotated', s: 'MO', a: 'Karishma', d: '2026-09-04', ns: 3, md: '2026-09-03T01:09:59Z' },
+      { g: '1217455631034930', n: 'G1 · Raise defects with miniOrange support — I1 write-back, I2 silent failure', s: 'MO', a: 'Mathew', d: '2026-09-04', ns: 4, md: '2026-09-02T21:41:35Z' },
+      { g: '1217455631529935', n: 'G3 · Integration user field-level access confirmed in writing', s: 'MO', a: 'Karishma', d: '2026-10-09', dp: ['1217455650390339', '1217455815876230'], md: '2026-08-13T09:12:21Z' },
+      { g: '1217455650721440', n: 'G6 · Reverse channel — discount eligibility + expiry + cessation dates', s: 'MO', a: 'Karishma', d: '2026-11-13', dp: ['1217455732698674', '1217455830324183', '1217455650908358'], ns: 5, md: '2026-08-25T00:24:29Z' },
+      { g: '1217455650390339', n: 'G2 · Dependency hold — confirm both upstream G2 gates complete', s: 'MO', a: 'Mathew', d: '2026-10-02', dp: ['1217455830662005', '1217455631034930', '1217455732720445', '1217455830550779'], md: '2026-09-02T01:08:14Z' },
+      { g: '1218078688427095', n: 'DEFECT · Order sync line item resolves to Postage $0 instead of the membership product (orders 10501, 10506, 10507)', s: 'MO', a: 'Mathew', d: '2026-09-04', md: '2026-09-02T01:08:44Z' },
+      { g: '1218078413982312', n: 'DEFECT · Product sync creates parent (variable) products with blank ProductCode — duplicate risk on every run', s: 'MO', a: 'Mathew', d: '2026-09-04', md: '2026-09-02T01:08:44Z' },
+      { g: '1218078555075370', n: 'MILESTONE · Staging rebuilt and reconnected to UAT — refresh, reauthorisation, product catalogue (completed 1-2 Sep)', s: 'MO', a: 'Mathew', d: '2026-09-02', x: true, c: '2026-09-02T01:08:58Z', m: true, md: '2026-09-02T01:08:59Z' },
+      { g: '1217455830082815', n: 'Open item O8: migrate, archive or leave behind — 20,401 legacy + 546 no-product records', s: 'GOV', a: 'Mathew', d: '2026-09-25', md: '2026-08-13T09:12:21Z' },
+      { g: '1217455950333097', n: 'Set up weekly programme status update and RAID review cadence', s: 'GOV', a: 'Mathew', d: '2026-08-25', x: true, c: '2026-08-24T23:05:23Z', md: '2026-08-24T23:05:23Z' },
+      { g: '1217455830134960', n: 'Open item O4: are historical migration lineage values still required?', s: 'GOV', a: 'Keith', d: '2026-09-04', md: '2026-08-13T09:11:40Z' },
+      { g: '1217455650452686', n: 'Open item O3: reporting requirements for the new membership model', s: 'GOV', a: 'Mathew', d: '2026-09-04', md: '2026-08-13T09:11:40Z' },
+      { g: '1217455650846597', n: 'Assess vendor responses line-by-line (Blitzm + miniOrange due 25 Aug)', s: 'GOV', a: 'Mathew', d: '2026-09-02', md: '2026-09-01T14:00:35Z' },
+      { g: '1217455732765710', n: 'Open item O7: decide the home for 11,473 Special Interest Group memberships', s: 'GOV', a: 'Mathew', d: '2026-09-11', md: '2026-08-13T09:11:39Z' },
+      { g: '1217455830661837', n: 'Escalate the reminder coverage gap (H4 / R9 / R13) to the Executive Sponsor', s: 'GOV', a: 'Mathew', d: '2026-09-01', md: '2026-08-31T14:00:38Z' },
+      { g: '1217784070732369', n: 'Fix the AUTO renewal letter — missing payment paragraph (510 letters a year)', s: 'GOV', a: 'Keith', d: '2026-09-04', md: '2026-08-30T23:28:06Z' },
+      { g: '1217784135466929', n: 'Tri-vendor working session — the six seams (after ownership decision closes)', s: 'GOV', a: 'Mathew', d: '2026-09-08', md: '2026-08-30T23:28:06Z' },
+      { g: '1217784002049102', n: 'Stripe payment-method reconciliation — 2,110 of 4,507 auto-renewals unknown', s: 'GOV', a: 'Mathew', d: '2026-09-11', md: '2026-08-24T11:31:43Z' },
+      { g: '1217784002754885', n: 'Decide membership ownership — household or contact (blocks Salesforce G2)', s: 'GOV', a: 'Mathew', d: '2026-08-31', x: true, c: '2026-08-26T04:15:14Z', md: '2026-08-26T04:15:14Z' },
+      { g: '1217784070766934', n: 'Rehost the Pardot logo and update the five reminder templates — hard stop 31 Aug', s: 'GOV', a: 'Keith', d: '2026-08-31', x: true, c: '2026-09-01T21:02:26Z', md: '2026-09-01T21:02:26Z' },
+      { g: '1217783919783456', n: 'Change control · 3 Aug Blitzm email decisions — reminder channel, no token migration, overseas definition', s: 'GOV', a: 'Mathew', d: '2026-09-02', md: '2026-09-01T14:00:41Z' },
+      { g: '1217784002598362', n: 'HARD DATE · Refund process completed and verified — Wednesday 26 Aug', s: 'GOV', a: 'Mathew', d: '2026-09-02', ns: 6, md: '2026-09-02T01:07:55Z' }
+    ]
+  };
+
+  // ------------------------------------------------------------------
+  // State
+  // ------------------------------------------------------------------
+  var state = { tasks: [], status: SNAPSHOT.status, storedAt: Date.parse(SNAPSHOT.asOf), live: false, error: null, truncated: false };
+  var live = { mcp: null, as: ASANA_SERVER };
+  var byGid = {};
+  var openWb = null;
+  var todayFilter = 'all';
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function isoLocal(dt) { return dt.getFullYear() + '-' + pad(dt.getMonth() + 1) + '-' + pad(dt.getDate()); }
+  function todayIso() { return isoLocal(new Date()); }
+  function dayDiff(a, b) { return Math.round((Date.parse(a + 'T00:00:00') - Date.parse(b + 'T00:00:00')) / 864e5); }
+  var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function fmt(d) { if (!d) return 'no date'; var t = new Date(d + 'T00:00:00'); return DOW[t.getDay()] + ' ' + t.getDate() + ' ' + MON[t.getMonth()]; }
+  function fmtLong(d) { if (!d) return 'no date'; var t = new Date(d + 'T00:00:00'); return t.getDate() + ' ' + MON[t.getMonth()] + ' ' + t.getFullYear(); }
+  function firstName(s) { if (!s) return 'Unassigned'; var f = String(s).trim().split(/\s+/)[0]; return f.charAt(0).toUpperCase() + f.slice(1).toLowerCase(); }
+  function taskUrl(gid) { return 'https://app.asana.com/1/' + WORKSPACE + '/project/' + PROJECT + '/task/' + gid; }
+
+  // Normalise a snapshot row or a live Asana task into one shape
+  function fromSnapshot(r) {
+    return { gid: r.g, name: r.n, sec: r.s, who: r.a || 'Unassigned', due: r.d || null, done: !!r.x, completedAt: r.c || null,
+      deps: r.dp || [], nsub: r.ns || 0, milestone: !!r.m, modified: r.md || null, url: taskUrl(r.g) };
+  }
+  function fromLive(t) {
+    var sec = 'GOV';
+    (t.memberships || []).forEach(function (m) { if (m.section && SECTIONS[m.section.gid]) sec = SECTIONS[m.section.gid]; });
+    return { gid: t.gid, name: t.name, sec: sec, who: t.assignee ? firstName(t.assignee.name) : 'Unassigned', due: t.due_on || null,
+      done: !!t.completed, completedAt: t.completed_at || null, deps: (t.dependencies || []).map(function (d) { return d.gid; }),
+      nsub: t.num_subtasks || 0, milestone: t.resource_subtype === 'milestone', modified: t.modified_at || null, url: t.permalink_url || taskUrl(t.gid) };
+  }
+  function load(tasks) {
+    state.tasks = tasks; byGid = {};
+    tasks.forEach(function (t) { byGid[t.gid] = t; });
+    tasks.forEach(function (t) {
+      var today = todayIso();
+      t.days = t.due ? dayDiff(t.due, today) : null;
+      t.state = t.done ? 'done' : (t.due == null ? 'undated' : t.days < 0 ? 'overdue' : t.days === 0 ? 'today' : t.days <= 7 ? 'soon' : 'later');
+      var g = t.name.match(/^(G\d[a-z]?)\s*[·:]/); t.gate = g ? g[1] : null;
+      t.kind = t.gate ? 'gate' : /^DEFECT/.test(t.name) ? 'defect' : /^(Open item|Decide|Change control|Escalate)/.test(t.name) ? 'decision' : /^(HARD DATE|MILESTONE)/.test(t.name) || t.milestone ? 'milestone' : 'task';
+      t.openDeps = t.deps.map(function (g) { return byGid[g]; }).filter(function (d) { return d && !d.done; });
+    });
+    tasks.forEach(function (t) { t.dependents = tasks.filter(function (o) { return o.deps.indexOf(t.gid) >= 0; }); });
+  }
+  function short(n) {
+    var s = n.replace(/^(G\d[a-z]?|DEFECT|HARD DATE|MILESTONE)\s*[·:]\s*/, '').replace(/^Open item (O\d+):\s*/, '$1: ');
+    s = s.replace(/\s*\(PROGRAMME CRITICAL PATH\)/, '');
+    return s;
+  }
+  function label(t) { return (t.gate ? t.gate + ' ' : '') + short(t.name); }
+  function stateChip(t) {
+    if (t.state === 'done') return '<span class="chip done">done</span>';
+    if (t.state === 'overdue') return '<span class="chip overdue">' + (-t.days) + 'd late</span>';
+    if (t.state === 'today') return '<span class="chip today">today</span>';
+    if (t.state === 'soon') return '<span class="chip soon">in ' + t.days + 'd</span>';
+    if (t.state === 'undated') return '<span class="chip">no date</span>';
+    return '';
+  }
+  function heldChip(t) {
+    if (t.done || !t.openDeps.length) return '';
+    return '<span class="chip held">held by ' + esc(t.openDeps.map(function (d) { return d.gate ? d.gate + ' ' + d.sec : short(d.name).slice(0, 28); }).join(', ')) + '</span>';
+  }
+  function rowHtml(t, opts) {
+    opts = opts || {};
+    var when = t.due ? '<b>' + esc(fmt(t.due)) + '</b>' + (t.state === 'overdue' ? (-t.days) + 'd late' : t.state === 'today' ? 'today' : t.days != null && t.days > 0 ? 'in ' + t.days + 'd' : '') : '<b>no date</b>';
+    return '<div class="row stripe ' + t.state + '" data-gid="' + t.gid + '">' +
+      '<div class="when">' + when + '</div><div class="body">' +
+      '<div class="name">' + esc(label(t)) + '</div>' +
+      '<div class="meta"><span class="chip lane">' + t.sec + '</span>' + (opts.noWho ? '' : esc(t.who) + ' · ') +
+      (t.nsub ? t.nsub + ' subtasks · ' : '') + stateChip(t) + heldChip(t) +
+      (isCritical(t) ? '<span class="chip crit">critical path</span>' : '') + '</div></div></div>';
+  }
+
+  // ------------------------------------------------------------------
+  // Delivery analytics
+  // ------------------------------------------------------------------
+  var critSet = {};
+  function isCritical(t) { return !!critSet[t.gid]; }
+  function chainTo(release) {
+    var chain = [], t = release, guard = 0;
+    while (t && guard++ < 40) {
+      chain.unshift(t);
+      var next = null;
+      t.deps.forEach(function (g) { var d = byGid[g]; if (d && !d.done && (!next || (d.due || '') > (next.due || ''))) next = d; });
+      t = next;
+    }
+    return chain;
+  }
+  function criticalPath() {
+    critSet = {};
+    var releases = state.tasks.filter(function (t) { return !t.done && /Production release/i.test(t.name); });
+    var union = {};
+    releases.forEach(function (r) { chainTo(r).forEach(function (t) { union[t.gid] = t; }); });
+    var nodes = Object.keys(union).map(function (g) { return union[g]; }).sort(function (a, b) { return (a.due || '9') < (b.due || '9') ? -1 : 1; });
+    nodes.forEach(function (n) { critSet[n.gid] = true; });
+    nodes.forEach(function (n) {
+      var succ = n.dependents.filter(function (d) { return union[d.gid]; });
+      n.slack = null; n.slackTo = null;
+      succ.forEach(function (s) { if (n.due && s.due) { var sl = dayDiff(s.due, n.due); if (n.slack == null || sl < n.slack) { n.slack = sl; n.slackTo = s; } } });
+    });
+    return nodes;
+  }
+  function inversions() {
+    var out = [];
+    state.tasks.forEach(function (t) {
+      if (t.done || !t.due) return;
+      t.openDeps.forEach(function (d) { if (d.due && d.due > t.due) out.push({ task: t, dep: d, days: dayDiff(d.due, t.due) }); });
+    });
+    return out;
+  }
+  function openTasks() { return state.tasks.filter(function (t) { return !t.done; }); }
+  function overdue() { return openTasks().filter(function (t) { return t.state === 'overdue'; }); }
+  function dueWithin(n) { return openTasks().filter(function (t) { return t.days != null && t.days >= 0 && t.days <= n; }); }
+  function people() {
+    var m = {};
+    openTasks().forEach(function (t) { (m[t.who] = m[t.who] || []).push(t); });
+    return Object.keys(m).sort(function (a, b) { return (PEOPLE[a] && PEOPLE[a].me ? 1 : 0) - (PEOPLE[b] && PEOPLE[b].me ? 1 : 0) || m[b].length - m[a].length; })
+      .map(function (k) { return { who: k, tasks: m[k].sort(byDue) }; });
+  }
+  function byDue(a, b) { return (a.due || '9') < (b.due || '9') ? -1 : (a.due || '9') > (b.due || '9') ? 1 : 0; }
+  function clusters() {
+    var m = {};
+    openTasks().forEach(function (t) { if (t.due) (m[t.due] = m[t.due] || []).push(t); });
+    return Object.keys(m).filter(function (d) { return m[d].length >= 5; }).sort().map(function (d) { return { due: d, tasks: m[d] }; });
+  }
+  function health() {
+    var cp = criticalPath();
+    var cpLate = cp.filter(function (t) { return t.state === 'overdue'; });
+    var inv = inversions();
+    var od = overdue();
+    var colour = cpLate.length || inv.length ? 'red' : od.length ? 'yellow' : 'green';
+    var minSlack = null, minNode = null;
+    cp.forEach(function (n) { if (n.slack != null && (minSlack == null || n.slack < minSlack)) { minSlack = n.slack; minNode = n; } });
+    var nextGate = openTasks().filter(function (t) { return t.gate && t.due; }).sort(byDue)[0];
+    var statusAge = state.status && state.status.created_at ? Math.floor((Date.now() - Date.parse(state.status.created_at)) / 864e5) : null;
+    return { cp: cp, cpLate: cpLate, inv: inv, od: od, colour: colour, minSlack: minSlack, minNode: minNode, nextGate: nextGate, statusAge: statusAge, week: dueWithin(7) };
+  }
+
+  // ------------------------------------------------------------------
+  // Rendering
+  // ------------------------------------------------------------------
+  function renderAll() {
+    var h = health();
+    renderTiles(h); renderToday(h); renderPath(h); renderLanes(); renderTalk(h); renderStandup(h); renderStatus(h); renderHygiene(h);
+    wireRows();
+  }
+  function renderTiles(h) {
+    var word = { red: 'Off track', yellow: 'At risk', green: 'On track' }[h.colour];
+    var why = h.cpLate.length ? h.cpLate.length + ' critical-path item' + (h.cpLate.length > 1 ? 's' : '') + ' late' : h.inv.length ? h.inv.length + ' date inversion' + (h.inv.length > 1 ? 's' : '') : h.od.length ? h.od.length + ' overdue, none critical' : 'nothing overdue';
+    var tiles = [
+      { k: 'Programme', v: word, s: why, c: h.colour === 'red' ? 'red' : h.colour === 'yellow' ? 'wat' : 'euc', go: 'p-path' },
+      { k: 'Overdue', v: String(h.od.length), s: h.od.length ? 'oldest ' + (-Math.min.apply(null, h.od.map(function (t) { return t.days; }))) + 'd late' : 'clear', c: h.od.length ? 'red' : 'euc', go: 'p-today', f: 'overdue' },
+      { k: 'Due in 7 days', v: String(h.week.length), s: h.week.filter(function (t) { return t.days === 0; }).length + ' today, ' + h.week.filter(function (t) { return t.days === 1; }).length + ' tomorrow', c: h.week.length > 12 ? 'wat' : '', go: 'p-today', f: 'week' },
+      { k: 'Next gate', v: h.nextGate ? h.nextGate.gate + ' ' + h.nextGate.sec : '—', s: h.nextGate ? fmt(h.nextGate.due) + ' · ' + h.nextGate.who : 'none dated', c: h.nextGate && h.nextGate.days <= 1 ? 'wat' : '', go: 'p-lanes' },
+      { k: 'Tightest link', v: h.minSlack == null ? '—' : h.minSlack + 'd', s: h.minNode ? h.minNode.gate + ' ' + h.minNode.sec + ' → ' + (h.minNode.slackTo.gate || '') + ' ' + h.minNode.slackTo.sec : 'critical path slack', c: h.minSlack != null && h.minSlack <= 3 ? 'red' : '', go: 'p-path' },
+      { k: 'Status age', v: h.statusAge == null ? '—' : h.statusAge + 'd', s: h.statusAge > 7 ? 'weekly cadence missed' : 'weekly cadence held', c: h.statusAge > 7 ? 'wat' : 'euc', go: 'p-status' }
+    ];
+    document.getElementById('tiles').innerHTML = tiles.map(function (t) {
+      return '<button class="tile ' + t.c + '" data-go="' + t.go + '" data-f="' + (t.f || '') + '"><div class="k">' + esc(t.k) + '</div><div class="v">' + esc(t.v) + '</div><div class="s">' + esc(t.s) + '</div></button>';
+    }).join('');
+    document.querySelectorAll('.tile').forEach(function (b) {
+      b.addEventListener('click', function () { if (b.dataset.f) todayFilter = b.dataset.f; showTab(b.dataset.go); if (b.dataset.f) renderToday(health()); wireRows(); });
+    });
+  }
+
+  function renderToday(h) {
+    var el = document.getElementById('p-today');
+    var list = todayFilter === 'overdue' ? h.od : todayFilter === 'week' ? h.week : openTasks().filter(function (t) { return t.state === 'overdue' || (t.days != null && t.days <= 7); });
+    var html = '';
+    // Frank read
+    var cl = clusters();
+    if (h.cpLate.length) html += '<div class="note bad"><b>Critical path is late.</b> ' + esc(h.cpLate.map(label).join('; ')) + '. Every day these slip, two vendors cannot test.</div>';
+    if (cl.length) html += cl.map(function (c) { return '<div class="note warn"><b>' + c.tasks.length + ' tasks share ' + esc(fmt(c.due)) + '.</b> That is a batch, not a plan. Pick the three that unblock someone else, re-date the rest honestly, and record why on each task.</div>'; }).join('');
+    var mine = openTasks().filter(function (t) { return PEOPLE[t.who] && PEOPLE[t.who].me && t.dependents.some(function (d) { return !d.done; }) && (t.state === 'overdue' || t.state === 'today'); });
+    if (mine.length) html += '<div class="note warn"><b>You are the blocker on ' + mine.length + '.</b> ' + esc(mine.map(function (t) { return label(t) + ' (holds ' + t.dependents.filter(function (d) { return !d.done; }).map(function (d) { return (d.gate || '') + ' ' + d.sec; }).join(', ') + ')'; }).join('; ')) + '.</div>';
+    html += '<h2>' + (todayFilter === 'overdue' ? 'Overdue' : todayFilter === 'week' ? 'Due in the next seven days' : 'This week, by person') + (todayFilter !== 'all' ? ' <button class="b" id="clear-f" style="font-size:12px;padding:3px 8px">show all</button>' : '') + '</h2>';
+    if (todayFilter === 'all') {
+      var groups = {};
+      list.forEach(function (t) { (groups[t.who] = groups[t.who] || []).push(t); });
+      var order = Object.keys(groups).sort(function (a, b) { return groups[b].length - groups[a].length; });
+      html += order.map(function (w) {
+        var ts = groups[w].sort(byDue), wip = ts.length;
+        return '<div class="person"><h3>' + esc(w) + (PEOPLE[w] ? ' <span class="small">' + esc(PEOPLE[w].role) + '</span>' : '') + '</h3><span class="wip' + (wip > 5 ? ' hot' : '') + '">' + wip + ' due this week' + (wip > 5 ? ' · over WIP limit' : '') + '</span></div><div class="card">' + ts.map(function (t) { return rowHtml(t, { noWho: true }); }).join('') + '</div>';
+      }).join('');
+    } else {
+      html += '<div class="card">' + (list.length ? list.sort(byDue).map(function (t) { return rowHtml(t); }).join('') : '<div class="empty">Nothing here.</div>') + '</div>';
+    }
+    el.innerHTML = html;
+    var cf = document.getElementById('clear-f'); if (cf) cf.addEventListener('click', function () { todayFilter = 'all'; renderToday(health()); wireRows(); });
+  }
+
+  function renderPath(h) {
+    var el = document.getElementById('p-path');
+    var html = '<h2>The chain to production</h2><p class="small">Computed from the board’s own dependencies: from each production release milestone, step back along the latest-dated open predecessor. Slack is the days between a link and the next. Zero is a coin toss, negative is a date that cannot be met.</p>';
+    html += '<div class="card">' + h.cp.map(function (n) {
+      var sl = n.slack == null ? '' : '<div class="slack' + (n.slack <= 3 ? ' tight' : '') + '">' + (n.slack < 0 ? 'inverted by ' + (-n.slack) + 'd' : n.slack + 'd slack') + ' → ' + esc((n.slackTo.gate || '') + ' ' + n.slackTo.sec + ' ' + short(n.slackTo.name).slice(0, 40)) + '</div>';
+      return '<div class="step ' + n.state + '"><div class="pin"></div><div><div class="row" data-gid="' + n.gid + '" style="border:none;padding:0"><div class="body"><div class="name">' + esc(fmt(n.due)) + ' · ' + esc(label(n)) + '</div><div class="meta"><span class="chip lane">' + n.sec + '</span>' + esc(n.who) + ' · ' + stateChip(n) + heldChip(n) + '</div></div></div>' + sl + '</div></div>';
+    }).join('') + '</div>';
+    if (h.inv.length) {
+      html += '<h2>Date inversions</h2><p class="small">A task dated before something it depends on. These are plan errors, not risks.</p><div class="card">' + h.inv.map(function (i) {
+        return '<div class="row" data-gid="' + i.task.gid + '"><div class="when"><b>' + esc(fmt(i.task.due)) + '</b></div><div class="body"><div class="name">' + esc(label(i.task)) + '</div><div class="meta">depends on ' + esc(label(i.dep)) + ' due ' + esc(fmt(i.dep.due)) + ', ' + i.days + 'd later</div></div></div>';
+      }).join('') + '</div>';
+    } else {
+      html += '<div class="note">No date inversions. Every task is dated on or after everything it depends on.</div>';
+    }
+    var zero = h.cp.filter(function (n) { return n.slack != null && n.slack <= 0; });
+    if (zero.length) html += '<div class="note warn"><b>Zero-slack links:</b> ' + esc(zero.map(function (n) { return (n.gate || '') + ' ' + n.sec + ' → ' + (n.slackTo.gate || '') + ' ' + n.slackTo.sec; }).join('; ')) + '. A gate that finishes on the day its successor is due leaves no time for the successor’s own test. Ask which one moves.</div>';
+    el.innerHTML = html;
+  }
+
+  function renderLanes() {
+    var el = document.getElementById('p-lanes');
+    el.innerHTML = '<h2>Workstreams and gates</h2>' + LANE_ORDER.map(function (code) {
+      var L = LANES[code];
+      var ts = state.tasks.filter(function (t) { return t.sec === code; }).sort(byDue);
+      var gates = ts.filter(function (t) { return t.gate; }).sort(function (a, b) { return a.gate < b.gate ? -1 : 1; });
+      var open = ts.filter(function (t) { return !t.done; }), done = ts.length - open.length;
+      var nextG = gates.filter(function (t) { return !t.done; })[0];
+      return '<div class="card"><div class="lanehead"><h3 style="margin:0"><span class="chip lane">' + code + '</span>' + esc(L.name) + (L.sow ? ' <span class="small">' + esc(L.sow) + '</span>' : '') + '</h3><span class="who">' + done + '/' + ts.length + ' done</span></div>' +
+        '<div class="who">' + esc(L.who) + '</div>' +
+        (gates.length ? '<div class="gates">' + gates.map(function (g) { return '<span class="g ' + g.state + '" title="' + esc(short(g.name)) + '">' + g.gate + '</span>'; }).join('') + '</div>' : '') +
+        (nextG ? '<div class="small">Next gate: <b>' + esc(nextG.gate + ' ' + short(nextG.name)) + '</b>, ' + esc(fmt(nextG.due)) + ', ' + esc(nextG.who) + (nextG.openDeps.length ? ', held by ' + esc(nextG.openDeps.map(function (d) { return (d.gate || short(d.name).slice(0, 24)) + ' ' + d.sec; }).join(', ')) : '') + '</div>' : '') +
+        '<div style="margin-top:6px">' + open.map(function (t) { return rowHtml(t); }).join('') + '</div></div>';
+    }).join('');
+  }
+
+  // Conversations: derived from who holds what, and what it unblocks
+  function draftFor(who, items, closer, register) {
+    var lines = items.map(function (t) {
+      var un = t.dependents.filter(function (d) { return !d.done; }).map(function (d) { return (d.gate || '') + ' ' + d.sec; }).join(', ');
+      return '• ' + short(t.name).replace(/\s*—.*$/, '') + ' (' + (t.state === 'overdue' ? 'was due ' + fmt(t.due) : 'due ' + fmt(t.due)) + ')' + (un ? '. Unblocks ' + un + '.' : '');
+    });
+    var n = items.length, count = n === 1 ? 'one thing' : n === 2 ? 'two things' : n === 3 ? 'three things' : n + ' things';
+    if (register === 'C') return 'Hi ' + who + ',\n\nShort answer: ' + count + ' I need from you this week, in priority order.\n\n' + lines.join('\n') + '\n\n' + closer + '\n\nI will come back to you either way.\n\nKind regards,\nMathew';
+    return 'Hi ' + who + ', ' + count + ' from you this week:\n' + lines.join('\n') + '\n' + closer + '\nThanks';
+  }
+  function conversations(h) {
+    var out = [];
+    people().forEach(function (p) {
+      if (PEOPLE[p.who] && PEOPLE[p.who].me) return;
+      var items = p.tasks.filter(function (t) { return t.state === 'overdue' || (t.days != null && t.days <= 7); });
+      if (!items.length) return;
+      var P = PEOPLE[p.who] || {};
+      var unblocks = items.reduce(function (n, t) { return n + t.dependents.filter(function (d) { return !d.done; }).length; }, 0);
+      out.push({ who: p.who, full: P.full || p.who, why: items.length + ' due this week' + (unblocks ? ', holding ' + unblocks + ' downstream item' + (unblocks > 1 ? 's' : '') : '') + (items.some(isCritical) ? ', on the critical path' : ''), items: items,
+        draft: draftFor(p.who, items, P.closer || 'Tell me what is in the way and I will move it.', 'B'), urgent: items.some(function (t) { return t.state === 'overdue' || isCritical(t); }) });
+    });
+    // vendors: Mathew-owned items in a vendor lane that are asks of that vendor
+    ['MO', 'WP'].forEach(function (code) {
+      var V = VENDORS[code];
+      var items = openTasks().filter(function (t) { return t.sec === code && (t.kind === 'defect' || (t.gate && /^G[01]$/.test(t.gate))) && (t.state === 'overdue' || (t.days != null && t.days <= 7)); });
+      if (!items.length) return;
+      out.push({ who: V.who, full: V.full, vendor: true, why: 'vendor asks due this week: ' + items.length, items: items, draft: draftFor(V.who, items, V.closer, 'C'), urgent: items.some(function (t) { return t.state === 'overdue' || t.kind === 'defect'; }) });
+    });
+    // escalations
+    var esc_ = openTasks().filter(function (t) { return /Escalat|Executive Sponsor|Board/.test(t.name); });
+    if (esc_.length) out.push({ who: 'Executive Sponsor', full: 'Executive Sponsor (Micah Demmert)', why: 'escalations sitting with you', items: esc_, draft: 'Hi Micah,\n\nShort answer: I need a decision on the reminder coverage gap this week rather than at the next steering meeting.\n\n' + esc_.map(function (t) { return '• ' + short(t.name) + ' (' + (t.state === 'overdue' ? 'was due ' : 'due ') + fmt(t.due) + ')'; }).join('\n') + '\n\nThe retiring system only fires the first step of its reminder ladder, so every week without a decision is retained revenue we do not chase. I will give you a one-page options note today and take fifteen minutes whenever suits.\n\nKind regards,\nMathew', urgent: esc_.some(function (t) { return t.state === 'overdue'; }) });
+    return out.sort(function (a, b) { return (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0); });
+  }
+  function askPrompt(c) {
+    return 'You are BirdLife Australia’s ICT assistant. Draft a message from Mathew Hema to ' + c.full + ' in Mathew’s voice (use the email-voice skill, register ' + (c.vendor || /Sponsor/.test(c.who) ? 'C' : 'B') + ', no em dashes). Context: Membership Build programme (Asana project ' + PROJECT + '). Items to raise, with due dates and what each unblocks:\n' + c.items.map(function (t) { return '- ' + label(t) + ' | ' + t.sec + ' | due ' + (t.due || 'undated') + ' | ' + t.state + (t.dependents.length ? ' | unblocks ' + t.dependents.map(function (d) { return (d.gate || '') + ' ' + d.sec; }).join(', ') : '') + ' | ' + t.url; }).join('\n') + '\nAsk for a firm date on each, name the downstream impact, and close by committing to come back either way.';
+  }
+  function renderTalk(h) {
+    var el = document.getElementById('p-talk');
+    var cs = conversations(h);
+    el.innerHTML = '<h2>Conversations to have this week</h2><p class="small">Generated from who holds what and what it unblocks. Drafts are in Mathew’s voice; edit before sending. “Ask Claude” hands the full context to a session for a proper draft.</p>' +
+      (cs.length ? cs.map(function (c, i) {
+        return '<div class="card talk"><div class="head"><h3 style="margin:0">' + esc(c.full) + '</h3>' + (c.urgent ? '<span class="chip overdue">today</span>' : '<span class="chip soon">this week</span>') + '</div><div class="why">' + esc(c.why) + '</div>' +
+          '<ul>' + c.items.map(function (t) { return '<li><span class="row" data-gid="' + t.gid + '" style="display:inline;border:none;padding:0">' + esc(label(t)) + '</span> <span class="small">' + esc(fmt(t.due)) + '</span> ' + stateChip(t) + '</li>'; }).join('') + '</ul>' +
+          '<pre class="draft" id="draft-' + i + '">' + esc(c.draft) + '</pre>' +
+          '<div class="btns"><button class="b p" data-copy="draft-' + i + '">Copy draft</button><button class="b" data-ask="' + i + '">Ask Claude to draft it</button></div></div>';
+      }).join('') : '<div class="empty">Nobody is holding anything due this week.</div>');
+    el.querySelectorAll('[data-copy]').forEach(function (b) { b.addEventListener('click', function () { copyText(document.getElementById(b.dataset.copy).textContent, b, 'Copied'); }); });
+    el.querySelectorAll('[data-ask]').forEach(function (b) { b.addEventListener('click', function () { handoff(askPrompt(cs[+b.dataset.ask]), b); }); });
+  }
+
+  function renderStandup(h) {
+    var el = document.getElementById('p-standup');
+    var k = openTasks().filter(function (t) { return t.who === 'Karishma'; }).sort(byDue);
+    var next = h.nextGate;
+    var html = '<h2>Standup script</h2><p class="small">Three questions per item, in this order: done, blocked, date still right. Do not accept a percentage. A date that moves gets a reason on the task.</p>';
+    html += '<h3>Karishma: ' + k.length + ' open, ' + k.filter(function (t) { return t.state === 'overdue' || t.days <= 7; }).length + ' due this week</h3><div class="card">' + k.slice(0, 12).map(function (t) { return rowHtml(t, { noWho: true }); }).join('') + '</div>';
+    var kload = k.filter(function (t) { return t.state === 'overdue' || (t.days != null && t.days <= 14); }).length;
+    if (kload > 5) html += '<div class="note warn"><b>Load check.</b> Karishma has ' + kload + ' items due in the next fortnight and owns the critical path. The governance items (SOW review, §10.2, staging email, housekeeping, StageName) are competing with G2. Decide which of those Mathew or Keith takes, or move a date, but not silently.</div>';
+    // Definition of done for the gates due soonest
+    var soonGates = openTasks().filter(function (t) { return t.gate && DOD[t.sec + ':' + t.gate]; }).sort(byDue).slice(0, 4);
+    html += '<h2>Definition of done, next gates</h2><p class="small">Straight from the gate subtasks. A gate closes when every line is evidenced, not when the work feels finished.</p>';
+    html += soonGates.map(function (g) {
+      return '<div class="card"><div class="lanehead"><h3 style="margin:0">' + esc(label(g)) + '</h3><span class="who">' + esc(fmt(g.due)) + ' · ' + esc(g.who) + '</span></div><ol style="margin:8px 0 0;padding-left:20px">' + DOD[g.sec + ':' + g.gate].map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ol></div>';
+    }).join('');
+    var refund = byGid['1217784002598362'];
+    if (refund && !refund.done) html += '<div class="card"><div class="lanehead"><h3 style="margin:0">Refund hard date (was 26 Aug)</h3><span class="who">' + esc(fmt(refund.due)) + ' · ' + esc(refund.who) + '</span></div><ol style="margin:8px 0 0;padding-left:20px">' + DOD['GOV:REFUND'].map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ol></div>';
+    // decisions
+    var dec = openTasks().filter(function (t) { return t.kind === 'decision'; }).sort(byDue);
+    html += '<h2>Decisions outstanding</h2><p class="small">Each one has an owner and a date. An overdue decision is a decision made by default, usually the expensive way.</p><div class="card">' + (dec.length ? dec.map(function (t) { return rowHtml(t); }).join('') : '<div class="empty">No open decisions.</div>') + '</div>';
+    el.innerHTML = html;
+  }
+
+  function statusDraft(h) {
+    var since = Date.now() - 7 * 864e5;
+    var done = state.tasks.filter(function (t) { return t.done && t.completedAt && Date.parse(t.completedAt) >= since; }).sort(function (a, b) { return a.completedAt < b.completedAt ? 1 : -1; });
+    var risk = h.cp.filter(function (t) { return t.state === 'overdue' || t.state === 'today' || (t.slack != null && t.slack <= 3); });
+    var dec = openTasks().filter(function (t) { return t.kind === 'decision' && (t.state === 'overdue' || (t.days != null && t.days <= 14)); }).sort(byDue);
+    var nextWeek = openTasks().filter(function (t) { return t.days != null && t.days >= 0 && t.days <= 7 && t.kind !== 'decision'; }).sort(byDue);
+    var word = { red: 'off track', yellow: 'at risk', green: 'on track' }[h.colour];
+    var t = new Date();
+    var title = 'Status ' + t.getDate() + ' ' + MON[t.getMonth()] + ' ' + t.getFullYear() + ' · ' + (h.nextGate ? h.nextGate.gate + ' ' + LANES[h.nextGate.sec].name.split(' ')[0] + ' is the next gate' : 'programme status');
+    var body = 'Overall: ' + word + '. ' + (h.cpLate.length ? 'The critical path has ' + h.cpLate.length + ' late item' + (h.cpLate.length > 1 ? 's' : '') + ' (' + h.cpLate.map(label).join('; ') + ').' : h.od.length ? h.od.length + ' items are overdue, none on the critical path.' : 'Nothing overdue.') + (h.minSlack != null && h.minSlack <= 3 ? ' Tightest link is ' + h.minSlack + ' days between ' + h.minNode.gate + ' ' + h.minNode.sec + ' and ' + (h.minNode.slackTo.gate || '') + ' ' + h.minNode.slackTo.sec + '.' : '') + '\n\n';
+    body += 'Done since last status\n' + (done.length ? done.map(function (x) { return '    ' + short(x.name) + ' (' + x.who + ', ' + fmtLong(x.completedAt.slice(0, 10)) + ')'; }).join('\n') : '    Nothing closed on the board this week. If work was done, the board is behind.') + '\n\n';
+    body += 'At risk\n' + (risk.length ? risk.map(function (x) { return '    ' + label(x) + ' (' + x.who + ', ' + fmtLong(x.due) + (x.state === 'overdue' ? ', ' + (-x.days) + ' days late' : x.slack != null ? ', ' + x.slack + ' days slack' : '') + ')'; }).join('\n') : '    No critical-path item is late or within three days of its successor.') + '\n\n';
+    body += 'Decisions needed\n' + (dec.length ? dec.map(function (x) { return '    ' + short(x.name) + ' (' + x.who + ', ' + fmtLong(x.due) + (x.state === 'overdue' ? ', overdue' : '') + ')'; }).join('\n') : '    None due in the next fortnight.') + '\n\n';
+    body += 'Next week\n' + (nextWeek.length ? nextWeek.slice(0, 10).map(function (x) { return '    ' + label(x) + ' (' + x.who + ', ' + fmtLong(x.due) + ')'; }).join('\n') + (nextWeek.length > 10 ? '\n    and ' + (nextWeek.length - 10) + ' more' : '') : '    Nothing dated in the next seven days.') + '\n';
+    return { title: title, body: body, colour: h.colour };
+  }
+  function renderStatus(h) {
+    var el = document.getElementById('p-status');
+    var d = statusDraft(h);
+    var last = state.status;
+    el.innerHTML = '<h2>Weekly status draft</h2><p class="small">Same shape as the 2 Sep update so readers see continuity. Built from the board, so if it reads wrong the board is wrong: fix the board, not the text.</p>' +
+      '<div class="card"><div class="small">Last posted: <b>' + esc(last ? last.title : 'none') + '</b>' + (h.statusAge != null ? ', ' + h.statusAge + ' days ago' : '') + '</div></div>' +
+      '<div class="card"><div class="small">Proposed colour: <span class="chip ' + (d.colour === 'red' ? 'overdue' : d.colour === 'yellow' ? 'today' : 'done') + '">' + d.colour + '</span></div><h3 id="st-title" style="margin:8px 0 6px">' + esc(d.title) + '</h3><pre class="draft" id="st-body">' + esc(d.body) + '</pre>' +
+      '<div class="btns"><button class="b p" id="st-copy">Copy status</button><button class="b" id="st-ask">Post via Claude</button></div><div class="small" style="margin-top:8px">Posting notifies all eight project members, so it goes through a session where you can edit first. The prompt carries the title, colour and body.</div></div>';
+    document.getElementById('st-copy').addEventListener('click', function (e) { copyText(d.title + '\n\n' + d.body, e.target, 'Copied'); });
+    document.getElementById('st-ask').addEventListener('click', function (e) { handoff('Post this status update to the Asana project Membership Build (gid ' + PROJECT + ') using create_project_status_update after I approve it. Colour: ' + d.colour + '. Title: ' + d.title + '\n\nBody:\n' + d.body + '\n\nShow me the final text first; I may edit it.', e.target); });
+  }
+
+  function renderHygiene(h) {
+    var el = document.getElementById('p-hygiene');
+    var open = openTasks();
+    var undated = open.filter(function (t) { return !t.due; });
+    var stale = open.filter(function (t) { return t.modified && (Date.now() - Date.parse(t.modified)) > 14 * 864e5; }).sort(function (a, b) { return a.modified < b.modified ? -1 : 1; });
+    var oldLate = open.filter(function (t) { return t.state === 'overdue' && t.days <= -7; });
+    var unassigned = open.filter(function (t) { return t.who === 'Unassigned'; });
+    var cl = clusters();
+    function block(title, why, list, rec) {
+      return '<h3>' + esc(title) + ' <span class="small">' + list.length + '</span></h3><p class="small">' + esc(why) + '</p><div class="card">' + (list.length ? list.map(function (t) { return rowHtml(t); }).join('') : '<div class="empty">Clean.</div>') + '</div>' + (list.length && rec ? '<div class="note">' + esc(rec) + '</div>' : '');
+    }
+    el.innerHTML = '<h2>Board hygiene</h2><p class="small">The board is the single source of truth for three vendors and four staff. Where it lies, standups are spent reconstructing status instead of removing blockers.</p>' +
+      block('Overdue by a week or more', 'Silent slippage. Either the work is done and unticked, or the date was never real.', oldLate, 'Close, delegate, or re-date with a reason comment. Do not let a date sit red for a second week.') +
+      block('Not touched in 14 days', 'No comment, no date change, no field edit. Nobody is looking at these.', stale, 'Ask the owner one question on the task so the next touch is theirs.') +
+      block('No due date', 'Undated work is invisible to the critical path and to everyone else.', undated) +
+      block('No owner', 'A task nobody owns is a task nobody does.', unassigned) +
+      (cl.length ? '<h3>Date clusters</h3><p class="small">Five or more open tasks on one day. Usually a bulk re-date rather than a plan.</p>' + cl.map(function (c) { return '<div class="card"><b>' + esc(fmt(c.due)) + '</b>: ' + c.tasks.length + ' tasks<div style="margin-top:6px">' + c.tasks.map(function (t) { return rowHtml(t); }).join('') + '</div></div>'; }).join('') : '') +
+      (state.truncated ? '<div class="note warn">The live read hit the 100-task page limit; some tasks may be missing from this view.</div>' : '');
+  }
+
+  // ------------------------------------------------------------------
+  // Workbench: comment, re-date with a reason, complete. Verified by re-read.
+  // ------------------------------------------------------------------
+  function wireRows() {
+    document.querySelectorAll('.row[data-gid]').forEach(function (r) {
+      if (r.dataset.wired) return; r.dataset.wired = '1';
+      r.addEventListener('click', function (e) {
+        if (e.target.closest('a,button')) return;
+        openWorkbench(r, r.dataset.gid);
+      });
+    });
+  }
+  function openWorkbench(row, gid) {
+    var t = byGid[gid]; if (!t) return;
+    var existing = document.getElementById('wb'); if (existing) existing.remove();
+    if (openWb === gid) { openWb = null; return; }
+    openWb = gid;
+    var wb = document.createElement('div'); wb.className = 'wb'; wb.id = 'wb';
+    var deps = t.openDeps.length ? '<div class="sub">Held by: ' + esc(t.openDeps.map(label).join('; ')) + '</div>' : '';
+    var dents = t.dependents.filter(function (d) { return !d.done; });
+    var un = dents.length ? '<div class="sub">Unblocks: ' + esc(dents.map(label).join('; ')) + '</div>' : '';
+    wb.innerHTML = '<div><b>' + esc(t.name) + '</b></div><div class="sub">' + esc(t.who) + ' · ' + esc(fmt(t.due)) + ' · <a href="' + esc(t.url) + '" target="_blank" rel="noopener">Open in Asana</a></div>' + deps + un +
+      '<textarea id="wb-text" placeholder="Comment for the task. A moved date needs the reason here."></textarea>' +
+      '<label class="sub">New due date (optional)</label><input type="date" id="wb-date" value="' + esc(t.due || '') + '">' +
+      '<div class="btns"><button class="b p" id="wb-comment">Post comment</button><button class="b" id="wb-date-btn">Move date</button>' + (t.done ? '' : '<button class="b d" id="wb-done">Mark complete</button>') + '</div><div class="wbmsg" id="wb-msg"></div>';
+    var parent = row.closest('li') || row;
+    parent.insertAdjacentElement('afterend', wb);
+    var text = document.getElementById('wb-text'), date = document.getElementById('wb-date'), msg = document.getElementById('wb-msg');
+    var btns = [document.getElementById('wb-comment'), document.getElementById('wb-date-btn'), document.getElementById('wb-done')].filter(Boolean);
+    if (!live.mcp) { msg.className = 'wbmsg bad'; msg.textContent = 'Read-only here. Open the page from its claude.ai link (signed in) to write to Asana.'; btns.forEach(function (b) { b.disabled = true; }); return; }
+    document.getElementById('wb-comment').addEventListener('click', function () {
+      if (!text.value.trim()) { msg.className = 'wbmsg bad'; msg.textContent = 'Write the comment first.'; return; }
+      doWork(t, { comment: text.value.trim() }, msg, btns);
+    });
+    arm2(document.getElementById('wb-date-btn'), 'Tap again to move the date to ' + (date.value ? fmt(date.value) : '?'), function () {
+      if (!date.value) { msg.className = 'wbmsg bad'; msg.textContent = 'Pick the new date.'; return; }
+      if (date.value === t.due) { msg.className = 'wbmsg bad'; msg.textContent = 'That is the current date.'; return; }
+      if (!text.value.trim()) { msg.className = 'wbmsg bad'; msg.textContent = 'A moved date needs a reason in the comment.'; return; }
+      doWork(t, { comment: 'Date moved ' + fmtLong(t.due) + ' to ' + fmtLong(date.value) + ' via Membership Delivery Desk. Reason: ' + text.value.trim(), due: date.value }, msg, btns);
+    });
+    var dn = document.getElementById('wb-done');
+    if (dn) arm2(dn, 'Tap again to mark complete', function () { doWork(t, { comment: text.value.trim() || null, complete: true }, msg, btns); });
+  }
+  function arm2(btn, armedText, fn) {
+    var armed = false, orig = btn.textContent;
+    btn.addEventListener('click', function () {
+      if (!armed) { armed = true; btn.textContent = armedText; setTimeout(function () { armed = false; btn.textContent = orig; }, 6000); return; }
+      armed = false; btn.textContent = orig; fn();
+    });
+  }
+  function parsePayload(res) { var p = res && res.payload; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } } return p; }
+  function doWork(t, opts, msg, btns) {
+    var mcp = live.mcp, as = live.as;
+    btns.forEach(function (b) { b.disabled = true; });
+    msg.className = 'wbmsg'; msg.textContent = 'Working…';
+    var step = opts.comment ? mcp.callTool(as, 'add_comment', { task_id: t.gid, text: opts.comment }) : Promise.resolve(null);
+    step.then(function () {
+      var upd = null;
+      if (opts.complete) upd = { task: t.gid, completed: true };
+      if (opts.due) upd = { task: t.gid, due_on: opts.due };
+      return upd ? mcp.callTool(as, 'update_tasks', { tasks: [upd] }) : null;
+    }).then(function (res) {
+      if (res) {
+        var p = parsePayload(res);
+        if (p && p.failed && p.failed.length) throw { code: 'tool_error', message: (p.failed[0].errors && p.failed[0].errors[0] && (p.failed[0].errors[0].message || p.failed[0].errors[0])) || 'Asana rejected the update' };
+      }
+      return mcp.callTool(as, 'get_task', { task_id: t.gid, include_comments: false, include_subtasks: false, opt_fields: 'name,completed,due_on' }, { cache: { refresh: true } }).then(function (v) {
+        var p = parsePayload(v), task = p && p.data;
+        if (opts.complete) { if (task && task.completed) ok('Done. "' + short(t.name).slice(0, 50) + '" is complete.'); else bad('That did not stick. Asana still shows it open.'); }
+        else if (opts.due) { if (task && task.due_on === opts.due) ok('Moved to ' + fmt(opts.due) + ', reason recorded on the task.'); else bad('The date did not stick. Check the task in Asana.'); }
+        else ok('Comment posted on the task.');
+        try { mcp.invalidate(as, 'get_tasks'); } catch (e) {}
+      }, function () { ok('Written, but could not re-check. Verify in Asana.'); });
+    }).catch(function (err) {
+      bad(err && err.code === 'tool_error' ? 'Asana said no: ' + (err.message || 'the update failed') + '.' : fixCopy(err));
+      btns.forEach(function (b) { b.disabled = false; });
+    });
+    function ok(s) { msg.className = 'wbmsg ok'; msg.textContent = s; }
+    function bad(s) { msg.className = 'wbmsg bad'; msg.textContent = s; }
+  }
+  function fixCopy(err) {
+    if (!err) return 'Unknown error.';
+    if (err.code === 'needs_reauth') return 'Your Asana login has lapsed. Reconnect it in claude.ai Settings, Connectors, then reopen this page.';
+    if (err.code === 'server_not_connected') return 'Asana is not connected to your claude.ai account.';
+    if (err.code === 'approval_required') return 'Asana needs your approval for this call.';
+    if (err.code === 'blocked_by_policy') return 'Policy blocks this Asana call.';
+    return 'Asana hiccup: ' + (err.message || err.code) + '.';
+  }
+
+  // ------------------------------------------------------------------
+  // Utilities
+  // ------------------------------------------------------------------
+  function flash(btn, t) { var o = btn.textContent; btn.textContent = t; setTimeout(function () { btn.textContent = o; }, 1500); }
+  function copyText(text, btn, done) { navigator.clipboard.writeText(text).then(function () { if (btn) flash(btn, done); }, function () { if (btn) flash(btn, 'Copy failed'); }); }
+  function handoff(prompt, btn) {
+    if (navigator.share) navigator.share({ text: prompt }).then(function () { flash(btn, 'Handed to Claude'); }).catch(function () { copyText(prompt, btn, 'Copied, paste into Claude'); });
+    else copyText(prompt, btn, 'Copied, paste into Claude');
+  }
+  function showTab(id) {
+    document.querySelectorAll('nav [role=tab]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.p === id ? 'true' : 'false'); });
+    document.querySelectorAll('.panel').forEach(function (p) { p.hidden = p.id !== id; });
+    var e = document.getElementById('wb'); if (e) e.remove(); openWb = null;
+  }
+  document.querySelectorAll('nav [role=tab]').forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.p); }); });
+
+  // ------------------------------------------------------------------
+  // Live data via the artifact mcp capability (falls back to the snapshot)
+  // ------------------------------------------------------------------
+  var liveDot = document.getElementById('live-dot'), liveStatus = document.getElementById('live-status');
+  var TASK_INPUT = { project: PROJECT, limit: 100, opt_fields: 'gid,name,completed,completed_at,assignee.name,due_on,modified_at,memberships.section.gid,dependencies.gid,num_subtasks,resource_subtype,permalink_url' };
+  function stamp() {
+    var d = new Date(state.storedAt);
+    liveStatus.textContent = (state.live ? 'Live from Asana, read ' : 'Snapshot of the board taken ') + d.getDate() + ' ' + MON[d.getMonth()] + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + (state.live ? '. Refreshes every five minutes. Tap a task to comment, re-date or complete it.' : '. Open from the claude.ai link for live data and writes.');
+    liveDot.className = 'dot' + (state.live ? ' on' : state.error ? ' bad' : '');
+  }
+  load(SNAPSHOT.tasks.map(fromSnapshot)); renderAll(); stamp();
+
+  if (window.claude && typeof window.claude.use === 'function') {
+    window.claude.use('mcp').then(function (mcp) {
+      if (!mcp) return;
+      var start = function (as) {
+        live.mcp = mcp; live.as = as;
+        mcp.watchTool(as, 'get_tasks', TASK_INPUT, function (ev) {
+          if (ev.type === 'data') {
+            var p = parsePayload(ev.result);
+            if (p && p.data) {
+              state.truncated = !!p.next_page;
+              load(p.data.map(fromLive)); state.live = true; state.error = null;
+              state.storedAt = ev.result.cache && ev.result.cache.storedAt ? ev.result.cache.storedAt : Date.now();
+              renderAll(); stamp();
+            }
+          } else {
+            state.error = ev.error; liveDot.className = 'dot bad';
+            liveStatus.textContent = fixCopy(ev.error) + ' Showing the last good read.';
+          }
+        }, { cache: { staleTime: 60000 }, refetchInterval: 300000 });
+        mcp.watchTool(as, 'get_project', { project_id: PROJECT, opt_fields: 'current_status.title,current_status.color,current_status.created_at' }, function (ev) {
+          if (ev.type === 'data') {
+            var p = parsePayload(ev.result);
+            if (p && p.data && p.data.current_status) { state.status = p.data.current_status; renderTiles(health()); renderStatus(health()); }
+          }
+        }, { cache: { staleTime: 300000 }, refetchInterval: 900000 });
+      };
+      try {
+        mcp.listTools().then(function (res) {
+          var names = (res.servers || []).map(function (s) { return s.server; });
+          start(names.find(function (n) { return /asana/i.test(n); }) || ASANA_SERVER);
+        }).catch(function () { start(ASANA_SERVER); });
+      } catch (e) { start(ASANA_SERVER); }
+    });
+  }
+})();
+</script>

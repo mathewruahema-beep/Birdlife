@@ -24,6 +24,7 @@ the real IDs, picklist values, gotchas, and playbooks:
 | `birdlife-stripe` | Payments, refunds, BECS, WooCommerce→Salesforce flow |
 | `birdlife-zapier` | The 17 connected apps, when Zapier vs native connector |
 | `birdlife-cloudflare` | DNS, SPF/DKIM, WAF, caching, the two accounts |
+| `birdlife-membership-delivery` | The Membership Build programme: board gids, gate map, critical chain, standup and status cadence, conversation playbooks, the Membership Delivery Desk tool |
 
 If the account-synced versions of these skills are also present, they take
 precedence when newer; otherwise these repo copies are the source of truth. When
@@ -65,6 +66,9 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
   actions to approve-only direct execution.
 - `dashboard/ict-dashboard.html` — the ICT dashboard design template; the live copy
   is republished each weekday by the `ICT Dashboard` routine.
+- `console/membership-delivery.html` — the Membership Delivery Desk: the Membership
+  Build Asana board read as a delivery problem (critical path, conversations, standup,
+  weekly status, hygiene). Published at https://claude.ai/code/artifact/c79983b4-5375-48b1-8d73-f405c4838f95.
 - `routines/` — scheduled-routine definitions and backups (credentials redacted).
 
 ## Style

@@ -16,6 +16,7 @@ This repository is two things:
 | | |
 |---|---|
 | Live dashboard | https://claude.ai/code/artifact/3aa92e1f-c8d7-4a91-95ad-c6dcd5db7606 |
+| Membership Delivery Desk | https://claude.ai/code/artifact/c79983b4-5375-48b1-8d73-f405c4838f95 |
 | Refresh | Weekdays 08:00 AEST, automated |
 | Salesforce org | `birdlifeaustralia.lightning.force.com` |
 | Asana project | `1211042432693678` — IT Operations Project Plan |

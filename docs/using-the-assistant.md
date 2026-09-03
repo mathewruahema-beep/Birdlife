@@ -31,6 +31,25 @@ assistant session "update the console" to change it. (Don't enable GitHub Pages
 for it on a free plan: Pages would make the page public, and it names internal
 systems. The artifact URL is private to you.)
 
+## The Membership Delivery Desk
+
+**https://claude.ai/code/artifact/c79983b4-5375-48b1-8d73-f405c4838f95** is the delivery tool for the
+Membership Build programme (Asana project `1217455650909553`, three workstreams:
+Salesforce IT-INT-005, WordPress/WooCommerce IT-INT-003 with Blitzm, miniOrange
+IT-INT-004). It reads the board live through your Asana connector and turns it
+into an agile delivery view: programme colour, overdue count, next gate, the
+tightest critical-path link and the age of the last status update; this week's
+work by person with a WIP warning; the chain to production computed from the
+board's own dependencies with slack per link and any date inversions; gates per
+workstream; the conversations to have this week with a draft in your voice per
+person and vendor; a standup script with the definition of done for the next
+gates; a weekly status draft in the shape of the last one; and a board hygiene
+pass. Tap any task to comment, move its date (reason mandatory, written to the
+task) or mark it complete, two-tap confirmed and verified by re-read. Source is
+`console/membership-delivery.html`; the operator knowledge behind it is the
+`birdlife-membership-delivery` skill. Tell any session "update the delivery
+desk" to change it.
+
 ## Ways to reach it
 
 **1. Phone or any browser — claude.ai/code.** Start a new session on
