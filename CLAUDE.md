@@ -24,7 +24,7 @@ the real IDs, picklist values, gotchas, and playbooks:
 | `birdlife-stripe` | Payments, refunds, BECS, WooCommerce→Salesforce flow |
 | `birdlife-zapier` | The 17 connected apps, when Zapier vs native connector |
 | `birdlife-cloudflare` | DNS, SPF/DKIM, WAF, caching, the two accounts |
-| `claude-os` | Managing Claude itself: routine/skill/connector/artefact governance, the weekly OS audit, the registers |
+| `claude-os` | Managing Claude itself: routine/skill/connector/artefact governance, the weekly OS audit, the registers, and operating/updating the BirdLife Australia console (Jarvis) |
 
 If the account-synced versions of these skills are also present, they take
 precedence when newer; otherwise these repo copies are the source of truth. When

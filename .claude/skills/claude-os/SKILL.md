@@ -7,9 +7,11 @@ description: >-
   to audit, list, create, change, pause, consolidate or retire scheduled
   routines; check why a routine failed or went quiet; review or sync skills
   between the repo and the claude.ai account; review connectors or artefact
-  URLs; or run the weekly OS audit. Trigger on "audit the routines", "OS audit",
-  "claude os", "what's running", "why didn't the dashboard update", "too many
-  routines", "create a routine", "retire that routine", "sync the skills", or
+  URLs; run the weekly OS audit; or update, fix or extend the BirdLife Australia
+  console (the Jarvis command deck artifact). Trigger on "audit the routines",
+  "OS audit", "claude os", "what's running", "why didn't the dashboard update",
+  "too many routines", "create a routine", "retire that routine", "sync the
+  skills", "update the console", "fix Jarvis", "the console shows an error", or
   any request to manage Claude itself rather than BirdLife's systems.
 ---
 
@@ -23,6 +25,81 @@ The single most important habit: **the register moves with reality**. Any
 routine, skill, connector or artefact change you make gets its register row
 updated, committed and pushed in the same session. A register that lags is
 worse than no register, because people trust it.
+
+## The console (the Jarvis command deck)
+
+The daily working surface is the **BirdLife Australia** console:
+https://claude.ai/code/artifact/2a9b7e57-dbc5-49e3-a4d7-c0a36bd236b2
+Source of truth: `os/claude-os-overview.html` in this repo. Stark HUD single-look
+design (dark, cyan/gold, explicit colours). Tabs: Command (default, the full
+picture: operations, project rollup, decisions, patterns), Today, Projects
+(Asana board by section), The system, Schedule, Registers, Rules.
+
+### Updating it
+1. Edit `os/claude-os-overview.html`, then republish with the Artifact tool
+   passing `url` = the address above (same URL, never a new artifact) AND
+   restating the FULL capabilities manifest (a non-empty capabilities object is
+   a full-set declaration; omitting it also works and carries the stored one):
+   `sample: {}` plus `mcp.servers`:
+   - "Salesforce Production": soqlQuery, createSobjectRecord, updateSobjectRecord
+   - "Asana": search_tasks, add_comment, update_tasks
+   - "Microsoft 365": outlook_email_search, chat_message_search,
+     teams_list_chats, outlook_create_reply_draft
+2. Connector names are DISPLAY NAMES with spaces ("Salesforce Production", not
+   "Salesforce-Production"; the hyphenated forms in routine mcp_connections are
+   not what the mcp capability wants). A wrong name shows as "Add <name> in
+   Settings, Connectors" on the tile.
+3. Never declare a connector tool the session has not observed a real
+   request/response for, or disclose it as unverified when publishing.
+4. Commit and push the source in the same session, and update the artefact
+   register row in `os/registers.md` if the capability surface changed.
+5. Keep the page's embedded register data (routines, decisions, counts) in sync
+   with `os/registers.md`; the page is a mirror, the markdown is authoritative.
+
+### Observed API facts (hard-won, do not rediscover)
+- M365 tools return ONE JSON block per item in `result.content`, not a single
+  payload; parse all text blocks and drop pagination trailers
+  (moreResults/nextOffset/nextCursor).
+- `outlook_create_reply_draft` answers in PLAIN TEXT ("id: ... webLink: ..."),
+  not JSON. It creates a draft only; `outlook_send_draft` exists but the console
+  deliberately never sends (charter: drafts are reviewed in Outlook).
+- Teams has NO send API: replies are drafted for copy-paste. Chat search with a
+  date filter scans recent chats only (channels can be missed).
+- Salesforce soqlQuery returns `{totalSize, done, records:[...]}` with
+  relationship fields nested (r.Owner.Name).
+- Asana `update_tasks` reports per-task `succeeded`/`failed`; check `failed`
+  before claiming success. Section move = add_projects {project_id, section_id}.
+
+### The action contract (what Jarvis on the page may do)
+Reads: live snapshot, single SOQL SELECT (always LIMIT, Cases always scoped
+RecordType.DeveloperName='Zeus'), Asana search. Writes, each behind an in-page
+Approve card showing the exact change, one record at a time, verified by
+re-read, with an internal audit comment on case writes: case internal note,
+case public reply (+optional status), case close (validated reason, Type if
+blank), case assign (ICT team only; duplicate User records resolved live by
+recent Zeus case ownership, ambiguity always put to the user), task comment,
+task complete, task move, Outlook reply DRAFT. Never: send email, bulk actions,
+assignment outside the team, Entra/M365 admin, Salesforce config. Decide-as-
+Mathew mode states the call (money first, efficiencies second, then risk), the
+reason, reversibility, then executes via the card; a cancelled card is an
+overrule.
+
+### Console failure modes
+- Tile says "Add/Reconnect <connector>": connector name mismatch or lapsed
+  auth; fix in claude.ai Settings, Connectors, or correct the name and republish.
+- Jarvis dead with "not available for this account": sample capability not
+  granted for that viewer; the page hides it by design.
+- A write "did not stick": the page re-reads and says so; trust the re-read,
+  check the record in the source system, never blind-retry a write.
+- Page content stale vs registers: republish after syncing the embedded data.
+
+## Estate state checkpoints (update when they change)
+- 3 Sep 2026: 12 recurring routines of a budget of 12 (budget decision closed by
+  retiring the Top 10 email draft), 2 one-shots. Old ICT Console artifact
+  tombstoned to a redirect; console/ and dashboard/ removed from the repo.
+  Department suite and Ops/Monitoring dashboards KEPT (console does not cover
+  their content or their team audience); the retire-or-share decision is open
+  in the registers.
 
 ## The weekly audit
 
