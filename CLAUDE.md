@@ -54,9 +54,15 @@ file here and commit — that is how the assistant learns.
    bulk-update or delete; confirm identity before reassigning (staff have duplicate
    SF User records); stop and hand to a human on security/finance/PII-sensitive
    actions; log every write with an internal comment.
-4. **Closing a Case takes two fields:** `Status = "Closed"` AND
+4. **Case assignment stays inside the ICT team.** An Ask Zeus case may only be
+   assigned to an active Salesforce User who is a member of the Zeus public group
+   (`00GRF000001s1RZ2AY`: today Andrew Dunn, Keith Tsui, Nina Lewis, Mathew Hema)
+   and whose username is on `birdlife.org.au`. Anyone else, including a team
+   member's external duplicate User record, is a reassignment decision for a human
+   and is never written by the assistant. Rule set by Mathew, 4 Sep 2026.
+5. **Closing a Case takes two fields:** `Status = "Closed"` AND
    `Case_Closed_Reason__c` — Status alone fails validation.
-5. **Always scope to Ask Zeus.** Case reporting without
+6. **Always scope to Ask Zeus.** Case reporting without
    `RecordType.DeveloperName = 'Zeus'` counts all 19 record types and inflates ICT
    numbers ~200×. `Owner.Name = 'Zeus'` is the unassigned intake queue, not a person.
 

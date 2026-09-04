@@ -94,9 +94,10 @@ RecordType.DeveloperName='Zeus'), Asana search. Writes, each behind an in-page
 Approve card showing the exact change, one record at a time, verified by
 re-read, with an internal audit comment on case writes: `case_comment`
 (public false = internal note, public true = reply, optional status),
-`case_close` (validated reason, Type if blank), `case_assign` (ICT team only;
-duplicate User records resolved live by recent Zeus case ownership, ambiguity
-always put to the user), `task_action` (comment, complete, move), `fix_track`,
+`case_close` (validated reason, Type if blank), `case_assign` (ICT team only,
+defined live as members of the Zeus public group 00GRF000001s1RZ2AY with a
+birdlife.org.au username; duplicate User records resolved by recent Zeus case
+ownership, ambiguity always put to the user; charter rule 4), `task_action` (comment, complete, move), `fix_track`,
 `email_draft_reply` (Outlook DRAFT). Tools are consolidated to 13 because the
 sample capability caps tools per call (`limits().tools.maxCount`); the page
 trims to the cap if it is ever lower. Never: send email, bulk actions,

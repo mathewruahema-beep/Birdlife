@@ -149,6 +149,13 @@ BirdLife-Security-Dashboard.html, plus the `_dashboard-run-log.txt` heartbeat.
 All artifact URLs are private. Do not publish any via GitHub Pages or any
 public host; they name internal systems.
 
+**Rule, 4 Sep 2026 (Mathew):** case assignment stays inside the ICT team. The
+team is defined live as the members of the Salesforce public group `Zeus`
+(`00GRF000001s1RZ2AY`) with `@birdlife.org.au` usernames; the console's
+`case_assign` and the skills enforce it (charter rule 4). Changing who the
+assistant may assign to is done by changing that group's membership, not the
+code.
+
 **Decision, 4 Sep 2026 (Mathew):** the assistant writes to Salesforce cases
 under Mathew's own account; no separate Zeus identity is created. Every console
 and routine write is therefore attributed to "Mathew Hema" with the

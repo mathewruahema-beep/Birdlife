@@ -64,9 +64,11 @@ Reassign owner: set `OwnerId` to a User Id or a Queue Id — **but resolve it fi
 
 ## 2. Salesforce — owners (duplicate-user caution)
 
-Each ICT staffer has **multiple active User records** — do not hardcode. Always
-resolve at write time and, if more than one active match, show them and let the user
-choose. Query:
+Each ICT staffer has **multiple active User records** — do not hardcode. The valid
+set is the Zeus public group `00GRF000001s1RZ2AY` (members are the ICT team) filtered
+to `@birdlife.org.au` usernames; the personal-email duplicates are External Identity
+portal users and are never assignment targets. Always resolve at write time and, if
+more than one match remains, show them and let the user choose. Query:
 ```
 SELECT Id, Name, IsActive, Username FROM User WHERE Name = 'Keith Tsui' AND IsActive = true
 ```

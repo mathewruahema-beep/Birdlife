@@ -54,6 +54,13 @@ anything customer-facing; be lighter on internal comments and Asana section move
 - **Confirm identity before reassigning.** Each ICT staffer has *multiple active
   Salesforce User records* (see reference). Resolve the owner by query and, if more
   than one active user matches, show the options and let the user pick — don't guess.
+- **Assign only inside the ICT team.** The team is defined live as the members of
+  the Salesforce public group `Zeus` (`00GRF000001s1RZ2AY`), not by a name list.
+  A case may be assigned only to an active User who is in that group AND whose
+  username ends in `@birdlife.org.au`. External duplicates (gmail, outlook,
+  melbpc usernames on the Birdlife External User profile) are never valid targets
+  even when the name matches. Anyone outside the group is a human's decision:
+  say so and stop. Rule set by Mathew, 4 Sep 2026.
 - **Stop and ask on anything security-, finance-, or privacy-sensitive**: password/MFA
   resets, access grants, payment/refund actions, anything touching supporter PII in
   bulk. Prepare the action, then hand the decision to a human.
@@ -178,13 +185,20 @@ one record at a time, exact change shown, verified by re-read.
 
 Every ICT staffer has more than one active Salesforce User. The resolution
 that works, in order:
-1. `SELECT Id, Name, Username, IsActive FROM User WHERE Name = '<name>' AND IsActive = true`
-2. If more than one, tie-break by who owns recent Zeus cases:
+1. Membership first: `SELECT UserOrGroupId FROM GroupMember WHERE GroupId = '00GRF000001s1RZ2AY'`
+   (the Zeus public group). Only those Ids are ever valid assignees.
+2. `SELECT Id, Name, Username, IsActive, Profile.Name FROM User WHERE Name = '<name>' AND IsActive = true AND Username LIKE '%@birdlife.org.au'`
+   and keep only the Ids that are in the group. Verified 4 Sep 2026: this
+   leaves exactly one record per team member (Andrew 0055g00000DqUq9AAF,
+   Keith 005I8000000J4L5IAK, Nina 005I8000000J5EtIAK, Mathew
+   005RF000003ahkfYAA); the other "duplicates" are External Identity portal
+   users with personal email usernames.
+3. If more than one still matches, tie-break by who owns recent Zeus cases:
    `SELECT OwnerId, COUNT(Id) c FROM Case WHERE RecordType.DeveloperName = 'Zeus' AND OwnerId IN (<ids>) AND CreatedDate = LAST_N_DAYS:180 GROUP BY OwnerId`
-3. Exactly one owner with cases: use it. Otherwise show the candidates with
+   Exactly one owner with cases: use it. Otherwise show the candidates with
    usernames and counts and require the user to pick. Never guess, never
-   hardcode. Assignment is limited to Andrew Dunn, Keith Tsui, Nina Lewis and
-   Mathew; anyone else is a reassignment decision for a human.
+   hardcode names. A name that resolves to nobody in the group is not an
+   assignment the assistant makes.
 
 ## Style
 
