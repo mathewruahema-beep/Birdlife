@@ -81,6 +81,18 @@ details{border-top:1px solid var(--rule);padding:.7rem 0}
 summary{cursor:pointer;font-family:var(--mono);font-size:.82rem;color:var(--ink2)}
 details ol{padding-left:1.25rem;margin:.6rem 0 0;font-size:.95rem}
 details li{margin:0 0 .35rem}
+
+/* learning, ratings, teach-it */
+.learn{margin:1.5rem 0 0;padding:1rem 1.1rem;background:var(--bg2);border-left:3px solid var(--link)}
+.learn h3{margin:.8rem 0 .3rem}.learn ul,.learn ol{margin:0 0 .5rem;max-width:none}.learn p{margin:0 0 .4rem;max-width:none}
+.rate{display:flex;gap:.4rem;margin:.25rem 0 0}
+.rate button,.fb button{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;background:transparent;color:var(--ink2);border:1px solid var(--rule);border-radius:2px;padding:.28rem .55rem;cursor:pointer}
+.rate button.on{color:var(--gold);border-color:var(--gold)}
+.fb{margin:1.5rem 0 0}.fbgrid{display:grid;grid-template-columns:1fr;gap:1rem;margin:.6rem 0}
+@media (min-width:640px){.fbgrid{grid-template-columns:1fr 1fr}}
+.fb label{display:flex;flex-direction:column;gap:.4rem;font-weight:600;font-size:.95rem}
+.fb textarea{font-family:var(--sans);font-size:.95rem;padding:.5rem .6rem;border:1px solid var(--rule);border-radius:2px;background:var(--bg);color:var(--ink);resize:vertical}
+.fb .row{display:flex;align-items:center;gap:.7rem}
 </style>
 
 <div class="wrap">
@@ -98,7 +110,7 @@ details li{margin:0 0 .35rem}
 <section class="daily" id="today">
   <div class="eyebrow">Daily · from your Gmail newsletters</div>
   <h2>Today's ten</h2>
-  <div class="meta"><!--STAMP-START--><span>Thursday 3 September 2026</span><span>Read from 5 newsletters in Gmail</span><span>Refreshes weekdays 6:30am AEST</span><!--STAMP-END--></div>
+  <div class="meta"><!--STAMP-START--><span data-day="2026-09-03">Thursday 3 September 2026</span><span>Read from 5 newsletters in Gmail</span><span>Refreshes weekdays 6:30am AEST</span><!--STAMP-END--></div>
   <div class="rep">
     <!--REP-START-->
     <div class="eyebrow">AI rep of the day</div>
@@ -159,6 +171,34 @@ details li{margin:0 0 .35rem}
 <p class="src">TLDR Dev, 3 Sep · <a href="https://tomtunguz.com/ai-productivity-doesnt-mean-what-i-think">Tomasz Tunguz</a></p></li>
 <!--TEN-END-->
   </ol>
+  <div class="learn">
+    <div class="eyebrow">What the system learned · from your AI work</div>
+    <!--LEARN-START-->
+    <p class="src">Sunday 6 September 2026 · evidence: session titles 3 to 5 Sep, routine run states, commits across 16 branches, the practice log, no hint ratings yet</p>
+    <h3>What it saw</h3>
+    <ul>
+      <li><strong>A build burst, then a clean-up.</strong> On 3 September you started sixteen sessions and twelve built new tools: job search, voice coach, fitness, sleep, church desk, security workbench, ICT compass, dev management, external ICT console, focus tool, Pocket clone, Claude OS. By 5 September the personal ones were moved to their own repos. Good separation. The cost: most of those tools have no check that proves they work and no number that proves they matter.</li>
+      <li><strong>The practice loop exists; the habit does not yet.</strong> Zero reps logged in three days since the curriculum was created.</li>
+      <li><strong>AI Daily Ten ran Thursday 6:35am and changed nothing.</strong> Gmail is still not attached, so it stopped as designed. The stamp date caught it.</li>
+      <li><strong>The overnight pre-draft has been abandoned since 3 September.</strong> The register recorded a fix; no run has proved it.</li>
+      <li><strong>This page needed three layout fixes after shipping.</strong> The system's own lesson: screenshot before publishing. That check is now in the routine.</li>
+    </ul>
+    <h3>Three improvements for today</h3>
+    <ol>
+      <li><strong>Attach Gmail to AI Daily Ten</strong> in claude.ai, Routines. Two minutes. Done when tomorrow's stamp shows tomorrow's date.</li>
+      <li><strong>Do rep 1 on one real ticket and log it.</strong> Done when the practice log has one scored row.</li>
+      <li><strong>Rate five hints above.</strong> The selection cannot learn from silence. Done when five ratings exist. Preferences learned so far: none.</li>
+    </ol>
+    <!--LEARN-END-->
+  </div>
+  <div class="fb" hidden>
+    <div class="eyebrow">Teach it</div>
+    <div class="fbgrid">
+      <label>What I did with AI today<textarea id="fb-work" rows="3" placeholder="One line. What you asked for, what worked, what did not."></textarea><span class="row"><button id="fb-work-save" type="button">Save</button><span id="fb-work-state" class="src"></span></span></label>
+      <label>Make tomorrow's ten better<textarea id="fb-better" rows="3" placeholder="More of, less of, a topic to cover, a hint that was wrong."></textarea><span class="row"><button id="fb-better-save" type="button">Save</button><span id="fb-better-state" class="src"></span></span></label>
+    </div>
+    <p class="src">Rate each hint with Useful or Not for me. The 6:30am run reads the ratings and these notes, and adjusts what it picks and what it proposes.</p>
+  </div>
   <h3>Previous days</h3>
   <!--ARCHIVE-START-->
 <p class="src">First edition. Yesterday's ten will appear here from tomorrow, five days kept.</p>
@@ -169,7 +209,7 @@ details li{margin:0 0 .35rem}
 <section id="now">
   <div class="eyebrow">Status</div>
   <h2>Where you actually are</h2>
-  <p>You are ahead of most ICT managers. The Birdlife repo already has a charter in CLAUDE.md, nine operator skills under version control with more on your claude.ai account, a phone console, four scheduled routines, and a three-tier honesty model for what the assistant executes versus prepares. That is an operating system, not a chatbot.</p>
+  <p>You are ahead of most ICT managers. The Birdlife repo already has a charter in CLAUDE.md, nine operator skills under version control with more on your claude.ai account, a phone console, eleven scheduled routines, and a three-tier honesty model for what the assistant executes versus prepares. That is an operating system, not a chatbot.</p>
   <h3>The honest gaps</h3>
   <ul>
     <li><strong>Usage is reactive.</strong> Most sessions start from a ticket. The leverage is in work you have not asked for yet: pre-drafting, pattern spotting, reporting.</li>
@@ -291,7 +331,7 @@ details li{margin:0 0 .35rem}
     <li><strong>End of session: "coach me".</strong> It quotes the prompts you actually wrote, shows the stronger version, names your weakest habit that day, and logs it.</li>
     <li><strong>Friday: "weekly AI review".</strong> Reps done, average score, streak, weakest habit, one proposed change.</li>
   </ul>
-  <p>Everything is recorded in the practice log with a date, a score and evidence. That log is the number the Board will ask for. The push version is the <a href="https://claude.ai/code/artifact/f146ec59-325a-4fb6-988c-e10a8f5c276a">AI Daily Ten</a> page: each weekday at 6:30am AEST it refreshes with ten hints from the AI newsletters in your Gmail, each turned into something to do in the role, plus the rep of the day.</p>
+  <p>Everything is recorded in the practice log with a date, a score and evidence. That log is the number the Board will ask for. The push version is <a href="#today">Today&#39;s ten</a> at the top of this page: each weekday at 6:30am AEST it refreshes with ten hints from the AI newsletters in your Gmail, the rep of the day, and what the system learned from your actual AI work the day before. Rate the hints and leave the two notes; that is how it learns.</p>
 </section>
 
 <section id="people">
@@ -329,4 +369,40 @@ details li{margin:0 0 .35rem}
 </section>
 
 <footer>Source: docs/ai-usage-guide.md in mathewruahema-beep/Birdlife, branch claude/ai-usage-guide-hk5e6s. Tell any assistant session "update the AI usage guide" to change it.</footer>
+<script>
+(async function(){
+  var dayEl=document.querySelector('#today [data-day]'); var day=dayEl?dayEl.getAttribute('data-day'):null;
+  var db=null; try{ if(window.claude&&window.claude.use){ db=await window.claude.use('db'); } }catch(e){ db=null; }
+  if(!db||!day) return;
+  var items=document.querySelectorAll('ol.ten li');
+  items.forEach(function(li,i){
+    var n=i+1; var row=document.createElement('p'); row.className='rate';
+    [['useful','Useful'],['skip','Not for me']].forEach(function(v){
+      var b=document.createElement('button'); b.type='button'; b.textContent=v[1]; b.setAttribute('data-vote',v[0]);
+      b.addEventListener('click',async function(){
+        try{ await db.doc('ratings/'+day+'-'+n).set({date:day,n:n,title:(li.querySelector('h3')||{}).textContent||'',vote:v[0],at:new Date().toISOString()}); }
+        catch(e){ b.textContent='Could not save'; }
+      });
+      row.appendChild(b);
+    });
+    li.appendChild(row);
+  });
+  try{
+    db.collection('ratings').where('date','==',day).onSnapshot(function(snap){
+      var votes={}; snap.docs.forEach(function(d){ var x=d.data(); if(x) votes[x.n]=x.vote; });
+      items.forEach(function(li,i){ li.querySelectorAll('.rate button').forEach(function(b){ b.classList.toggle('on', votes[i+1]===b.getAttribute('data-vote')); }); });
+    }, function(){});
+  }catch(e){}
+  var fb=document.querySelector('.fb'); if(fb) fb.hidden=false;
+  [['fb-work','worklog'],['fb-better','feedback']].forEach(async function(pair){
+    var ta=document.getElementById(pair[0]); var btn=document.getElementById(pair[0]+'-save'); var st=document.getElementById(pair[0]+'-state');
+    if(!ta||!btn) return; var ref=db.doc(pair[1]+'/'+day);
+    try{ var snap=await ref.get(); if(snap.exists){ var d=snap.data(); if(d&&d.text) ta.value=d.text; } }catch(e){}
+    btn.addEventListener('click',async function(){
+      try{ await ref.set({date:day,text:ta.value.trim(),at:new Date().toISOString()}); st.textContent='Saved. The 6:30am run reads it.'; }
+      catch(e){ st.textContent='Could not save.'; }
+    });
+  });
+})();
+</script>
 </div>
