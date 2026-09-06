@@ -25,7 +25,7 @@ the real IDs, picklist values, gotchas, and playbooks:
 | `birdlife-zapier` | The 17 connected apps, when Zapier vs native connector |
 | `birdlife-cloudflare` | DNS, SPF/DKIM, WAF, caching, the two accounts |
 <<<<<<< HEAD
-| `ai-coach` | Mathew's daily AI practice: today's rep, session review, think-with-me frame, weekly review, the practice log |
+| `ai-coach` | Mathew's daily AI practice: today's rep, session review, think-with-me frame, weekly review, the practice log, and the learnings memory |
 =======
 | `birdlife-security` | Security posture across the estate, Essential Eight anchor, deadline register, admin ratios, incident playbooks (CONFIDENTIAL content) |
 | `birdlife-people-lifecycle` | Joiner/mover/leaver across every system, in order, with the Tier 2 scripts and the departed-staff credential sweep |
@@ -59,6 +59,15 @@ file here and commit — that is how the assistant learns.
 5. **Always scope to Ask Zeus.** Case reporting without
    `RecordType.DeveloperName = 'Zeus'` counts all 19 record types and inflates ICT
    numbers ~200×. `Owner.Name = 'Zeus'` is the unassigned intake queue, not a person.
+
+## The learning loop
+
+`docs/ai-practice/learnings.md` is the system's memory of how Mathew works with
+AI. The AI Daily Ten routine writes to it each weekday from evidence; the
+`ai-coach` skill writes to it after a review. Any session that spends real
+effort on AI work with Mathew (a new tool, a routine, a prompt that failed or
+landed) appends one dated line to its Observations before ending, and commits it.
+Read it before proposing an improvement, so nothing is proposed twice.
 
 ## Connectors this assistant expects
 

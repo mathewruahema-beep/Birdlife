@@ -32,7 +32,7 @@ created the same day outside the register and is now registered below.
 | Data feed and expiry monitor | `trig_01Q6X1Xr1syjg7U5QGNwDSUg` | daily 9am | |
 | Stale case chaser (report-only) | `trig_01S3ShSb7KSBA32LxFWaLaNa` | Mon 8:30am | |
 | Membership Build delivery briefing | `trig_01F7wy1pGcauqCsgUxVU4b47` | Mon, Wed, Fri 7:08am | Extended 3 Sep from Friday-only to Mon/Wed/Fri; Friday adds the status update draft. Read-only |
-| AI Daily Ten (Gmail newsletters into the AI Field Guide) | `trig_01Y69zEQwQtn4HcGw9Esz8ua` | weekdays 6:34am | Created 3 Sep outside the register. Read-only on Gmail, republishes artifact 3dd8818e. Gmail must be attached in the Routines UI before its first fire or it stops and reports that |
+| AI Daily Ten (Gmail newsletters and the learning block into the AI Field Guide) | `trig_01Y69zEQwQtn4HcGw9Esz8ua` | weekdays 6:34am | Created 3 Sep; rewritten 6 Sep as the daily learning loop: reads Gmail newsletters (read-only), hint ratings and notes saved on the page (artifact `db`), session titles, routine run states, commits and the practice log; refreshes the ten and the learning block on artifact 3dd8818e; appends to `docs/ai-practice/learnings.md` and pushes. The learning half runs even without Gmail. First run 4 Sep succeeded but changed nothing: Gmail still not attached in the Routines UI. Check: stamp date on the page equals today |
 
 ### One-shots (do not count against budget)
 

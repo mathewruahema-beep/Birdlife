@@ -1,4 +1,4 @@
-# Routine: AI Daily Ten (weekdays 6:30am AEST)
+# Routine: AI Daily Ten and the daily learning loop (weekdays 6:30am AEST)
 
 **Status: live, created 3 September 2026.** Trigger `trig_01Y69zEQwQtn4HcGw9Esz8ua`,
 first run 4 September 6:34am AEST. **One manual step remains:** attach the Gmail
@@ -15,7 +15,20 @@ connectors for this organisation). Until that is done the routine reports
 | Page | The AI Field Guide, daily block at the top: https://claude.ai/code/artifact/3dd8818e-d1c8-4b81-877f-6945e62ddc1d |
 | Template | `dashboard/ai-field-guide.html` (whole page; the routine changes only the STAMP, REP, TEN and ARCHIVE marker blocks) |
 
-## What it does
+## What it does (rewritten 6 September 2026)
+
+Two jobs, one run. **The ten:** as below. **The learning loop:** gathers evidence
+of Mathew's actual AI work (session titles from the last day, every routine's
+last run state, commits across all branches, the practice log, hint ratings and
+the two notes saved on the page), writes a learning block on the page (what it
+saw, three ranked improvements with owner and done-when, preferences learned),
+and appends the same entry to `docs/ai-practice/learnings.md` on the branch.
+The learning half runs even when Gmail is unavailable. Hint selection is
+weighted by ratings: topics rated Useful in the last five days come first,
+topics rated Not for me are avoided, and the "make tomorrow's ten better" note
+overrides both.
+
+## What the ten does
 
 Reads the previous day's AI newsletters in Mathew's Gmail (TLDR, The Rundown,
 The Neuron, AI for Work, The Deep View, Techpresso, One Useful Thing), extracts
