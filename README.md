@@ -165,6 +165,14 @@ weekday morning and republished to a stable URL.
 (`trig_0126KYAM3TAaZpBQKN8UeVdk`), cron `0 22 * * 0-4` UTC = weekdays 08:00 AEST.
 Fresh session per run, read-only, push notification on completion.
 
+> **Superseded (2 Sep 2026, corrected 3 Sep 2026):** that trigger no longer exists and
+> the routine estate has changed substantially since this section was written. The
+> current state of record for all routines is [`os/registers.md`](os/registers.md);
+> the weekday dashboard job is now `trig_01HhAKnEe6PXAvo6EEq72BHo` (the 2 Sep
+> successor `trig_01QKqXyfwVoUwejxBbe15gX9` was itself absorbed the same day). The
+> latest routine review is `routines/unused-routines-review-2026-09-03.md`. The
+> history below is kept because the scoping lessons in it still apply.
+
 ### Why it replaced the old file
 
 `birdlife_ict_dashboard.html` (Google Drive, 5 Aug 2026) was correctly scoped, but:
@@ -254,7 +262,7 @@ Consolidated to one scheduled job plus an in-session loop.
 | ICT Dashboard refresh — early AM | folded in; collided with the new job at the same minute |
 
 **Kept (4):** the consolidated ICT dashboard job (`trig_0126KYAM3TAaZpBQKN8UeVdk`,
-weekdays 7am AEST), Morning brief, the working security dashboard monthly, and the
+weekdays 7am AEST; itself retired 13 Aug, see `routines/unused-routines-review-2026-09-03.md`), Morning brief, the working security dashboard monthly, and the
 October DST fix — which is still needed for the Morning brief and skips the ICT part
 gracefully now that the separate dashboard triggers are gone.
 
@@ -288,15 +296,16 @@ They have been redacted from the backup in this repo, but:
 
 ```
 CLAUDE.md                            the AI ICT Assistant charter — loads into every session on this repo
+os/README.md                         the Claude Operating System — rules, budgets, cadence for managing the Claude estate itself
+os/registers.md                      state-of-record registers: routines, skills, connectors, artefacts, credential watchlist
 console/index.html                   the ICT Console — interactive prompt builder, runbook generator, quick reference
                                      (published at https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e)
 .claude/skills/                      the nine birdlife-* operator-knowledge skills (versioned)
 docs/using-the-assistant.md          remote access channels + prompt playbook
 README.md                            findings, admin runbook, routine consolidation
-dashboard/ict-dashboard.html         dashboard source as published
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
 ```
 
-The HTML is kept for reference and as the design template the morning routine
-rebuilds against. It is not itself the live artefact — the routine republishes to
-the artifact URL each weekday.
+The console and dashboard template files were retired on 3 Sep 2026 (git history
+keeps them); the live dashboards are fetched and republished in place by the
+routines, and the daily working surface is the BirdLife Australia console.

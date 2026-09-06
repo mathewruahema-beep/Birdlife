@@ -79,6 +79,48 @@ Data volume: **587,260 GL journal lines back to Dec 2016**; vendor bills back to
 
 `ns_runCustomSuiteQL` with `ns_getSuiteQLMetadata` is the right tool for reconciliation and analysis questions. Prefer it over saved searches for ad-hoc work: it leaves no artefacts behind in an already-cluttered saved-search library. Always scope to subsidiary id 2 unless you specifically want parent context.
 
+### Observed behaviour (verified 3 Sep 2026)
+- Response shape: `{data:[...rows], totalResults, numberOfPages}`. Rows are
+  flat objects keyed by the selected column names (lower case as NetSuite
+  returns them). Page when `numberOfPages > 1`; never assume one page.
+- `SELECT id, name FROM subsidiary` returns exactly two rows (2 and -1); it is
+  the cheapest live connectivity check and the console's Money tab uses it.
+- Use `ns_getSuiteQLMetadata` for a table's columns before guessing; the
+  transaction tables are `transaction`, `transactionline`,
+  `transactionaccountingline`, joined on `transaction.id`.
+
+### Cookbook (subsidiary 2, AUD)
+Unreconciled-style view of income posted in a window (the NetSuite side of
+the Salesforce reconciliation):
+```sql
+SELECT t.id, t.tranid, t.trandate, t.type, tal.account, tal.amount
+FROM transaction t
+JOIN transactionaccountingline tal ON tal.transaction = t.id
+JOIN account a ON a.id = tal.account
+WHERE t.posting = 'T' AND a.acctnumber IN ('11103','11104','118636581')
+  AND t.trandate >= TO_DATE('2026-08-01','YYYY-MM-DD')
+ORDER BY t.trandate DESC
+```
+Unmatched bank lines by account (the bank-rec backlog, ages included):
+```sql
+SELECT a.acctnumber, COUNT(*) AS lines, MIN(t.trandate) AS oldest
+FROM transaction t
+JOIN transactionaccountingline tal ON tal.transaction = t.id
+JOIN account a ON a.id = tal.account
+WHERE a.acctnumber IN ('11103','11104') AND t.posting = 'T' AND t.cleared = 'F'
+GROUP BY a.acctnumber
+```
+Treat both as starting points: confirm column names with metadata first,
+because the reconciliation flag differs between bank-feed and manual lines.
+
+### The money lens (how this fits the console)
+The console's Money tab and Jarvis `money_snapshot` put Salesforce (won and
+paid, last 7 days), Stripe (balances across five livemode accounts) and
+NetSuite side by side and treat disagreement as the finding. NetSuite's
+contribution is the reconciliation state: unreconciled income, the two bank
+recs, and whether the exception-report Zap has been published. When asked
+for "the money", answer with all three views and the date basis of each.
+
 ## Integrations — there are essentially none
 
 Only **2 formal integration records** (Default Web Services; SuiteCloud Development Integration) and **1 active access token**. A bundle audit (212 events, 7 bundles) confirms **no CRM, fundraising, donor or BI integration exists in NetSuite at all**.

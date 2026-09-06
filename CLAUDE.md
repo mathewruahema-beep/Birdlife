@@ -24,7 +24,16 @@ the real IDs, picklist values, gotchas, and playbooks:
 | `birdlife-stripe` | Payments, refunds, BECS, WooCommerce→Salesforce flow |
 | `birdlife-zapier` | The 17 connected apps, when Zapier vs native connector |
 | `birdlife-cloudflare` | DNS, SPF/DKIM, WAF, caching, the two accounts |
+<<<<<<< HEAD
 | `ai-coach` | Mathew's daily AI practice: today's rep, session review, think-with-me frame, weekly review, the practice log |
+=======
+| `birdlife-security` | Security posture across the estate, Essential Eight anchor, deadline register, admin ratios, incident playbooks (CONFIDENTIAL content) |
+| `birdlife-people-lifecycle` | Joiner/mover/leaver across every system, in order, with the Tier 2 scripts and the departed-staff credential sweep |
+| `birdlife-reporting` | The report library (weekly status, money state, security posture, exec brief, Board paper, incident), data discipline, production path |
+| `birdlife-improvement` | The improvement loop: observe processes, propose fixes (the console Fixes tab), track, verify, and write the learning back into the skills |
+| `email-voice` | Mathew's email voice: three registers plus the report register; load before drafting anything he will send |
+| `birdlife-os` | Managing Claude itself: routine/skill/connector/artefact governance, the weekly OS audit, the registers, and operating/updating the BirdLife Australia console (Jarvis) |
+>>>>>>> e0b27605071d745908a4d92bdb91fbb0b2a322dc
 
 If the account-synced versions of these skills are also present, they take
 precedence when newer; otherwise these repo copies are the source of truth. When
@@ -59,6 +68,10 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
 
 ## What else is in this repo
 
+- `os/` — the Claude Operating System: the rules for managing the Claude estate
+  itself (`os/README.md`) and the state-of-record registers for routines,
+  skills, connectors, artefacts and credentials (`os/registers.md`). Any session
+  that changes the estate updates the registers in the same piece of work.
 - `README.md` — how to use the assistant remotely, dashboard findings, Salesforce
   admin runbook, routine consolidation history.
 - `docs/using-the-assistant.md` — remote access channels and the prompt playbook.
@@ -66,11 +79,17 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
   in this role: habits, remote playbook, governance rules, 30-day plan.
 - `docs/entra-admin-connector.md` — the plan to promote Tier 2 Entra/Exchange
   actions to approve-only direct execution.
+<<<<<<< HEAD
 - `dashboard/ict-dashboard.html` — the ICT dashboard design template; the live copy
   is republished each weekday by the `ICT Dashboard` routine.
 - `dashboard/ai-field-guide.html` — the AI Field Guide page template; its daily block
   is refreshed each weekday from Gmail newsletters by the `AI Daily Ten` routine.
+=======
+>>>>>>> e0b27605071d745908a4d92bdb91fbb0b2a322dc
 - `routines/` — scheduled-routine definitions and backups (credentials redacted).
+- The daily working surface is the **BirdLife Australia console** (Jarvis), source
+  at `os/claude-os-overview.html`; the old `console/` and `dashboard/` template
+  files were retired 3 Sep 2026 (recoverable from git history).
 
 ## Style
 

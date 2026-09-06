@@ -173,6 +173,39 @@ All 129 reviewed 21 Jun 2026 — **every reviewer decision field is still blank;
 
 `mcp__Microsoft_365__*` covers Outlook mail and calendar, SharePoint file operations, Teams chat listing, and `get_me`. It does **not** expose Entra directory administration, Intune, Defender, Conditional Access or licence assignment. For those, either use the local `C:\azureintegration` read-only MCP, Graph PowerShell, or the portal. **Do not promise Entra writes from this connector.**
 
+### Observed connector behaviour (hard-won, do not rediscover)
+- Every M365 tool returns **one JSON block per item** in `result.content`, not
+  a single payload. Parse all text blocks; drop the pagination trailers
+  (`moreResults`, `nextOffset`, `nextCursor`).
+- `outlook_email_search` accepts a query string with Outlook operators
+  (`from:`, `received>=`, `isRead:false`); filter out notification senders
+  (no-reply, noreply, notifications, Asana, Salesforce, Zapier) yourself if
+  you want people.
+- `outlook_create_reply_draft` answers in **plain text**: `id: <draft id>
+  webLink: <url>`. Not JSON. It creates a draft in Mathew's Drafts folder
+  and never sends.
+- `outlook_send_draft`, `outlook_send_mail`, `outlook_forward_mail`,
+  `outlook_batch_delete_messages` and `outlook_set_vacation` exist. The
+  console and the routines **deliberately never call them**; a session uses
+  a send tool only when Mathew has said "send" in that session about that
+  draft.
+- **Teams has no send API.** `teams_list_chats` gives chat ids and members;
+  `chat_message_search` with a date filter scans recent chats only, so
+  channel messages can be missed. Replies are drafted for copy-paste.
+- `sharepoint_upload_file` and `sharepoint_update_file` are how the
+  dashboards land in the ICT Teams channel: fixed filenames, never renamed,
+  so the channel tabs keep pointing at them.
+- `outlook_calendar_search` / `find_meeting_availability` are reliable for
+  "what is on today"; `outlook_create_event` is a write and follows the
+  charter.
+
+### Where the rest of the estate lives
+- Security posture, deadlines and incident playbooks: `birdlife-security`.
+- Joiner/mover/leaver end to end, with the exact Graph commands in order:
+  `birdlife-people-lifecycle`.
+- The Tier 2 promotion plan (approve-only Entra writes via a consented app):
+  `docs/entra-admin-connector.md` in the repo.
+
 ## People
 
 Mathew Hema (Senior Manager ICT; `mathew.hema` + `mathew.hema.admin`, both GA) · Keith Tsui (`admin365.keith`, GA) · Ross James (`ross.james.admin`, GA) · Andrew Dunn (TeamOrgChart admin; only fully-MFA SF sysadmin) · Kate Millar (CEO, org-tree root, intentionally no manager) · Caroline Scales.

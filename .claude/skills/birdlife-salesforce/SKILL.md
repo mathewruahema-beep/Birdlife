@@ -129,6 +129,45 @@ Health Check 83%. But: 0 trusted IP ranges; 8 objects with Public external acces
 
 **Release Updates all at 0%.** Transaction Security Policies was due **13 Jul 2026 — past due**. OAuth username-password flow retirement, instanced-URL retirement, Authorized Email Domains and Profile Filtering all due **1 Sep 2026**. MoveData is flagged as affected by the OAuth change.
 
+## Working the org from the connectors (verified 3 Sep 2026)
+
+Two connectors: **"Salesforce Production"** and **"Salesforce Staging"**
+(display names with spaces; the artifact `mcp` capability wants them exactly
+so). Staging is the place to observe write-response shapes and test anything
+structural; production writes follow propose-then-write, one record at a time.
+
+- `soqlQuery` returns `{totalSize, done, records:[...]}`; relationship fields
+  nested (`records[i].Owner.Name`); aggregates come back as `expr0`, `expr1`
+  unless aliased (`COUNT(Id) c`). Always `LIMIT`.
+- `getObjectSchema` before any field you have not seen; the namespace is the
+  usual mistake (`Subscription__c` vs `AAkPay__Subscription__c`).
+- `createSobjectRecord(sobject-name, body)` and `updateSobjectRecord(
+  sobject-name, id, body)` are the write surface; re-read after every write
+  and report the re-read, not the write response.
+
+### Ask Zeus scoping, the rule that saves every report
+`RecordType.DeveloperName = 'Zeus'` (Id `012I80000004IPnIAM`) on every Case
+query. Without it you count all 19 record types and inflate ICT numbers about
+200 times. `Owner.Name = 'Zeus'` is the unassigned intake queue, not a person.
+Statuses, close reasons and write mechanics are in `birdlife-ict-assistant`.
+
+### Queries the console runs (reuse rather than reinvent)
+- Open queue: `SELECT Id, CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE IsClosed = false AND RecordType.DeveloperName = 'Zeus' ORDER BY CreatedDate ASC LIMIT 200`
+- Money in (7 days): `SELECT COUNT(Id), SUM(Amount) FROM Opportunity WHERE IsWon = true AND CloseDate = LAST_N_DAYS:7` and `SELECT COUNT(Id), SUM(npe01__Payment_Amount__c) FROM npe01__OppPayment__c WHERE npe01__Paid__c = true AND npe01__Payment_Date__c = LAST_N_DAYS:7` (3 Sep read: 516 opps / $824,378.63 and 612 payments / $827,300.15).
+- Stripe sync health: `SELECT COUNT(Id) FROM stripeGC__Sync_Log__c WHERE stripeGC__Error_Details__c != null AND CreatedDate = LAST_N_DAYS:1`
+- Posture: active sysadmins by `LastLoginDate`, inactive sysadmins, active
+  Standard users, users with no login in 30 days (exact SOQL in
+  `birdlife-security`). Admin ratio = sysadmins / active Standard users,
+  target 5%.
+- Owner resolution for ICT staff (duplicate User records): actives by Name,
+  tie-break by Zeus case ownership in `LAST_N_DAYS:180`; ambiguity goes back
+  to the user. Full algorithm in `birdlife-ict-assistant`.
+
+### Regular giving, stated once
+Regular giving spans NPSP Recurring Donations (`npe03__Recurring_Donation__c`,
+1,778 active) AND AAkPay Recurring Payments (392 active). Any single-object
+figure is wrong; report the union and say so.
+
 ## Landmines checklist — run through this before any change
 - Validation rule `Block_Reconciled_Changes` on `npe01__OppPayment__c` blocks manual correction of reconciled payments (created Nina Lewis, 8/12/2025).
 - `Active_BL_Member__c` is maintained by **Payments2Us, which is being decommissioned**. Taylor & Francis Emu journal access depends on it. If the new `Membership__c` build does not take over this flag, member journal access silently breaks at migration. This is documented nowhere else.
