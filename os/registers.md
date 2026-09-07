@@ -12,7 +12,7 @@ to 15 (13 recurring active + 2 one-shots). Nine routines retired with full
 definitions backed up in `routines/routines-backup-2026-09-02.json`; two updated
 in place as merge survivors; one created (the weekly audit).
 
-**Budget: 11 of 12 as at 3 Sep 2026 (evening).** Mathew retired the Top 10 morning
+**Budget: 10 of 12 as at 7 Sep 2026.** On 7 Sep Mathew retired the overnight pre-draft ("my work will be my growth") and the ten-only AI Daily Ten was replaced by the Claude watch learning-loop routine (backup `routines/routines-backup-2026-09-07.json`). Earlier: 11 of 12 as at 3 Sep 2026 (evening). Mathew retired the Top 10 morning
 email draft in the morning (backup `routines/routines-backup-2026-09-03.json`), then
 after the evening review retired the weekend dashboards job and the Friday weekly
 status update (backup `routines/routines-backup-2026-09-03b.json`). AI Daily Ten was
@@ -24,15 +24,14 @@ created the same day outside the register and is now registered below.
 |---|---|---|---|
 | ICT weekday dashboards and monitor (single job) | `trig_01HhAKnEe6PXAvo6EEq72BHo` | hourly 7:04am to 5:04pm weekdays | Merge survivor. FIXED 3 Sep: website probes moved from the Zapier webhook action (held for approval in unattended runs, stalled every slot) to WebFetch; the Zapier Teams post is now the last connector call so a held approval cannot take the SharePoint push or heartbeat down. Heartbeat log had been silent since 25 Aug; first verified heartbeat is the test. 7am deep slot: Ops dashboard + Teams push + heartbeat + monitor sweep + department suite. Other slots light. Fires on Melbourne weekends too (cron cannot span the UTC midnight boundary) and exits immediately via a weekend gate; those no-op fires are expected |
 | Claude OS weekly audit | `trig_01V3i4b5zekjZuuFTF6Ymu9G` | Mon 6am | Created 2 Sep. Observe-and-record only; needs no connectors (repo and trigger list come from the environment) |
-| ICT overnight pre-draft (approve-first) | `trig_01EbMkfD4UcGUKLkUB1mNQ8V` | weekdays 5:30am | Write-capable, capped: internal comments only, max 8. FIXED 3 Sep: the Salesforce create is held for approval in unattended runs (zero autonomous drafts 24 Aug to 2 Sep); prompt now prints the full draft pack as text before attempting writes, and the retired console snapshot step was removed. Push notification still off (cannot be set via API); pre-approving createSobjectRecord in the Routines UI restores full function |
 | Refund fix watch, daily blast radius scan | `trig_01VdzVKqN12nyemiu976mNca` | daily 8:15am | |
 | Membership boards date sync (Build to Model) | `trig_01K4kh1m8foc2oYAv9Gs8xqo` | daily 7:30am | |
 | Offboarding detector, daily scan and approval pack | `trig_016nQBEZNDReT1DyrEbbqeSU` | daily 8am | |
 | Onboarding detector, daily scan and approval pack | `trig_01HiCsJkKpSUqPxq2xUpAbEo` | daily 8:30am | |
 | Data feed and expiry monitor | `trig_01Q6X1Xr1syjg7U5QGNwDSUg` | daily 9am | |
 | Stale case chaser (report-only) | `trig_01S3ShSb7KSBA32LxFWaLaNa` | Mon 8:30am | |
+| Claude watch: AI Daily Ten and learning loop | `trig_01SvfXRoZbCkRxs967LFxZZ6` | weekdays 6:37am | Created 7 Sep, replaces AI Daily Ten. Reads Gmail newsletters (read-only), hint ratings and notes from the field guide page db, session titles, routine run states, commits, the practice log; refreshes the ten and the learning block on artifact 3dd8818e; appends to `docs/ai-practice/learnings.md` and pushes. Learning half runs without Gmail. **Gmail must be attached in the Routines UI.** Check: LEARN block date equals today |
 | Membership Build delivery briefing | `trig_01F7wy1pGcauqCsgUxVU4b47` | Mon, Wed, Fri 7:08am | Extended 3 Sep from Friday-only to Mon/Wed/Fri; Friday adds the status update draft. Read-only |
-| AI Daily Ten (Gmail newsletters and the learning block into the AI Field Guide) | `trig_01Y69zEQwQtn4HcGw9Esz8ua` | weekdays 6:34am | Created 3 Sep; rewritten 6 Sep as the daily learning loop: reads Gmail newsletters (read-only), hint ratings and notes saved on the page (artifact `db`), session titles, routine run states, commits and the practice log; refreshes the ten and the learning block on artifact 3dd8818e; appends to `docs/ai-practice/learnings.md` and pushes. The learning half runs even without Gmail. First run 4 Sep succeeded but changed nothing: Gmail still not attached in the Routines UI. Check: stamp date on the page equals today |
 
 ### One-shots (do not count against budget)
 
@@ -52,6 +51,8 @@ created the same day outside the register and is now registered below.
 
 | Routine | Trigger | Disposition |
 |---|---|---|
+| ICT overnight pre-draft (approve-first) | `trig_01EbMkfD4UcGUKLkUB1mNQ8V` | Retired 7 Sep 2026 on Mathew's call. Its last run (6 Sep) had succeeded; the drafts-as-internal-notes outcome is now unowned. Backup `routines/routines-backup-2026-09-07.json` |
+| AI Daily Ten (ten only) | `trig_01Y69zEQwQtn4HcGw9Esz8ua` | Replaced 7 Sep 2026 by the Claude watch learning-loop routine; never had Gmail attached. Backup `routines/routines-backup-2026-09-07.json` |
 | BirdLife Top 10 morning email draft | `trig_016BES4jwEodCfNdSTBYfSow` | Retired on Mathew's call: overlapped the console's Catch me up. Closed the budget decision at 12 of 12. Its prompt still carried the Owner.Name scoping bug |
 
 ### Retired 2 Sep 2026 (definitions in `routines/routines-backup-2026-09-02.json`)

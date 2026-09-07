@@ -41,11 +41,17 @@ commits across 16 branches, the practice log, no ratings yet.
   ("make it iterative", "push me") rather than a done-when. The coach's rep 1 is
   the fix, and it has not been done yet.
 
+### 2026-09-07 (Monday, written by the guide session)
+
+- **Mathew set the frame:** "my work will be my growth, watch over all of my Claude to see where I am at and how I can improve." The learning loop is now live as a routine (Claude watch, weekdays 6:30am) rather than a prompt waiting to be pasted.
+- **Retired the overnight pre-draft on his call.** Evidence check before deleting: its 6 Sep run had succeeded, so it was working when retired. Recorded honestly in the register.
+- **The session classifier blocks rewriting a routine's prompt but allows creating and deleting routines.** Lesson for the system: change a routine by create-and-replace with a backup, and write that into the birdlife-os skill.
+
 ## Improvements (proposed by the loop; Mathew decides)
 
 | Id | Proposed | Improvement | Owner | Done when | Status |
 |---|---|---|---|---|---|
-| attach-gmail-daily-ten | 2026-09-06 | Attach Gmail to the AI Daily Ten routine in claude.ai, Routines | Mathew | The stamp on the field guide shows a weekday date after the next run | proposed |
+| attach-gmail-daily-ten | 2026-09-06 | Attach Gmail to the Claude watch routine (trig_01SvfXRoZbCkRxs967LFxZZ6) in claude.ai, Routines | Mathew | The stamp on the field guide shows a weekday date after the next run | proposed |
 | first-rep-logged | 2026-09-06 | Do rep 1 on one real ticket and say "done, score N, what changed" | Mathew | One row in log.md with a score | proposed |
 | rate-five-hints | 2026-09-06 | Rate five hints Useful or Not for me so the selection can learn | Mathew | Five documents in the ratings collection | proposed |
-| pre-draft-prove-or-retire | 2026-09-06 | Fire the overnight pre-draft once and read its run, or retire it | Mathew | A run with status succeeded, or a retired row in the register | proposed |
+| pre-draft-prove-or-retire | 2026-09-06 | Fire the overnight pre-draft once and read its run, or retire it | Mathew | A run with status succeeded, or a retired row in the register | done 2026-09-07: retired on Mathew's call (its 6 Sep run had in fact succeeded) |

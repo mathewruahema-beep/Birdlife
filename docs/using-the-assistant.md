@@ -33,11 +33,11 @@ automatically on ticket-shaped requests, or explicitly with
 **3. Scheduled routines (it works while you sleep).** The live routine estate
 changes often enough that listing it here went stale twice; the state of record
 is now [`os/registers.md`](../os/registers.md), refreshed by the weekly OS
-audit. Highlights as of 3 Sep 2026: overnight pre-draft (weekdays 5:30am AEST),
-onboarding/offboarding detectors (daily), dashboard refresh (7am), stale case
-chaser (Mondays), the weekly OS audit (Mondays 6am), and AI Daily Ten (weekdays
-6:30am, ten AI hints from your Gmail newsletters plus the rep of the day and the
-learning block at the top of the AI Field Guide, `routines/ai-daily-ten.md`).
+audit. Highlights as of 7 Sep 2026: onboarding/offboarding detectors (daily), dashboard
+refresh (7am), stale case chaser (Mondays), the weekly OS audit (Mondays 6am), and
+Claude watch (weekdays 6:30am: ten AI hints from your Gmail newsletters, the rep
+of the day and what the system learned from your AI work, at the top of the AI
+Field Guide, `routines/ai-daily-ten.md`). The overnight pre-draft was retired 7 Sep.
 Connectors must be attached to each routine in claude.ai → Routines, one time
 each. Definitions and backups live in `routines/`; the management rules are
 `os/README.md`.

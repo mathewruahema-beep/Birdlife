@@ -1,4 +1,7 @@
-# Routine: ICT overnight pre-draft (approve-first)
+# Routine: ICT overnight pre-draft (RETIRED 7 September 2026)
+
+**Retired on Mathew's call ("remove the overnight pre-draft, my work will be my growth"). Deleted trigger `trig_01EbMkfD4UcGUKLkUB1mNQ8V`; live prompt and settings backed up in `routines-backup-2026-09-07.json`. Its last run on 6 Sep had succeeded. The outcome it owned, a draft reply waiting as an internal note on every case that needs one, is now unowned; the console's reply drafts cover it on demand.**
+
 
 **Status: LIVE** as `trig_01EbMkfD4UcGUKLkUB1mNQ8V` (confirmed in the 2 Sep 2026
 OS audit, see `os/registers.md`). This file remains the definition of record;
