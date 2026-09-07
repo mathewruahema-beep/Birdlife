@@ -164,9 +164,43 @@ Statuses, close reasons and write mechanics are in `birdlife-ict-assistant`.
   to the user. Full algorithm in `birdlife-ict-assistant`.
 
 ### Regular giving, stated once
-Regular giving spans NPSP Recurring Donations (`npe03__Recurring_Donation__c`,
-1,778 active) AND AAkPay Recurring Payments (392 active). Any single-object
-figure is wrong; report the union and say so.
+Regular giving spans NPSP Recurring Donations (`npe03__Recurring_Donation__c`)
+AND AAkPay Recurring Payments. Any single-object figure is wrong; report the
+union and say so. **Re-read 7 Sep 2026:** NPSP RDs are now 4,754 Closed and
+5 Open (the June figure was 1,778 active; nobody recorded the migration or
+bulk close). AAkPay Recurring Payments by `AAkPay__Recurring_Payment_Status__c`:
+Active 5,327 ($44,982/month), Expired 7,043, Cancelled 713, Suspended max
+retries 565 ($4,277/month, recoverable), Cancelled AR 228. Of those, the
+"BirdLife Membership" payment form holds 4,386 Active and 3,215 Expired.
+
+### Supporter data facts (read 7 Sep 2026; full assessment in `docs/supporter-analytics-strategy.md`)
+- Contacts 481,974; individual/household Accounts 475,416 (households are not
+  grouping). Email present 461,857; `HasOptedOutOfEmail` 151,060 (31%);
+  `Ortto_Inactive__c` true 253,719 (53%); no postcode 142,412; Plauti
+  duplicate records 200,441. New contacts in 365 days 49,833, of which 24
+  carry a `LeadSource`.
+- Two donor counts: `Last_Gift_Date_All_Sources__c` in 365 days = 9,642
+  contacts; `COUNT_DISTINCT(npsp__Primary_Contact__c)` on won Opportunities
+  in 365 days = 18,959. Ortto segments on the first. Treat the field as
+  unreliable until the rollup is diagnosed.
+- Won 365 days by record type: Donation 40,841 / $6.30M; Bequest 39 /
+  $3.81M; Membership 8,791 / $569,700; Major Gift 4. Donations with no
+  Campaign: 0.
+- `Active_BL_Member__c` true: 7,640. `BetterImpact_ID__c` is a number field;
+  populated (`!= null AND != 0`) on 1 contact.
+- Participation: `pmdm__ProgramEngagement__c` 338,417 rows across 208,281
+  distinct `pmdm__Contact__c` (Aussie Bird Count 243,044). `Interaction__c`
+  is Birdata survey submissions only (`Type__c` one value, `Source__c` app
+  or website): 689,894 all time, 77,225 in 365 days by 4,090 people.
+  `WebsiteEvent__c` 181,851 (event registrations). CampaignMember 1,686,579.
+- Volunteering has no data: `GW_Volunteers__*` 0 jobs / 0 hours; Campaign
+  record type `Volunteers_Campaign` has 2 campaigns, 0 members. The
+  "Volunteer Interest" flag Ortto sees on Program Engagement is not
+  `Volunteer_Interest__c`; find the real API name with `getObjectSchema`.
+- Supporter-facing Cases in 365 days (all record types except Zeus): 30,152,
+  half General Enquiry (14,847). Ask Zeus was 838.
+- `Contact.RecordTypeId` does not exist on this org (no Contact record types);
+  `GROUP BY RecordType.Name` on Contact fails.
 
 ## Landmines checklist — run through this before any change
 - Validation rule `Block_Reconciled_Changes` on `npe01__OppPayment__c` blocks manual correction of reconciled payments (created Nina Lewis, 8/12/2025).
