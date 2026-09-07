@@ -199,6 +199,14 @@ retries 565 ($4,277/month, recoverable), Cancelled AR 228. Of those, the
   `Volunteer_Interest__c`; find the real API name with `getObjectSchema`.
 - Supporter-facing Cases in 365 days (all record types except Zeus): 30,152,
   half General Enquiry (14,847). Ask Zeus was 838.
+- Lead is unused: 6 records ever, 0 created in the last 365 days (7 Sep 2026).
+  Decision 7 Sep 2026: Lead does not sync to Ortto; do not propose it.
+- Decisions 7 Sep 2026 (Mathew): duplicate management is owned by Supporter
+  Care (named owner still to be set; ICT keeps the duplicate rules on the
+  Raisely and miniOrange API paths, which bypass Plauti); the reporting layer
+  is Power BI (licence path for the Salesforce connection unresolved, 70/70
+  full licences consumed); Marketing owns the participant-to-donor journey,
+  blocked on the Last Gift Date rollup fix.
 - `Contact.RecordTypeId` does not exist on this org (no Contact record types);
   `GROUP BY RecordType.Name` on Contact fails.
 

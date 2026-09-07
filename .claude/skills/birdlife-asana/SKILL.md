@@ -12,7 +12,7 @@ description: Expert operator knowledge for BirdLife Australia's Asana workspace 
 | Workspace GID | **443963187362944** |
 | Mathew's user GID | **1210202992538499** (mathew.hema@birdlife.org.au) |
 | SF developer onboarding board | `app.asana.com/1/443963187362944/project/1211042432693678` |
-| Better Impact board | "ICT Better Impact Implementation" — **private to the ICT Manager**, phased plan from 1 Aug 2026 |
+| Better Impact board | "ICT Better Impact Implementation" (`1216475196947167`) — **private to the ICT Manager**, phased plan from 1 Aug 2026. Read 7 Sep 2026: 21 tasks, 0 assigned, 0 complete, Phase 1 overdue. Decision 7 Sep 2026 (Mathew): Better Impact is the system of choice for volunteers; the Salesforce Contact ID must travel on every import from the first (due 8 Sep), and the Salesforce sync moves from Phase 4 to a Phase 2 design item. See `docs/supporter-analytics-strategy.md` section 9 |
 
 Teams are organised by conservation programme and function, not by system. Verified team GIDs include: Advocacy/Policy `1210433663470343`, Beach-nesting Birds `1207819728138563`, Black-cockatoos `1207418217121010`, Campaign Management `1205098136351778`, Citizen Science `1204255684549550`, Coastal and Wetland Birds `1207947394108072`, Comms and Engagement `1204164938395809`, eCommerce `1211041491719670`, Finance `1211135286171472` and `1213223677662621` (**duplicate Finance teams — a cleanup item**), Finance & Business Improvement `1213223677662598`, Fundraising and Marketing `1204407434526263`, Global Authentication (login.birdlife.org.au) `1204617145641439`, Glossy Black-Cockatoo `1207321314790331`, Grasswrens `1207489426903543`, 2024 Nature Laws Project `1206587228062563`, Advanced Tier `1211029269244275`.
 

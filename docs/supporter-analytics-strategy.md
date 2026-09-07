@@ -2,7 +2,7 @@
 
 **Prepared for:** Mathew Hema, Senior Manager ICT
 **Data read:** 7 September 2026, live from Salesforce Production, Ortto and Asana. Repo skills supplied the dated facts for Stripe, NetSuite, WordPress and Zapier.
-**Status:** Assessment and proposal. Nothing in this paper has been changed in any system.
+**Status:** Assessment with decisions taken 7 Sep 2026 (section 9). Nothing in this paper has been changed in any system.
 
 ---
 
@@ -307,13 +307,37 @@ Indicative cost, unquoted and to be verified: Power BI Pro under nonprofit licen
 
 ---
 
-## 9. Decisions needed
+## 9. Decisions taken (Mathew Hema, 7 September 2026)
 
-1. **Who owns the definition of volunteer, and does Better Impact carry the Salesforce supporter ID from the first import?** Mathew and James Vilinsky, before 8 Sep.
-2. **Who owns duplicate management in Salesforce?** Mathew, 18 Sep. Until decided, every count in this paper is inflated by an unknown margin.
-3. **Is the Ortto retention upgrade funded, and does Lead sync?** Mathew, 30 Sep.
-4. **Is the reporting layer Power BI on the Microsoft tenant?** Mathew, with CFO input on the Business Central timing, by end of October.
-5. **Which team owns the participant-to-donor journey?** Fundraising and Participation jointly, September.
+| Decision | Outcome | What it still needs, and where I push back |
+|---|---|---|
+| Volunteer system | **Better Impact is the system of choice for volunteers.** | The decision names the system, not the key. Assumption recorded here: the Salesforce Contact ID travels on every Better Impact import from the first one, and a volunteer is defined as "a person with an Active status in Better Impact" from cutover. Until then Birdata surveyors and shorebird counters are participants, not volunteers. The first bulk import is due 8 Sep; if the ID column is not in the UserData export, delay the import rather than load 10 branches without a key. The Salesforce sync task moves from Phase 4 to a design item in Phase 2. |
+| Duplicate management | **Owned by Supporter Care.** | Supporter Care owns the outcome; ICT still owns the controls. The Blocked "Plauti bulk merge permissions" item has to be granted to the named Supporter Care owner, and the API paths (Raisely via MoveData, miniOrange) bypass Plauti entirely, so ICT keeps duplicate rules on those integrations. Name the person, not the team, before the task leaves Blocked. Merge order matters: Portal User records are the master, financial records on blank duplicates escalate. |
+| Ortto retention and Lead | **Retention upgrade funded. Lead does not sync.** | Confirmed safe: Lead holds 6 records ever, none created in the last year. Lead sync is closed. The retention upgrade unblocks the Ortto Inactive review (253,719 excluded); that review is still owed by 30 Sep and Marketing needs to state the rule that will replace the current filter. |
+| Reporting layer | **Power BI.** | Power BI sits on the Microsoft tenant ICT already governs. Two constraints to settle in the design: Salesforce has 70 of 70 full licences consumed, so the Power BI connection either reuses an existing integration user or a licence is freed first; and the store (Azure SQL or Fabric) needs a quote. Business Central timing decides whether the finance feed is built once or twice. |
+| Participant-to-donor journey | **Owned by Marketing.** | Inna Kersman builds journeys today, so this lands with her. Dependency stated plainly: the journey must not launch on the "Last Gift Date" field until the 9,642 vs 18,959 donor-count gap is fixed, or it will invite existing donors to give for the first time. Fundraising sets the ask and the segment; Marketing owns the build and the measure. |
+
+### What these decisions unblock, and the tasks they become
+
+Each line is one Asana task, created one at a time behind an approval, per the charter.
+
+| Task | Project / section | Owner | Due |
+|---|---|---|---|
+| Add Salesforce Contact ID to the Better Impact UserData export; block the 8 Sep import until it is present | ICT Better Impact Implementation, Phase 2 | Mathew Hema | 8 Sep 2026 |
+| Move "Salesforce Integration with Better Impact" from Blocked to In Development as a Phase 2 design item keyed on Contact ID | IT Operations Project Plan | Mathew Hema | 18 Sep 2026 |
+| Write the volunteer definition into the metric dictionary (Better Impact Active status) and confirm with James Vilinsky | IT Operations Project Plan, Backlog/Requests | Mathew Hema | 30 Sep 2026 |
+| Grant Plauti bulk merge permission to the named Supporter Care owner; move "Duplicate Management, decision on responsibility" out of Blocked | IT Operations Project Plan | Mathew Hema, then Keith Tsui | 18 Sep 2026 |
+| Diagnose and fix the Last Gift Date rollup (9,642 vs 18,959) | IT Operations Project Plan, In Development | Keith Tsui, Karishma Soni | 25 Sep 2026 |
+| Ortto Inactive rule review after the retention upgrade lands | IT Operations Project Plan, Backlog/Requests | Mathew Hema, Inna Kersman | 30 Sep 2026 |
+| Power BI design note: licence path for the Salesforce connection, store choice, first three models | IT Operations Project Plan, Backlog/Requests | Mathew Hema | 31 Oct 2026 |
+| Participant-to-donor journey brief: segment, ask, measure; blocked on the rollup fix | Marketing and Sales, Requests | Inna Kersman | 30 Sep 2026 |
+
+## 9a. Decisions still open
+
+1. **The named person in Supporter Care who owns duplicates.** A team cannot hold a Plauti permission.
+2. **Whether the 8 Sep Better Impact import proceeds without the Contact ID column.** Recommendation: it does not.
+3. **The Salesforce licence path for Power BI** (reuse an integration user or free a licence).
+4. **Business Central timing**, which decides whether the finance feed into Power BI is built once or twice.
 
 ---
 
