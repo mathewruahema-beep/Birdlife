@@ -1,18 +1,6 @@
 ---
 name: birdlife-os
-description: >-
-  The operating system for managing the Claude estate at BirdLife Australia:
-  routines, skills, connectors, sessions and artefacts, governed by the rules in
-  os/README.md and the registers in os/registers.md. Use whenever the user wants
-  to audit, list, create, change, pause, consolidate or retire scheduled
-  routines; check why a routine failed or went quiet; review or sync skills
-  between the repo and the claude.ai account; review connectors or artefact
-  URLs; run the weekly OS audit; or update, fix or extend the BirdLife Australia
-  console (the Jarvis command deck artifact). Trigger on "audit the routines",
-  "OS audit", "claude os", "what's running", "why didn't the dashboard update",
-  "too many routines", "create a routine", "retire that routine", "sync the
-  skills", "update the console", "fix Jarvis", "the console shows an error", or
-  any request to manage Claude itself rather than BirdLife's systems.
+description: "The operating system for managing the Claude estate at BirdLife Australia: routines, skills, connectors, artefacts, the Jarvis console, and the lens model (IT Admin live; Security, Finance link, Manager, Board and Exec stubbed). Use for OS audits, routine changes, skill sync, console updates, or any request to act through a lens."
 ---
 
 # Claude OS operator
@@ -32,9 +20,10 @@ The daily working surface is the **BirdLife Australia** console:
 https://claude.ai/code/artifact/2a9b7e57-dbc5-49e3-a4d7-c0a36bd236b2
 Source of truth: `os/claude-os-overview.html` in this repo. Stark HUD single-look
 design (dark, cyan/gold, explicit colours). Tabs: Command (default, the full
-picture: operations, project rollup, decisions, patterns), Today, Projects
+picture: operations, project rollup, decisions, patterns), Lens (the active
+persona and the IT Admin capability matrix), Today, Projects
 (Asana board by section), Money (money in/out and the reconciliation bridges),
-Security (posture, admins, deadlines — CONFIDENTIAL), Fixes (the suggested-fixes
+Security (posture, admins, deadlines, CONFIDENTIAL), Fixes (the suggested-fixes
 catalogue, technical and process, with Jarvis live suggestions), The system,
 Schedule, Registers, Rules.
 
@@ -49,7 +38,7 @@ Schedule, Registers, Rules.
      per approval, used only by fix_track)
    - "Microsoft 365": outlook_email_search, chat_message_search,
      teams_list_chats, outlook_create_reply_draft
-   - "Stripe": stripe_api_read (READ ONLY — never declare stripe_api_write)
+   - "Stripe": stripe_api_read (READ ONLY, never declare stripe_api_write)
    - "NetSuite": ns_runCustomSuiteQL
 2. Connector names are DISPLAY NAMES with spaces ("Salesforce Production", not
    "Salesforce-Production"; the hyphenated forms in routine mcp_connections are
@@ -58,7 +47,10 @@ Schedule, Registers, Rules.
 3. Never declare a connector tool the session has not observed a real
    request/response for, or disclose it as unverified when publishing.
 4. Commit and push the source in the same session, and update the artefact
-   register row in `os/registers.md` if the capability surface changed.
+   register row in `os/registers.md` if the capability surface changed. When
+   GitHub is not connected to the session, save the patch and full-file copies
+   to `OneDrive Birdlife\Claude\repo-inbox` with a REGISTER-ROW-nnnn.md apply
+   note (pattern established 7 Sep 2026, patches 0001 to 0003).
 5. Keep the page's embedded register data (routines, decisions, counts) in sync
    with `os/registers.md`; the page is a mirror, the markdown is authoritative.
 
@@ -76,33 +68,42 @@ Schedule, Registers, Rules.
 - Asana `update_tasks` reports per-task `succeeded`/`failed`; check `failed`
   before claiming success. Section move = add_projects {project_id, section_id}.
 - Stripe `stripe_api_read` GetBalance returns amounts in CENTS:
-  `{available:[{amount,currency}], pending:[...]}` — divide by 100. Pass
+  `{available:[{amount,currency}], pending:[...]}`, divide by 100. Pass
   `stripe_context` = the account id and `livemode: true`. There are FIVE
   livemode accounts (see birdlife-stripe skill for the list); balance shape
   observed on eCommerce and assumed identical on the other four.
 - NetSuite `ns_runCustomSuiteQL` returns `{data:[...], totalResults,
   numberOfPages}`. Always filter subsidiary id 2; never create saved searches.
+- `sample` (Jarvis): the framing must be folded into the FIRST user turn;
+  two consecutive user turns, a tool count over `limits().tools.maxCount`,
+  or `cache` other than false with tools all fail the call. The page shows
+  `[code] message` for page-bug codes so the cause is visible; a bare
+  "Transient hiccup" now means a genuine upstream_error.
 
 ### The action contract (what Jarvis on the page may do)
 Reads: live snapshot, single SOQL SELECT (always LIMIT, Cases always scoped
 RecordType.DeveloperName='Zeus'), Asana search. Writes, each behind an in-page
 Approve card showing the exact change, one record at a time, verified by
-re-read, with an internal audit comment on case writes: case internal note,
-case public reply (+optional status), case close (validated reason, Type if
-blank), case assign (ICT team only; duplicate User records resolved live by
-recent Zeus case ownership, ambiguity always put to the user), task comment,
-task complete, task move, Outlook reply DRAFT. Never: send email, bulk actions,
-assignment outside the team, Entra/M365 admin, Salesforce config. Decide-as-
-Mathew mode states the call (money first, efficiencies second, then risk), the
-reason, reversibility, then executes via the card; a cancelled card is an
-overrule.
+re-read, with an internal audit comment on case writes: `case_comment`
+(public false = internal note, public true = reply, optional status),
+`case_close` (validated reason, Type if blank), `case_assign` (ICT team only,
+defined live as members of the Zeus public group 00GRF000001s1RZ2AY with a
+birdlife.org.au username; duplicate User records resolved by recent Zeus case
+ownership, ambiguity always put to the user; charter rule 4), `task_action`
+(comment, complete, move), `fix_track`, `email_draft_reply` (Outlook DRAFT).
+Tools are consolidated to 13 because the sample capability caps tools per call
+(`limits().tools.maxCount`); the page trims to the cap if it is ever lower.
+Never: send email, bulk actions, assignment outside the team, Entra/M365 admin,
+Salesforce config. Decide-as-Mathew mode states the call (money first,
+efficiencies second, then risk), the reason, reversibility, then executes via
+the card; a cancelled card is an overrule.
 
 ### Money tab and money_snapshot
 The Money tab is a LENS, not a ledger: Stripe, Salesforce and NetSuite rarely
 agree, and the gap between them IS the finding. It shows won opportunities and
 paid payments (last 7 days, Salesforce), live balances summed across all five
 Stripe livemode accounts, and the three broken bridges as standing facts: the
-SF→NetSuite manual monthly CSV, the unreconciled income backlog, and the two
+SF to NetSuite manual monthly CSV, the unreconciled income backlog, and the two
 stale bank reconciliations. Jarvis has a `money_snapshot` tool that returns the
 live numbers plus those doctrine facts. Rules: stripe_api_read only, NEVER
 stripe_api_write on or from the page (livemode = real donor money); never
@@ -122,8 +123,8 @@ dive stays in the weekly Security dashboard artifact (linked from the tab).
 The Fixes tab is the improvement loop's working surface (process in
 `birdlife-improvement`). Seed catalogue lives in the page as `FIXES_SEED`
 (id, title, system, cat, sev 1-3, tier 1-3, effort, owner, why, people,
-steps, src); Jarvis adds live suggestions with `fix_propose`, reads with
-`fixes_catalog`, records progress with `fix_status`, and `fix_track` creates
+steps, src); Jarvis uses one `fixes` tool (action list, propose, status) to
+read, add live suggestions and record progress, and `fix_track` creates
 ONE Asana task in Backlog/Requests behind an approval card, verified by
 re-reading the board. Status and Jarvis additions are per-browser
 (localStorage); the durable record is the Asana task and, once done, the
@@ -150,6 +151,59 @@ repo session with the document skills produces the file. Register C in
   check the record in the source system, never blind-retry a write.
 - Page content stale vs registers: republish after syncing the embedded data.
 
+## Lenses (added 8 Sep 2026, IT-GOV-004, ADR 0019)
+
+A lens is a persona laid over the estate. It fixes who is acting, which systems
+and in what order, the write tier per action, the standing questions and the
+outputs. A lens narrows authority; it never raises it above what the connector
+and the ADRs allow. Five lenses exist: **IT Admin** (live), **Security**,
+**Finance link**, **Manager**, **Board and Exec** (stubs, each named, owned and
+wired to the skill that already carries its knowledge).
+
+- The record is `os/lenses.md` (repo) with the human copy at
+  `OneDrive Birdlife\Claude\IT-GOV-004_BirdLife_OS_Lens_Model.md`.
+- The console has a **Lens** tab (second tab). The active lens is stored per
+  browser (`claude-os.lens`) and its `framing` string is prepended to every
+  Jarvis turn, so Jarvis answers in that persona and applies that tier table.
+  `LENSES` and `ITADMIN_MATRIX` in the page are the data; both are also folded
+  into the Jarvis state pack.
+- A session opening with "act as IT Admin" (or any lens name) reads the matrix
+  first, states the tier out loud for the action in hand, and never goes quiet
+  on a Tier 2 action.
+- The IT Admin matrix is re-verified at the Monday OS audit: one identity or
+  capability call per connector. Any row older than 30 days is a baseline, not
+  a fact (birdlife-core rule 2). Update the row in `os/lenses.md`, the page
+  `ITADMIN_MATRIX`, and republish.
+- Building a stub lens follows the same four steps: probe live, write the
+  matrix, prove one action through it with its DONE test, record (ADR if a
+  decision was made, register row, skill update).
+
+### IT Admin lens: facts observed 8 Sep 2026 (re-probe before quoting)
+- 22 systems in the matrix, 20 reached. Tier 1 rows: Salesforce Production and
+  Staging (data only), M365 user level, Asana, NetSuite reads, WordPress UAT,
+  Zapier Teams posts and reads, Atlassian ICT space, Canva, Miro, Zoom, Granola,
+  Google personal folder, the Claude estate itself. Tier 2: Entra admin (write
+  tools exist, gate in ADR 0019), Azure, Cloudflare (this connector does not
+  reach DNS or WAF), Raisely writes, Ortto writes. Tier 3: Stripe money movement,
+  NetSuite record writes, Salesforce configuration.
+- Not usable: AWS bridge (no credential profile on h20blacks), GitHub (not
+  connected to Cowork; patches queue in `OneDrive Birdlife\Claude\repo-inbox`).
+- Findings carried as open items: F1 Entra write connector live while ADR 0002
+  says pending; F2 Zapier holds a 2024 Teams connection under the shared
+  admin365.ross .onmicrosoft.com login (credential watchlist); F3 AWS bridge
+  credentials; F4 GitHub connection or formalise repo-inbox; F5 Raisely MCP
+  token privilege unknown; F6 three overlapping Salesforce read paths.
+- Delegation reads off the matrix: Tier 1 rows with one-record blast radius
+  (Asana, Zeus Case comments and assignment inside the Zeus group, WordPress
+  UAT order notes, Confluence ICT pages) are the first rung for Andrew Dunn
+  under IT-SEC-002.
+
+### Console publish note
+The 8 Sep republish carried the stored capability declaration forward
+(Salesforce Production 3 tools, Asana 4, Microsoft 365 4, Stripe 1, NetSuite 1,
+sample). The Lens tab adds no new connector tools. The `show` tool now accepts
+`lens` as a tab.
+
 ## Estate state checkpoints (update when they change)
 - 3 Sep 2026: 12 recurring routines of a budget of 12 (budget decision closed by
   retiring the Top 10 email draft), 2 one-shots. Old ICT Console artifact
@@ -162,6 +216,10 @@ repo session with the document skills produces the file. Register C in
   surface extended with Stripe (stripe_api_read) and NetSuite
   (ns_runCustomSuiteQL). Five livemode Stripe accounts confirmed (the skill
   previously knew one).
+- 8 Sep 2026: lens model added (IT-GOV-004, ADR 0019 Proposed). Console gained
+  the Lens tab and active-lens framing for Jarvis; open decisions now three
+  (Entra write gate, dashboard estate, WooCommerce key rotation). IT Admin
+  matrix verified live: 22 systems, 20 reached, AWS bridge and GitHub unusable.
 
 ## The weekly audit
 
@@ -191,7 +249,9 @@ Run when asked ("run the OS audit") or when the weekly audit routine fires.
 5. **Check artefacts and docs**: the registered artifact URLs, and grep the
    repo (`README.md`, `docs/`, `routines/`) for trigger IDs that no longer
    exist.
-6. **Check the memory** (`memory/`, rules in `memory/README.md`):
+6. **Re-probe the IT Admin matrix**: one identity or capability call per
+   connector; update any row whose reach or write surface changed.
+7. **Check the memory** (`memory/`, rules in `memory/README.md`):
    `git log --since=<last audit> --name-only` against `memory/journal/`. A
    commit day that touched a skill, `os/`, `routines/` or a system of record
    with no journal file that day is drift and gets a one-line finding. Then:
@@ -199,7 +259,12 @@ Run when asked ("run the OS audit") or when the weekly audit routine fires.
    marked done in the Fixes tab or Asana with no "Learned" line; a `SKILL.md`
    changed in the window whose `references/facts.md` was not, where the
    diff contains an ID, URL or number. Write the audit's own journal entry.
-7. **Report**: lead with what changed since last audit and the decisions Mathew
+8. **Check the account skill list** against `.claude/skills/`: any skill on
+   the account that is not in the repo, or whose account copy is newer, is
+   unversioned knowledge and a finding (11 Sep 2026: eight skills and three
+   newer copies were found this way). Repo wins only once the account
+   content has been committed.
+9. **Report**: lead with what changed since last audit and the decisions Mathew
    needs to make, one line each. Then update `os/registers.md` with the new
    audit date and findings, commit, push. Propose fixes; execute only approved
    ones.
@@ -234,19 +299,26 @@ Refuse to create casually. Walk the change control from `os/README.md`:
 
 ## The skill estate (what exists, what each is for)
 
-Fifteen skills, all versioned in `.claude/skills/` and mirrored to the
+Twenty-four skills, all versioned in `.claude/skills/` and mirrored to the
 account by uploading a zip per skill (the uploader rejects any name containing
 "claude"; the zip must include the skill's `references/` directory, which
-since 11 Sep 2026 carries a `facts.md` lookup file for the eight system
+since 11 Sep 2026 carries a `facts.md` lookup file for the eight core system
 skills). System skills: `birdlife-salesforce`, `birdlife-microsoft365`,
 `birdlife-asana`, `birdlife-netsuite`, `birdlife-wordpress`,
-`birdlife-stripe`, `birdlife-zapier`, `birdlife-cloudflare`. Cross-cutting:
+`birdlife-wpengine`, `birdlife-stripe`, `birdlife-zapier`,
+`birdlife-cloudflare`, `google-workspace-expert`. Salesforce deep dives:
+`birdlife-payments2us`, `birdlife-conga`, `birdlife-sdocs`,
+`birdlife-movedata`, `birdlife-powerbi`. Cross-cutting:
 `birdlife-ict-assistant` (workflow and tiers), `birdlife-security` (posture,
 deadlines, incidents), `birdlife-people-lifecycle` (joiner/mover/leaver),
 `birdlife-reporting` (report library and data discipline),
 `birdlife-improvement` (the process-to-fix-to-learning loop behind the Fixes
-tab), `email-voice` (Mathew's voice), `birdlife-os` (this one). Account-only:
-`morning`.
+tab), `birdlife-prompting` (the six-line prompt frame), `email-voice`
+(Mathew's voice), `morning` (personal brief), `birdlife-os` (this one).
+Referenced by several skills but existing nowhere found on 11 Sep 2026:
+`birdlife-core`, `birdlife-manager`, `salesforce-delivery-governance`; treat
+those references as pointers to `CLAUDE.md` and this skill until the files
+are located or written.
 
 A skill earns a slot when its knowledge is hard-won and reused. Connectors
 without a skill (Atlassian, Canva, Miro, Zoom, Granola, Gmail, Google Drive
@@ -286,3 +358,5 @@ skills for idle connectors; that is skill sprawl.
 - Do not attach or detach connectors yourself; that is Mathew, in the UI.
 - The charter's propose-then-write applies to the estate exactly as it does to
   Salesforce.
+- A lens narrows authority. No lens, prompt or persona raises a Tier 2 or
+  Tier 3 action to Tier 1; only a dated ADR does.

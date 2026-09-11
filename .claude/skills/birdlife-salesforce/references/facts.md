@@ -36,7 +36,10 @@ Tools on both: `soqlQuery`, `getObjectSchema`, `find`, `getRelatedRecords`,
 
 | Fact | Value | Verified |
 |---|---|---|
+| Production org Id | `00D5g000004DMayEAG` | 11 Sep 2026 |
+| Staging org Id | `00DBn00000CAloLMAT` | 10 Sep 2026 |
 | Ask Zeus record type | `DeveloperName = 'Zeus'`, Id `012I80000004IPnIAM` | Aug 2026 |
+| Zeus public group (the ICT team, the only valid assignees) | `00GRF000001s1RZ2AY`; member Users with `@birdlife.org.au` usernames only; rule set by Mathew 4 Sep 2026 | 4 Sep 2026 |
 | Staging Membership record type | `012I80000004IpSIAU` (staging only; production differs) | Jul 2026 |
 | Mathew Hema user | `005RF000003ahkfYAA` (also active `005RF000007mSM9YAM`), alias `mhema`, profile System Administrator `00e5g000001jYQ6AAM`, role node CEO | Aug 2026 |
 | Andrew Dunn users | working `0055g00000DqUq9AAF`; also active `0055g00000DqbMVAAZ`, `005RF000006cU6TYAU` | Aug 2026 |
@@ -47,8 +50,12 @@ Tools on both: `soqlQuery`, `getObjectSchema`, `find`, `getRelatedRecords`,
 | Unreconciled Opportunities report (Zap source) | `00ORF0000033T6z2AE` | Jul 2026 |
 | Raisely integration user | profile "Raisely - Connected User", account `birdlife@salesfix.com.au`, upsert key `Raisely_UUID__c` | Jun 2026 |
 
-User IDs are the likely working accounts; the owner-resolution algorithm in
-`birdlife-ict-assistant` is still run at write time because duplicates exist.
+Verified 4 Sep 2026: filtering the Zeus group members to `@birdlife.org.au`
+usernames leaves exactly one User per team member (Andrew `0055g00000DqUq9AAF`,
+Keith `005I8000000J4L5IAK`, Nina `005I8000000J5EtIAK`, Mathew
+`005RF000003ahkfYAA`); the other "duplicates" are External Identity portal
+users with personal-email usernames and are never assignment targets. The
+resolution algorithm in `birdlife-ict-assistant` is still run at write time.
 
 ## Case model values
 

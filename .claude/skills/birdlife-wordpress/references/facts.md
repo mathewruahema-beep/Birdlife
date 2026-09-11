@@ -3,16 +3,22 @@
 The lookup table for `birdlife-wordpress`. **Edit this file first when a
 value changes, then the prose.** Health numbers date from Jul to Aug 2026.
 
-## Environments
+## Environments (live read 11 Sep 2026; Jul values in brackets where changed)
 
 | Environment | Value |
 |---|---|
-| Production | `birdlife.org.au`, WP Engine environment `birdlifeaus`, behind Cloudflare |
+| Production | `birdlife.org.au`, WP Engine environment `birdlifeaus`, behind Cloudflare; root `/nas/content/live/birdlifeaus` |
 | Staging | `birdlifestage.wpengine.com` |
-| Deployment | Git |
-| Platform | WordPress 7.0, PHP 8.4.22, custom BirdLife theme |
-| Registered users | 14,285 |
+| Deployment | Git, via admin account `bitbucket@wpengine.com` |
+| Core | WordPress 7.0.4, 7.1 available (was 7.0), single site |
+| PHP | 8.4.25 FPM, 512M limit, OPcache disabled by configuration (was 8.4.22) |
+| Server / DB | nginx, Linux 6.8 (GKE); MySQL 8.4.11, `wp_birdlifeaus`, prefix `wp_` |
+| Size | 15.39 GB: uploads 11.17 GB, DB 1.82 GB, plugins 606 MB, themes 60 MB |
+| Constants | `WP_MEMORY_LIMIT` 40M, `WP_DEBUG` off, `WP_DEBUG_LOG` off (fixed), `WP_CACHE` on, `DISALLOW_FILE_EDIT` unset |
+| Theme | `birdlife` v2.4.6.31 by Webplace, classic parent theme, no child theme, 1,146 files |
+| Registered users | 15,380 (was 14,285) |
 | miniOrange staging redirect URI | `https://birdlifestage.wpengine.com` |
+| Cart / checkout | `/cart/` Cart block; `/checkout/` `[woocommerce_checkout]` shortcode |
 
 Staging differences: subscription period 1 day (production 1 year); SKUs
 suffixed `-STAGING`; all Salesforce IDs differ.
@@ -30,18 +36,24 @@ suffixed `-STAGING`; all Salesforce IDs differ.
 Tools: `mcp-adapter-discover-abilities`, `mcp-adapter-get-ability-info`,
 `mcp-adapter-execute-ability`. No production connector exists.
 
-## Health snapshot (Jul to Aug 2026)
+## Health snapshot (11 Sep 2026 live read; Jul values in brackets where changed)
 
 | Item | Value |
 |---|---|
-| Score | 5/10 |
-| Plugins | 82 (62 active, 20 inactive), 30 awaiting update, auto-updates off |
+| Score | 5/10 (Jul 2026) |
+| Plugins | 62 active, 22 inactive, 6 WP Engine must-use; 44 updates pending (was 30); auto-updates off |
 | Themes | 5 inactive |
-| Page cache | 31 ms |
-| Autoloaded options | 1,063 (~1 MB per request) |
-| Risky active plugins | WP File Manager v8.0.2; WP phpMyAdmin; ACF to REST API v3.3.4 |
-| WP 2FA | Melapress v3.1.1.2, four majors behind, not enforced |
-| Logged emails with PII in DB | 82,089 |
+| Page cache | 31 ms (Jul 2026) |
+| Autoloaded options | 1,174, ~1 MB per request (was 1,063) |
+| Risky active plugins | ACF to REST API 3.3.4; WPCode Lite (5 PHP/JS snippets in the DB); SVG Support; Email Log 2.63. WP File Manager and WP phpMyAdmin REMOVED (do not cite) |
+| WP 2FA | 4.1.0, no enforcement policy, 3 of 20 admins configured (was Melapress 3.1.1.2) |
+| Logged emails with PII in DB | 86,629 (was 82,089), no retention policy |
+| Gravity Forms | 3.1.0.2, 87 forms, reCAPTCHA inactive |
+| ACF PRO | 6.8.7, 72 field groups, 1,122 fields, 4 ACF blocks |
+| Content model | 20 CPTs, 35+ taxonomies via Custom Post Type UI (database config, not in Git) |
+| WooCommerce | 11.0.1, HPOS enabled; Stripe gateway 10.8.5 live on `acct_1PaqQkEdZ08H7Yxq` (card, apple_pay, google_pay, au_becs_debit); Subscriptions 9.1.0 with zero subscriptions on any gateway; WooPayments 11.0.0 also active |
+| miniOrange | Object Data Sync For Salesforce Enterprise 25.0.2 |
+| Salesforce paths | three: miniOrange sync, forked Custom Salesforce OIDC Generic 3.9.1 (SSO), Integration for Gravity Forms and Salesforce Pro |
 | Mobile PageSpeed | 46/100 |
 | Smart Plugin Manager | 2 of 115 licences used |
 | WooCommerce sales | ~A$11,108.70/month |
@@ -55,10 +67,11 @@ Multi-currency, Gravity Forms to Pardot.
 
 | Item | Value |
 |---|---|
-| "Anyone can register" | ENABLED, default role Shop Manager |
-| Admin accounts | 25 (6 Blitzm, 2 EnvisionCP, 1 The PG, 1 Xecurify, `wpengine` system account) |
-| 2FA | enforced on none, configured on 3; 20 admins never logged in |
-| Agreed removals (not executed) | Ahilya, Ayush Saxena, David Arvaji, Holly Browne, James O'Brien, Justin Joseph, Justin Rivera, Krish, Ross James; `wpengine` to inactive |
+| "Anyone can register" | DISABLED (fixed by 11 Sep 2026; was enabled with default role Shop Manager, which is still the default if re-enabled) |
+| Admin accounts | 20 (was 25): 7 external vendor accounts, 11 never logged in; vendor accounts Blitzm x5, Xecurify x1, The PG x1, plus `bitbucket@wpengine.com` deploy account. Ahilya removed |
+| 2FA | no enforcement policy, configured on 3 of 20 |
+| Agreed removals (Jul list, partly executed) | Ahilya (done), Ayush Saxena, David Arvaji, Holly Browne, James O'Brien, Justin Joseph, Justin Rivera, Krish, Ross James; `wpengine` to inactive |
+| Custom roles | Content Lead, Content Creator, Group content creator, SEO Manager, SEO Editor, Supporter Care User (User Role Editor) |
 | Undecided | Fiona Cahill, Hannah Langford, James Vilinsky, editors |
 | Sanctioned 2FA | email code, 6 digits, 15-minute expiry, 10 backup codes |
 

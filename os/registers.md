@@ -99,50 +99,63 @@ created the same day outside the register and is now registered below.
 ## 2. Skill register
 
 Versioned in `.claude/skills/` here; mirrored to the claude.ai account so they
-load without the repo. Repo copies are the source of truth; when they diverge,
-re-sync the account from the repo unless the account copy is deliberately newer,
-in which case commit it back first.
+load without the repo. **The repo is the source of truth only once the account
+content has been committed.** On 11 Sep 2026 the account was found AHEAD of the
+repo: eight skills existed on the account only and three account copies were
+newer than the repo (security, wordpress, ict-assistant, plus os with the lens
+model). All were pulled into the repo that day (commit on
+`claude/birdlife-brain-build-02zobt`). Until the two-brains decision is made,
+every audit compares the live account list against this table.
 
-| Skill | Scope | Repo | Account |
+| Skill | Scope | Repo | Account (11 Sep 2026) |
 |---|---|---|---|
-| birdlife-ict-assistant | Core workflow, tiers, guardrails | yes | yes |
-| birdlife-salesforce | Zeus org | yes | yes |
-| birdlife-microsoft365 | Entra, M365 | yes | yes |
-| birdlife-asana | IT Operations Project Plan | yes | yes |
-| birdlife-netsuite | ERP | yes | yes |
-| birdlife-wordpress | WP Engine estate | yes | yes |
-| birdlife-stripe | Payments | yes | yes |
-| birdlife-zapier | Automation | yes | yes |
-| birdlife-cloudflare | DNS, edge | yes | yes |
-| birdlife-os | This operating system and the console | yes | re-upload (3 Sep) |
-| birdlife-security | Posture, deadlines, incidents (CONFIDENTIAL) | yes (created 3 Sep 2026) | upload |
-| birdlife-people-lifecycle | Joiner/mover/leaver | yes (created 3 Sep 2026) | upload |
-| birdlife-reporting | Report library and data discipline | yes (created 3 Sep 2026) | upload |
-| birdlife-improvement | Process observation, fixes, learning loop | yes (created 3 Sep 2026) | upload |
-| email-voice | Mathew's email voice | yes (committed 2 Sep 2026) | re-upload (3 Sep) |
-| morning | Morning brief | no, account only | yes |
+| birdlife-ict-assistant | Core workflow, tiers, guardrails, Zeus-group assignment rule | yes | yes, pulled 11 Sep (newer: Zeus group rule of 4 Sep) |
+| birdlife-salesforce | Zeus org | yes | yes, stale (lacks facts file) |
+| birdlife-microsoft365 | Entra, M365 | yes | yes, stale (lacks facts file) |
+| birdlife-asana | IT Operations Project Plan | yes | yes, stale (lacks facts file) |
+| birdlife-netsuite | ERP | yes | yes, stale (lacks facts file) |
+| birdlife-wordpress | WP Engine estate, theme developer handbook | yes | yes, pulled 11 Sep (rewrite, live read 11 Sep) |
+| birdlife-wpengine | WP Engine account, portal, caching, Web Rules | yes (pulled 11 Sep) | yes |
+| birdlife-stripe | Payments | yes | yes, stale (lacks facts file) |
+| birdlife-zapier | Automation | yes | yes, stale (lacks facts file) |
+| birdlife-cloudflare | DNS, edge | yes | yes, stale (lacks facts file) |
+| google-workspace-expert | Google Workspace tenant C01muaswh | yes (pulled 11 Sep) | yes |
+| birdlife-payments2us | Payments2Us deep dive | yes (pulled 11 Sep) | yes |
+| birdlife-conga | Conga receipting estate | yes (pulled 11 Sep) | yes |
+| birdlife-sdocs | S-Docs and S-Sign | yes (pulled 11 Sep) | yes |
+| birdlife-movedata | MoveData / Raisely pipeline | yes (pulled 11 Sep) | yes |
+| birdlife-powerbi | Power BI and Fabric | yes (pulled 11 Sep) | yes |
+| birdlife-os | This operating system, the console, the lens model | yes (merged 11 Sep: account lens model plus repo memory audit) | yes, stale (lacks memory audit steps) |
+| birdlife-security | Posture, SC-300 baseline, deadlines, incidents (CONFIDENTIAL) | yes | yes, pulled 11 Sep (newer: SC-300 baseline, P1/P2, identity playbooks) |
+| birdlife-people-lifecycle | Joiner/mover/leaver | yes | yes, identical |
+| birdlife-reporting | Report library and data discipline | yes | yes, identical |
+| birdlife-improvement | Process observation, fixes, learning loop | yes | **no** (never uploaded) |
+| birdlife-prompting | Six-line prompt frame | yes (pulled 11 Sep) | yes |
+| email-voice | Mathew's email voice | yes | yes, identical |
+| morning | Personal morning brief | yes (pulled 11 Sep) | yes |
 
-**Expert pass, 3 Sep 2026:** every repo skill was extended with observed
-connector behaviour and runbooks (Salesforce query set and Staging connector;
-Asana section semantics and API shapes; M365 connector facts; NetSuite SuiteQL
-cookbook; Stripe five-account map and reconciliation playbook; Cloudflare
-SPF/DMARC runbook; Zapier exception-report publish runbook; WordPress UAT
-connector, which has write abilities; email-voice report register). All
-account copies are therefore stale until re-uploaded from the zips sent on
-3 Sep; until then the repo copies are the only expert versions.
+**Referenced but not found anywhere (11 Sep 2026):** skills `birdlife-core`
+(cited by seven account skills as the precedence and write-tier rule set),
+`birdlife-manager` (weekly manager review and learning log),
+`salesforce-delivery-governance`; files `os/lenses.md`, ADR 0002, ADR 0019,
+IT-GOV-004, IT-SEC-002/003/006/007, IT-WEB-001, IT-SF-018; and the OneDrive
+`Claude\repo-inbox` patches 0001 to 0003 with their REGISTER-ROW apply notes
+(written 7 Sep 2026 by Cowork sessions that had no GitHub connection). Not in
+the repo, not on the account, not returned by SharePoint search. Either they
+live in Mathew's local OneDrive folder only, or they were never written. Until
+located, `CLAUDE.md` and `birdlife-os` stand in for `birdlife-core`.
 
-**Facts files, 11 Sep 2026:** the eight system skills (salesforce, asana,
+**Facts files, 11 Sep 2026:** the eight core system skills (salesforce, asana,
 microsoft365, netsuite, wordpress, stripe, zapier, cloudflare) gained
 `references/facts.md`, the structured lookup for IDs, URLs, counts and dates,
 with the rule "facts file first, prose second" when a value changes.
 `birdlife-ict-assistant` keeps `references/reference.md` in that role. Account
-copies must be re-uploaded as zips that include `references/`; until then the
-account copies lack the facts files as well as the 3 Sep expert pass.
+copies must be re-uploaded as zips that include `references/`.
 
 Account-only skills are unversioned: if the account loses them, they are gone.
-`email-voice` was account-only and load-bearing (the overnight pre-draft depends
-on it); it was copied verbatim into `.claude/skills/email-voice/` on 2 Sep 2026.
-`morning` remains account-only; low stakes, commit when convenient.
+That is exactly what eight skills were until 11 Sep 2026. `email-voice` was
+account-only and load-bearing (the overnight pre-draft depends on it); it was
+copied verbatim into `.claude/skills/email-voice/` on 2 Sep 2026.
 
 ## 3. Connector register
 
@@ -217,4 +230,6 @@ commit as any change; the weekly audit (step 6 in `birdlife-os`) reports drift.
 | Patterns | `salesforce.md`, `website.md`, `claude-estate.md` seeded from the skills; new files per system as patterns arrive | 11 Sep 2026 |
 | Routine write-back | Not yet: no routine appends to the journal. Adding it to the weekday job and the pre-draft is an estate change (propose first) | 11 Sep 2026 |
 | Weekly audit memory check | In the `birdlife-os` skill, which the live audit routine follows; no trigger change needed | 11 Sep 2026 |
-| Open decision | Two brains: stop syncing skills to the account (always start on the repo) or automate the sync in the audit. Mathew to decide before the next re-upload | 11 Sep 2026 |
+| Account pull | Eight account-only skills and four newer account copies committed to the repo; the repo is now a superset of the account except for `references/facts.md` and the memory audit steps, which the account lacks | 11 Sep 2026 |
+| Open decision | Two brains: stop syncing skills to the account (always start on the repo) or keep re-uploading by hand. Recommendation on record: repo only, keep `email-voice` on the account. Mathew to decide; nothing deleted yet | 11 Sep 2026 |
+| Open item | Locate `birdlife-core`, `os/lenses.md`, the ADRs and the OneDrive `repo-inbox` patches, then commit them | 11 Sep 2026 |

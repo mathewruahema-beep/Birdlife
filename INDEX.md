@@ -27,12 +27,21 @@ Facts file first, prose second, when a value changes.
 | `birdlife-stripe` | Money chain, refund gap, migration constraints, playbook | `facts.md`: five account IDs, connector mechanics, constants |
 | `birdlife-zapier` | When Zapier versus native, the exception report, the runbook | `facts.md`: connected apps, Zap 371228125 steps, other automations |
 | `birdlife-cloudflare` | What the MCP cannot do, email authentication runbook, edge controls | `facts.md`: account IDs, deployed surfaces, SPF/DMARC findings |
-| `birdlife-security` | Posture by system, deadline register, ratios, incident playbooks (CONFIDENTIAL) | (deadline register is in the SKILL.md table) |
+| `birdlife-wpengine` | WP Engine User Portal, five caching layers, Web Rules, SSH/WP-CLI/GitPush/API, the seven environments, review playbook | |
+| `google-workspace-expert` | Google Workspace admin model, tenant C01muaswh verified configuration, decision rules | |
+| `birdlife-payments2us` | Payments2Us licence deadline, automation stack (triggers, 13 Flows, 9 DLRS rollups), direct debit internals, defects | |
+| `birdlife-conga` | 17 Conga batches, query and template inventory, Composer grammar, defects, S-Docs scope (verified 10 Sep 2026) | |
+| `birdlife-sdocs` | S-Docs and S-Sign configuration; installed in neither org as at 10 Sep 2026 | |
+| `birdlife-movedata` | MoveData pipeline model, extension Flow authoring, live Zeus config, eight defects, error catalogue (verified 11 Sep 2026) | |
+| `birdlife-powerbi` | Power BI and Fabric backlog, Zeus data-model traps, Copilot exposure, Fabric cost | |
+| `birdlife-prompting` | The six-line prompt frame and how to route a prompt to the right skill | |
+| `birdlife-security` | Posture by system, SC-300 identity baseline, P1 versus P2, deadline register, identity playbooks, incident playbooks (CONFIDENTIAL) | (deadline register is in the SKILL.md table) |
 | `birdlife-people-lifecycle` | Joiner, mover, leaver in order with the Tier 2 scripts, credential sweep | |
 | `birdlife-reporting` | Report library, data discipline, skeletons, production path | |
 | `birdlife-improvement` | Observe, propose, decide, track, verify, learn; the fix format; the Fixes tab | |
 | `email-voice` | Mathew's three registers, sign-offs, phrasing | `samples.md`: verbatim sent-mail excerpts |
-| `birdlife-os` | Managing Claude itself: console, weekly audit, routine lifecycle, skill estate | |
+| `morning` | Mathew's personal morning brief (HTML artifact, optional weekday routine) | `assets/`: font |
+| `birdlife-os` | Managing Claude itself: console, the lens model (IT Admin live), weekly audit, routine lifecycle, skill estate | |
 
 ## Episodic memory (`memory/`)
 
@@ -76,6 +85,7 @@ Facts file first, prose second, when a value changes.
 |---|---|
 | Live routines | claude.ai Routines; IDs in `os/registers.md` |
 | Connector credentials | claude.ai Settings, Connectors; never here |
-| Account-synced skill copies | claude.ai account; repo wins on drift |
+| Account-synced skill copies | claude.ai account; repo wins on drift only once account content is committed (11 Sep 2026: the account was ahead) |
+| `birdlife-core`, `birdlife-manager`, `salesforce-delivery-governance` skills; `os/lenses.md`; ADRs 0002 and 0019; IT-GOV-004; the OneDrive `Claude\repo-inbox` patches | Referenced by account skills, not found in the repo, the account, or SharePoint search on 11 Sep 2026 (open item, journal) |
 | Dashboards and console | artifact URLs in `os/registers.md`; Teams copies on SharePoint |
 | June 2026 security reviews, July NetSuite review, WordPress health check | SharePoint documents, not yet ingested (open item, journal 11 Sep 2026) |

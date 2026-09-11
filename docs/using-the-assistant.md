@@ -25,7 +25,7 @@ The previous ICT Console was retired 3 Sep 2026 and its old link now redirects.
 the ICT assistant automatically and the skills load with it. This is the
 "solve an issue from anywhere" path — it works from your phone on the train.
 
-**2. Claude / Cowork app (no repo needed).** The same nine `birdlife-*` skills are
+**2. Claude / Cowork app (no repo needed).** The same `birdlife-*` skills are
 synced to your account, so in any Claude conversation the assistant triggers
 automatically on ticket-shaped requests, or explicitly with
 `/birdlife-ict-assistant`.
@@ -86,7 +86,7 @@ queuing work from a locked-down machine.
 - `Add <person> to the <distribution list>`
 - `Triage the phishing report on case <number>`
 
-**Systems knowledge (any of the nine skills)**
+**Systems knowledge (any of the system skills)**
 - `Why would a WooCommerce order be missing its Salesforce Opportunity ID?`
 - `Walk me through the unreconciled income report in NetSuite`
 - `What's our SPF situation for the Salesforce case email rule?`

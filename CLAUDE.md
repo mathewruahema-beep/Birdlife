@@ -20,7 +20,14 @@ the real IDs, picklist values, gotchas, and playbooks:
 | `birdlife-microsoft365` | Entra ID, Conditional Access, MFA, Intune, onboarding/offboarding |
 | `birdlife-asana` | IT Operations Project Plan, sections, backlog governance |
 | `birdlife-netsuite` | ERP, chart of accounts, SuiteQL, reconciliation |
-| `birdlife-wordpress` | WP Engine estate, WooCommerce, plugins, staging |
+| `birdlife-wordpress` | WP Engine estate, WooCommerce, plugins, staging; the theme architecture and developer handbook |
+| `birdlife-wpengine` | The WP Engine account itself: User Portal, caching layers, Web Rules, SSH/WP-CLI, the seven environments |
+| `birdlife-payments2us` | Payments2Us (AAkPay) in Zeus: licence deadline, automation stack, direct debit internals, live defects |
+| `birdlife-conga` | Conga Composer and Batch: the 17 receipting batches, templates, defects, S-Docs migration scope |
+| `birdlife-sdocs` | S-Docs and S-Sign: configuration and the plan to replace Conga receipting |
+| `birdlife-movedata` | MoveData (Raisely to Salesforce): pipeline model, extension Flows, live config, eight known defects, error catalogue |
+| `birdlife-powerbi` | Power BI and Fabric: scoping backlog, Zeus data-model traps, definitions to agree first |
+| `google-workspace-expert` | Google Workspace tenant C01muaswh: admin model, 2SV, SSO, Drive sharing, posture |
 | `birdlife-stripe` | Payments, refunds, BECS, WooCommerce→Salesforce flow |
 | `birdlife-zapier` | The 17 connected apps, when Zapier vs native connector |
 | `birdlife-cloudflare` | DNS, SPF/DKIM, WAF, caching, the two accounts |
@@ -28,7 +35,9 @@ the real IDs, picklist values, gotchas, and playbooks:
 | `birdlife-people-lifecycle` | Joiner/mover/leaver across every system, in order, with the Tier 2 scripts and the departed-staff credential sweep |
 | `birdlife-reporting` | The report library (weekly status, money state, security posture, exec brief, Board paper, incident), data discipline, production path |
 | `birdlife-improvement` | The improvement loop: observe processes, propose fixes (the console Fixes tab), track, verify, and write the learning back into the skills |
+| `birdlife-prompting` | The six-line prompt frame (Outcome, Evidence, Tier, Deliver, People, Done); load to challenge and sharpen a prompt |
 | `email-voice` | Mathew's email voice: three registers plus the report register; load before drafting anything he will send |
+| `morning` | Mathew's personal morning brief artifact |
 | `birdlife-os` | Managing Claude itself: routine/skill/connector/artefact governance, the weekly OS audit, the registers, and operating/updating the BirdLife Australia console (Jarvis) |
 
 If the account-synced versions of these skills are also present, they take
