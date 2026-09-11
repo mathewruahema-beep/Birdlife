@@ -25,6 +25,8 @@ audit the estate and apply these rules.
 | **Sessions** | Processes: interactive or routine-fired | claude.ai/code, apps, GitHub | Ephemeral by design |
 | **Artefacts** | Outputs: dashboard, console | Stable artifact URLs | Republished by routines or sessions |
 | **Registers** | State of record for all of the above | `os/registers.md` | Same commit as any estate change |
+| **Memory** | Episodic: what was decided, done, learned, left open | `memory/journal/`, `memory/patterns/` | Every session that changes something, same commit (charter session close rule) |
+| **Index** | Map of what is known where | `INDEX.md` | Same commit as any file added, moved or retired |
 
 ## Operating rules
 
@@ -57,6 +59,11 @@ audit the estate and apply these rules.
 8. **Propose, then write.** The charter rule applies to the estate itself.
    Sessions propose routine changes, skill edits and consolidations; Mathew
    approves; then they execute and commit.
+9. **Learn in the same session.** Any session that changes the estate, a
+   system of record, or a decision writes the journal entry and the skill or
+   facts edit in the same commit (the charter's session close rule). The
+   weekly audit reports commits with no journal entry as drift. A brain that
+   cannot show what it learned this week did not learn.
 
 ## Cadence
 
@@ -64,8 +71,10 @@ audit the estate and apply these rules.
   routine list, compare against the register, verdict every row (healthy,
   failing, paused, overlapping, unregistered), check skill drift between repo
   and account copies, verify artefact URLs still resolve, and report the
-  decisions Mathew actually needs to make. The ready-to-create routine
-  definition is `routines/os-weekly-audit.md`.
+  decisions Mathew actually needs to make. Also read the memory: journal
+  entries since the last audit against the commits, fixes done without a
+  learn step, facts changed in prose but not in the facts file. The
+  ready-to-create routine definition is `routines/os-weekly-audit.md`.
 - **Monthly review.** Beyond the audit: does each routine still earn its slot,
   are the budgets right, has anything moved tiers (see
   `docs/entra-admin-connector.md`), do the registers match reality end to end.

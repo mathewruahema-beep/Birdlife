@@ -5,6 +5,8 @@ description: Expert operator knowledge for BirdLife Australia's WordPress estate
 
 # BirdLife Australia — WordPress
 
+Environments, connector abilities, health numbers, membership tiers and the cart-flood rule live in `references/facts.md`. When a value changes, edit the facts file first, then this prose.
+
 ## Connector reality (verified live 3 Sep 2026)
 
 A **"BirdLife UAT WordPress"** MCP connector is attached to the account. It is

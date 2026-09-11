@@ -5,6 +5,8 @@ description: Expert operator knowledge for BirdLife Australia's Asana workspace 
 
 # BirdLife Australia — Asana
 
+Exact gids, section IDs, team IDs and API shapes live in `references/facts.md`. When a value changes, edit the facts file first, then this prose.
+
 ## Workspace identity — verified
 
 | Fact | Value |

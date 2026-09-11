@@ -5,6 +5,8 @@ description: Operator knowledge for BirdLife Australia's Zapier account — the 
 
 # BirdLife Australia — Zapier
 
+The connected-app table, Zap 371228125 steps and the other automations live in `references/facts.md`. When a value changes, edit the facts file first, then this prose.
+
 Zapier is BirdLife's integration layer of last resort. It reaches systems that have no native MCP connector: **Raisely, Ortto, Campaign Monitor, Humanitix, Award Force, LearnUpon, BugHerd, Content Workflow (Bynder), Google Analytics 4**. That is its real value here. For Salesforce, Asana, Outlook, Teams and Excel it duplicates a native connector, and duplication is a governance cost.
 
 ## Connected apps — verified live

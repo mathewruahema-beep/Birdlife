@@ -5,6 +5,8 @@ description: Operator knowledge for BirdLife Australia's Cloudflare estate — t
 
 # BirdLife Australia — Cloudflare
 
+Account IDs, deployed surfaces, connector limits and the email-authentication findings live in `references/facts.md`. When a value changes, edit the facts file first, then this prose.
+
 ## Accounts — verified live
 
 | Account | ID |

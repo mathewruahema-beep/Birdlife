@@ -131,6 +131,14 @@ connector, which has write abilities; email-voice report register). All
 account copies are therefore stale until re-uploaded from the zips sent on
 3 Sep; until then the repo copies are the only expert versions.
 
+**Facts files, 11 Sep 2026:** the eight system skills (salesforce, asana,
+microsoft365, netsuite, wordpress, stripe, zapier, cloudflare) gained
+`references/facts.md`, the structured lookup for IDs, URLs, counts and dates,
+with the rule "facts file first, prose second" when a value changes.
+`birdlife-ict-assistant` keeps `references/reference.md` in that role. Account
+copies must be re-uploaded as zips that include `references/`; until then the
+account copies lack the facts files as well as the 3 Sep expert pass.
+
 Account-only skills are unversioned: if the account loses them, they are gone.
 `email-voice` was account-only and load-bearing (the overnight pre-draft depends
 on it); it was copied verbatim into `.claude/skills/email-voice/` on 2 Sep 2026.
@@ -194,3 +202,19 @@ grants) and fold the missing checks in. Security dashboard kept (governance).
 | Vevox SAML certificates | Dashboard 21 Aug 2026 (passed), Vevox 8 Sep 2026 | Verify SSO still works; renew before 8 Sep |
 | Employment Hero sync Graph secret | Expires 5 Jan 2027 | Rotate when the Logic App is unblocked; add a reminder routine |
 | Salesforce test accounts `test101`, `test123` | Active with real credentials | Disable |
+
+## 6. Memory register
+
+Episodic memory lives in `memory/` (rules in `memory/README.md`); the map of
+the whole brain is `INDEX.md`. Both created 11 Sep 2026 on Mathew's
+instruction ("build it, steps one to four"). The charter's session close rule
+makes the journal entry and the skill or facts edit mandatory in the same
+commit as any change; the weekly audit (step 6 in `birdlife-os`) reports drift.
+
+| Item | State | As of |
+|---|---|---|
+| Journal | `memory/journal/`, one file per day; backfilled 7 Aug, 2 Sep, 3 Sep from this register and the git log; live from 11 Sep 2026 | 11 Sep 2026 |
+| Patterns | `salesforce.md`, `website.md`, `claude-estate.md` seeded from the skills; new files per system as patterns arrive | 11 Sep 2026 |
+| Routine write-back | Not yet: no routine appends to the journal. Adding it to the weekday job and the pre-draft is an estate change (propose first) | 11 Sep 2026 |
+| Weekly audit memory check | In the `birdlife-os` skill, which the live audit routine follows; no trigger change needed | 11 Sep 2026 |
+| Open decision | Two brains: stop syncing skills to the account (always start on the repo) or automate the sync in the audit. Mathew to decide before the next re-upload | 11 Sep 2026 |

@@ -5,6 +5,8 @@ description: Expert operator knowledge for BirdLife Australia's Microsoft 365 an
 
 # BirdLife Australia — Microsoft 365 / Entra ID
 
+Tenant IDs, policy names, account lists, sync components and dates live in `references/facts.md`. When a value changes, edit the facts file first, then this prose.
+
 ## Tenant identity — verified
 
 | Fact | Value |

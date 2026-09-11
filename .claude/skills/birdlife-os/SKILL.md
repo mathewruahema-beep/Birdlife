@@ -191,7 +191,15 @@ Run when asked ("run the OS audit") or when the weekly audit routine fires.
 5. **Check artefacts and docs**: the registered artifact URLs, and grep the
    repo (`README.md`, `docs/`, `routines/`) for trigger IDs that no longer
    exist.
-6. **Report**: lead with what changed since last audit and the decisions Mathew
+6. **Check the memory** (`memory/`, rules in `memory/README.md`):
+   `git log --since=<last audit> --name-only` against `memory/journal/`. A
+   commit day that touched a skill, `os/`, `routines/` or a system of record
+   with no journal file that day is drift and gets a one-line finding. Then:
+   journal "Open" items older than 14 days with no owner or date; fixes
+   marked done in the Fixes tab or Asana with no "Learned" line; a `SKILL.md`
+   changed in the window whose `references/facts.md` was not, where the
+   diff contains an ID, URL or number. Write the audit's own journal entry.
+7. **Report**: lead with what changed since last audit and the decisions Mathew
    needs to make, one line each. Then update `os/registers.md` with the new
    audit date and findings, commit, push. Propose fixes; execute only approved
    ones.
@@ -226,9 +234,11 @@ Refuse to create casually. Walk the change control from `os/README.md`:
 
 ## The skill estate (what exists, what each is for)
 
-Fourteen skills, all versioned in `.claude/skills/` and mirrored to the
+Fifteen skills, all versioned in `.claude/skills/` and mirrored to the
 account by uploading a zip per skill (the uploader rejects any name containing
-"claude"). System skills: `birdlife-salesforce`, `birdlife-microsoft365`,
+"claude"; the zip must include the skill's `references/` directory, which
+since 11 Sep 2026 carries a `facts.md` lookup file for the eight system
+skills). System skills: `birdlife-salesforce`, `birdlife-microsoft365`,
 `birdlife-asana`, `birdlife-netsuite`, `birdlife-wordpress`,
 `birdlife-stripe`, `birdlife-zapier`, `birdlife-cloudflare`. Cross-cutting:
 `birdlife-ict-assistant` (workflow and tiers), `birdlife-security` (posture,
@@ -247,7 +257,10 @@ skills for idle connectors; that is skill sprawl.
 ## Skill lifecycle
 
 - New knowledge goes into the relevant `birdlife-*` skill file, committed and
-  pushed; that is how every future session learns it.
+  pushed; that is how every future session learns it. Values (IDs, URLs,
+  counts, dates) go in that skill's `references/facts.md` first, prose
+  second. What happened (the decision, the case, the lesson) goes in
+  `memory/journal/` the same day; see the charter's session close rule.
 - New skills get a register row and a CLAUDE.md table entry.
 - Drift resolution: repo wins, unless the account copy is deliberately newer,
   in which case commit it to the repo first, then it wins.

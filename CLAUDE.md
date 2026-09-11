@@ -56,6 +56,30 @@ file here and commit — that is how the assistant learns.
    `RecordType.DeveloperName = 'Zeus'` counts all 19 record types and inflates ICT
    numbers ~200×. `Owner.Name = 'Zeus'` is the unassigned intake queue, not a person.
 
+## The brain: memory and index
+
+The skills are long-term knowledge. `memory/` is what happened: `memory/journal/`
+(one file per day: decisions and by whom, work done, lessons, open items) and
+`memory/patterns/` (resolved problems by system: symptom, cause, fix, verify).
+`INDEX.md` at the repo root maps what is known where; read it when you do not
+know which file holds something. Starting cold on estate or process work, read
+the last five journal files first.
+
+**Session close rule.** Before ending any piece of work that changed something
+(a record, a task, a routine, a skill, a document, or a decision Mathew made),
+the session, in the same commit:
+
+1. Appends to today's `memory/journal/YYYY-MM-DD.md`: what was decided and by
+   whom, what was done and how it was verified, what was learned, what is open
+   (with owner and date). Format in `memory/README.md`.
+2. Edits the owning skill if a gotcha, value or process changed. Values go in
+   the skill's `references/facts.md` first, prose second. A resolved problem
+   gets a pattern entry.
+3. Commits and pushes on the working branch.
+
+A session that only read and answered writes nothing. No credentials, no donor
+or member PII, and no named security gaps outside `birdlife-security`.
+
 ## Connectors this assistant expects
 
 Salesforce Production, Asana, Microsoft 365, NetSuite, Stripe, Zapier, Cloudflare,
@@ -64,6 +88,9 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
 
 ## What else is in this repo
 
+- `INDEX.md` — one line per file: what is known where.
+- `memory/` — episodic memory: the dated journal of decisions, work and lessons,
+  and the resolved-problem patterns per system. Rules in `memory/README.md`.
 - `os/` — the Claude Operating System: the rules for managing the Claude estate
   itself (`os/README.md`) and the state-of-record registers for routines,
   skills, connectors, artefacts and credentials (`os/registers.md`). Any session

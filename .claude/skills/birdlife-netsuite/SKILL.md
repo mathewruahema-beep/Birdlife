@@ -5,6 +5,8 @@ description: Expert operator knowledge for BirdLife Australia's NetSuite OneWorl
 
 # BirdLife Australia — NetSuite
 
+Account IDs, GL codes, role names, reconciliation figures and the certificate record live in `references/facts.md`. When a value changes, edit the facts file first, then this prose.
+
 ## Account identity — verified
 
 | Fact | Value |

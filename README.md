@@ -295,11 +295,12 @@ They have been redacted from the backup in this repo, but:
 
 ```
 CLAUDE.md                            the AI ICT Assistant charter — loads into every session on this repo
+INDEX.md                             one line per file: what is known where
+memory/                              episodic memory: journal/ (decisions, done, learned, open, per day) and patterns/ (resolved problems per system)
 os/README.md                         the Claude Operating System — rules, budgets, cadence for managing the Claude estate itself
 os/registers.md                      state-of-record registers: routines, skills, connectors, artefacts, credential watchlist
-console/index.html                   the ICT Console — interactive prompt builder, runbook generator, quick reference
-                                     (published at https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e)
-.claude/skills/                      the nine birdlife-* operator-knowledge skills (versioned)
+os/claude-os-overview.html           source of the BirdLife Australia console (Jarvis); artifact URL in os/registers.md
+.claude/skills/                      the fifteen operator-knowledge skills (versioned); SKILL.md is doctrine, references/facts.md the lookup values
 docs/using-the-assistant.md          remote access channels + prompt playbook
 README.md                            findings, admin runbook, routine consolidation
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)

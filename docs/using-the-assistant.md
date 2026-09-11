@@ -99,8 +99,14 @@ security-, finance- or PII-sensitive to a human with the action prepared.
 
 ## Teaching it
 
-The assistant's memory is this repo. When a process changes or you learn a new
-gotcha, tell a session "update the <name> skill with …" — it edits the file in
-`.claude/skills/`, commits, and pushes. Every future session, on any device,
-knows it from then on. (Re-sync the account copies from these files when they
-drift.)
+The assistant's memory is this repo, in two halves. The skills in
+`.claude/skills/` are how things work (doctrine in `SKILL.md`, exact values in
+`references/facts.md`). `memory/` is what happened: a dated journal of
+decisions, work and lessons, and resolved-problem patterns per system. When a
+process changes or you learn a new gotcha, tell a session "update the <name>
+skill with …" and it edits the file, commits, and pushes. Any session that
+changes something also writes the day's journal entry before it finishes (the
+session close rule in `CLAUDE.md`), so the next session, on any device, starts
+knowing what was decided and why. `INDEX.md` maps every file. (Re-sync the
+account copies from these files when they drift; the zips must include
+`references/`.)

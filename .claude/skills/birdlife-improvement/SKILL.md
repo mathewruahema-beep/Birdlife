@@ -121,7 +121,12 @@ When a fix reaches done, in the same session:
 4. **Pattern check**: ask whether the fix is a symptom. Two fixes in the same
    place (two leaked keys, two departed admins) is a process fix, and that
    becomes the next proposal.
-5. **Commit** with the fix described; push; the account skill copy is
+5. **Journal**: today's `memory/journal/` entry records the fix reaching
+   done under "Done" and the lesson under "Learned"; if the fix resolved a
+   recurring symptom, add the pattern to `memory/patterns/<system>.md`
+   (format in `memory/README.md`). Values that changed go in the owning
+   skill's `references/facts.md` before the prose.
+6. **Commit** with the fix described; push; the account skill copy is
    re-uploaded at the next sync.
 
 For an incident, the learn step is a short post-incident note in the
@@ -146,6 +151,6 @@ detected it, what would have detected it sooner, what changed.
 4. **One task per approval.** Never bulk-create.
 5. **Done is observed, not announced.**
 6. **Learn in the same commit.** The skill is the memory; the page is a
-   mirror.
+   mirror; the journal is the record of when and why.
 7. **Tier honesty.** A tier 2 or 3 fix is prepared, and the preparation is
    the deliverable; never mark it done because the script was written.

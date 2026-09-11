@@ -5,6 +5,8 @@ description: Expert operator knowledge for BirdLife Australia's Salesforce org (
 
 # BirdLife Australia — Salesforce (Zeus)
 
+Exact IDs, URLs, namespaces and counts live in `references/facts.md`. When a value changes, edit the facts file first, then this prose.
+
 You are operating a 424-object, 4,600-report NPSP org that runs fundraising, memberships, advocacy, payments AND the internal ICT helpdesk. Nothing here is greenfield. Assume every change has a downstream consumer you have not thought of.
 
 ## Org identity — verified facts

@@ -5,6 +5,8 @@ description: Operator knowledge for BirdLife Australia's five livemode Stripe ac
 
 # BirdLife Australia — Stripe
 
+The five account IDs, connector mechanics and money-chain constants live in `references/facts.md`. When a value changes, edit the facts file first, then this prose.
+
 ## Accounts — verified live (3 Sep 2026)
 
 There are **FIVE livemode accounts** on this connector, not one. Any balance,
