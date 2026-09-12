@@ -53,9 +53,23 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(17px,2.6vw,26px);m
 .ctl{position:fixed;right:20px;top:calc(50% - 60px);display:flex;flex-direction:column;gap:6px;z-index:2}
 .ctl button{width:34px;height:34px;background:rgba(8,13,24,.82);border:1px solid var(--line);color:var(--fg);font-family:var(--mono);font-size:16px;cursor:pointer}
 .ctl button:hover,.ctl button:focus-visible{border-color:var(--holo);color:var(--holo);outline:none}
+.tools{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.search button{font:inherit;font-family:var(--display);font-size:9px;letter-spacing:.18em;text-transform:uppercase;background:transparent;border:1px solid var(--line);color:var(--holo);padding:4px 8px;cursor:pointer}
+.search button:hover,.search button:focus-visible{border-color:var(--holo);outline:none;background:rgba(53,215,255,.08)}
+#ref{width:210px;font-size:12px}
+.banner{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;max-width:min(520px,calc(100vw - 32px));background:rgba(8,13,24,.94);border:1px solid var(--line);border-top:2px solid var(--holo);padding:16px 18px;font-size:13px;color:var(--fg)}
+.banner h4{margin:0 0 6px;font-family:var(--display);font-weight:400;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--holo)}
+.banner p{margin:0 0 6px}
+.banner code{font-family:var(--mono);font-size:12px;color:var(--gold)}
+.banner .dismiss{margin-top:8px;font:inherit;font-size:12px;background:transparent;border:1px solid var(--line);color:var(--fg);padding:4px 10px;cursor:pointer}
+.inspector .detail{border-top:1px solid var(--line);padding-top:8px;margin-top:4px;color:var(--fg-dim);font-size:12.5px;white-space:pre-wrap;word-break:break-word}
+.inspector .detail b{color:var(--fg);font-weight:500}
+.inspector a{color:var(--holo)}
 @media (max-width:720px){
+  .tools{align-items:stretch;width:100%} #ref{width:120px}
   .hud-top{padding:12px 14px}
   .search input{width:130px}
+  .banner{top:auto;bottom:calc(38vh + 70px);transform:translateX(-50%)}
   .legend{width:auto;left:12px;right:12px;bottom:12px;max-height:38vh;flex-direction:row;flex-wrap:wrap;gap:0 10px;padding:10px}
   .legend h2{width:100%}
   .lg{grid-template-columns:10px 1fr auto;font-size:11.5px;padding:3px 4px}
@@ -75,17 +89,21 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(17px,2.6vw,26px);m
     <h1>The BirdLife Brain</h1>
     <div class="sub" id="sub"></div>
   </div>
-  <div class="search"><label for="q">Find</label><input id="q" type="search" placeholder="skill, system, ADR, routine" autocomplete="off"></div>
+  <div class="tools">
+    <div class="search"><label for="q">Find</label><input id="q" type="search" placeholder="skill, system, ADR, routine" autocomplete="off"></div>
+    <div class="search"><label for="ref">Branch</label><input id="ref" type="text" autocomplete="off" spellcheck="false" aria-label="Git branch to read"><button id="reload" type="button" title="Reload from GitHub">Reload</button></div>
+  </div>
 </div>
 
 <div class="hud legend" id="legend" aria-label="Layers"></div>
 <div class="ctl"><button id="zin" title="Zoom in" aria-label="Zoom in">+</button><button id="zout" title="Zoom out" aria-label="Zoom out">−</button><button id="zfit" title="Reset view" aria-label="Reset view">⌂</button></div>
 <div class="inspector" id="insp" role="dialog" aria-label="Node detail"><button class="close" id="ic" aria-label="Close">×</button><div id="ib"></div></div>
 <div class="status" id="status"></div>
+<div class="banner" id="banner" hidden></div>
 <div class="tip" id="tip"></div>
 
+
 <script>
-const DATA = {"skills": [{"id": "birdlife-asana", "layer": "system", "desc": "Expert operator knowledge for BirdLife Australia's Asana workspace \u2014 the IT Operations Project Plan, the Salesforce Case email rule and its SPF blocker, the Better Impact.", "facts": true}, {"id": "birdlife-atlassian", "layer": "connskill", "desc": "Operator knowledge for BirdLife Australia's Atlassian site (birdlife-ict.atlassian.net) \u2014 the ICT Confluence space, personal-space sprawl, what the Rovo connector can rea.", "facts": false}, {"id": "birdlife-canva", "layer": "connskill", "desc": "Operator knowledge for BirdLife Australia's Canva account \u2014 the flagship brand kit and campaign kits, brand template autofill, and safe use for ICT and campaign collatera.", "facts": false}, {"id": "birdlife-cloudflare", "layer": "system", "desc": "Operator knowledge for BirdLife Australia's Cloudflare estate \u2014 two accounts, CDN/DNS/proxy role in front of WP Engine, what the connected MCP can and cannot do, and wher.", "facts": true}, {"id": "birdlife-conga", "layer": "deep", "desc": "Expert operator knowledge for Conga Composer 8 and Conga Batch in BirdLife Australia's Salesforce org (Zeus) - the 17 live scheduled batches behind every receipt and rene.", "facts": false}, {"id": "birdlife-core", "layer": "doctrine", "desc": "The operating doctrine for every BirdLife Australia session, which layer of knowledge wins when two sources disagree, how to tell a live fact from a durable one, the writ.", "facts": true}, {"id": "birdlife-gmail", "layer": "connskill", "desc": "Operator knowledge for the personal Gmail account connected to this workspace \u2014 why it is NOT BirdLife mail, the boundary between personal and work correspondence, and sa.", "facts": false}, {"id": "birdlife-google-calendar", "layer": "connskill", "desc": "Operator knowledge for the personal Google Calendar connected to this workspace \u2014 why BirdLife scheduling belongs in Outlook, and safe use of the Google calendar tools.", "facts": false}, {"id": "birdlife-granola", "layer": "connskill", "desc": "Operator knowledge for BirdLife Australia's Granola meeting-notes workspace \u2014 scope of note access, overlap with Zoom and Teams transcripts, and safe handling of meeting .", "facts": false}, {"id": "birdlife-ict-assistant", "layer": "cross", "desc": "BirdLife Australia's ICT helpdesk assistant for working Salesforce \"Ask Zeus\" Cases and the Asana \"IT Operations Project Plan\".", "facts": true}, {"id": "birdlife-improvement", "layer": "cross", "desc": "The continuous-improvement loop for BirdLife Australia ICT: how a session or the console watches processes (queue patterns, board drift, money gaps, security posture, inc.", "facts": false}, {"id": "birdlife-manager", "layer": "cross", "desc": "The weekly ICT manager review for Mathew Hema at BirdLife Australia, run from live evidence (Asana IT Operations Project Plan, Zeus Case queue, routine health, the securi.", "facts": false}, {"id": "birdlife-microsoft-learn", "layer": "connskill", "desc": "Operator knowledge for using the Microsoft Learn documentation connector to ground Azure, Entra, Intune, Defender, Graph, Power Automate, Logic Apps and Business Central .", "facts": false}, {"id": "birdlife-microsoft365", "layer": "system", "desc": "Expert operator knowledge for BirdLife Australia's Microsoft 365 and Entra ID tenant \u2014 Conditional Access, MFA remediation, privileged accounts, Intune, Defender, Essenti.", "facts": true}, {"id": "birdlife-miro", "layer": "connskill", "desc": "Operator knowledge for BirdLife Australia's Miro workspace \u2014 the empty-spaces state, what the connector can build (diagrams, canvases, tables, prototypes), and where Miro.", "facts": false}, {"id": "birdlife-movedata", "layer": "deep", "desc": "Expert operator knowledge for MoveData at BirdLife Australia: the pipeline phase model, platform keys, extension Flow authoring, the live Zeus configuration and its eight.", "facts": false}, {"id": "birdlife-netsuite", "layer": "system", "desc": "Expert operator knowledge for BirdLife Australia's NetSuite OneWorld ERP \u2014 chart of accounts, subsidiary and segmentation model, saved searches, SuiteQL, the Salesforce-t.", "facts": true}, {"id": "birdlife-os", "layer": "cross", "desc": "The operating system for managing the Claude estate at BirdLife Australia: routines, skills, connectors, artefacts, the Jarvis console, and the lens model (IT Admin live;.", "facts": false}, {"id": "birdlife-payments2us", "layer": "deep", "desc": "Expert operator and deep technical knowledge for Payments2Us (AAkPay) in BirdLife Australia's Salesforce org (Zeus): the licence deadline, live configuration, the full au.", "facts": false}, {"id": "birdlife-people-lifecycle", "layer": "cross", "desc": "The joiner, mover and leaver process for BirdLife Australia staff and contractors across every system (Employment Hero, Entra ID/M365, Salesforce, NetSuite, Asana, WordPr.", "facts": false}, {"id": "birdlife-powerbi", "layer": "deep", "desc": "Operator knowledge for Power BI and Fabric at BirdLife Australia: the unbuilt 2025 scoping backlog, the Zeus data model traps that make reports lie, the definitions to ag.", "facts": false}, {"id": "birdlife-prompting", "layer": "cross", "desc": "Rewrite and challenge every BirdLife Australia prompt into the six-line frame (Outcome, Evidence, Tier, Deliver, People, Done) using the context of the system in play, ro.", "facts": false}, {"id": "birdlife-reporting", "layer": "cross", "desc": "How BirdLife Australia's ICT reports get written from live data in Mathew Hema's voice: the report library (weekly ICT status, money state, security posture, executive br.", "facts": false}, {"id": "birdlife-salesforce", "layer": "system", "desc": "Expert operator knowledge for BirdLife Australia's Salesforce org (\"Zeus\") \u2014 NPSP/Household model, Payments2Us, Conga, miniOrange/WooCommerce sync, Raisely/MoveData, Pard.", "facts": true}, {"id": "birdlife-sdocs", "layer": "deep", "desc": "Expert operator knowledge for configuring, administering and using S-Docs and S-Sign in BirdLife Australia's Salesforce org, and for replacing the live Conga Composer and.", "facts": false}, {"id": "birdlife-security", "layer": "cross", "desc": "BirdLife Australia's security posture, deadline register, identity capability baseline and incident playbooks across the whole estate (Entra/M365, Salesforce, WordPress, .", "facts": false}, {"id": "birdlife-stripe", "layer": "system", "desc": "Operator knowledge for BirdLife Australia's five livemode Stripe accounts (eCommerce, Memberships, Ausbirdfund, BLP, eStore/AOC), how payments flow through WooCommerce in.", "facts": true}, {"id": "birdlife-wordpress", "layer": "system", "desc": "Expert web developer and operator knowledge for BirdLife Australia's WordPress estate on WP Engine: the custom BirdLife theme architecture (SCSS build, ACF blocks, 20 CPT.", "facts": true}, {"id": "birdlife-wpengine", "layer": "system", "desc": "Expert operator knowledge for BirdLife Australia's WP Engine account: every User Portal area and what it controls, the five caching layers, network tiers and Web Rules, t.", "facts": false}, {"id": "birdlife-zapier", "layer": "system", "desc": "Operator knowledge for BirdLife Australia's Zapier account \u2014 the 17 connected apps and their credentials, the unpublished unreconciled-income exception report, the LearnU.", "facts": true}, {"id": "email-voice", "layer": "cross", "desc": "Mathew Hema's email voice for his BirdLife Australia Outlook account (mathew.hema@birdlife.org.au).", "facts": true}, {"id": "google-workspace-expert", "layer": "system", "desc": "Expert operator knowledge for Google Workspace administration and for BirdLife Australia's tenant (C01muaswh) specifically: the admin model, how to read live state throug.", "facts": false}, {"id": "morning", "layer": "cross", "desc": "Render the user's morning brief as a styled HTML artifact, or set it up as a recurring weekday task.", "facts": false}], "adrs": [{"id": "0001-security-framework", "title": "ADR 0001: Anchor the security programme to ACSC Essential Eight with a SaaS/identity overlay"}, {"id": "0002-approve-only-automation", "title": "ADR 0002: Approve-only automation for identity and offboarding"}, {"id": "0003-first-three-systems", "title": "ADR 0003: Salesforce, Asana and Office 365 as the first connected systems"}, {"id": "0004-knowledge-architecture", "title": "ADR 0004: Four-layer knowledge architecture with an explicit precedence order"}, {"id": "0005-git-source-of-truth", "title": "ADR 0005: Git is the source of truth; the plugin is a build artefact"}, {"id": "0006-connector-scope", "title": "ADR 0006: Connected estate has outgrown the approved connector list"}, {"id": "0007-entra-admin-identity", "title": "ADR 0007: Dedicated admin identity and app registration for the entra-admin MCP"}, {"id": "0008-mfa-strength-risk-acceptance", "title": "ADR 0008: Risk acceptance, push MFA rather than phishing-resistant authentication on the entra-admin endpoint"}, {"id": "0009-azure-subscription-owner", "title": "ADR 0009: Grant Owner on the Azure subscription to the dedicated admin account"}, {"id": "0010-entra-admin-mcp-hosting", "title": "ADR 0010: Host the entra-admin MCP server in Azure rather than on the local workstation"}, {"id": "0011-membership-rebuild-sequence", "title": "ADR 0011: Membership rebuild sequence and scope"}, {"id": "0012-monitoring-alert-routing", "title": "ADR 0012: Monitoring alerts route to Teams, not Salesforce Cases"}, {"id": "0013-offboarding-saas-revocation", "title": "ADR 0013: Offboarding extends to third-party SaaS revocation"}, {"id": "0014-learnupon-sync-platform", "title": "ADR 0014: LearnUpon to Employment Hero completion sync runs on Logic Apps, not Zapier Code"}, {"id": "0015-privileged-access-model", "title": "ADR 0015: Privileged access stays with a single owner, with progressive delegation"}, {"id": "0016-ai-agent-privileged-access-standard", "title": "ADR 0016: Govern AI connectors through an org-level AI agent privileged access standard"}, {"id": "0018-break-glass-emergency-access", "title": "ADR 0018: Establish break-glass emergency access, separated from privilege delegation"}, {"id": "0019-birdata-supporter-feed", "title": "ADR 0019: Birdata supporter feed goes to Salesforce, not to Ortto"}, {"id": "0019-lens-model-and-entra-write-gate", "title": "ADR 0019: The BirdLife OS lens model, and the gate for promoting Entra writes to Tier 1"}, {"id": "0020-salesforce-outlook-integration", "title": "ADR 0020: Salesforce and Outlook integration, add-in pilot with Einstein Activity Capture held"}, {"id": "0021-brain-location-and-ownership", "title": "ADR 0021: The brain lives in Mathew's personal git repository, with his Google Drive as the human copy"}], "journals": ["2026-08-07", "2026-09-02", "2026-09-03", "2026-09-11", "2026-09-12"], "patterns": ["claude-estate", "salesforce", "website"]};
 const LAYERS = {
   kernel:   {name:'Kernel',            c:'#ffd66b', what:'Loads into every session. The charter and the map.'},
   doctrine: {name:'Doctrine',          c:'#b48cff', what:'birdlife-core: precedence, fact classes, write tiers, verification queries.'},
@@ -101,112 +119,141 @@ const LAYERS = {
   artefacts:{name:'Artefacts',         c:'#f08cff', what:'Published pages: the console, dashboards, the department suite.'},
   copy:     {name:'Human copy',        c:'#8aa4c8', what:'Where the brain is mirrored for people: Google Drive, the account, a local clone.'},
 };
+const order=['kernel','doctrine','os','memory','system','deep','cross','connskill','routines','decisions','live','artefacts','copy'];
 const short = s => s.replace(/^birdlife-/,'').replace('google-workspace-expert','google-workspace');
-const N=[], E=[]; const byId={};
+const RING_R=[0,120,300,440,580];
+let N=[], E=[], byId={}, adj={}, rings={};
 function add(n){ N.push(n); byId[n.id]=n; return n; }
-function link(a,b,label){ if(byId[a]&&byId[b]) E.push({a,b,label}); }
+function link(a,b,label){ if(byId[a]&&byId[b]&&a!==b) E.push({a,b,label}); }
 
-// Ring 0 and 1: kernel, doctrine, OS core
-add({id:'CLAUDE.md',label:'CLAUDE.md',layer:'kernel',ring:0,desc:'The charter. Identity, the five operating rules, the session close rule, the skill table. Loads into every session on the repository.',path:'CLAUDE.md'});
-add({id:'INDEX.md',label:'INDEX',layer:'kernel',ring:1,desc:'One line per file: what is known where.',path:'INDEX.md'});
-add({id:'birdlife-core',label:'birdlife-core',layer:'doctrine',ring:1,desc:'The doctrine underneath everything: live query beats skill beats digest beats memory; four fact classes; three write tiers; where a new fact goes. Carries the ADR log and the verification queries.',path:'.claude/skills/birdlife-core/SKILL.md'});
-add({id:'os/README.md',label:'OS rules',layer:'os',ring:1,desc:'The Claude operating system: estate model, ten rules, cadence, change control, incident handling.',path:'os/README.md'});
-add({id:'os/registers.md',label:'registers',layer:'os',ring:1,desc:'State of record: routines, skills, connectors, artefacts, credential watchlist, memory, decisions.',path:'os/registers.md'});
-add({id:'os/lenses.md',label:'lenses',layer:'os',ring:1,desc:'IT-GOV-004 lens model: five lenses, the IT Admin capability matrix over 22 systems, findings F1 to F6.',path:'os/lenses.md'});
-add({id:'console',label:'console source',layer:'os',ring:1,desc:'Source of the BirdLife Australia console (Jarvis): Command, Lens, Today, Projects, Money, Security, Fixes tabs.',path:'os/claude-os-overview.html'});
-add({id:'memory/README.md',label:'memory rules',layer:'memory',ring:1,desc:'Who writes to memory, the journal and pattern formats, no credentials, no PII.',path:'memory/README.md'});
-link('INDEX.md','CLAUDE.md','maps'); link('birdlife-core','CLAUDE.md','doctrine under'); link('os/README.md','CLAUDE.md','governs'); link('os/registers.md','os/README.md','state of'); link('os/lenses.md','os/README.md','tiers'); link('console','os/registers.md','mirrors'); link('memory/README.md','CLAUDE.md','session close');
-
-// Ring 2: skills
-for(const s of DATA.skills){ if(s.id==='birdlife-core') continue;
-  add({id:s.id,label:short(s.id),layer:s.layer,ring:2,desc:s.desc + (s.facts?' Carries a references folder with lookup values.':''),path:'.claude/skills/'+s.id+'/SKILL.md'});
-  link(s.id,'birdlife-core','reads first');
-}
-
-// Ring 3: memory files, routines, decisions
-for(const j of DATA.journals){ add({id:'journal/'+j,label:j,layer:'memory',ring:3,desc:'Journal for '+j+': decisions and by whom, work done, lessons, open items.',path:'memory/journal/'+j+'.md'}); link('journal/'+j,'memory/README.md','entry'); }
-for(const p of DATA.patterns){ add({id:'pattern/'+p,label:'pattern: '+p,layer:'memory',ring:3,desc:'Resolved problems for '+p+': symptom, cause, fix, verify, doctrine.',path:'memory/patterns/'+p+'.md'}); }
-link('pattern/salesforce','birdlife-salesforce','doctrine'); link('pattern/website','birdlife-wordpress','doctrine'); link('pattern/claude-estate','birdlife-os','doctrine');
-const ROUT=[
- ['weekday','ICT weekday dashboards and monitor','hourly 7:04am to 5:04pm weekdays. Ops and Monitoring dashboards, Teams push, heartbeat, monitor sweep, department suite.',['sys/Microsoft 365','sys/Zapier','art/Ops dashboard','art/Monitoring dashboard','art/Department suite']],
- ['audit','Claude OS weekly audit','Mondays 6am. Verdicts every trigger, checks budget, skill drift, artefacts, memory, the account skill list and the repository itself.',['os/registers.md','journal/'+DATA.journals[DATA.journals.length-1]]],
- ['predraft','ICT overnight pre-draft','weekdays 5:30am. Writes internal Case comments only, max eight, never Status or Owner.',['sys/Salesforce Production']],
- ['refund','Refund fix watch','daily 8:15am. Blast radius scan of the refund sync.',['sys/Salesforce Production','sys/Stripe']],
- ['boards','Membership boards date sync','daily 7:30am. Build to Model.',['sys/Asana']],
- ['offboard','Offboarding detector','daily 8am. Scan and approval pack; never disables anyone.',['sys/Salesforce Production','sys/Microsoft 365']],
- ['onboard','Onboarding detector','daily 8:30am. Scan and approval pack.',['sys/Salesforce Production','sys/Microsoft 365']],
- ['feeds','Data feed and expiry monitor','daily 9am.',['sys/Zapier']],
- ['stale','Stale case chaser','Mondays 8:30am. Report only.',['sys/Salesforce Production']],
- ['briefing','Membership Build delivery briefing','Mon, Wed, Fri 7:08am. Read only.',['sys/Asana']],
- ['dailyten','AI Daily Ten','weekdays 6:34am. Gmail newsletters into the AI Field Guide artifact.',['sys/Gmail','art/AI Field Guide']],
- ['dst','DST fix (one-shot)','5 Oct 2026 2pm. Shifts every recurring routine one hour.',['os/registers.md']],
- ['cert','Renew entra-admin certificate (one-shot)','25 Jul 2027. Certificate expires 26 Aug 2027.',['sys/Entra admin (desktop bridge)']],
-];
-for(const [id,label,d,links] of ROUT){ add({id:'r/'+id,label,layer:'routines',ring:3,desc:d,path:'os/registers.md, section 1',links}); }
-for(const a of DATA.adrs){ const num=a.id.slice(0,4); add({id:'adr/'+a.id,label:'ADR '+num,layer:'decisions',ring:3,desc:a.title,path:'.claude/skills/birdlife-core/references/decisions/'+a.id+'.md'}); link('adr/'+a.id,'birdlife-core','recorded in'); }
-
-// Ring 4: live systems, artefacts, human copy
-const LIVE=[
- ['Salesforce Production','Zeus. NPSP org, 424 objects, the hub most systems write into. Tier 1 data, one record per approval.'],
- ['Salesforce Staging','Sandbox. Experiments and write-response shapes.'],
- ['Microsoft 365','Mail, calendar, Teams read, SharePoint. User level only; no Entra admin.'],
- ['Entra admin (desktop bridge)','Graph reads proven; writes stay Tier 2 until the ADR 0019 gate passes.'],
- ['Asana','IT Operations Project Plan. Tier 1, one task per approval.'],
- ['NetSuite','SuiteQL reads, subsidiary 2. Writes Tier 3.'],
- ['Stripe','Five livemode accounts. Read only from any page or routine.'],
- ['Zapier','Seventeen connected apps. Writes held for approval in unattended runs.'],
- ['Cloudflare','Developer Platform only. DNS and WAF are dashboard changes.'],
- ['WordPress UAT','Eleven WooCommerce abilities on the UAT site. Say UAT.'],
- ['GitHub','This repository. The executable brain.'],
- ['Atlassian','Confluence ICT space and Jira.'],
- ['Google Drive','Mathew\'s personal account. Reaches the Claude folder.'],
- ['Gmail','Personal account. Not BirdLife mail.'],
- ['Granola','Meeting notes and transcripts. Read only.'],
- ['Canva','Brand kits and templates.'],
- ['Miro','Boards and diagrams.'],
- ['Zoom','Meetings, recordings, transcripts.'],
- ['Microsoft Learn','Official documentation. Reference only.'],
-];
-for(const [n,d] of LIVE){ add({id:'sys/'+n,label:n,layer:'live',ring:4,desc:d,path:'claude.ai Settings, Connectors'}); }
-const ART=[
- ['BirdLife Australia console','Jarvis command deck: live queue, board, inbox, Teams, Money, Security, Fixes; approve-card writes.'],
- ['Ops dashboard','ICT Operations dashboard; Teams file copy.'],
- ['Monitoring dashboard','ICT Monitoring dashboard; Teams file copy.'],
- ['Security dashboard','Confidential deep view; refreshed on request since 3 Sep.'],
- ['Department suite','Nine department pages rebuilt by the weekday job.'],
- ['AI Field Guide','Republished by AI Daily Ten.'],
-];
-for(const [n,d] of ART){ add({id:'art/'+n,label:n,layer:'artefacts',ring:4,desc:d,path:'os/registers.md, section 4'}); }
-link('art/BirdLife Australia console','console','published from');
-add({id:'copy/gdrive',label:'Google Drive · Claude',layer:'copy',ring:4,desc:'Mathew\'s personal Google Drive: documents by IT identifier, the Manager folder, archived artifacts, and the weekly git bundle of this repository. The human copy and backup (ADR 0021).',path:'GoogleDrive/Claude'});
-add({id:'copy/account',label:'claude.ai account skills',layer:'copy',ring:4,desc:'Account-synced copies of the skills so the app can load them without the repo. Repo wins once account content is committed.',path:'claude.ai, Skills'});
-add({id:'copy/clone',label:'local clone',layer:'copy',ring:4,desc:'A clone on Mathew\'s machine outside any synced folder; desktop sessions commit and push from here.',path:'C:\\src\\Birdlife'});
-link('copy/gdrive','CLAUDE.md','backs up'); link('copy/account','CLAUDE.md','mirrors'); link('copy/clone','sys/GitHub','pushes to'); link('sys/GitHub','CLAUDE.md','hosts');
-
-// Skill to live-system edges
+// ---------- what the repository is read for ----------
+const OWNER='mathewruahema-beep', REPO='Birdlife', SERVER='github', TOOL='get_file_contents';
+const DEFAULT_REF='claude/birdlife-brain-build-02zobt';
+const READS={
+  charter:  {path:'CLAUDE.md', kind:'file', why:'the charter and its skill table'},
+  index:    {path:'INDEX.md', kind:'file', why:'what is known where'},
+  registers:{path:'os/registers.md', kind:'file', why:'routines, connectors, artefacts'},
+  osdir:    {path:'os', kind:'dir', why:'the OS files'},
+  skills:   {path:'.claude/skills', kind:'dir', why:'the skill list'},
+  journal:  {path:'memory/journal', kind:'dir', why:'the journal'},
+  patterns: {path:'memory/patterns', kind:'dir', why:'the patterns'},
+  adrs:     {path:'.claude/skills/birdlife-core/references/decisions', kind:'dir', why:'the decision log'},
+};
+const SKILL_LAYER={ 'birdlife-asana':'system','birdlife-cloudflare':'system','birdlife-microsoft365':'system','birdlife-netsuite':'system','birdlife-salesforce':'system','birdlife-stripe':'system','birdlife-wordpress':'system','birdlife-wpengine':'system','birdlife-zapier':'system','google-workspace-expert':'system',
+  'birdlife-conga':'deep','birdlife-movedata':'deep','birdlife-payments2us':'deep','birdlife-powerbi':'deep','birdlife-sdocs':'deep',
+  'birdlife-atlassian':'connskill','birdlife-canva':'connskill','birdlife-gmail':'connskill','birdlife-google-calendar':'connskill','birdlife-granola':'connskill','birdlife-microsoft-learn':'connskill','birdlife-miro':'connskill' };
 const USES={
  'birdlife-salesforce':['Salesforce Production','Salesforce Staging'],'birdlife-ict-assistant':['Salesforce Production','Asana','Microsoft 365'],
  'birdlife-payments2us':['Salesforce Production'],'birdlife-conga':['Salesforce Production'],'birdlife-sdocs':['Salesforce Production','Salesforce Staging'],'birdlife-movedata':['Salesforce Production'],'birdlife-powerbi':['Salesforce Production'],
- 'birdlife-security':['Salesforce Production','Entra admin (desktop bridge)'],'birdlife-people-lifecycle':['Salesforce Production','Microsoft 365','Asana'],'birdlife-reporting':['Salesforce Production','Stripe','NetSuite','Microsoft 365'],
- 'birdlife-manager':['Salesforce Production','Asana'],'birdlife-improvement':['Asana'],'birdlife-asana':['Asana'],'birdlife-microsoft365':['Microsoft 365','Entra admin (desktop bridge)'],
- 'birdlife-netsuite':['NetSuite'],'birdlife-stripe':['Stripe'],'birdlife-zapier':['Zapier'],'birdlife-cloudflare':['Cloudflare'],'birdlife-wordpress':['WordPress UAT'],'birdlife-wpengine':[],
- 'google-workspace-expert':['Google Drive'],'birdlife-atlassian':['Atlassian'],'birdlife-canva':['Canva'],'birdlife-miro':['Miro'],'birdlife-granola':['Granola'],'birdlife-gmail':['Gmail'],'birdlife-google-calendar':[],'birdlife-microsoft-learn':['Microsoft Learn'],
- 'birdlife-os':['GitHub'],'birdlife-prompting':[],'email-voice':['Microsoft 365'],'morning':['Google Drive'],
+ 'birdlife-security':['Salesforce Production','Microsoft 365'],'birdlife-people-lifecycle':['Salesforce Production','Microsoft 365','Asana'],'birdlife-reporting':['Salesforce Production','Stripe','NetSuite','Microsoft 365'],
+ 'birdlife-manager':['Salesforce Production','Asana'],'birdlife-improvement':['Asana'],'birdlife-asana':['Asana'],'birdlife-microsoft365':['Microsoft 365'],
+ 'birdlife-netsuite':['NetSuite'],'birdlife-stripe':['Stripe'],'birdlife-zapier':['Zapier'],'birdlife-cloudflare':['Cloudflare'],'birdlife-wordpress':['BirdLife UAT WordPress'],
+ 'google-workspace-expert':['Google Drive'],'birdlife-atlassian':['Atlassian Rovo'],'birdlife-canva':['Canva'],'birdlife-miro':['Miro'],'birdlife-granola':['Granola'],'birdlife-gmail':['Gmail'],'birdlife-google-calendar':['Google Calendar'],'birdlife-microsoft-learn':['Microsoft Learn'],
+ 'birdlife-os':['GitHub'],'email-voice':['Microsoft 365'],'morning':['Google Drive','Google Calendar'],
 };
-for(const k in USES) for(const s of USES[k]) link(k,'sys/'+s,'reads');
-link('birdlife-os','art/BirdLife Australia console','updates');
-for(const n of N) if(n.links) for(const t of n.links) link(n.id,t,'runs on');
-for(const j of DATA.journals) link('journal/'+j,'CLAUDE.md','record');
+const MENTIONS=[[/salesforce|zeus|\bcases?\b|offboard|onboard|pre-draft/i,'Salesforce Production'],[/asana|board|membership|briefing/i,'Asana'],[/teams|sharepoint|outlook|microsoft 365|entra/i,'Microsoft 365'],[/gmail/i,'Gmail'],[/zapier/i,'Zapier'],[/stripe|refund/i,'Stripe'],[/github|repo\b|repository/i,'GitHub'],[/netsuite/i,'NetSuite'],[/wordpress|website/i,'BirdLife UAT WordPress']];
+const OS_DESC={'README.md':['OS rules','The Claude operating system: estate model, ten rules, cadence, change control, incident handling.'],'registers.md':['registers','State of record: routines, skills, connectors, artefacts, credential watchlist, memory, decisions.'],'lenses.md':['lenses','IT-GOV-004 lens model: five lenses, the IT Admin capability matrix, findings F1 to F6.'],'claude-os-overview.html':['console source','Source of the BirdLife Australia console (Jarvis).'],'birdlife-brain.html':['this map','Source of this page. It reads the repository through the viewer\u2019s GitHub connector at every open.']};
 
-// ---------- layout ----------
-const RING_R=[0,120,300,440,580];
-const rings={};
-for(const n of N){ (rings[n.ring]=rings[n.ring]||[]).push(n); }
-// order ring 2 by layer so colours cluster; ring 3 by layer; ring 4 by layer
-const order=['kernel','doctrine','os','memory','system','deep','cross','connskill','routines','decisions','live','artefacts','copy'];
-for(const r in rings){ rings[r].sort((a,b)=>order.indexOf(a.layer)-order.indexOf(b.layer)); }
-for(const r in rings){ const arr=rings[r], R=RING_R[r]; arr.forEach((n,i)=>{ const t=(i/arr.length)*Math.PI*2 - Math.PI/2; n.a=t; n.r=R; n.x=Math.cos(t)*R; n.y=Math.sin(t)*R; }); }
-const adj={}; for(const e of E){ (adj[e.a]=adj[e.a]||new Set()).add(e.b); (adj[e.b]=adj[e.b]||new Set()).add(e.a); }
+// ---------- parsing the repository ----------
+function fileText(result){
+  let text=null, sha=null;
+  for(const b of (result&&result.content||[])){
+    if(b.type==='resource' && b.resource && typeof b.resource.text==='string'){ text=b.resource.text; const m=/\/sha\/([0-9a-f]{7,40})\//.exec(b.resource.uri||''); if(m) sha=m[1]; }
+    else if(b.type==='text' && typeof b.text==='string'){ const m=/^\[Resource from [^\]]*?\/sha\/([0-9a-f]{7,40})\/[^\]]*\]\s*/.exec(b.text); if(m){ sha=m[1]; text=b.text.slice(m[0].length); } }
+  }
+  if(text===null && result && typeof result.payload==='string' && !/^successfully downloaded/i.test(result.payload)) text=result.payload;
+  return {text, sha};
+}
+function dirList(result){
+  let p=result&&result.payload; if(typeof p==='string'){ try{ p=JSON.parse(p);}catch(e){ p=null; } }
+  if(!Array.isArray(p)) for(const b of (result&&result.content||[])){ if(b.type==='text'){ try{ const j=JSON.parse(b.text); if(Array.isArray(j)){ p=j; break; } }catch(e){} } }
+  return Array.isArray(p)?p:[];
+}
+function tableAfter(md, headingRe){
+  const lines=md.split('\n'); let i=lines.findIndex(l=>headingRe.test(l)); if(i<0) return [];
+  const rows=[]; let inT=false;
+  for(i=i+1;i<lines.length;i++){ const l=lines[i]; if(/^#{2,3}\s/.test(l)) break;
+    if(/^\|/.test(l)){ if(/^\|\s*:?-{2,}/.test(l)){ inT=true; continue; } if(inT) rows.push(l.split('|').slice(1,-1).map(c=>c.trim())); }
+    else if(inT && rows.length) break; }
+  return rows;
+}
+function section(md, startRe, endRe){ const a=md.search(startRe); if(a<0) return ''; const rest=md.slice(a); const b=rest.slice(1).search(endRe); return b<0?rest:rest.slice(0,b+1); }
+const strip=s=>String(s).replace(/`/g,'').replace(/\*\*/g,'').replace(/\s+/g,' ').trim();
+const clip=(s,n)=>{ s=strip(s); return s.length>n? s.slice(0,n-1).replace(/\s\S*$/,'')+'\u2026' : s; };
+
+// ---------- graph assembly from live reads ----------
+function buildGraph(R){
+  N=[]; E=[]; byId={}; adj={}; rings={};
+  const charter=R.charter&&R.charter.text||'', index=R.index&&R.index.text||'', reg=R.registers&&R.registers.text||'';
+  const skillDesc={}; for(const row of tableAfter(charter,/^\|\s*Skill\s*\|/)){ if(row.length<2) continue; for(const m of row[0].matchAll(/`([^`]+)`/g)) skillDesc[m[1]]=strip(row[1]); }
+  const indexDesc={}; for(const l of index.split('\n')){ const m=/^\|\s*`([^`]+)`\s*\|\s*(.+?)\s*\|\s*$/.exec(l); if(m) indexDesc[m[1]]=strip(m[2]); }
+
+  add({id:'CLAUDE.md',label:'CLAUDE.md',layer:'kernel',ring:0,desc: indexDesc['CLAUDE.md']||'The charter. Identity, the operating rules, the session close rule, the skill table. Loads into every session on the repository.',path:'CLAUDE.md',file:true, present:!!charter});
+  add({id:'INDEX.md',label:'INDEX',layer:'kernel',ring:1,desc:'One line per file: what is known where.',path:'INDEX.md',file:true, present:!!index});
+  link('INDEX.md','CLAUDE.md','maps');
+  const skills=(R.skills&&R.skills.list||[]).filter(e=>e.type==='dir').map(e=>e.name);
+  if(skills.includes('birdlife-core')){ add({id:'birdlife-core',label:'birdlife-core',layer:'doctrine',ring:1,desc:skillDesc['birdlife-core']||'The doctrine underneath everything.',path:'.claude/skills/birdlife-core/SKILL.md',file:true}); link('birdlife-core','CLAUDE.md','doctrine under'); }
+  const osFiles=(R.osdir&&R.osdir.list||[]).filter(e=>e.type==='file').map(e=>e.name);
+  for(const f of osFiles){ const d=OS_DESC[f]||[f.replace(/\.(md|html)$/,''),indexDesc['os/'+f]||'File in os/.']; add({id:'os/'+f,label:d[0],layer:'os',ring:1,desc:indexDesc['os/'+f]||d[1],path:'os/'+f,file:true}); }
+  link('os/README.md','CLAUDE.md','governs'); link('os/registers.md','os/README.md','state of'); link('os/lenses.md','os/README.md','tiers'); link('os/claude-os-overview.html','os/registers.md','mirrors'); link('os/birdlife-brain.html','os/registers.md','reads');
+  add({id:'memory/README.md',label:'memory rules',layer:'memory',ring:1,desc:indexDesc['memory/README.md']||'Who writes to memory, the journal and pattern formats, no credentials, no PII.',path:'memory/README.md',file:true}); link('memory/README.md','CLAUDE.md','session close');
+
+  for(const s of skills){ if(s==='birdlife-core') continue; const layer=SKILL_LAYER[s]||'cross';
+    add({id:s,label:short(s),layer,ring:2,desc:skillDesc[s]||'Skill folder in the repository. No row in the charter\u2019s skill table yet: add one.',path:'.claude/skills/'+s+'/SKILL.md',file:true, orphan:!skillDesc[s]});
+    link(s,'birdlife-core','reads first'); }
+
+  const journals=(R.journal&&R.journal.list||[]).filter(e=>e.type==='file'&&/\.md$/.test(e.name)).map(e=>e.name.replace(/\.md$/,'')).sort();
+  for(const j of journals){ add({id:'journal/'+j,label:j,layer:'memory',ring:3,desc:'Journal for '+j+': decisions and by whom, work done, lessons, open items.',path:'memory/journal/'+j+'.md',file:true}); link('journal/'+j,'memory/README.md','entry'); link('journal/'+j,'CLAUDE.md','record'); }
+  const patterns=(R.patterns&&R.patterns.list||[]).filter(e=>e.type==='file'&&/\.md$/.test(e.name)).map(e=>e.name.replace(/\.md$/,''));
+  const PAT={salesforce:'birdlife-salesforce',website:'birdlife-wordpress','claude-estate':'birdlife-os',microsoft365:'birdlife-microsoft365',money:'birdlife-netsuite'};
+  for(const p of patterns){ add({id:'pattern/'+p,label:'pattern: '+p,layer:'memory',ring:3,desc:'Resolved problems for '+p+': symptom, cause, fix, verify, doctrine.',path:'memory/patterns/'+p+'.md',file:true}); const t=PAT[p]||('birdlife-'+p); if(byId[t]) link('pattern/'+p,t,'doctrine'); else link('pattern/'+p,'memory/README.md','pattern'); }
+
+  const adrs=(R.adrs&&R.adrs.list||[]).filter(e=>e.type==='file'&&/\.md$/.test(e.name)).map(e=>e.name.replace(/\.md$/,'')).sort();
+  for(const a of adrs){ const num=a.slice(0,4); add({id:'adr/'+a,label:'ADR '+num,layer:'decisions',ring:3,desc:'ADR '+num+': '+a.slice(5).replace(/-/g,' ')+'. Click loads the title from the file.',path:'.claude/skills/birdlife-core/references/decisions/'+a+'.md',file:true}); if(byId['birdlife-core']) link('adr/'+a,'birdlife-core','recorded in'); }
+
+  // live systems from the connector register
+  const conn=section(reg,/^## 3\. Connector register/m,/^## \d/m); const live=[]; const seen=new Set();
+  for(const m of conn.matchAll(/\*\*([^*]+)\*\*/g)){ const n=m[1].trim(); if(!seen.has(n)){ seen.add(n); live.push(n); } }
+  const also=/Also connected[^:]*:\s*([^.]+)\./.exec(conn.replace(/\n/g,' ')); if(also) for(const n of also[1].split(/,\s*/)){ const t=n.replace(/^and\s+/,'').trim(); if(t&&!seen.has(t)){ seen.add(t); live.push(t); } }
+  const LIVE_DESC={'Salesforce Production':'Zeus. The hub most systems write into. Tier 1 data, one record per approval.','Salesforce Staging':'Sandbox. Experiments and write-response shapes.','Microsoft 365':'Mail, calendar, Teams read, SharePoint. User level only; no Entra admin.','Asana':'IT Operations Project Plan. Tier 1, one task per approval.','NetSuite':'SuiteQL reads. Writes Tier 3.','Stripe':'Five livemode accounts. Read only from any page or routine.','Zapier':'Connected apps. Writes held for approval in unattended runs.','Cloudflare':'Developer Platform only. DNS and WAF are dashboard changes.','GitHub':'This repository. The executable brain, and what this page reads.','BirdLife UAT WordPress':'WooCommerce abilities on the UAT site. Say UAT.','Google Drive':'Mathew\u2019s personal account. Reaches the Claude folder, the human copy.','Gmail':'Personal account. Not BirdLife mail.'};
+  for(const n of live) add({id:'sys/'+n,label:n,layer:'live',ring:4,desc:LIVE_DESC[n]||'Connected at the claude.ai account level. Listed in the connector register.',path:'os/registers.md, section 3'});
+  for(const k in USES) for(const s of USES[k]) link(k,'sys/'+s,'reads');
+  if(byId['sys/GitHub']) link('sys/GitHub','CLAUDE.md','hosts');
+
+  // artefacts from the artefact register
+  const arts=tableAfter(reg,/^## 4\. Artefact register/m);
+  for(const row of arts){ if(row.length<3) continue; const full=strip(row[0]); const label=full.replace(/\s*\(.*$/,''); const url=/https?:\/\/\S+/.exec(row[1]); const id='art/'+label;
+    add({id,label,layer:'artefacts',ring:4,desc:clip(row[2],260)+(url?'':' No single URL: '+clip(row[1],80)),path:url?url[0]:'os/registers.md, section 4',url:url?url[0]:null,idfrag:url?url[0].split('/').pop().slice(0,8):null});
+    const src=/`(os\/[^`]+)`/.exec(row[2]); if(src&&byId[src[1]]) link(id,src[1],'published from'); }
+  if(byId['birdlife-os']){ for(const n of N) if(n.layer==='artefacts'&&/console/i.test(n.label)) link('birdlife-os',n.id,'updates'); }
+
+  // routines from the routine register
+  const active=tableAfter(reg,/^### Active recurring/m), once=tableAfter(reg,/^### One-shots/m);
+  const addRoutine=(row,oneShot)=>{ if(row.length<3) return; const name=strip(row[0]); const trig=(/trig_[A-Za-z0-9]+/.exec(row[1])||[''])[0]; const when=strip(row[2]); const notes=row[3]?strip(row[3]):''; const id='r/'+(trig||name);
+    add({id,label:oneShot?name+' (one-shot)':name,layer:'routines',ring:3,desc:(when?when+'. ':'')+clip(notes,240),path:'os/registers.md, section 1'+(trig?' \u00b7 '+trig:''),oneShot});
+    const text=name+' '+notes+' '+when; const linked=new Set();
+    for(const [re,sys] of MENTIONS) if(re.test(text)&&byId['sys/'+sys]&&!linked.has(sys)){ linked.add(sys); link(id,'sys/'+sys,'mentions'); }
+    for(const n of N) if(n.layer==='artefacts'){ if((/dashboard/i.test(text)&&/dashboard/i.test(n.label))||(/department suite/i.test(text)&&/department suite/i.test(n.label))||(n.idfrag&&text.includes(n.idfrag))||(/console/i.test(text)&&/console/i.test(n.label))) link(id,n.id,'rebuilds'); }
+    if(/audit|register|trigger list|routine/i.test(notes+' '+name)&&byId['os/registers.md']) link(id,'os/registers.md','audits'); };
+  for(const r of active) addRoutine(r,false); for(const r of once) addRoutine(r,true);
+
+  // human copy (ADR 0021)
+  add({id:'copy/gdrive',label:'Google Drive \u00b7 Claude',layer:'copy',ring:4,desc:'Mathew\u2019s personal Google Drive: documents by IT identifier, archived artifacts, and the weekly git bundle of this repository. The human copy and backup (ADR 0021).',path:'GoogleDrive/Claude'});
+  add({id:'copy/account',label:'claude.ai account skills',layer:'copy',ring:4,desc:'Account-synced copies of the skills so the app can load them without the repo. Repo wins once account content is committed.',path:'claude.ai, Skills'});
+  add({id:'copy/clone',label:'local clone',layer:'copy',ring:4,desc:'A clone on Mathew\u2019s machine outside any synced folder; desktop sessions commit and push from here (ADR 0021).',path:'C:\\src\\Birdlife'});
+  link('copy/gdrive','CLAUDE.md','backs up'); link('copy/account','CLAUDE.md','mirrors'); if(byId['sys/GitHub']) link('copy/clone','sys/GitHub','pushes to');
+
+  layout(); renderHud(R);
+  return {skills:skills.length, adrs:adrs.length, routines:active.length+once.length, live:live.length, journals:journals.length, patterns:patterns.length, artefacts:arts.length};
+}
+function layout(){
+  rings={}; for(const n of N){ (rings[n.ring]=rings[n.ring]||[]).push(n); }
+  for(const r in rings){ rings[r].sort((a,b)=>order.indexOf(a.layer)-order.indexOf(b.layer)); }
+  for(const r in rings){ const arr=rings[r], R=RING_R[r]; arr.forEach((n,i)=>{ const t=(i/arr.length)*Math.PI*2 - Math.PI/2; n.a=t; n.r=R; }); }
+  adj={}; for(const e of E){ (adj[e.a]=adj[e.a]||new Set()).add(e.b); (adj[e.b]=adj[e.b]||new Set()).add(e.a); }
+  if(sel && !byId[sel.id]) select(null); else if(sel) sel=byId[sel.id];
+  hover=null;
+}
 
 // ---------- state ----------
 const off={}; let hover=null, sel=null, query='', rot=0, zoom=1, pan={x:0,y:0};
@@ -276,17 +323,58 @@ document.getElementById('zout').onclick=()=>zoom=Math.max(.6,zoom/1.2);
 document.getElementById('zfit').onclick=()=>{zoom=1;pan={x:0,y:0};};
 function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 const insp=document.getElementById('insp'), ib=document.getElementById('ib');
-function select(n){ sel=n; if(!n){ insp.classList.remove('open'); return; } const L=LAYERS[n.layer]; insp.style.setProperty('--c',L.c); const nb=[...(adj[n.id]||[])].map(id=>byId[id]).filter(Boolean); nb.sort((a,b)=>order.indexOf(a.layer)-order.indexOf(b.layer)); ib.innerHTML='<div class="kind">'+esc(L.name)+'</div><h3>'+esc(n.label)+'</h3><p>'+esc(n.desc)+'</p><div class="path">'+esc(n.path)+'</div>'+(nb.length?'<div class="kind" style="margin-bottom:6px">Connected ('+nb.length+')</div><div class="links">'+nb.map(m=>'<button data-id="'+esc(m.id)+'" style="--c:'+LAYERS[m.layer].c+'"><i></i>'+esc(m.label)+'</button>').join('')+'</div>':''); insp.classList.add('open'); ib.querySelectorAll('button').forEach(b=>b.onclick=()=>select(byId[b.dataset.id])); }
+let mcp=null, detailSeq=0;
+function select(n){ sel=n; if(!n){ insp.classList.remove('open'); return; } const L=LAYERS[n.layer]; insp.style.setProperty('--c',L.c); const nb=[...(adj[n.id]||[])].map(id=>byId[id]).filter(Boolean); nb.sort((a,b)=>order.indexOf(a.layer)-order.indexOf(b.layer));
+  const pathHtml = n.url ? '<a href="'+esc(n.url)+'" target="_blank" rel="noopener">'+esc(n.url)+'</a>' : esc(n.path);
+  ib.innerHTML='<div class="kind">'+esc(L.name)+'</div><h3>'+esc(n.label)+'</h3><p>'+esc(n.desc)+'</p><div class="path">'+pathHtml+'</div>'+(n.file?'<div class="detail" id="detail">'+(mcp?'Reading the file\u2026':'')+'</div>':'')+(nb.length?'<div class="kind" style="margin:8px 0 6px">Connected ('+nb.length+')</div><div class="links">'+nb.map(m=>'<button data-id="'+esc(m.id)+'" style="--c:'+LAYERS[m.layer].c+'"><i></i>'+esc(m.label)+'</button>').join('')+'</div>':'');
+  insp.classList.add('open'); ib.querySelectorAll('.links button').forEach(b=>b.onclick=()=>select(byId[b.dataset.id]));
+  if(n.file && mcp){ const seq=++detailSeq; mcp.callTool(SERVER,TOOL,{owner:OWNER,repo:REPO,path:n.path,ref:'refs/heads/'+REF},{cache:{staleTime:300000}}).then(res=>{ if(seq!==detailSeq) return; const d=document.getElementById('detail'); if(!d) return; const {text}=fileText(res); if(text==null){ d.textContent='The connector answered but sent no text for this file.'; return; } const lines=text.split('\n'); const h=lines.find(l=>/^#\s/.test(l)); const body=lines.filter(l=>l.trim()&&!/^#/.test(l)&&!/^---/.test(l)&&!/^\|/.test(l)).slice(0,3).join(' '); d.innerHTML=(h?'<b>'+esc(strip(h.replace(/^#\s*/,'')))+'</b>\n':'')+esc(clip(body,380))+'\n<span style="color:var(--fg-faint)">'+lines.length+' lines \u00b7 '+(res.cache?'cached '+new Date(res.cache.storedAt).toLocaleTimeString():'read just now')+'</span>'; }).catch(err=>{ if(seq!==detailSeq) return; const d=document.getElementById('detail'); if(d) d.textContent=explain(err); }); } }
 document.getElementById('ic').onclick=()=>select(null);
 addEventListener('keydown',e=>{ if(e.key==='Escape') select(null); });
 
-// legend
-const legend=document.getElementById('legend'); const counts={}; for(const n of N) counts[n.layer]=(counts[n.layer]||0)+1;
-legend.innerHTML='<h2>Layers · click to isolate</h2>'+order.map(k=>'<button class="lg" data-k="'+k+'" style="--c:'+LAYERS[k].c+'" title="'+esc(LAYERS[k].what)+'"><i></i><span>'+esc(LAYERS[k].name)+'</span><em>'+counts[k]+'</em></button>').join('')+'<div class="foot">Drag to pan, wheel to zoom, click a node for detail. Pulses are synapses: knowledge moving between layers.</div>';
-legend.querySelectorAll('.lg').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; const anyOff=Object.values(off).some(v=>v); const onlyThis = !off[k] && Object.keys(LAYERS).filter(x=>x!==k).every(x=>off[x]); if(onlyThis){ for(const x in LAYERS) off[x]=false; } else if(!anyOff){ for(const x in LAYERS) off[x]=x!==k; } else { off[k]=!off[k]; } legend.querySelectorAll('.lg').forEach(x=>x.classList.toggle('off',!!off[x.dataset.k])); if(sel && off[sel.layer]) select(null); });
-// search
+
+// ---------- HUD ----------
+const legend=document.getElementById('legend');
+function renderHud(R){ const counts={}; for(const n of N) counts[n.layer]=(counts[n.layer]||0)+1;
+  legend.innerHTML='<h2>Layers \u00b7 click to isolate</h2>'+order.map(k=>'<button class="lg" data-k="'+k+'" style="--c:'+LAYERS[k].c+'" title="'+esc(LAYERS[k].what)+'"><i></i><span>'+esc(LAYERS[k].name)+'</span><em>'+(counts[k]||0)+'</em></button>').join('')+'<div class="foot">Drag to pan, wheel to zoom, click a node for detail. Pulses are synapses: knowledge moving between layers.</div>';
+  legend.querySelectorAll('.lg').forEach(b=>{ b.classList.toggle('off',!!off[b.dataset.k]); b.onclick=()=>{ const k=b.dataset.k; const anyOff=Object.values(off).some(v=>v); const onlyThis = !off[k] && Object.keys(LAYERS).filter(x=>x!==k).every(x=>off[x]); if(onlyThis){ for(const x in LAYERS) off[x]=false; } else if(!anyOff){ for(const x in LAYERS) off[x]=x!==k; } else { off[k]=!off[k]; } legend.querySelectorAll('.lg').forEach(x=>x.classList.toggle('off',!!off[x.dataset.k])); if(sel && off[sel.layer]) select(null); }; }); }
 document.getElementById('q').addEventListener('input',e=>{ query=e.target.value.trim().toLowerCase(); });
-// header
-document.getElementById('sub').innerHTML='<b>'+N.length+'</b> nodes, <b>'+E.length+'</b> synapses. '+DATA.skills.length+' skills, '+DATA.adrs.length+' decisions, '+ROUT.length+' routines, '+LIVE.length+' live systems. The repository is the brain; everything here is a file in it or a system it reaches.';
-document.getElementById('status').innerHTML='<b>'+N.length+'</b> nodes · <b>'+E.length+'</b> synapses · as at 12 Sep 2026 · commit 8036c72';
+const statusEl=document.getElementById('status'), subEl=document.getElementById('sub'), bannerEl=document.getElementById('banner'), refEl=document.getElementById('ref');
+function banner(title, html){ if(!title){ bannerEl.hidden=true; return; } bannerEl.innerHTML='<h4>'+esc(title)+'</h4>'+html+'<button class="dismiss" type="button">Dismiss</button>'; bannerEl.hidden=false; bannerEl.querySelector('.dismiss').onclick=()=>{ bannerEl.hidden=true; }; }
+function explain(err){ const c=err&&err.code||'upstream_error'; const M={
+  needs_reauth:'GitHub needs reconnecting: claude.ai Settings, Connectors.', server_not_connected:'Add the GitHub connector in claude.ai Settings, Connectors, then reload.', selection_required:'More than one GitHub connector is connected; choose one when claude.ai asks, then reload.',
+  not_in_manifest:'This page was not allowed to use GitHub for this view. Allow it when asked, or in the page\u2019s connector settings.', blocked_by_policy:'Organisation policy blocks this GitHub tool for you.', approval_required:'Organisation policy wants per-call approval, which pages cannot do yet.',
+  tool_error:'GitHub answered with an error: '+(err.message||'')+' Check the branch name.', server_unavailable:'GitHub did not answer in time. Reload in a moment.', rate_limited:'Too many reads in a short time. Wait a little, then reload.', consent_required:'Allow this page to use GitHub, then reload.', not_granted:'This view has no connector access.', capability_disabled:'This view cannot run connectors.' };
+  return M[c]||('GitHub read failed ('+c+'). '+(err&&err.message||'')); }
+
+// ---------- live loading ----------
+function getRef(){ const u=new URL(location.href).searchParams.get('ref'); if(u) return u; try{ return localStorage.getItem('brain.ref')||DEFAULT_REF; }catch(e){ return DEFAULT_REF; } }
+let REF=getRef(); refEl.value=REF;
+const results={}, errors={}; let unsubs=[], rebuildTimer=null, headSha=null, loadedAt=null;
+function offlineGraph(){ buildGraph({}); subEl.innerHTML='Structural view only. Nothing has been read from the repository.'; }
+function scheduleRebuild(){ clearTimeout(rebuildTimer); rebuildTimer=setTimeout(rebuild,180); }
+function rebuild(){
+  const R={}; for(const k in READS){ const r=results[k]; if(!r) continue; R[k]= READS[k].kind==='file' ? fileText(r) : {list:dirList(r)}; if(R[k].sha) headSha=R[k].sha; if(r.cache&&r.cache.storedAt) loadedAt=Math.max(loadedAt||0,r.cache.storedAt); }
+  const have=Object.keys(R).length, want=Object.keys(READS).length; const stats=buildGraph(R);
+  const failed=Object.keys(errors).filter(k=>!results[k]);
+  subEl.innerHTML='<b>'+N.length+'</b> nodes, <b>'+E.length+'</b> synapses, read live from GitHub. '+stats.skills+' skills, '+stats.adrs+' decisions, '+stats.routines+' routines, '+stats.live+' live systems, '+stats.journals+' journal days, '+stats.artefacts+' artefacts.'+(failed.length?' <b>'+failed.length+' of '+want+' reads failed</b>: '+failed.map(k=>READS[k].path).join(', ')+'.':'');
+  statusEl.innerHTML='<b>'+N.length+'</b> nodes \u00b7 <b>'+E.length+'</b> synapses \u00b7 live \u00b7 '+esc(REF)+(headSha?' @ '+headSha.slice(0,7):'')+' \u00b7 '+(loadedAt?'read '+new Date(loadedAt).toLocaleTimeString():'read just now')+(have<want?' \u00b7 '+have+'/'+want+' reads':'');
+  const codes=[...new Set(failed.map(k=>errors[k].code))]; if(failed.length===want && codes.length===1) banner('Cannot read the repository', '<p>'+esc(explain(errors[failed[0]]))+'</p><p>Branch: <code>'+esc(REF)+'</code></p>'); else if(failed.length) { const e=errors[failed[0]]; if(/needs_reauth|server_not_connected|selection_required|consent_required|not_in_manifest/.test(e.code)) banner('GitHub is not answering', '<p>'+esc(explain(e))+'</p>'); }
+}
+function watchAll(){
+  for(const u of unsubs) u(); unsubs=[]; for(const k in READS){ delete results[k]; delete errors[k]; } headSha=null; loadedAt=null; banner(null);
+  statusEl.innerHTML='Reading <b>'+esc(REF)+'</b> from GitHub\u2026';
+  for(const k in READS){ const d=READS[k]; const input={owner:OWNER,repo:REPO,path:d.path,ref:'refs/heads/'+REF}; if(d.kind==='dir') input.fields=['name','type','path','size'];
+    unsubs.push(mcp.watchTool(SERVER,TOOL,input,ev=>{ if(ev.type==='data'){ results[k]=ev.result; delete errors[k]; } else { errors[k]=ev.error; if(/needs_reauth|server_not_connected|blocked_by_policy|approval_required|not_in_manifest|consent_required/.test(ev.error.code)) delete results[k]; } scheduleRebuild(); },{cache:{staleTime:60000,gcTime:3600000},refetchInterval:300000})); }
+}
+document.getElementById('reload').onclick=()=>{ const v=refEl.value.trim(); if(v && v!==REF){ REF=v; try{ localStorage.setItem('brain.ref',REF); }catch(e){} } if(!mcp){ offlineGraph(); return; } mcp.invalidate(SERVER,TOOL).catch(()=>{}).then(watchAll); };
+refEl.addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('reload').click(); });
+
+offlineGraph(); statusEl.innerHTML='Connecting to GitHub\u2026';
+(async()=>{
+  if(!window.claude || typeof window.claude.use!=='function'){ statusEl.innerHTML='Not inside claude.ai: nothing can be read.'; banner('Open this page in claude.ai','<p>The map reads the repository through your GitHub connector. A saved copy or another host has no connector, so only the structure shows.</p>'); return; }
+  mcp=await window.claude.use('mcp');
+  if(!mcp){ statusEl.innerHTML='No connector access in this view.'; banner('Connectors are not available here','<p>This view cannot run the GitHub connector, so the repository has not been read. Open the artifact in claude.ai and allow GitHub when asked.</p>'); return; }
+  watchAll();
+})();
 </script>
