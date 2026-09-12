@@ -61,6 +61,8 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(17px,2.6vw,26px);m
 .banner h4{margin:0 0 6px;font-family:var(--display);font-weight:400;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--holo)}
 .banner p{margin:0 0 6px}
 .banner code{font-family:var(--mono);font-size:12px;color:var(--gold)}
+.banner .row{display:flex;gap:6px;flex-wrap:wrap}
+.banner pre{font-family:var(--mono);font-size:11px;color:var(--fg-dim);white-space:pre-wrap;word-break:break-word;margin:10px 0 0;max-height:200px;overflow:auto;border-top:1px solid var(--line);padding-top:8px}
 .banner .dismiss{margin-top:8px;font:inherit;font-size:12px;background:transparent;border:1px solid var(--line);color:var(--fg);padding:4px 10px;cursor:pointer}
 .inspector .detail{border-top:1px solid var(--line);padding-top:8px;margin-top:4px;color:var(--fg-dim);font-size:12.5px;white-space:pre-wrap;word-break:break-word}
 .inspector .detail b{color:var(--fg);font-weight:500}
@@ -127,7 +129,7 @@ function add(n){ N.push(n); byId[n.id]=n; return n; }
 function link(a,b,label){ if(byId[a]&&byId[b]&&a!==b) E.push({a,b,label}); }
 
 // ---------- what the repository is read for ----------
-const OWNER='mathewruahema-beep', REPO='Birdlife', SERVER='github', TOOL='get_file_contents';
+const OWNER='mathewruahema-beep', REPO='Birdlife', SERVER='GitHub', TOOL='get_file_contents';
 const DEFAULT_REF='claude/birdlife-brain-build-02zobt';
 const READS={
   charter:  {path:'CLAUDE.md', kind:'file', why:'the charter and its skill table'},
@@ -340,11 +342,16 @@ function renderHud(R){ const counts={}; for(const n of N) counts[n.layer]=(count
   legend.querySelectorAll('.lg').forEach(b=>{ b.classList.toggle('off',!!off[b.dataset.k]); b.onclick=()=>{ const k=b.dataset.k; const anyOff=Object.values(off).some(v=>v); const onlyThis = !off[k] && Object.keys(LAYERS).filter(x=>x!==k).every(x=>off[x]); if(onlyThis){ for(const x in LAYERS) off[x]=false; } else if(!anyOff){ for(const x in LAYERS) off[x]=x!==k; } else { off[k]=!off[k]; } legend.querySelectorAll('.lg').forEach(x=>x.classList.toggle('off',!!off[x.dataset.k])); if(sel && off[sel.layer]) select(null); }; }); }
 document.getElementById('q').addEventListener('input',e=>{ query=e.target.value.trim().toLowerCase(); });
 const statusEl=document.getElementById('status'), subEl=document.getElementById('sub'), bannerEl=document.getElementById('banner'), refEl=document.getElementById('ref');
-function banner(title, html){ if(!title){ bannerEl.hidden=true; return; } bannerEl.innerHTML='<h4>'+esc(title)+'</h4>'+html+'<button class="dismiss" type="button">Dismiss</button>'; bannerEl.hidden=false; bannerEl.querySelector('.dismiss').onclick=()=>{ bannerEl.hidden=true; }; }
+function banner(title, html){ if(!title){ bannerEl.hidden=true; return; } bannerEl.innerHTML='<h4>'+esc(title)+'</h4>'+html+'<div class="row"><button class="dismiss" type="button" id="bconnect">Connect GitHub</button><button class="dismiss" type="button" id="bdiag">Diagnose</button><button class="dismiss" type="button">Dismiss</button></div><pre id="diag" hidden></pre>'; bannerEl.hidden=false; bannerEl.querySelectorAll('.dismiss').forEach(b=>{ if(!b.id) b.onclick=()=>{ bannerEl.hidden=true; }; }); document.getElementById('bconnect').onclick=connectGitHub; document.getElementById('bdiag').onclick=diagnose; }
+async function connectGitHub(){ if(!window.claude||!window.claude.use){ return; } const perms=await window.claude.use('permissions'); if(perms&&perms.request){ try{ await perms.request(['mcp:'+SERVER]); }catch(e){} } if(mcp) watchAll(); else { mcp=await window.claude.use('mcp'); if(mcp) watchAll(); } }
+async function diagnose(){ const out=[]; try{ const perms=window.claude&&window.claude.use? await window.claude.use('permissions'):null; if(perms){ const st=await perms.state('mcp:'+SERVER).catch(()=>'unavailable'); out.push('permission mcp:'+SERVER+' = '+st); } }catch(e){ out.push('permissions: '+(e&&e.message||e)); }
+  if(!mcp) out.push('mcp namespace: not available in this view'); else { try{ const lt=await mcp.listTools(); if(!lt.servers.length) out.push('connectors reachable: none'); for(const sv of lt.servers) out.push('connector "'+sv.server+'": auth '+sv.authStatus+', tools '+(sv.tools.map(t=>t.name).join(', ')||'none')); }catch(e){ out.push('listTools: '+(e.code||'')+' '+(e.message||'')); } }
+  out.push('branch: '+REF); for(const k in READS){ if(errors[k]) out.push('read '+READS[k].path+': '+errors[k].code+' '+(errors[k].message||'').slice(0,160)); else if(results[k]) out.push('read '+READS[k].path+': ok'+(READS[k].kind==='file'&&fileText(results[k]).text==null?' but no text decoded (blocks: '+(results[k].content||[]).map(b=>b.type).join(',')+')':'')); else out.push('read '+READS[k].path+': pending'); }
+  const d=document.getElementById('diag'); if(d){ d.textContent=out.join('\n'); d.hidden=false; } }
 function explain(err){ const c=err&&err.code||'upstream_error'; const M={
   needs_reauth:'GitHub needs reconnecting: claude.ai Settings, Connectors.', server_not_connected:'Add the GitHub connector in claude.ai Settings, Connectors, then reload.', selection_required:'More than one GitHub connector is connected; choose one when claude.ai asks, then reload.',
   not_in_manifest:'This page was not allowed to use GitHub for this view. Allow it when asked, or in the page\u2019s connector settings.', blocked_by_policy:'Organisation policy blocks this GitHub tool for you.', approval_required:'Organisation policy wants per-call approval, which pages cannot do yet.',
-  tool_error:'GitHub answered with an error: '+(err.message||'')+' Check the branch name.', server_unavailable:'GitHub did not answer in time. Reload in a moment.', rate_limited:'Too many reads in a short time. Wait a little, then reload.', consent_required:'Allow this page to use GitHub, then reload.', not_granted:'This view has no connector access.', capability_disabled:'This view cannot run connectors.' };
+  tool_error: /404/.test(err.message||'') ? 'GitHub says 404 for this repository or branch. The repository is private, so the Claude GitHub app on the mathewruahema-beep account must be granted access to Birdlife: GitHub, Settings, Applications, Installed GitHub Apps, the Claude app, Repository access. Then Reload.' : 'GitHub answered with an error: '+(err.message||'')+' Check the branch name.', server_unavailable:'GitHub did not answer in time. Reload in a moment.', rate_limited:'Too many reads in a short time. Wait a little, then reload.', consent_required:'Allow this page to use GitHub, then reload.', not_granted:'This view has no connector access.', capability_disabled:'This view cannot run connectors.' };
   return M[c]||('GitHub read failed ('+c+'). '+(err&&err.message||'')); }
 
 // ---------- live loading ----------
@@ -359,7 +366,7 @@ function rebuild(){
   const failed=Object.keys(errors).filter(k=>!results[k]);
   subEl.innerHTML='<b>'+N.length+'</b> nodes, <b>'+E.length+'</b> synapses, read live from GitHub. '+stats.skills+' skills, '+stats.adrs+' decisions, '+stats.routines+' routines, '+stats.live+' live systems, '+stats.journals+' journal days, '+stats.artefacts+' artefacts.'+(failed.length?' <b>'+failed.length+' of '+want+' reads failed</b>: '+failed.map(k=>READS[k].path).join(', ')+'.':'');
   statusEl.innerHTML='<b>'+N.length+'</b> nodes \u00b7 <b>'+E.length+'</b> synapses \u00b7 live \u00b7 '+esc(REF)+(headSha?' @ '+headSha.slice(0,7):'')+' \u00b7 '+(loadedAt?'read '+new Date(loadedAt).toLocaleTimeString():'read just now')+(have<want?' \u00b7 '+have+'/'+want+' reads':'');
-  const codes=[...new Set(failed.map(k=>errors[k].code))]; if(failed.length===want && codes.length===1) banner('Cannot read the repository', '<p>'+esc(explain(errors[failed[0]]))+'</p><p>Branch: <code>'+esc(REF)+'</code></p>'); else if(failed.length) { const e=errors[failed[0]]; if(/needs_reauth|server_not_connected|selection_required|consent_required|not_in_manifest/.test(e.code)) banner('GitHub is not answering', '<p>'+esc(explain(e))+'</p>'); }
+  const codes=[...new Set(failed.map(k=>errors[k].code))]; if(failed.length===want && codes.length===1) banner('Cannot read the repository', '<p>'+esc(explain(errors[failed[0]]))+'</p><p>Branch: <code>'+esc(REF)+'</code></p>'); else if(failed.length) { const e=errors[failed[0]]; banner('Some reads failed', '<p>'+esc(explain(e))+'</p><p>Failed: '+esc(failed.map(k=>READS[k].path).join(', '))+'</p>'); }
 }
 function watchAll(){
   for(const u of unsubs) u(); unsubs=[]; for(const k in READS){ delete results[k]; delete errors[k]; } headSha=null; loadedAt=null; banner(null);
@@ -370,7 +377,7 @@ function watchAll(){
 document.getElementById('reload').onclick=()=>{ const v=refEl.value.trim(); if(v && v!==REF){ REF=v; try{ localStorage.setItem('brain.ref',REF); }catch(e){} } if(!mcp){ offlineGraph(); return; } mcp.invalidate(SERVER,TOOL).catch(()=>{}).then(watchAll); };
 refEl.addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('reload').click(); });
 
-offlineGraph(); statusEl.innerHTML='Connecting to GitHub\u2026';
+offlineGraph(); statusEl.innerHTML='Connecting to GitHub\u2026'; statusEl.onclick=()=>{ if(bannerEl.hidden) banner('Connection', '<p>Branch <code>'+esc(REF)+'</code>. Press Diagnose to see what the page can reach.</p>'); };
 (async()=>{
   if(!window.claude || typeof window.claude.use!=='function'){ statusEl.innerHTML='Not inside claude.ai: nothing can be read.'; banner('Open this page in claude.ai','<p>The map reads the repository through your GitHub connector. A saved copy or another host has no connector, so only the structure shows.</p>'); return; }
   mcp=await window.claude.use('mcp');

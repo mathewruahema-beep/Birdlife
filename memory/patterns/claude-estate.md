@@ -44,3 +44,10 @@ Seeded 11 Sep 2026 from `os/registers.md`; doctrine in `birdlife-os` and
 - **Fix**: GitHub, repository Settings, General, Danger Zone, Change visibility, Private; Settings, Pages, disable; prune unrelated branches. Mathew's click; no session tool changes visibility. Then treat the exposure window as a leaked document under `birdlife-security`.
 - **Verify**: the GitHub search API reports `"private": true`; the weekly audit adds a visibility check.
 - **Doctrine**: ADR 0021; `birdlife-security`, leaked credential playbook.
+
+### A published page cannot reach GitHub even though the session can
+- **Seen**: 12 Sep 2026, the brain map's first live version
+- **Cause**: the page's connector manifest named `github`, the lowercase tool prefix of Claude Code's built-in GitHub integration. That integration exists only inside remote sessions; a published page can call only the viewer's claude.ai connectors, whose GitHub connector is `GitHub`. A second cause stacked on top: the repository had just been made private and the connector's GitHub App had no access to it (404 on the repository).
+- **Fix**: manifest and page name `GitHub`; Mathew grants the Claude GitHub App repository access to Birdlife in GitHub Settings, Applications.
+- **Verify**: the page's Diagnose panel lists connector "GitHub" with auth connected and every read "ok"; the header counts match the registers.
+- **Doctrine**: `birdlife-os`, console and artefact rules; artefact register row for the map.
