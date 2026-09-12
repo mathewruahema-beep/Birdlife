@@ -64,6 +64,7 @@ Facts file first, prose second, when a value changes.
 | `os/registers.md` | Routine register (trigger IDs, schedules, retirements), skill register, connector register, artefact register (URLs), credential watchlist, memory register |
 | `os/lenses.md` | IT-GOV-004 lens model: five lenses, the IT Admin capability matrix (22 systems, verified 8 Sep 2026), findings F1 to F6 |
 | `os/claude-os-overview.html` | Source of the BirdLife Australia console (Jarvis) with the Lens tab (8 Sep 2026); published artifact URL is in the artefact register |
+| `os/birdlife-brain.html` | Source of The BirdLife Brain map (i, Robot style neural view of every skill, ADR, routine, system and artefact, coloured by layer; 12 Sep 2026); published artifact URL is in the artefact register. Data is baked in, rebuild after estate changes |
 
 ## Routines (`routines/`)
 

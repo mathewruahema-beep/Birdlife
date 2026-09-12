@@ -1,0 +1,292 @@
+<title>The BirdLife Brain</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#04070e; --ground-2:#080d18; --line:rgba(53,215,255,.14); --fg:#d9e6f5; --fg-dim:#7f93ad; --fg-faint:#4a5b73;
+  --holo:#35d7ff; --gold:#ffd66b; --violet:#b48cff; --blue:#4d8dff; --teal:#2ee6c5; --green:#6fe38a; --amber:#ffa63d;
+  --magenta:#ff5fb7; --orange:#ff7a45; --coral:#ff5c5c; --pink:#f08cff; --lime:#c8f04c; --slate:#8aa4c8;
+  --display:'Michroma','Orbitron','Segoe UI',sans-serif; --body:'Instrument Sans','Segoe UI',system-ui,sans-serif; --mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--fg);font-family:var(--body);font-size:14px;line-height:1.45;overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;display:block;touch-action:none;cursor:grab}
+#stage.grabbing{cursor:grabbing}
+.hud{position:fixed;pointer-events:none;z-index:2}
+.hud > *{pointer-events:auto}
+.hud-top{top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:18px 20px;gap:16px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;gap:6px;max-width:min(520px,80vw)}
+.eyebrow{font-family:var(--display);font-size:10px;letter-spacing:.28em;color:var(--holo);text-transform:uppercase;opacity:.85}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(17px,2.6vw,26px);margin:0;letter-spacing:.06em;color:#eaf6ff;text-shadow:0 0 18px rgba(53,215,255,.45);text-wrap:balance}
+.sub{color:var(--fg-dim);font-size:13px;max-width:52ch}
+.sub b{color:var(--fg);font-weight:500}
+.search{display:flex;align-items:center;gap:8px;background:rgba(8,13,24,.82);border:1px solid var(--line);padding:8px 12px;backdrop-filter:blur(6px)}
+.search label{font-family:var(--display);font-size:9px;letter-spacing:.22em;color:var(--fg-dim);text-transform:uppercase}
+.search input{background:transparent;border:0;color:var(--fg);font-family:var(--mono);font-size:13px;width:200px;outline:none}
+.search input::placeholder{color:var(--fg-faint)}
+.search input:focus{box-shadow:0 1px 0 var(--holo)}
+.legend{left:20px;bottom:20px;display:flex;flex-direction:column;gap:2px;background:rgba(8,13,24,.82);border:1px solid var(--line);padding:12px 14px;backdrop-filter:blur(6px);max-height:min(62vh,560px);overflow:auto;width:230px;max-width:calc(100vw - 40px)}
+.legend h2{font-family:var(--display);font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--fg-dim);margin:0 0 8px;font-weight:400}
+.lg{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:center;padding:5px 4px;border:0;background:transparent;color:var(--fg);font:inherit;font-size:12.5px;text-align:left;cursor:pointer;border-radius:2px}
+.lg:hover,.lg:focus-visible{background:rgba(53,215,255,.08);outline:none}
+.lg:focus-visible{box-shadow:inset 0 0 0 1px var(--holo)}
+.lg.off{opacity:.38}
+.lg i{width:9px;height:9px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c);justify-self:center}
+.lg em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--fg-dim);font-variant-numeric:tabular-nums}
+.legend .foot{margin-top:8px;font-size:11px;color:var(--fg-faint);border-top:1px solid var(--line);padding-top:8px}
+.inspector{right:20px;bottom:20px;width:320px;max-width:calc(100vw - 40px);background:rgba(8,13,24,.88);border:1px solid var(--line);border-top:2px solid var(--c,var(--holo));padding:14px 16px 16px;backdrop-filter:blur(6px);max-height:min(62vh,560px);overflow:auto;display:none}
+.inspector.open{display:block}
+.inspector .kind{font-family:var(--display);font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--c,var(--holo))}
+.inspector h3{font-family:var(--mono);font-weight:500;font-size:15px;margin:6px 0 8px;color:#eaf6ff;word-break:break-word}
+.inspector p{margin:0 0 10px;color:var(--fg);font-size:13px}
+.inspector .path{font-family:var(--mono);font-size:11px;color:var(--fg-dim);word-break:break-all;margin-bottom:10px}
+.inspector .links{display:flex;flex-wrap:wrap;gap:6px}
+.inspector .links button{font:inherit;font-size:11.5px;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--fg);padding:3px 8px;cursor:pointer;border-radius:2px;display:inline-flex;align-items:center;gap:6px}
+.inspector .links button i{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 6px var(--c)}
+.inspector .links button:hover,.inspector .links button:focus-visible{border-color:var(--holo);outline:none}
+.inspector .close{position:absolute;top:8px;right:10px;background:transparent;border:0;color:var(--fg-dim);font-size:18px;cursor:pointer;line-height:1}
+.inspector{position:fixed}
+.status{left:50%;bottom:20px;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--fg-dim);background:rgba(8,13,24,.7);border:1px solid var(--line);padding:6px 12px;white-space:nowrap}
+.status b{color:var(--holo);font-weight:500}
+.tip{position:fixed;z-index:3;pointer-events:none;background:rgba(8,13,24,.94);border:1px solid var(--line);border-left:2px solid var(--c,var(--holo));padding:7px 10px;font-size:12px;max-width:260px;display:none;color:var(--fg)}
+.tip .k{font-family:var(--display);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--c,var(--holo));display:block;margin-bottom:2px}
+.tip .n{font-family:var(--mono);font-size:12.5px;color:#eaf6ff}
+.ctl{position:fixed;right:20px;top:calc(50% - 60px);display:flex;flex-direction:column;gap:6px;z-index:2}
+.ctl button{width:34px;height:34px;background:rgba(8,13,24,.82);border:1px solid var(--line);color:var(--fg);font-family:var(--mono);font-size:16px;cursor:pointer}
+.ctl button:hover,.ctl button:focus-visible{border-color:var(--holo);color:var(--holo);outline:none}
+@media (max-width:720px){
+  .hud-top{padding:12px 14px}
+  .search input{width:130px}
+  .legend{width:auto;left:12px;right:12px;bottom:12px;max-height:38vh;flex-direction:row;flex-wrap:wrap;gap:0 10px;padding:10px}
+  .legend h2{width:100%}
+  .lg{grid-template-columns:10px 1fr auto;font-size:11.5px;padding:3px 4px}
+  .legend .foot{display:none}
+  .inspector{left:12px;right:12px;width:auto;bottom:12px;max-height:52vh;z-index:4}
+  .status{display:none}
+  .ctl{right:12px;top:auto;bottom:calc(38vh + 24px)}
+}
+@media (prefers-reduced-motion:reduce){ .pulse-hint{display:none} }
+</style>
+
+<canvas id="stage" aria-label="The BirdLife Brain: a radial network of the kernel, doctrine, thirty-three skills, memory, decisions, routines, live systems and artefacts, coloured by layer" role="img"></canvas>
+
+<div class="hud hud-top">
+  <div class="brand">
+    <span class="eyebrow">BirdLife Australia · ICT · Claude estate</span>
+    <h1>The BirdLife Brain</h1>
+    <div class="sub" id="sub"></div>
+  </div>
+  <div class="search"><label for="q">Find</label><input id="q" type="search" placeholder="skill, system, ADR, routine" autocomplete="off"></div>
+</div>
+
+<div class="hud legend" id="legend" aria-label="Layers"></div>
+<div class="ctl"><button id="zin" title="Zoom in" aria-label="Zoom in">+</button><button id="zout" title="Zoom out" aria-label="Zoom out">−</button><button id="zfit" title="Reset view" aria-label="Reset view">⌂</button></div>
+<div class="inspector" id="insp" role="dialog" aria-label="Node detail"><button class="close" id="ic" aria-label="Close">×</button><div id="ib"></div></div>
+<div class="status" id="status"></div>
+<div class="tip" id="tip"></div>
+
+<script>
+const DATA = {"skills": [{"id": "birdlife-asana", "layer": "system", "desc": "Expert operator knowledge for BirdLife Australia's Asana workspace \u2014 the IT Operations Project Plan, the Salesforce Case email rule and its SPF blocker, the Better Impact.", "facts": true}, {"id": "birdlife-atlassian", "layer": "connskill", "desc": "Operator knowledge for BirdLife Australia's Atlassian site (birdlife-ict.atlassian.net) \u2014 the ICT Confluence space, personal-space sprawl, what the Rovo connector can rea.", "facts": false}, {"id": "birdlife-canva", "layer": "connskill", "desc": "Operator knowledge for BirdLife Australia's Canva account \u2014 the flagship brand kit and campaign kits, brand template autofill, and safe use for ICT and campaign collatera.", "facts": false}, {"id": "birdlife-cloudflare", "layer": "system", "desc": "Operator knowledge for BirdLife Australia's Cloudflare estate \u2014 two accounts, CDN/DNS/proxy role in front of WP Engine, what the connected MCP can and cannot do, and wher.", "facts": true}, {"id": "birdlife-conga", "layer": "deep", "desc": "Expert operator knowledge for Conga Composer 8 and Conga Batch in BirdLife Australia's Salesforce org (Zeus) - the 17 live scheduled batches behind every receipt and rene.", "facts": false}, {"id": "birdlife-core", "layer": "doctrine", "desc": "The operating doctrine for every BirdLife Australia session, which layer of knowledge wins when two sources disagree, how to tell a live fact from a durable one, the writ.", "facts": true}, {"id": "birdlife-gmail", "layer": "connskill", "desc": "Operator knowledge for the personal Gmail account connected to this workspace \u2014 why it is NOT BirdLife mail, the boundary between personal and work correspondence, and sa.", "facts": false}, {"id": "birdlife-google-calendar", "layer": "connskill", "desc": "Operator knowledge for the personal Google Calendar connected to this workspace \u2014 why BirdLife scheduling belongs in Outlook, and safe use of the Google calendar tools.", "facts": false}, {"id": "birdlife-granola", "layer": "connskill", "desc": "Operator knowledge for BirdLife Australia's Granola meeting-notes workspace \u2014 scope of note access, overlap with Zoom and Teams transcripts, and safe handling of meeting .", "facts": false}, {"id": "birdlife-ict-assistant", "layer": "cross", "desc": "BirdLife Australia's ICT helpdesk assistant for working Salesforce \"Ask Zeus\" Cases and the Asana \"IT Operations Project Plan\".", "facts": true}, {"id": "birdlife-improvement", "layer": "cross", "desc": "The continuous-improvement loop for BirdLife Australia ICT: how a session or the console watches processes (queue patterns, board drift, money gaps, security posture, inc.", "facts": false}, {"id": "birdlife-manager", "layer": "cross", "desc": "The weekly ICT manager review for Mathew Hema at BirdLife Australia, run from live evidence (Asana IT Operations Project Plan, Zeus Case queue, routine health, the securi.", "facts": false}, {"id": "birdlife-microsoft-learn", "layer": "connskill", "desc": "Operator knowledge for using the Microsoft Learn documentation connector to ground Azure, Entra, Intune, Defender, Graph, Power Automate, Logic Apps and Business Central .", "facts": false}, {"id": "birdlife-microsoft365", "layer": "system", "desc": "Expert operator knowledge for BirdLife Australia's Microsoft 365 and Entra ID tenant \u2014 Conditional Access, MFA remediation, privileged accounts, Intune, Defender, Essenti.", "facts": true}, {"id": "birdlife-miro", "layer": "connskill", "desc": "Operator knowledge for BirdLife Australia's Miro workspace \u2014 the empty-spaces state, what the connector can build (diagrams, canvases, tables, prototypes), and where Miro.", "facts": false}, {"id": "birdlife-movedata", "layer": "deep", "desc": "Expert operator knowledge for MoveData at BirdLife Australia: the pipeline phase model, platform keys, extension Flow authoring, the live Zeus configuration and its eight.", "facts": false}, {"id": "birdlife-netsuite", "layer": "system", "desc": "Expert operator knowledge for BirdLife Australia's NetSuite OneWorld ERP \u2014 chart of accounts, subsidiary and segmentation model, saved searches, SuiteQL, the Salesforce-t.", "facts": true}, {"id": "birdlife-os", "layer": "cross", "desc": "The operating system for managing the Claude estate at BirdLife Australia: routines, skills, connectors, artefacts, the Jarvis console, and the lens model (IT Admin live;.", "facts": false}, {"id": "birdlife-payments2us", "layer": "deep", "desc": "Expert operator and deep technical knowledge for Payments2Us (AAkPay) in BirdLife Australia's Salesforce org (Zeus): the licence deadline, live configuration, the full au.", "facts": false}, {"id": "birdlife-people-lifecycle", "layer": "cross", "desc": "The joiner, mover and leaver process for BirdLife Australia staff and contractors across every system (Employment Hero, Entra ID/M365, Salesforce, NetSuite, Asana, WordPr.", "facts": false}, {"id": "birdlife-powerbi", "layer": "deep", "desc": "Operator knowledge for Power BI and Fabric at BirdLife Australia: the unbuilt 2025 scoping backlog, the Zeus data model traps that make reports lie, the definitions to ag.", "facts": false}, {"id": "birdlife-prompting", "layer": "cross", "desc": "Rewrite and challenge every BirdLife Australia prompt into the six-line frame (Outcome, Evidence, Tier, Deliver, People, Done) using the context of the system in play, ro.", "facts": false}, {"id": "birdlife-reporting", "layer": "cross", "desc": "How BirdLife Australia's ICT reports get written from live data in Mathew Hema's voice: the report library (weekly ICT status, money state, security posture, executive br.", "facts": false}, {"id": "birdlife-salesforce", "layer": "system", "desc": "Expert operator knowledge for BirdLife Australia's Salesforce org (\"Zeus\") \u2014 NPSP/Household model, Payments2Us, Conga, miniOrange/WooCommerce sync, Raisely/MoveData, Pard.", "facts": true}, {"id": "birdlife-sdocs", "layer": "deep", "desc": "Expert operator knowledge for configuring, administering and using S-Docs and S-Sign in BirdLife Australia's Salesforce org, and for replacing the live Conga Composer and.", "facts": false}, {"id": "birdlife-security", "layer": "cross", "desc": "BirdLife Australia's security posture, deadline register, identity capability baseline and incident playbooks across the whole estate (Entra/M365, Salesforce, WordPress, .", "facts": false}, {"id": "birdlife-stripe", "layer": "system", "desc": "Operator knowledge for BirdLife Australia's five livemode Stripe accounts (eCommerce, Memberships, Ausbirdfund, BLP, eStore/AOC), how payments flow through WooCommerce in.", "facts": true}, {"id": "birdlife-wordpress", "layer": "system", "desc": "Expert web developer and operator knowledge for BirdLife Australia's WordPress estate on WP Engine: the custom BirdLife theme architecture (SCSS build, ACF blocks, 20 CPT.", "facts": true}, {"id": "birdlife-wpengine", "layer": "system", "desc": "Expert operator knowledge for BirdLife Australia's WP Engine account: every User Portal area and what it controls, the five caching layers, network tiers and Web Rules, t.", "facts": false}, {"id": "birdlife-zapier", "layer": "system", "desc": "Operator knowledge for BirdLife Australia's Zapier account \u2014 the 17 connected apps and their credentials, the unpublished unreconciled-income exception report, the LearnU.", "facts": true}, {"id": "email-voice", "layer": "cross", "desc": "Mathew Hema's email voice for his BirdLife Australia Outlook account (mathew.hema@birdlife.org.au).", "facts": true}, {"id": "google-workspace-expert", "layer": "system", "desc": "Expert operator knowledge for Google Workspace administration and for BirdLife Australia's tenant (C01muaswh) specifically: the admin model, how to read live state throug.", "facts": false}, {"id": "morning", "layer": "cross", "desc": "Render the user's morning brief as a styled HTML artifact, or set it up as a recurring weekday task.", "facts": false}], "adrs": [{"id": "0001-security-framework", "title": "ADR 0001: Anchor the security programme to ACSC Essential Eight with a SaaS/identity overlay"}, {"id": "0002-approve-only-automation", "title": "ADR 0002: Approve-only automation for identity and offboarding"}, {"id": "0003-first-three-systems", "title": "ADR 0003: Salesforce, Asana and Office 365 as the first connected systems"}, {"id": "0004-knowledge-architecture", "title": "ADR 0004: Four-layer knowledge architecture with an explicit precedence order"}, {"id": "0005-git-source-of-truth", "title": "ADR 0005: Git is the source of truth; the plugin is a build artefact"}, {"id": "0006-connector-scope", "title": "ADR 0006: Connected estate has outgrown the approved connector list"}, {"id": "0007-entra-admin-identity", "title": "ADR 0007: Dedicated admin identity and app registration for the entra-admin MCP"}, {"id": "0008-mfa-strength-risk-acceptance", "title": "ADR 0008: Risk acceptance, push MFA rather than phishing-resistant authentication on the entra-admin endpoint"}, {"id": "0009-azure-subscription-owner", "title": "ADR 0009: Grant Owner on the Azure subscription to the dedicated admin account"}, {"id": "0010-entra-admin-mcp-hosting", "title": "ADR 0010: Host the entra-admin MCP server in Azure rather than on the local workstation"}, {"id": "0011-membership-rebuild-sequence", "title": "ADR 0011: Membership rebuild sequence and scope"}, {"id": "0012-monitoring-alert-routing", "title": "ADR 0012: Monitoring alerts route to Teams, not Salesforce Cases"}, {"id": "0013-offboarding-saas-revocation", "title": "ADR 0013: Offboarding extends to third-party SaaS revocation"}, {"id": "0014-learnupon-sync-platform", "title": "ADR 0014: LearnUpon to Employment Hero completion sync runs on Logic Apps, not Zapier Code"}, {"id": "0015-privileged-access-model", "title": "ADR 0015: Privileged access stays with a single owner, with progressive delegation"}, {"id": "0016-ai-agent-privileged-access-standard", "title": "ADR 0016: Govern AI connectors through an org-level AI agent privileged access standard"}, {"id": "0018-break-glass-emergency-access", "title": "ADR 0018: Establish break-glass emergency access, separated from privilege delegation"}, {"id": "0019-birdata-supporter-feed", "title": "ADR 0019: Birdata supporter feed goes to Salesforce, not to Ortto"}, {"id": "0019-lens-model-and-entra-write-gate", "title": "ADR 0019: The BirdLife OS lens model, and the gate for promoting Entra writes to Tier 1"}, {"id": "0020-salesforce-outlook-integration", "title": "ADR 0020: Salesforce and Outlook integration, add-in pilot with Einstein Activity Capture held"}, {"id": "0021-brain-location-and-ownership", "title": "ADR 0021: The brain lives in Mathew's personal git repository, with his Google Drive as the human copy"}], "journals": ["2026-08-07", "2026-09-02", "2026-09-03", "2026-09-11", "2026-09-12"], "patterns": ["claude-estate", "salesforce", "website"]};
+const LAYERS = {
+  kernel:   {name:'Kernel',            c:'#ffd66b', what:'Loads into every session. The charter and the map.'},
+  doctrine: {name:'Doctrine',          c:'#b48cff', what:'birdlife-core: precedence, fact classes, write tiers, verification queries.'},
+  system:   {name:'System skills',     c:'#35d7ff', what:'One skill per system, with a facts file of IDs and values.'},
+  deep:     {name:'Salesforce deep dives', c:'#4d8dff', what:'Payments2Us, Conga, S-Docs, MoveData, Power BI.'},
+  cross:    {name:'Cross-cutting skills', c:'#2ee6c5', what:'Workflow, security, people, reporting, improvement, prompting, manager, voice, OS.'},
+  connskill:{name:'Connector skills',  c:'#6fe38a', what:'What each small connector reaches and the boundary.'},
+  memory:   {name:'Memory',            c:'#ffa63d', what:'The journal (what happened, by whom) and the patterns (symptom, cause, fix).'},
+  os:       {name:'OS and registers',  c:'#ff5fb7', what:'Rules, the state of record, the lens model, the console source.'},
+  routines: {name:'Routines',          c:'#ff7a45', what:'Unattended work on schedules; budget of twelve.'},
+  decisions:{name:'Decisions (ADRs)',  c:'#c8f04c', what:'Append-only, never edited, superseded by a new dated entry.'},
+  live:     {name:'Live systems',      c:'#ff5c5c', what:'Connectors. A live query beats every stored fact.'},
+  artefacts:{name:'Artefacts',         c:'#f08cff', what:'Published pages: the console, dashboards, the department suite.'},
+  copy:     {name:'Human copy',        c:'#8aa4c8', what:'Where the brain is mirrored for people: Google Drive, the account, a local clone.'},
+};
+const short = s => s.replace(/^birdlife-/,'').replace('google-workspace-expert','google-workspace');
+const N=[], E=[]; const byId={};
+function add(n){ N.push(n); byId[n.id]=n; return n; }
+function link(a,b,label){ if(byId[a]&&byId[b]) E.push({a,b,label}); }
+
+// Ring 0 and 1: kernel, doctrine, OS core
+add({id:'CLAUDE.md',label:'CLAUDE.md',layer:'kernel',ring:0,desc:'The charter. Identity, the five operating rules, the session close rule, the skill table. Loads into every session on the repository.',path:'CLAUDE.md'});
+add({id:'INDEX.md',label:'INDEX',layer:'kernel',ring:1,desc:'One line per file: what is known where.',path:'INDEX.md'});
+add({id:'birdlife-core',label:'birdlife-core',layer:'doctrine',ring:1,desc:'The doctrine underneath everything: live query beats skill beats digest beats memory; four fact classes; three write tiers; where a new fact goes. Carries the ADR log and the verification queries.',path:'.claude/skills/birdlife-core/SKILL.md'});
+add({id:'os/README.md',label:'OS rules',layer:'os',ring:1,desc:'The Claude operating system: estate model, ten rules, cadence, change control, incident handling.',path:'os/README.md'});
+add({id:'os/registers.md',label:'registers',layer:'os',ring:1,desc:'State of record: routines, skills, connectors, artefacts, credential watchlist, memory, decisions.',path:'os/registers.md'});
+add({id:'os/lenses.md',label:'lenses',layer:'os',ring:1,desc:'IT-GOV-004 lens model: five lenses, the IT Admin capability matrix over 22 systems, findings F1 to F6.',path:'os/lenses.md'});
+add({id:'console',label:'console source',layer:'os',ring:1,desc:'Source of the BirdLife Australia console (Jarvis): Command, Lens, Today, Projects, Money, Security, Fixes tabs.',path:'os/claude-os-overview.html'});
+add({id:'memory/README.md',label:'memory rules',layer:'memory',ring:1,desc:'Who writes to memory, the journal and pattern formats, no credentials, no PII.',path:'memory/README.md'});
+link('INDEX.md','CLAUDE.md','maps'); link('birdlife-core','CLAUDE.md','doctrine under'); link('os/README.md','CLAUDE.md','governs'); link('os/registers.md','os/README.md','state of'); link('os/lenses.md','os/README.md','tiers'); link('console','os/registers.md','mirrors'); link('memory/README.md','CLAUDE.md','session close');
+
+// Ring 2: skills
+for(const s of DATA.skills){ if(s.id==='birdlife-core') continue;
+  add({id:s.id,label:short(s.id),layer:s.layer,ring:2,desc:s.desc + (s.facts?' Carries a references folder with lookup values.':''),path:'.claude/skills/'+s.id+'/SKILL.md'});
+  link(s.id,'birdlife-core','reads first');
+}
+
+// Ring 3: memory files, routines, decisions
+for(const j of DATA.journals){ add({id:'journal/'+j,label:j,layer:'memory',ring:3,desc:'Journal for '+j+': decisions and by whom, work done, lessons, open items.',path:'memory/journal/'+j+'.md'}); link('journal/'+j,'memory/README.md','entry'); }
+for(const p of DATA.patterns){ add({id:'pattern/'+p,label:'pattern: '+p,layer:'memory',ring:3,desc:'Resolved problems for '+p+': symptom, cause, fix, verify, doctrine.',path:'memory/patterns/'+p+'.md'}); }
+link('pattern/salesforce','birdlife-salesforce','doctrine'); link('pattern/website','birdlife-wordpress','doctrine'); link('pattern/claude-estate','birdlife-os','doctrine');
+const ROUT=[
+ ['weekday','ICT weekday dashboards and monitor','hourly 7:04am to 5:04pm weekdays. Ops and Monitoring dashboards, Teams push, heartbeat, monitor sweep, department suite.',['sys/Microsoft 365','sys/Zapier','art/Ops dashboard','art/Monitoring dashboard','art/Department suite']],
+ ['audit','Claude OS weekly audit','Mondays 6am. Verdicts every trigger, checks budget, skill drift, artefacts, memory, the account skill list and the repository itself.',['os/registers.md','journal/'+DATA.journals[DATA.journals.length-1]]],
+ ['predraft','ICT overnight pre-draft','weekdays 5:30am. Writes internal Case comments only, max eight, never Status or Owner.',['sys/Salesforce Production']],
+ ['refund','Refund fix watch','daily 8:15am. Blast radius scan of the refund sync.',['sys/Salesforce Production','sys/Stripe']],
+ ['boards','Membership boards date sync','daily 7:30am. Build to Model.',['sys/Asana']],
+ ['offboard','Offboarding detector','daily 8am. Scan and approval pack; never disables anyone.',['sys/Salesforce Production','sys/Microsoft 365']],
+ ['onboard','Onboarding detector','daily 8:30am. Scan and approval pack.',['sys/Salesforce Production','sys/Microsoft 365']],
+ ['feeds','Data feed and expiry monitor','daily 9am.',['sys/Zapier']],
+ ['stale','Stale case chaser','Mondays 8:30am. Report only.',['sys/Salesforce Production']],
+ ['briefing','Membership Build delivery briefing','Mon, Wed, Fri 7:08am. Read only.',['sys/Asana']],
+ ['dailyten','AI Daily Ten','weekdays 6:34am. Gmail newsletters into the AI Field Guide artifact.',['sys/Gmail','art/AI Field Guide']],
+ ['dst','DST fix (one-shot)','5 Oct 2026 2pm. Shifts every recurring routine one hour.',['os/registers.md']],
+ ['cert','Renew entra-admin certificate (one-shot)','25 Jul 2027. Certificate expires 26 Aug 2027.',['sys/Entra admin (desktop bridge)']],
+];
+for(const [id,label,d,links] of ROUT){ add({id:'r/'+id,label,layer:'routines',ring:3,desc:d,path:'os/registers.md, section 1',links}); }
+for(const a of DATA.adrs){ const num=a.id.slice(0,4); add({id:'adr/'+a.id,label:'ADR '+num,layer:'decisions',ring:3,desc:a.title,path:'.claude/skills/birdlife-core/references/decisions/'+a.id+'.md'}); link('adr/'+a.id,'birdlife-core','recorded in'); }
+
+// Ring 4: live systems, artefacts, human copy
+const LIVE=[
+ ['Salesforce Production','Zeus. NPSP org, 424 objects, the hub most systems write into. Tier 1 data, one record per approval.'],
+ ['Salesforce Staging','Sandbox. Experiments and write-response shapes.'],
+ ['Microsoft 365','Mail, calendar, Teams read, SharePoint. User level only; no Entra admin.'],
+ ['Entra admin (desktop bridge)','Graph reads proven; writes stay Tier 2 until the ADR 0019 gate passes.'],
+ ['Asana','IT Operations Project Plan. Tier 1, one task per approval.'],
+ ['NetSuite','SuiteQL reads, subsidiary 2. Writes Tier 3.'],
+ ['Stripe','Five livemode accounts. Read only from any page or routine.'],
+ ['Zapier','Seventeen connected apps. Writes held for approval in unattended runs.'],
+ ['Cloudflare','Developer Platform only. DNS and WAF are dashboard changes.'],
+ ['WordPress UAT','Eleven WooCommerce abilities on the UAT site. Say UAT.'],
+ ['GitHub','This repository. The executable brain.'],
+ ['Atlassian','Confluence ICT space and Jira.'],
+ ['Google Drive','Mathew\'s personal account. Reaches the Claude folder.'],
+ ['Gmail','Personal account. Not BirdLife mail.'],
+ ['Granola','Meeting notes and transcripts. Read only.'],
+ ['Canva','Brand kits and templates.'],
+ ['Miro','Boards and diagrams.'],
+ ['Zoom','Meetings, recordings, transcripts.'],
+ ['Microsoft Learn','Official documentation. Reference only.'],
+];
+for(const [n,d] of LIVE){ add({id:'sys/'+n,label:n,layer:'live',ring:4,desc:d,path:'claude.ai Settings, Connectors'}); }
+const ART=[
+ ['BirdLife Australia console','Jarvis command deck: live queue, board, inbox, Teams, Money, Security, Fixes; approve-card writes.'],
+ ['Ops dashboard','ICT Operations dashboard; Teams file copy.'],
+ ['Monitoring dashboard','ICT Monitoring dashboard; Teams file copy.'],
+ ['Security dashboard','Confidential deep view; refreshed on request since 3 Sep.'],
+ ['Department suite','Nine department pages rebuilt by the weekday job.'],
+ ['AI Field Guide','Republished by AI Daily Ten.'],
+];
+for(const [n,d] of ART){ add({id:'art/'+n,label:n,layer:'artefacts',ring:4,desc:d,path:'os/registers.md, section 4'}); }
+link('art/BirdLife Australia console','console','published from');
+add({id:'copy/gdrive',label:'Google Drive · Claude',layer:'copy',ring:4,desc:'Mathew\'s personal Google Drive: documents by IT identifier, the Manager folder, archived artifacts, and the weekly git bundle of this repository. The human copy and backup (ADR 0021).',path:'GoogleDrive/Claude'});
+add({id:'copy/account',label:'claude.ai account skills',layer:'copy',ring:4,desc:'Account-synced copies of the skills so the app can load them without the repo. Repo wins once account content is committed.',path:'claude.ai, Skills'});
+add({id:'copy/clone',label:'local clone',layer:'copy',ring:4,desc:'A clone on Mathew\'s machine outside any synced folder; desktop sessions commit and push from here.',path:'C:\\src\\Birdlife'});
+link('copy/gdrive','CLAUDE.md','backs up'); link('copy/account','CLAUDE.md','mirrors'); link('copy/clone','sys/GitHub','pushes to'); link('sys/GitHub','CLAUDE.md','hosts');
+
+// Skill to live-system edges
+const USES={
+ 'birdlife-salesforce':['Salesforce Production','Salesforce Staging'],'birdlife-ict-assistant':['Salesforce Production','Asana','Microsoft 365'],
+ 'birdlife-payments2us':['Salesforce Production'],'birdlife-conga':['Salesforce Production'],'birdlife-sdocs':['Salesforce Production','Salesforce Staging'],'birdlife-movedata':['Salesforce Production'],'birdlife-powerbi':['Salesforce Production'],
+ 'birdlife-security':['Salesforce Production','Entra admin (desktop bridge)'],'birdlife-people-lifecycle':['Salesforce Production','Microsoft 365','Asana'],'birdlife-reporting':['Salesforce Production','Stripe','NetSuite','Microsoft 365'],
+ 'birdlife-manager':['Salesforce Production','Asana'],'birdlife-improvement':['Asana'],'birdlife-asana':['Asana'],'birdlife-microsoft365':['Microsoft 365','Entra admin (desktop bridge)'],
+ 'birdlife-netsuite':['NetSuite'],'birdlife-stripe':['Stripe'],'birdlife-zapier':['Zapier'],'birdlife-cloudflare':['Cloudflare'],'birdlife-wordpress':['WordPress UAT'],'birdlife-wpengine':[],
+ 'google-workspace-expert':['Google Drive'],'birdlife-atlassian':['Atlassian'],'birdlife-canva':['Canva'],'birdlife-miro':['Miro'],'birdlife-granola':['Granola'],'birdlife-gmail':['Gmail'],'birdlife-google-calendar':[],'birdlife-microsoft-learn':['Microsoft Learn'],
+ 'birdlife-os':['GitHub'],'birdlife-prompting':[],'email-voice':['Microsoft 365'],'morning':['Google Drive'],
+};
+for(const k in USES) for(const s of USES[k]) link(k,'sys/'+s,'reads');
+link('birdlife-os','art/BirdLife Australia console','updates');
+for(const n of N) if(n.links) for(const t of n.links) link(n.id,t,'runs on');
+for(const j of DATA.journals) link('journal/'+j,'CLAUDE.md','record');
+
+// ---------- layout ----------
+const RING_R=[0,120,300,440,580];
+const rings={};
+for(const n of N){ (rings[n.ring]=rings[n.ring]||[]).push(n); }
+// order ring 2 by layer so colours cluster; ring 3 by layer; ring 4 by layer
+const order=['kernel','doctrine','os','memory','system','deep','cross','connskill','routines','decisions','live','artefacts','copy'];
+for(const r in rings){ rings[r].sort((a,b)=>order.indexOf(a.layer)-order.indexOf(b.layer)); }
+for(const r in rings){ const arr=rings[r], R=RING_R[r]; arr.forEach((n,i)=>{ const t=(i/arr.length)*Math.PI*2 - Math.PI/2; n.a=t; n.r=R; n.x=Math.cos(t)*R; n.y=Math.sin(t)*R; }); }
+const adj={}; for(const e of E){ (adj[e.a]=adj[e.a]||new Set()).add(e.b); (adj[e.b]=adj[e.b]||new Set()).add(e.a); }
+
+// ---------- state ----------
+const off={}; let hover=null, sel=null, query='', rot=0, zoom=1, pan={x:0,y:0};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cv=document.getElementById('stage'), cx=cv.getContext('2d');
+let W=0,H=0,dpr=1;
+function resize(){ dpr=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight; cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px'; }
+addEventListener('resize',resize); resize();
+function baseScale(){ const m=Math.min(W,H); return (m/2-70)/RING_R[4]; }
+function centre(){ return {x:W/2+pan.x, y:H/2+ (W>720?0:-40)+pan.y}; }
+function toScreen(n){ const s=baseScale()*zoom, c=centre(), t=n.a+rot; return {x:c.x+Math.cos(t)*n.r*s, y:c.y+Math.sin(t)*n.r*s, ang:t}; }
+function visible(n){ return !off[n.layer]; }
+function matches(n){ return query && (n.label.toLowerCase().includes(query)||n.id.toLowerCase().includes(query)); }
+function focusSet(){ const f=sel||hover; if(!f) return null; const s=new Set([f.id]); (adj[f.id]||[]).forEach(x=>s.add(x)); return s; }
+
+// glow sprites
+const sprites={};
+function sprite(c){ if(sprites[c]) return sprites[c]; const s=document.createElement('canvas'); s.width=s.height=64; const g=s.getContext('2d'); const gr=g.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0,c); gr.addColorStop(.25,c+'aa'); gr.addColorStop(1,c+'00'); g.fillStyle=gr; g.fillRect(0,0,64,64); return sprites[c]=s; }
+
+// pulses
+const pulses=[]; function spawn(){ if(reduce) return; const alive=E.filter(e=>visible(byId[e.a])&&visible(byId[e.b])); if(!alive.length) return; const e=alive[Math.floor(Math.random()*alive.length)]; pulses.push({e,t:0,d:.6+Math.random()*.9, rev:Math.random()<.5}); }
+let last=performance.now(), spawnAcc=0;
+
+function draw(now){
+  const dt=Math.min(.05,(now-last)/1000); last=now;
+  if(!reduce && !hover && !sel) rot+=dt*0.035;
+  spawnAcc+=dt; while(spawnAcc>0.08){ spawnAcc-=0.08; if(pulses.length<48) spawn(); }
+  for(const p of pulses) p.t+=dt/p.d; for(let i=pulses.length-1;i>=0;i--) if(pulses[i].t>=1) pulses.splice(i,1);
+  cx.setTransform(dpr,0,0,dpr,0,0); cx.clearRect(0,0,W,H);
+  const c=centre(), s=baseScale()*zoom;
+  // ground
+  const vg=cx.createRadialGradient(c.x,c.y,0,c.x,c.y,Math.max(W,H)*.75); vg.addColorStop(0,'#0a1626'); vg.addColorStop(.45,'#060b16'); vg.addColorStop(1,'#03050b'); cx.fillStyle=vg; cx.fillRect(0,0,W,H);
+  // rings and ticks
+  cx.lineWidth=1; for(let r=1;r<=4;r++){ cx.strokeStyle='rgba(53,215,255,'+(r===2?.09:.05)+')'; cx.beginPath(); cx.arc(c.x,c.y,RING_R[r]*s,0,Math.PI*2); cx.stroke(); }
+  cx.strokeStyle='rgba(53,215,255,.06)'; for(let i=0;i<72;i++){ const t=i/72*Math.PI*2+rot*.5; const r1=RING_R[4]*s+8, r2=r1+(i%6===0?14:6); cx.beginPath(); cx.moveTo(c.x+Math.cos(t)*r1,c.y+Math.sin(t)*r1); cx.lineTo(c.x+Math.cos(t)*r2,c.y+Math.sin(t)*r2); cx.stroke(); }
+  const fs=focusSet();
+  // edges
+  for(const e of E){ const a=byId[e.a], b=byId[e.b]; if(!visible(a)||!visible(b)) continue; const A=toScreen(a), B=toScreen(b); const inF=fs && fs.has(a.id) && fs.has(b.id) && (a.id===(sel||hover).id || b.id===(sel||hover).id); let al = fs ? (inF? .85 : .04) : (e.label==='reads first'? .05 : .13); if(query && !fs){ al = (matches(a)||matches(b)) ? .5 : .03; } const col=LAYERS[(a.ring>b.ring?a:b).layer].c; cx.strokeStyle=col+Math.round(al*255).toString(16).padStart(2,'0'); cx.lineWidth= inF?1.4:.8; cx.beginPath(); const mx=(A.x+B.x)/2, my=(A.y+B.y)/2, k=.18; const qx=mx+(c.x-mx)*k, qy=my+(c.y-my)*k; cx.moveTo(A.x,A.y); cx.quadraticCurveTo(qx,qy,B.x,B.y); cx.stroke(); }
+  // pulses
+  for(const p of pulses){ const a=byId[p.e.a], b=byId[p.e.b]; if(!visible(a)||!visible(b)) continue; let A=toScreen(a), B=toScreen(b); if(p.rev){ const t=A; A=B; B=t; } const mx=(A.x+B.x)/2, my=(A.y+B.y)/2, k=.18, qx=mx+(c.x-mx)*k, qy=my+(c.y-my)*k; const t=p.t, u=1-t; const x=u*u*A.x+2*u*t*qx+t*t*B.x, y=u*u*A.y+2*u*t*qy+t*t*B.y; const col=LAYERS[(a.ring>b.ring?a:b).layer].c; const dim = fs && !(fs.has(a.id)&&fs.has(b.id)); cx.globalAlpha=dim?.15:.9; cx.drawImage(sprite(col),x-7,y-7,14,14); cx.globalAlpha=1; }
+  // nodes + labels
+  const breathe = reduce?1:(1+Math.sin(now/900)*.08);
+  for(const n of N){ if(!visible(n)) continue; const P=toScreen(n); const col=LAYERS[n.layer].c; const isF = fs? fs.has(n.id) : true; const m = query? matches(n) : true; const al = (isF && (m||fs)) ? 1 : .18; const base = n.ring===0?9: n.ring===1?5.5: n.ring===2?4.2: 3.2; const rad = base*(n.id===(sel&&sel.id)||n.id===(hover&&hover.id)?1.5:1); cx.globalAlpha=al*.9; const g= rad*3.2*breathe; cx.drawImage(sprite(col),P.x-g,P.y-g,g*2,g*2); cx.globalAlpha=al; cx.fillStyle='#ffffff'; cx.beginPath(); cx.arc(P.x,P.y,rad*.55,0,Math.PI*2); cx.fill(); cx.fillStyle=col; cx.beginPath(); cx.arc(P.x,P.y,rad,0,Math.PI*2); cx.globalAlpha=al*.55; cx.fill(); cx.globalAlpha=1; }
+  // labels
+  const showOuter = W>560 || zoom>1.4;
+  cx.textBaseline='middle';
+  for(const n of N){ if(!visible(n)) continue; const P=toScreen(n); const col=LAYERS[n.layer].c; const isF = fs? fs.has(n.id) : true; const m = query? matches(n) : true; const hot = n.id===(sel&&sel.id)||n.id===(hover&&hover.id);
+    if(n.ring===0){ cx.font='500 12px '+getComputedStyle(document.body).getPropertyValue('--mono'); cx.textAlign='center'; cx.fillStyle=col; cx.globalAlpha=isF?1:.3; cx.fillText(n.label,P.x,P.y+22); cx.globalAlpha=1; continue; }
+    if(n.ring===1){ cx.font='11px '+getComputedStyle(document.body).getPropertyValue('--mono'); const dx=Math.cos(P.ang), left=dx<0; cx.textAlign=left?'right':'left'; cx.fillStyle=hot?'#ffffff':col; cx.globalAlpha=(isF&&(m||fs))?.95:.2; cx.fillText(n.label,P.x+(left?-10:10),P.y); cx.globalAlpha=1; continue; }
+    if(!showOuter && !hot) continue;
+    cx.save(); cx.translate(P.x,P.y); let ang=P.ang; const flip = Math.cos(ang)<0; cx.rotate(flip?ang+Math.PI:ang); cx.font=(hot?'500 11.5px ':'10px ')+getComputedStyle(document.body).getPropertyValue('--mono'); cx.textAlign=flip?'right':'left'; cx.fillStyle=hot?'#ffffff':col; cx.globalAlpha=(isF&&(m||fs))?(n.ring===2?.9:.7):.12; cx.fillText(n.label,flip?-11:11,0); cx.restore(); cx.globalAlpha=1; }
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+// ---------- interaction ----------
+function pick(x,y){ let best=null,bd=14*14; for(const n of N){ if(!visible(n)) continue; const P=toScreen(n); const d=(P.x-x)**2+(P.y-y)**2; if(d<bd){bd=d;best=n;} } return best; }
+const tip=document.getElementById('tip');
+let drag=null, moved=false;
+cv.addEventListener('pointerdown',e=>{ drag={x:e.clientX,y:e.clientY,px:pan.x,py:pan.y}; moved=false; cv.setPointerCapture(e.pointerId); cv.classList.add('grabbing'); });
+cv.addEventListener('pointermove',e=>{ if(drag){ const dx=e.clientX-drag.x, dy=e.clientY-drag.y; if(Math.abs(dx)+Math.abs(dy)>4) moved=true; if(moved){ pan.x=drag.px+dx; pan.y=drag.py+dy; } return; } const n=pick(e.clientX,e.clientY); hover=n; if(n){ tip.style.display='block'; tip.style.setProperty('--c',LAYERS[n.layer].c); tip.innerHTML='<span class="k">'+LAYERS[n.layer].name+'</span><span class="n">'+esc(n.label)+'</span>'; tip.style.left=Math.min(e.clientX+14,W-270)+'px'; tip.style.top=Math.max(8,e.clientY-10)+'px'; cv.style.cursor='pointer'; } else { tip.style.display='none'; cv.style.cursor='grab'; } });
+cv.addEventListener('pointerup',e=>{ cv.classList.remove('grabbing'); if(drag && !moved){ const n=pick(e.clientX,e.clientY); select(n); } drag=null; });
+cv.addEventListener('pointerleave',()=>{ hover=null; tip.style.display='none'; });
+cv.addEventListener('wheel',e=>{ e.preventDefault(); zoom=Math.max(.6,Math.min(3,zoom*(e.deltaY<0?1.1:.9))); },{passive:false});
+document.getElementById('zin').onclick=()=>zoom=Math.min(3,zoom*1.2);
+document.getElementById('zout').onclick=()=>zoom=Math.max(.6,zoom/1.2);
+document.getElementById('zfit').onclick=()=>{zoom=1;pan={x:0,y:0};};
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+const insp=document.getElementById('insp'), ib=document.getElementById('ib');
+function select(n){ sel=n; if(!n){ insp.classList.remove('open'); return; } const L=LAYERS[n.layer]; insp.style.setProperty('--c',L.c); const nb=[...(adj[n.id]||[])].map(id=>byId[id]).filter(Boolean); nb.sort((a,b)=>order.indexOf(a.layer)-order.indexOf(b.layer)); ib.innerHTML='<div class="kind">'+esc(L.name)+'</div><h3>'+esc(n.label)+'</h3><p>'+esc(n.desc)+'</p><div class="path">'+esc(n.path)+'</div>'+(nb.length?'<div class="kind" style="margin-bottom:6px">Connected ('+nb.length+')</div><div class="links">'+nb.map(m=>'<button data-id="'+esc(m.id)+'" style="--c:'+LAYERS[m.layer].c+'"><i></i>'+esc(m.label)+'</button>').join('')+'</div>':''); insp.classList.add('open'); ib.querySelectorAll('button').forEach(b=>b.onclick=()=>select(byId[b.dataset.id])); }
+document.getElementById('ic').onclick=()=>select(null);
+addEventListener('keydown',e=>{ if(e.key==='Escape') select(null); });
+
+// legend
+const legend=document.getElementById('legend'); const counts={}; for(const n of N) counts[n.layer]=(counts[n.layer]||0)+1;
+legend.innerHTML='<h2>Layers · click to isolate</h2>'+order.map(k=>'<button class="lg" data-k="'+k+'" style="--c:'+LAYERS[k].c+'" title="'+esc(LAYERS[k].what)+'"><i></i><span>'+esc(LAYERS[k].name)+'</span><em>'+counts[k]+'</em></button>').join('')+'<div class="foot">Drag to pan, wheel to zoom, click a node for detail. Pulses are synapses: knowledge moving between layers.</div>';
+legend.querySelectorAll('.lg').forEach(b=>b.onclick=()=>{ const k=b.dataset.k; const anyOff=Object.values(off).some(v=>v); const onlyThis = !off[k] && Object.keys(LAYERS).filter(x=>x!==k).every(x=>off[x]); if(onlyThis){ for(const x in LAYERS) off[x]=false; } else if(!anyOff){ for(const x in LAYERS) off[x]=x!==k; } else { off[k]=!off[k]; } legend.querySelectorAll('.lg').forEach(x=>x.classList.toggle('off',!!off[x.dataset.k])); if(sel && off[sel.layer]) select(null); });
+// search
+document.getElementById('q').addEventListener('input',e=>{ query=e.target.value.trim().toLowerCase(); });
+// header
+document.getElementById('sub').innerHTML='<b>'+N.length+'</b> nodes, <b>'+E.length+'</b> synapses. '+DATA.skills.length+' skills, '+DATA.adrs.length+' decisions, '+ROUT.length+' routines, '+LIVE.length+' live systems. The repository is the brain; everything here is a file in it or a system it reaches.';
+document.getElementById('status').innerHTML='<b>'+N.length+'</b> nodes · <b>'+E.length+'</b> synapses · as at 12 Sep 2026 · commit 8036c72';
+</script>
