@@ -27,6 +27,7 @@ audit the estate and apply these rules.
 | **Registers** | State of record for all of the above | `os/registers.md` | Same commit as any estate change |
 | **Memory** | Episodic: what was decided, done, learned, left open | `memory/journal/`, `memory/patterns/` | Every session that changes something, same commit (charter session close rule) |
 | **Index** | Map of what is known where | `INDEX.md` | Same commit as any file added, moved or retired |
+| **Human copy and backup** | Documents by IT identifier, weekly `git bundle` of this repository | `GoogleDrive/Claude` in Mathew's personal Google account (ADR 0021) | Sessions through the Google Drive connector; Mathew by hand |
 
 ## Operating rules
 
@@ -59,7 +60,10 @@ audit the estate and apply these rules.
 8. **Propose, then write.** The charter rule applies to the estate itself.
    Sessions propose routine changes, skill edits and consolidations; Mathew
    approves; then they execute and commit.
-9. **Learn in the same session.** Any session that changes the estate, a
+9. **Never commit from inside a cloud-synced folder.** The local clone lives
+   outside OneDrive and Google Drive sync; a synced `.git` corrupts. The
+   human copy is a weekly bundle, not a synced checkout (ADR 0021).
+10. **Learn in the same session.** Any session that changes the estate, a
    system of record, or a decision writes the journal entry and the skill or
    facts edit in the same commit (the charter's session close rule). The
    weekly audit reports commits with no journal entry as drift. A brain that

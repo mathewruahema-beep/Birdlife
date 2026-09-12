@@ -15,11 +15,11 @@ Boundary with the daily "AI Daily Ten and learning loop" routine (created 7 Sep 
 
 | File | Path | Rule |
 |---|---|---|
-| Weekly review | `OneDrive Birdlife\Claude\Manager\Manager-Review-<YYYY-MM-DD>.md` | One per week, never edited after the day it is written |
-| Learning log | `OneDrive Birdlife\Claude\Manager\Manager-Learning-Log.md` | Append only. One dated entry per week, one learning per entry |
+| Weekly review | `GoogleDrive\Claude\Manager\Manager-Review-<YYYY-MM-DD>.md` (Mathew's personal Google Drive, ADR 0021) | One per week, never edited after the day it is written |
+| Learning log | `GoogleDrive\Claude\Manager\Manager-Learning-Log.md` | Append only. One dated entry per week, one learning per entry |
 | Document ID | IT-GOV-003 | Both files carry it |
 
-Repo copy: `docs/manager/` in the Birdlife repo when the session has it; otherwise write a patch to `OneDrive Birdlife\Claude\repo-inbox\` as the prompting skill did.
+Repo copy: `docs/manager/` in the Birdlife repo, the record of truth. A desktop session commits from the local clone; the repo-inbox patch pattern is retired (ADR 0021).
 
 ## The review, in order
 

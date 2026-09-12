@@ -36,10 +36,10 @@ The ICT space key is `OPERATIONS` but the display name is `ICT` and the URL alia
 
 ## The documentation problem worth naming
 
-BirdLife's real ICT knowledge base is **not** in Confluence. It is a set of markdown digests in OneDrive (`Birdlife\Claude\KnowledgeBase\`) plus ~116 Word documents. Confluence has one populated global space.
+BirdLife's real ICT knowledge base is **not** in Confluence. It is a set of markdown digests in the repository (`.claude/skills/birdlife-core/references/knowledge/`, ADR 0021) with document copies in Mathew's Google Drive (`Birdlife\Claude\KnowledgeBase\`) plus ~116 Word documents. Confluence has one populated global space.
 
 That split means:
-- Documentation is only discoverable by people who know the OneDrive folder exists.
+- Documentation is only discoverable by people who have the repository or know the Google Drive folder exists.
 - There is no page history, no comments, no ownership metadata, no permissions model on the authoritative content.
 - The two corrupted source files (Arun Nair's DocGen LWC spec and the Developer Onboarding System Audit) had **no second copy**, and their content is now unrecoverable. Confluence would have prevented that.
 

@@ -75,7 +75,10 @@ The skills are long-term knowledge. `memory/` is what happened: `memory/journal/
 (one file per day: decisions and by whom, work done, lessons, open items) and
 `memory/patterns/` (resolved problems by system: symptom, cause, fix, verify).
 `INDEX.md` at the repo root maps what is known where; read it when you do not
-know which file holds something. Starting cold on estate or process work, read
+know which file holds something. This repository is the executable brain and is
+Mathew's personally; his Google Drive `Claude` folder is the human copy and
+backup, OneDrive is not a brain location, and desktop sessions commit from a
+local clone rather than queueing patches (ADR 0021). Starting cold on estate or process work, read
 the last five journal files first.
 
 **Session close rule.** Before ending any piece of work that changed something

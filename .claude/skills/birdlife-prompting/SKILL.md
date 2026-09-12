@@ -5,7 +5,7 @@ description: "Rewrite and challenge every BirdLife Australia prompt into the six
 
 # BirdLife prompting frame
 
-This skill runs first on every BirdLife Australia request, before any system skill does work. It exists because the record since August 2026 shows four repeat costs: sessions that restart cold, deliverables that need a second pass, Tier 2 work that stalls between design and execution, and more output than a team of four can absorb. The human copy is `OneDrive Birdlife\Claude\BirdLife_Prompt_Playbook.md`. `birdlife-core` (in the birdlife-ict plugin) is the rulebook underneath; this skill applies it to the prompt itself.
+This skill runs first on every BirdLife Australia request, before any system skill does work. It exists because the record since August 2026 shows four repeat costs: sessions that restart cold, deliverables that need a second pass, Tier 2 work that stalls between design and execution, and more output than a team of four can absorb. The human copy is `GoogleDrive\Claude\BirdLife_Prompt_Playbook.md` (ADR 0021). `birdlife-core` (in the birdlife-ict plugin) is the rulebook underneath; this skill applies it to the prompt itself.
 
 ## Step 1. Work out which system Mathew is looking at, and load its skill
 
@@ -39,7 +39,7 @@ Using what the loaded skills know (the system's traps, its ADRs, its verificatio
 OUTCOME   what is different at BirdLife when this is done, one sentence, no file names
 EVIDENCE  what will be verified live first, naming the system and the figure and the query
 TIER      1 execute / 2 prepare for Mathew to run / 3 design only
-DELIVER   one primary deliverable and where it lands (OneDrive path and IT ID, artifact, Asana, Case)
+DELIVER   one primary deliverable and where it lands (Google Drive path and IT ID, artifact, Asana, Case)
 PEOPLE    who is affected and what they must do differently, by name
 DONE      the test that proves it worked: a query, a screenshot, a number, a date
 ```
@@ -72,10 +72,10 @@ When a decision was made, the estate changed, or a deliverable was produced, fin
 1. ADR written if a decision was made.
 2. The affected birdlife-* skill updated with any durable fact learned; live figures go into verification queries as queries, never as values.
 3. Every dated open item into Asana with an owner.
-4. Deliverable filed to OneDrive Birdlife under the next free IT-xxx-nnn ID after checking existing IDs (IT-SEC-006 and IT-SF-005 were each used twice).
+4. Deliverable filed to Mathew's Google Drive under the next free IT-xxx-nnn ID after checking existing IDs (IT-SEC-006 and IT-SF-005 were each used twice).
 5. What in memory is now stale.
 6. Three lines Mathew can send to the team.
 
 ## Style
 
-Frank and logical. Challenge the request when the record says it will not work, and always give the workable path rather than a bare no. No em dashes. BirdLife documents use the Board Paper Word template. Deliverables are saved to OneDrive, not only sent in chat.
+Frank and logical. Challenge the request when the record says it will not work, and always give the workable path rather than a bare no. No em dashes. BirdLife documents use the Board Paper Word template. Deliverables are saved to Google Drive, not only sent in chat.

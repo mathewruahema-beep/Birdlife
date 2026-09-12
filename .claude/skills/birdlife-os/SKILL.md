@@ -48,9 +48,10 @@ Schedule, Registers, Rules.
    request/response for, or disclose it as unverified when publishing.
 4. Commit and push the source in the same session, and update the artefact
    register row in `os/registers.md` if the capability surface changed. When
-   GitHub is not connected to the session, save the patch and full-file copies
-   to `OneDrive Birdlife\Claude\repo-inbox` with a REGISTER-ROW-nnnn.md apply
-   note (pattern established 7 Sep 2026, patches 0001 to 0003).
+   GitHub is not connected to the session, commit from the local clone on the
+   machine (kept outside any cloud-synced folder) and push. The repo-inbox
+   patch pattern of 7 Sep 2026 is retired (ADR 0021): its three patches sat
+   unapplied for five days.
 5. Keep the page's embedded register data (routines, decisions, counts) in sync
    with `os/registers.md`; the page is a mirror, the markdown is authoritative.
 
@@ -161,7 +162,7 @@ and the ADRs allow. Five lenses exist: **IT Admin** (live), **Security**,
 wired to the skill that already carries its knowledge).
 
 - The record is `os/lenses.md` (repo) with the human copy at
-  `OneDrive Birdlife\Claude\IT-GOV-004_BirdLife_OS_Lens_Model.md`.
+  `GoogleDrive\Claude\IT-GOV-004_BirdLife_OS_Lens_Model.md` (Mathew's personal Google Drive, ADR 0021).
 - The console has a **Lens** tab (second tab). The active lens is stored per
   browser (`claude-os.lens`) and its `framing` string is prepended to every
   Jarvis turn, so Jarvis answers in that persona and applies that tier table.
@@ -187,7 +188,7 @@ wired to the skill that already carries its knowledge).
   reach DNS or WAF), Raisely writes, Ortto writes. Tier 3: Stripe money movement,
   NetSuite record writes, Salesforce configuration.
 - Not usable: AWS bridge (no credential profile on h20blacks), GitHub (not
-  connected to Cowork; patches queue in `OneDrive Birdlife\Claude\repo-inbox`).
+  connected to Cowork; resolved 12 Sep by committing from a local clone, ADR 0021).
 - Findings carried as open items: F1 Entra write connector live while ADR 0002
   says pending; F2 Zapier holds a 2024 Teams connection under the shared
   admin365.ross .onmicrosoft.com login (credential watchlist); F3 AWS bridge
@@ -264,7 +265,11 @@ Run when asked ("run the OS audit") or when the weekly audit routine fires.
    unversioned knowledge and a finding (11 Sep 2026: eight skills and three
    newer copies were found this way). Repo wins only once the account
    content has been committed.
-9. **Report**: lead with what changed since last audit and the decisions Mathew
+9. **Check the repository itself**: visibility (must be private), Pages
+   (must be off), branch count and default branch, and whether the weekly
+   `git bundle` in `GoogleDrive/Claude/repo-backup` is newer than seven days
+   (ADR 0021). A public brain is an incident, not a finding.
+10. **Report**: lead with what changed since last audit and the decisions Mathew
    needs to make, one line each. Then update `os/registers.md` with the new
    audit date and findings, commit, push. Propose fixes; execute only approved
    ones.

@@ -37,3 +37,10 @@ Seeded 11 Sep 2026 from `os/registers.md`; doctrine in `birdlife-os` and
 - **Fix**: pull the account skills from `/root/.claude/skills/synced/` (they are on disk in any repo session), then the Google Drive `Claude/repo-inbox` through the Google Drive connector, apply with `git am --3way`. Weekly audit step 8 now compares the live account list against the repo. Tier 1.
 - **Verify**: the account skill list has nothing the repo lacks; the repo-inbox folder has no patch newer than the last journal entry that mentions it.
 - **Doctrine**: `birdlife-os`, weekly audit steps 4 and 8; `memory/README.md`.
+
+### "The brain repository is public"
+- **Seen**: 12 Sep 2026, public since creation on 2 Aug 2026
+- **Cause**: the repository was created from a Claude session as a personal GitHub repo and visibility was never set; the registers said "never publish artifact URLs via GitHub Pages" but nobody checked the repository itself.
+- **Fix**: GitHub, repository Settings, General, Danger Zone, Change visibility, Private; Settings, Pages, disable; prune unrelated branches. Mathew's click; no session tool changes visibility. Then treat the exposure window as a leaked document under `birdlife-security`.
+- **Verify**: the GitHub search API reports `"private": true`; the weekly audit adds a visibility check.
+- **Doctrine**: ADR 0021; `birdlife-security`, leaked credential playbook.

@@ -7,7 +7,7 @@ description: "Expert operator and deep technical knowledge for Payments2Us (AAkP
 
 Payments2Us is the membership and direct debit engine at BirdLife. It is live money, not legacy. Every figure below was read from production on 10 September 2026; re-run the verification query before quoting any number.
 
-Companion document: `IT-SF-018_Payments2Us_Expert_Operator_Reference.md` in OneDrive Birdlife. Read `birdlife-core` first, `birdlife-salesforce` for the wider org, `birdlife-conga` and `birdlife-sdocs` for receipting, `birdlife-netsuite` for the GL side, `birdlife-wordpress` for the membership rebuild.
+Companion document: `IT-SF-018_Payments2Us_Expert_Operator_Reference.md` in Mathew's Google Drive (the Claude parent folder, ADR 0021). Read `birdlife-core` first, `birdlife-salesforce` for the wider org, `birdlife-conga` and `birdlife-sdocs` for receipting, `birdlife-netsuite` for the GL side, `birdlife-wordpress` for the membership rebuild.
 
 ---
 

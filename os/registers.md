@@ -245,7 +245,7 @@ against this register and the live trigger list):**
   Regular Giving Rescue Desk, Supporter Care on Zeus, BirdLife Companion, Mini
   Program Playbook, Flightpath Change Board, AI Opportunity Radar, Dashboard
   Refresh Build & Cost, Agent Aviary, Insights Model, ICT Board Reset. Full HTML
-  exported 3 Sep to OneDrive `Birdlife\Claude\Archive\artifact-archive-2026-09-03-*.html`
+  exported 3 Sep to Google Drive `Claude\Archive\artifact-archive-2026-09-03-*.html` (17 files, confirmed present 12 Sep)
   (17 files). Deletion is Mathew's manual step in the gallery; the tool has no
   delete action.
 - Personal (non BirdLife) artifacts are out of scope and were not assessed.
@@ -273,6 +273,7 @@ grants) and fold the missing checks in. Security dashboard kept (governance).
 | Vevox SAML certificates | Dashboard 21 Aug 2026 (passed), Vevox 8 Sep 2026 | Verify SSO still works; renew before 8 Sep |
 | Employment Hero sync Graph secret | Expires 5 Jan 2027 | Rotate when the Logic App is unblocked; add a reminder routine |
 | Salesforce test accounts `test101`, `test123` | Active with real credentials | Disable |
+| GitHub repository `mathewruahema-beep/Birdlife` public since 2 Aug 2026 | Confidential content exposed; visibility is Mathew's setting | Make private, disable Pages, prune branches, then run the leaked-credential sweep over the history (ADR 0021) |
 | Zapier: Microsoft Teams connection under the shared `admin365.ross@BirdLifeAustralia.onmicrosoft.com` login (created 24 May 2024, last refreshed 25 Jul 2024, connection 47169426) | Shared admin credential still authorised (IT-GOV-004 finding F2) | Confirm no Zap uses it, remove it, close the row |
 
 ## 6. Memory register
@@ -292,7 +293,8 @@ commit as any change; the weekly audit (step 6 in `birdlife-os`) reports drift.
 | Account pull | Eight account-only skills and four newer account copies committed to the repo; the repo is now a superset of the account except for `references/facts.md` and the memory audit steps, which the account lacks | 11 Sep 2026 |
 | Open decision | Two brains: stop syncing skills to the account (always start on the repo) or keep re-uploading by hand. Recommendation on record: repo only, keep `email-voice` on the account. Mathew to decide; nothing deleted yet | 11 Sep 2026 |
 | Closed 12 Sep | `birdlife-core`, `os/lenses.md`, ADRs 0001 to 0020 and the repo-inbox patches located in Google Drive and committed | 12 Sep 2026 |
-| Open decision | Mathew's stated direction (11 Sep, late): run the brain from his personal Google Drive rather than BirdLife. Recommendation on record in the journal: keep the git repository as the executable brain (it is already under his personal GitHub), make `GoogleDrive/Claude` the human-copy layer, and stop using OneDrive for it. Not implemented pending his word | 12 Sep 2026 |
+| Decided 12 Sep (ADR 0021) | The git repository is the executable brain; `GoogleDrive/Claude` in Mathew's personal Google account is the human copy and weekly `git bundle` backup; OneDrive is out; the repo-inbox is retired; ownership is Mathew's personally. Decided by Mathew | 12 Sep 2026 |
+| **Incident, open** | The repository was found PUBLIC on GitHub on 12 Sep 2026 (created 2 Aug, Pages enabled, 30+ branches, 0 forks, 0 stars). Contains the confidential security register. Remediation is Mathew's in the GitHub UI: make private, disable Pages, prune unrelated branches; then treat as a leaked document under `birdlife-security` | 12 Sep 2026 |
 
 ## 7. Decision register
 
@@ -309,3 +311,4 @@ gate, 8 Sep 2026, Proposed). The next number is 0021. Status of the open ones:
 | 0019 (lens) | Lens model accepted; Entra write promotion gate (one proven reversible write, then four actions to Tier 1 with approval) | Lens model Accepted 8 Sep; gate Proposed, awaiting Mathew |
 | 0019 (Birdata) | Birdata supporter feed goes to Salesforce, aggregates only, not to Ortto | Accepted 7 Sep 2026, execution pending under IT-INT-004 |
 | 0020 | Salesforce Outlook add-in pilot for five users; Einstein Activity Capture held; EWS position needed before 1 Oct 2026 | Accepted 11 Sep 2026 |
+| 0021 | The brain lives in Mathew's personal git repository; his Google Drive is the human copy and backup; OneDrive and the repo-inbox retired; ownership personal; repository to be made private | Accepted 12 Sep 2026 |

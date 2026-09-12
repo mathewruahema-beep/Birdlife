@@ -1,7 +1,7 @@
 # IT-GOV-004: BirdLife OS lens model, IT Admin lens first
 
 Owner: Mathew Hema, Senior Manager ICT. Date: 8 September 2026. Status: Live (IT Admin lens), Stub (four others).
-Human copy: OneDrive Birdlife\Claude\IT-GOV-004_BirdLife_OS_Lens_Model.md. This file (os/lenses.md) is the repo record.
+Human copy: GoogleDrive\Claude\IT-GOV-004_BirdLife_OS_Lens_Model.md in Mathew's personal Google Drive (ADR 0021; the OneDrive path in the 8 Sep original was the same folder seen through OneDrive sync). This file (os/lenses.md) is the repo record.
 
 ## 1. What a lens is
 

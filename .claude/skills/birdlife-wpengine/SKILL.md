@@ -9,7 +9,7 @@ This is the **platform** layer. `birdlife-wordpress` covers what is inside WordP
 
 There is **no WP Engine MCP connector**. Work through the User Portal in the browser, the Customer API, or SSH. Always say which you used. Every figure below was read live on **11 September 2026** and must be re-verified before quoting.
 
-Reference document: **IT-WEB-001 WP Engine Mastery Reference** in OneDrive Birdlife.
+Reference document: **IT-WEB-001 WP Engine Mastery Reference** in Mathew's Google Drive (ADR 0021; not found there on 12 Sep 2026, ask Mathew).
 
 ---
 
