@@ -299,7 +299,7 @@ Refuse to create casually. Walk the change control from `os/README.md`:
 
 ## The skill estate (what exists, what each is for)
 
-Twenty-four skills, all versioned in `.claude/skills/` and mirrored to the
+Thirty-three skills, all versioned in `.claude/skills/` and mirrored to the
 account by uploading a zip per skill (the uploader rejects any name containing
 "claude"; the zip must include the skill's `references/` directory, which
 since 11 Sep 2026 carries a `facts.md` lookup file for the eight core system
@@ -315,10 +315,10 @@ deadlines, incidents), `birdlife-people-lifecycle` (joiner/mover/leaver),
 `birdlife-improvement` (the process-to-fix-to-learning loop behind the Fixes
 tab), `birdlife-prompting` (the six-line prompt frame), `email-voice`
 (Mathew's voice), `morning` (personal brief), `birdlife-os` (this one).
-Referenced by several skills but existing nowhere found on 11 Sep 2026:
-`birdlife-core`, `birdlife-manager`, `salesforce-delivery-governance`; treat
-those references as pointers to `CLAUDE.md` and this skill until the files
-are located or written.
+`birdlife-core` (the doctrine) and `birdlife-manager` were pulled into the
+repo from Google Drive on 12 Sep 2026, with seven small connector skills
+(atlassian, canva, gmail, google-calendar, granola, microsoft-learn, miro).
+`salesforce-delivery-governance` is still cited and still not found.
 
 A skill earns a slot when its knowledge is hard-won and reused. Connectors
 without a skill (Atlassian, Canva, Miro, Zoom, Granola, Gmail, Google Drive

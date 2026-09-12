@@ -150,17 +150,24 @@ every audit compares the live account list against this table.
 | birdlife-prompting | Six-line prompt frame | yes (pulled 11 Sep) | yes |
 | email-voice | Mathew's email voice | yes | yes, identical |
 | morning | Personal morning brief | yes (pulled 11 Sep) | yes |
+| birdlife-core | The doctrine: precedence, fact classes, tiers, ADR log 0001 to 0020, verification queries, six knowledge digests | yes (pulled 12 Sep from the Aug 2026 plugin in Google Drive) | **no** (was only ever in the plugin) |
+| birdlife-manager | Weekly ICT manager review, learning log (IT-GOV-003) | yes (patch 0002 applied 12 Sep) | **no** (the 7 Sep note says saved; the live list does not show it) |
+| birdlife-atlassian, birdlife-canva, birdlife-gmail, birdlife-google-calendar, birdlife-granola, birdlife-microsoft-learn, birdlife-miro | One small skill per connector (Aug 2026) | yes (pulled 12 Sep from the plugin) | no |
 
-**Referenced but not found anywhere (11 Sep 2026):** skills `birdlife-core`
-(cited by seven account skills as the precedence and write-tier rule set),
-`birdlife-manager` (weekly manager review and learning log),
-`salesforce-delivery-governance`; files `os/lenses.md`, ADR 0002, ADR 0019,
-IT-GOV-004, IT-SEC-002/003/006/007, IT-WEB-001, IT-SF-018; and the OneDrive
-`Claude\repo-inbox` patches 0001 to 0003 with their REGISTER-ROW apply notes
-(written 7 Sep 2026 by Cowork sessions that had no GitHub connection). Not in
-the repo, not on the account, not returned by SharePoint search. Either they
-live in Mathew's local OneDrive folder only, or they were never written. Until
-located, `CLAUDE.md` and `birdlife-os` stand in for `birdlife-core`.
+**Found and imported, 12 Sep 2026.** The missing rule set lived in Mathew's
+personal Google Drive (`GoogleDrive/Claude`), not OneDrive: the August 2026
+Cowork plugin `birdlife-ict.plugin` (birdlife-core with ADRs 0001 to 0016, the
+verification queries, the fact classification and six knowledge digests, plus
+nine connector skills), the `repo-inbox` with patches 0001 to 0003 and their
+apply notes, IT-GOV-004 and IT-GOV-005, ADRs 0018 to 0020 and the Manager
+folder. All committed on 12 Sep. Still cited and still not found: the
+`salesforce-delivery-governance` skill, ADR 0017, IT-SEC-002/003/004/007,
+IT-WEB-001 and IT-SF-018 as Markdown (IT-SF-018 exists in Drive as a 68 KB
+Markdown reference and was not imported; it is the Payments2Us operator
+reference behind `birdlife-payments2us`). Not imported by choice: the August
+`birdlife-google-workspace` skill (superseded by `google-workspace-expert`),
+`birdlife-spotify` (personal, no business function), and the
+`birdlife-ict-brain-repo.tar.gz` snapshot of 11 Aug.
 
 **Facts files, 11 Sep 2026:** the eight core system skills (salesforce, asana,
 microsoft365, netsuite, wordpress, stripe, zapier, cloudflare) gained
@@ -200,7 +207,7 @@ the charter (propose, then write). The Entra admin promotion plan is
 | Security dashboard (CONFIDENTIAL) | https://claude.ai/code/artifact/ff6c82e3-38d4-41de-b872-606521972498 | No automated refresh since 3 Sep (weekend job retired); sessions on request |
 | Department suite (9 pages: fundraising, membership, finance, supporter care, marketing, conservation, people, volunteering, executive rollup) | artifact IDs listed in the weekday job's prompt, section 6 | Weekday job, deep slot |
 | ICT Console | https://claude.ai/code/artifact/29a063d4-20c6-4793-bee5-d9916b40c84e | Sessions, on request ("update the console") |
-| Claude OS console with Jarvis | https://claude.ai/code/artifact/2a9b7e57-dbc5-49e3-a4d7-c0a36bd236b2 | Sessions, on request; source at `os/claude-os-overview.html`. Daily console: live Today tab (queue, board attention, Outlook inbox filtered to people, latest Teams messages) plus a Board tab by section, via the viewer's "Salesforce Production", "Asana" and "Microsoft 365" connectors. Jarvis HUD assistant (sample capability, viewer's own Claude usage). Write surface, each behind an in-page Approve card: Case internal note, public reply, close with reason, assign to the ICT team only (duplicate User records resolved live by recent Zeus case ownership, ambiguous matches always put to the user) (`createSobjectRecord`/`updateSobjectRecord`, verified by re-read); Asana comment, complete, move section (`add_comment`/`update_tasks`); Outlook reply DRAFT only, never send (`outlook_create_reply_draft`). Teams is read-only (no send API); replies are drafted to copy. Reads via `soqlQuery`/`search_tasks`/`outlook_email_search`/`chat_message_search`/`teams_list_chats`, plus (added 3 Sep) "Stripe" `stripe_api_read` (GetBalance across the five livemode accounts, READ ONLY — `stripe_api_write` is never declared) and "NetSuite" `ns_runCustomSuiteQL` for the Money tab, and live SF User queries for the Security tab (CONFIDENTIAL content). Jarvis carries `money_snapshot` and `security_snapshot` tools and a report library (weekly ICT status, money state, security posture, exec brief). Fixes tab (added 3 Sep): seeded catalogue of technical and process fixes plus Jarvis live suggestions (`fixes_catalog`, `fix_propose`, `fix_status`); `fix_track` creates one Asana task per approval via `create_tasks` (added to the Asana surface), verified by re-read. No bulk actions, no reassignment, no email sending from the page. Update this row and the page when the registers change materially |
+| Claude OS console with Jarvis | https://claude.ai/code/artifact/2a9b7e57-dbc5-49e3-a4d7-c0a36bd236b2 | Sessions, on request; source at `os/claude-os-overview.html` (8 Sep 2026 version with the Lens tab, committed 12 Sep from the repo-inbox; the live artifact was republished 8 Sep with the capability surface unchanged). Daily console: live Today tab (queue, board attention, Outlook inbox filtered to people, latest Teams messages) plus a Board tab by section, via the viewer's "Salesforce Production", "Asana" and "Microsoft 365" connectors. Jarvis HUD assistant (sample capability, viewer's own Claude usage). Write surface, each behind an in-page Approve card: Case internal note, public reply, close with reason, assign to the ICT team only (duplicate User records resolved live by recent Zeus case ownership, ambiguous matches always put to the user) (`createSobjectRecord`/`updateSobjectRecord`, verified by re-read); Asana comment, complete, move section (`add_comment`/`update_tasks`); Outlook reply DRAFT only, never send (`outlook_create_reply_draft`). Teams is read-only (no send API); replies are drafted to copy. Reads via `soqlQuery`/`search_tasks`/`outlook_email_search`/`chat_message_search`/`teams_list_chats`, plus (added 3 Sep) "Stripe" `stripe_api_read` (GetBalance across the five livemode accounts, READ ONLY — `stripe_api_write` is never declared) and "NetSuite" `ns_runCustomSuiteQL` for the Money tab, and live SF User queries for the Security tab (CONFIDENTIAL content). Jarvis carries `money_snapshot` and `security_snapshot` tools and a report library (weekly ICT status, money state, security posture, exec brief). Fixes tab (added 3 Sep): seeded catalogue of technical and process fixes plus Jarvis live suggestions (`fixes_catalog`, `fix_propose`, `fix_status`); `fix_track` creates one Asana task per approval via `create_tasks` (added to the Asana surface), verified by re-read. No bulk actions, no reassignment, no email sending from the page. Update this row and the page when the registers change materially |
 
 Teams channel copies (SharePoint files, fixed names, never renamed):
 BirdLife-ICT-Operations-Dashboard.html, BirdLife-ICT-Monitoring-Dashboard.html,
@@ -266,6 +273,7 @@ grants) and fold the missing checks in. Security dashboard kept (governance).
 | Vevox SAML certificates | Dashboard 21 Aug 2026 (passed), Vevox 8 Sep 2026 | Verify SSO still works; renew before 8 Sep |
 | Employment Hero sync Graph secret | Expires 5 Jan 2027 | Rotate when the Logic App is unblocked; add a reminder routine |
 | Salesforce test accounts `test101`, `test123` | Active with real credentials | Disable |
+| Zapier: Microsoft Teams connection under the shared `admin365.ross@BirdLifeAustralia.onmicrosoft.com` login (created 24 May 2024, last refreshed 25 Jul 2024, connection 47169426) | Shared admin credential still authorised (IT-GOV-004 finding F2) | Confirm no Zap uses it, remove it, close the row |
 
 ## 6. Memory register
 
@@ -283,4 +291,21 @@ commit as any change; the weekly audit (step 6 in `birdlife-os`) reports drift.
 | Weekly audit memory check | In the `birdlife-os` skill, which the live audit routine follows; no trigger change needed | 11 Sep 2026 |
 | Account pull | Eight account-only skills and four newer account copies committed to the repo; the repo is now a superset of the account except for `references/facts.md` and the memory audit steps, which the account lacks | 11 Sep 2026 |
 | Open decision | Two brains: stop syncing skills to the account (always start on the repo) or keep re-uploading by hand. Recommendation on record: repo only, keep `email-voice` on the account. Mathew to decide; nothing deleted yet | 11 Sep 2026 |
-| Open item | Locate `birdlife-core`, `os/lenses.md`, the ADRs and the OneDrive `repo-inbox` patches, then commit them | 11 Sep 2026 |
+| Closed 12 Sep | `birdlife-core`, `os/lenses.md`, ADRs 0001 to 0020 and the repo-inbox patches located in Google Drive and committed | 12 Sep 2026 |
+| Open decision | Mathew's stated direction (11 Sep, late): run the brain from his personal Google Drive rather than BirdLife. Recommendation on record in the journal: keep the git repository as the executable brain (it is already under his personal GitHub), make `GoogleDrive/Claude` the human-copy layer, and stop using OneDrive for it. Not implemented pending his word | 12 Sep 2026 |
+
+## 7. Decision register
+
+Decisions are ADRs in `.claude/skills/birdlife-core/references/decisions/`,
+append-only, never edited, superseded by a new dated entry. The log runs
+0001 to 0020 as at 12 Sep 2026. Known defects: ADR 0017 (autonomy levels) is
+cited by 0018 and 0019 and was not found; two ADRs carry the number 0019
+(Birdata supporter feed, 7 Sep 2026, Accepted; lens model and Entra write
+gate, 8 Sep 2026, Proposed). The next number is 0021. Status of the open ones:
+
+| ADR | Decision | Status |
+|---|---|---|
+| 0018 | Break-glass emergency access, sealed credential with the CEO or CFO, agent emergency stop | Proposed 24 Aug 2026, awaiting Mathew |
+| 0019 (lens) | Lens model accepted; Entra write promotion gate (one proven reversible write, then four actions to Tier 1 with approval) | Lens model Accepted 8 Sep; gate Proposed, awaiting Mathew |
+| 0019 (Birdata) | Birdata supporter feed goes to Salesforce, aggregates only, not to Ortto | Accepted 7 Sep 2026, execution pending under IT-INT-004 |
+| 0020 | Salesforce Outlook add-in pilot for five users; Einstein Activity Capture held; EWS position needed before 1 Oct 2026 | Accepted 11 Sep 2026 |

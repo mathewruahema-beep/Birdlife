@@ -30,3 +30,10 @@ Seeded 11 Sep 2026 from `os/registers.md`; doctrine in `birdlife-os` and
 - **Fix**: prompt rewritten against the current routine list. Estate changes must update dependent prompts in the same piece of work.
 - **Verify**: the one-shot prompt lists exactly the triggers in the register.
 - **Doctrine**: `os/README.md`, stale documentation is an incident.
+
+### "A Cowork session made a change and the repo never saw it"
+- **Seen**: 4 to 11 Sep 2026 (Zeus group rule, lens model, SC-300 baseline, WordPress rewrite, six new skills, three repo-inbox patches, the 3 Sep orphan-check patch)
+- **Cause**: Cowork sessions on Mathew's machine had no GitHub connection, so they saved skills to the claude.ai account and patches to a Google Drive folder that syncs through his personal OneDrive; the tenant OneDrive the M365 connector reads never had it, and no repo session checked either place.
+- **Fix**: pull the account skills from `/root/.claude/skills/synced/` (they are on disk in any repo session), then the Google Drive `Claude/repo-inbox` through the Google Drive connector, apply with `git am --3way`. Weekly audit step 8 now compares the live account list against the repo. Tier 1.
+- **Verify**: the account skill list has nothing the repo lacks; the repo-inbox folder has no patch newer than the last journal entry that mentions it.
+- **Doctrine**: `birdlife-os`, weekly audit steps 4 and 8; `memory/README.md`.

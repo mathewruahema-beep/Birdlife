@@ -15,6 +15,7 @@ the real IDs, picklist values, gotchas, and playbooks:
 
 | Skill | Covers |
 |---|---|
+| `birdlife-core` | The doctrine underneath everything: precedence order (live query beats skill beats digest beats memory), the four fact classes, the write tiers, where a new fact goes, and the ADR decision log (0001 to 0020) with the verification queries. This charter wins on conflict |
 | `birdlife-ict-assistant` | The core assistant: Case workflow, close-reason trap, Asana section IDs, Tier 1/2/3 boundaries, per-issue playbooks |
 | `birdlife-salesforce` | The "Zeus" org: NPSP, Payments2Us, miniOrange, Case model, SOQL patterns |
 | `birdlife-microsoft365` | Entra ID, Conditional Access, MFA, Intune, onboarding/offboarding |
@@ -36,9 +37,12 @@ the real IDs, picklist values, gotchas, and playbooks:
 | `birdlife-reporting` | The report library (weekly status, money state, security posture, exec brief, Board paper, incident), data discipline, production path |
 | `birdlife-improvement` | The improvement loop: observe processes, propose fixes (the console Fixes tab), track, verify, and write the learning back into the skills |
 | `birdlife-prompting` | The six-line prompt frame (Outcome, Evidence, Tier, Deliver, People, Done); load to challenge and sharpen a prompt |
+| `birdlife-manager` | The weekly ICT manager review: scorecard from live evidence, one learning a week, delegations under IT-SEC-002, writes `docs/manager/` |
+| `birdlife-atlassian`, `birdlife-canva`, `birdlife-granola`, `birdlife-miro`, `birdlife-microsoft-learn` | What each of those connectors reaches and what it is for at BirdLife |
+| `birdlife-gmail`, `birdlife-google-calendar` | The personal Google account connectors: why they are not BirdLife mail or scheduling, and the boundary |
 | `email-voice` | Mathew's email voice: three registers plus the report register; load before drafting anything he will send |
 | `morning` | Mathew's personal morning brief artifact |
-| `birdlife-os` | Managing Claude itself: routine/skill/connector/artefact governance, the weekly OS audit, the registers, and operating/updating the BirdLife Australia console (Jarvis) |
+| `birdlife-os` | Managing Claude itself: routine/skill/connector/artefact governance, the weekly OS audit, the registers, the lens model (`os/lenses.md`), and operating/updating the BirdLife Australia console (Jarvis) |
 
 If the account-synced versions of these skills are also present, they take
 precedence when newer; otherwise these repo copies are the source of truth. When
@@ -100,6 +104,8 @@ needed connector is absent, say so and deliver the prepared fix instead of guess
 - `INDEX.md` — one line per file: what is known where.
 - `memory/` — episodic memory: the dated journal of decisions, work and lessons,
   and the resolved-problem patterns per system. Rules in `memory/README.md`.
+- `os/lenses.md` — the lens model (IT-GOV-004): who is acting, which systems, the
+  write tier per action, verified live 8 Sep 2026.
 - `os/` — the Claude Operating System: the rules for managing the Claude estate
   itself (`os/README.md`) and the state-of-record registers for routines,
   skills, connectors, artefacts and credentials (`os/registers.md`). Any session

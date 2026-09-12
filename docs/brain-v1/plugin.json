@@ -1,0 +1,18 @@
+{
+  "name": "birdlife-ict",
+  "version": "1.1.0",
+  "description": "BirdLife Australia ICT operating knowledge: 19 skills covering Salesforce, Microsoft 365, NetSuite, WordPress, Asana, Stripe, Cloudflare and Zapier, plus the doctrine that keeps them honest.",
+  "author": {
+    "name": "Mathew Hema, Senior Manager ICT, BirdLife Australia"
+  },
+  "license": "UNLICENSED",
+  "keywords": [
+    "birdlife",
+    "ict",
+    "helpdesk",
+    "salesforce",
+    "microsoft365",
+    "netsuite",
+    "essential-eight"
+  ]
+}

@@ -225,6 +225,17 @@ table.reg tbody tr.clicky:hover td{background:var(--surface2)}
 .panel.warnp{border-left:4px solid var(--warn)}
 .panel.watchp{border-left:4px solid var(--accent)}
 
+.lensbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.lensbar button{font-family:var(--disp);font-weight:600;font-size:14px;padding:8px 15px;border-radius:10px;border:1px solid var(--line2);background:var(--surface);color:var(--ink2);transition:background .15s,transform .1s}
+.lensbar button:hover{background:var(--surface2);transform:translateY(-1px)}
+.lensbar button[aria-selected="true"]{background:var(--gold);color:var(--gold-ink);border-color:var(--gold);box-shadow:0 2px 12px rgba(240,180,41,.25)}
+.lensbar button small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:400;opacity:.8}
+.lenscard{background:var(--surface);border:1px solid var(--line2);border-left:4px solid var(--gold);border-radius:12px;padding:14px 17px;margin-bottom:16px}
+.lenscard dl{display:grid;grid-template-columns:120px 1fr;gap:4px 14px;margin:8px 0 0;font-size:13.5px}
+.lenscard dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding-top:2px}
+.lenscard dd{margin:0;color:var(--ink2)}
+@media (max-width:560px){.lenscard dl{grid-template-columns:1fr}}
+.tier1{background:var(--ok-bg);color:var(--ok)} .tier2{background:var(--warn-bg);color:var(--warn)} .tier3{background:var(--crit-bg);color:var(--crit)} .tier0{background:var(--surface2);color:var(--ink3);border:1px solid var(--line2)}
 footer{margin-top:48px;border-top:1px solid var(--line2);padding-top:14px;font-size:12.5px;color:var(--ink3)}
 footer .mono{font-size:11.5px}
 
@@ -289,14 +300,16 @@ footer .mono{font-size:11.5px}
     <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>12</b> recurring routines</span>
     <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>2</b> one-shots</span>
     <span class="chip" role="button" tabindex="0" data-goto="registers:routines"><b>9</b> retired 2 Sep, backed up</span>
-    <span class="chip" role="button" tabindex="0" data-goto="registers:skills"><b>12</b> skills in repo</span>
-    <span class="chip warn" role="button" tabindex="0" data-goto="rules"><b>2</b> decisions open</span>
+    <span class="chip" role="button" tabindex="0" data-goto="registers:skills"><b>15</b> skills in repo</span>
+    <span class="chip" role="button" tabindex="0" data-goto="lens"><b>IT Admin</b> lens live</span>
+    <span class="chip warn" role="button" tabindex="0" data-goto="rules"><b>3</b> decisions open</span>
   </div>
   <p class="hint">Everything is tappable: chips navigate, tiles filter, rows load Jarvis with a ready question, and reply/close/complete buttons start an approved action.</p>
 </header>
 
 <nav class="tabs" role="tablist" aria-label="Sections">
   <button role="tab" data-view="command" aria-selected="true">Command</button>
+  <button role="tab" data-view="lens" aria-selected="false">Lens</button>
   <button role="tab" data-view="today" aria-selected="false">Today</button>
   <button role="tab" data-view="board" aria-selected="false">Projects</button>
   <button role="tab" data-view="money" aria-selected="false">Money</button>
@@ -322,6 +335,17 @@ footer .mono{font-size:11.5px}
   </div>
   <div class="grouphead" style="margin-top:22px">Patterns worth acting on</div>
   <div id="cmd-patterns"></div>
+</div>
+
+<!-- ============ LENS ============ -->
+<div class="view" id="view-lens" hidden>
+  <div class="todaybar">
+    <h2 class="vt" style="margin:0">Lens: who the OS is acting as</h2>
+    <span class="asof" id="lens-asof"></span>
+  </div>
+  <p class="lede">A lens fixes who is acting, which systems, the write tier per action, the standing questions and the outputs. It can narrow authority, never raise it. The active lens is remembered on this device and prepended to every Jarvis turn. IT Admin is live; the other four are stubs wired to the skills that already hold their knowledge. Record: IT-GOV-004 and ADR 0019.</p>
+  <div class="lensbar" role="tablist" aria-label="Lens" id="lensbar"></div>
+  <div id="lens-host"></div>
 </div>
 
 <!-- ============ TODAY ============ -->
@@ -460,6 +484,7 @@ footer .mono{font-size:11.5px}
     <div class="panel warnp">
       <h3>Open decisions (tap to work one)</h3>
       <ul>
+        <li class="clicky" data-ask="ADR 0019 proposes promoting four Entra actions (disable account, revoke sessions, licence removal, group removal) to Tier 1 with approval once one reversible write is proven. Lay out the first proof write, its rollback, and what I say to Andrew and Keith."><b>Entra write gate (ADR 0019).</b> The entra-admin connector answers Graph live; the record still says pending. Decide the proof write.</li>
         <li class="clicky" data-ask="Should I retire the department dashboard suite or share this console with the team instead? Lay out both paths with effort and impact, and recommend one."><b>Dashboard estate.</b> Retire the department suite, or share this console with the team (each viewer needs their own connector grants). The budget decision itself was resolved 3 Sep at 12 of 12.</li>
         <li class="clicky" data-ask="What exactly do I need to do to verify the WooCommerce key rotation from the August exposure, and how do I close it off the watchlist?"><b>WooCommerce key rotation.</b> Flagged in August after keys sat in routine prompts; still not verified done. Stays on the credential watchlist until confirmed.</li>
       </ul>
@@ -480,7 +505,7 @@ footer .mono{font-size:11.5px}
   <a href="https://github.com/mathewruahema-beep/Birdlife/blob/claude/os-for-claude-y12d5q/os/registers.md">os/registers.md</a> (state of record) ·
   <a href="https://github.com/mathewruahema-beep/Birdlife/tree/claude/os-for-claude-y12d5q/.claude/skills/birdlife-os">birdlife-os skill</a> ·
   <a href="https://github.com/mathewruahema-beep/Birdlife/tree/claude/os-for-claude-y12d5q/routines">routine backups</a><br>
-  Consolidation executed 2 Sep 2026. Times AEST (UTC+10); the standing DST one-shot adjusts crons on 5 Oct 2026. This page names internal systems: keep the link private.
+  Consolidation executed 2 Sep 2026. Lens model added 8 Sep 2026 (IT-GOV-004, ADR 0019). Times AEST (UTC+10); the standing DST one-shot adjusts crons on 5 Oct 2026. This page names internal systems: keep the link private.
 </footer>
 </div>
 
@@ -509,10 +534,10 @@ footer .mono{font-size:11.5px}
 // ---------- data ----------
 const LAYERS = [
  {role:"Charter", sub:"kernel", kernel:true, what:"Loads into every session on this repo and sets who the assistant is and what it may never do.", home:"CLAUDE.md",
-  points:["Three honesty tiers: T1 executes with approval (Salesforce data, Asana, user-level M365), T2 prepares exact fixes for an admin (Entra/Exchange), T3 designs only (Salesforce config).","Hard guardrails: propose then write, no external email without showing the draft, no bulk updates or deletes, confirm identity before reassigning, log every write.","Changed only by a commit Mathew approves."]},
+  points:["Three honesty tiers: T1 executes with approval (Salesforce data, Asana, user-level M365), T2 prepares exact fixes for an admin (Entra/Exchange), T3 designs only (Salesforce config).","Hard guardrails: propose then write, no external email without showing the draft, no bulk updates or deletes, confirm identity before reassigning, log every write.","Changed only by a commit Mathew approves.","Lenses (8 Sep 2026): IT Admin live, Security, Finance link, Manager, Board and Exec stubbed. A lens narrows authority, never raises it (IT-GOV-004)."]},
  {role:"Skills", sub:"memory", what:"Versioned operator knowledge. This is how the assistant learns: change the file, commit, and every future session on any device knows it.", home:".claude/skills/  (mirrored to the claude.ai account)",
-  points:["Nine birdlife-* system skills: ict-assistant, salesforce, microsoft365, asana, netsuite, wordpress, stripe, zapier, cloudflare.","email-voice: Mathew's three email registers, committed to the repo 2 Sep 2026 after living account-only.","claude-os: the operator skill for this OS. Any session told to run the audit follows the same playbook."]},
- {role:"Routines", sub:"scheduler", what:"Unattended work on cron. 13 recurring plus 2 one-shots, governed by a budget of 12 and one-job-per-outcome.", home:"claude.ai Routines",
+  points:["Nine birdlife-* system skills: ict-assistant, salesforce, microsoft365, asana, netsuite, wordpress, stripe, zapier, cloudflare.","Four cross-cutting skills added 3 Sep: security, people-lifecycle, reporting, improvement (the loop behind the Fixes tab).","email-voice: Mathew's registers, committed 2 Sep. birdlife-os: the operator skill for this OS and the console."]},
+ {role:"Routines", sub:"scheduler", what:"Unattended work on cron. 12 recurring plus 2 one-shots, at the budget of 12, one job per outcome.", home:"claude.ai Routines",
   points:["Every routine carries a passport: name that says what and when, UTC cron with the AEST translation, prompt with goal and hard rules, connectors, notification, register row.","Write-capable routines name their exact write surface and hard caps in the prompt. Model: the overnight pre-draft, internal comments only, max 8.","Retirement always exports the definition to routines/ first. Nothing is deleted unrecoverably."]},
  {role:"Connectors", sub:"drivers", what:"Access to the real systems: Salesforce, Asana, Microsoft 365, NetSuite, Stripe, Zapier, Cloudflare, GitHub and more.", home:"claude.ai Settings, Connectors",
   points:["Attached and detached by Mathew only, in the UI. Sessions never touch connector configuration.","Routines carry their own per-routine grants; a routine created without them fires but reads nothing, the most common silent failure.","Salesforce Staging for anything experimental; Production writes follow the charter."]},
@@ -589,8 +614,12 @@ const SKILLS = [
  ["birdlife-stripe","Payments, refunds, BECS, payment flow","yes","yes"],
  ["birdlife-zapier","The 17 connected apps, when Zapier vs native","yes","yes"],
  ["birdlife-cloudflare","DNS, SPF/DKIM, WAF, the two accounts","yes","yes"],
- ["claude-os","This operating system","yes","sync it"],
- ["email-voice","Mathew's email voice, three registers","yes (2 Sep)","yes"],
+ ["birdlife-security","Posture, deadlines, incident playbooks (confidential)","yes (3 Sep)","upload"],
+ ["birdlife-people-lifecycle","Joiner, mover, leaver across every system","yes (3 Sep)","upload"],
+ ["birdlife-reporting","Report library, data discipline, production path","yes (3 Sep)","upload"],
+ ["birdlife-improvement","Observe, propose, track, verify, learn (the Fixes tab)","yes (3 Sep)","upload"],
+ ["birdlife-os","This operating system and the console","yes","re-upload"],
+ ["email-voice","Mathew's email voice, three registers plus reports","yes (2 Sep)","re-upload"],
  ["morning","Morning brief","account only","yes"]
 ];
 const CONN_CORE = [
@@ -633,6 +662,102 @@ const AUTOMATION_SIGNALS = [
 const CLOSE_REASONS=["Closed - Resolved","Closed - Resolved First Call","Closed - Email Sent","Closed - Email Edited & Sent","Closed - Phone Call","Closed - No Action Required","Closed - Internal Follow up","Closed - Duplicate","Closed - Spam","Closed - Abandoned","Closed - Autoreply","Closed - Returned Letter"];
 const STATUSES=["New","In Progress","Pending","On Hold-Internal","Waiting Response-External","Response Received","Closed"];
 
+
+// ---------- lenses (IT-GOV-004, verified live 8 Sep 2026) ----------
+const LENSES=[
+ {id:"itadmin",name:"IT Admin",status:"live",who:"Mathew acting as administrator of every connected system",
+  systems:"All connected systems, in the matrix order below",
+  question:"What can I do in each system right now, at what tier, and what proves it worked",
+  outputs:"Capability matrix, one admin action per system with its DONE test, delegation candidates for IT-SEC-002",
+  skills:"birdlife-os, birdlife-core (rule 3), birdlife-security, birdlife-people-lifecycle",
+  framing:"ACTIVE LENS: IT Admin. Act as the administrator of every connected BirdLife system. Before any action name the system, the tier from the IT Admin capability matrix (1 execute after approval, 2 prepare exact commands for a named runner, 3 design only) and the proof query. Entra ID is Tier 2 until ADR 0019's gate passes. Never go quiet on a Tier 2 action."},
+ {id:"security",name:"Security",status:"stub",who:"Mathew as security owner, Essential Eight anchor with a SaaS and identity overlay",
+  systems:"Entra, Salesforce, WordPress, Cloudflare, Stripe, Zapier, email authentication",
+  question:"What is overdue, who holds privilege, what changed since Sunday",
+  outputs:"Security tab, Sunday security dashboard, deadline register, incident playbooks",
+  skills:"birdlife-security, birdlife-microsoft365",
+  framing:"ACTIVE LENS: Security. Answer as BirdLife's security owner anchored on Essential Eight. Lead with overdue deadlines and privileged accounts. Content is confidential; keep it in this conversation."},
+ {id:"finance",name:"Finance link",status:"stub",who:"Nina Lewis with Mathew, the bridge to Finance",
+  systems:"Salesforce, Stripe (five livemode accounts), NetSuite subsidiary 2, Zapier",
+  question:"Do the three money systems agree, and where is the gap",
+  outputs:"Money tab, money state report, reconciliation pack",
+  skills:"birdlife-netsuite, birdlife-stripe, birdlife-reporting",
+  framing:"ACTIVE LENS: Finance link. Answer for Nina Lewis and Finance. Every figure names its lens (opportunity close date, payment date, Stripe settlement, NetSuite posting). The gap between systems is the finding. Money page tools are read only."},
+ {id:"manager",name:"Manager",status:"stub",who:"Mathew as manager of Andrew Dunn, Keith Tsui, Nina Lewis and contractor Karishma Soni",
+  systems:"Zeus queue, IT Operations Project Plan, routines, deadline register",
+  question:"What moved, what stalled, what do I delegate this week, what is the one learning",
+  outputs:"Weekly manager review (IT-GOV-003), learning log, delegation ladder under IT-SEC-002",
+  skills:"birdlife-manager, birdlife-asana, birdlife-ict-assistant",
+  framing:"ACTIVE LENS: Manager. Rank money first, then what blocks people, then risk. Name the delegation for Andrew, Keith or Nina with a DONE test they can check themselves. Call out what Mathew is neglecting."},
+ {id:"board",name:"Board and Exec",status:"stub",who:"Mathew reporting to Kate Millar (CEO), the CFO, the ICT Steering Group and the Board",
+  systems:"Read only over everything",
+  question:"What does the CEO or Board need to decide, in five sentences",
+  outputs:"Exec brief, Board paper on the Board Paper template, ISG deck",
+  skills:"birdlife-reporting, email-voice register C",
+  framing:"ACTIVE LENS: Board and Exec. Register C voice. Lead with the decision needed, money first, five sentences unless asked for more. No system names the Board would not recognise; no confidential security detail."}
+];
+// IT Admin matrix: [system, connector, reached, tier, rule, proof]. Tier 0 = not usable from here.
+const ITADMIN_MATRIX=[
+ ["Salesforce Production (Zeus)","Salesforce Production","yes, System Administrator profile",1,"Data writes one record per approval with an internal audit comment; never bulk; no delete without a Case. Configuration is Tier 3 (no Metadata API here).","Re-read the record by Id"],
+ ["Salesforce Staging","Salesforce Staging","yes, same user .staging",1,"Experiments go here first. Refreshed from Production before 30 Aug, so it holds prod data.","Re-read by Id"],
+ ["Microsoft 365 (user level)","Microsoft 365","yes, mathew.hema",1,"Own mailbox and calendar only. Console never sends; sessions send after showing the draft. No admin surface.","Message or event id re-read"],
+ ["Microsoft Entra ID (admin)","entra-admin-cloud (desktop bridge)","yes, Graph read proven",2,"Write tools exist (disable, licences, groups, revoke sessions, create user, TAP). Stays Tier 2 until one reversible write is proven under an approval card (ADR 0019 gate). Mail-enabled groups still need Exchange PowerShell (IT-SEC-004).","get_user re-read: accountEnabled, assignedLicenses"],
+ ["Azure subscription","Azure MCP Server (desktop bridge)","yes, BirdLife Australia Azure",2,"Full ARM surface under Mathew's Owner identity. Logic App and Container App changes prepared as az commands with a change record.","Resource read after the change"],
+ ["Asana","Asana","yes, workspace 443963187362944",1,"One task per approval; section moves via add_projects; never delete.","update_tasks succeeded, then search_tasks re-read"],
+ ["NetSuite OneWorld","NetSuite","yes, subsidiary 2",1,"Read only in practice (SuiteQL, always subsidiary 2, never create saved searches). Record writes are Tier 3: it is the ledger.","SuiteQL count before and after"],
+ ["Stripe (5 livemode accounts)","Stripe","yes, all five livemode",3,"stripe_api_read only. stripe_api_write is never declared on this page and never used from a session without a written Case and Mathew present.","stripe_api_read of the object"],
+ ["WordPress UAT (WooCommerce)","BirdLife UAT WordPress","yes, 11 abilities",1,"UAT only: order notes, status, products. Production WordPress has no connector: Tier 2 via wp-admin, Tier 3 for plugin work.","orders-query or products-query re-read"],
+ ["Cloudflare","Cloudflare Developer Platform","yes, two accounts, 0 Workers",2,"This connector reaches Workers, KV, R2, D1 only. DNS, WAF, rate limiting and cache are dashboard changes prepared as click-paths with rollback.","dig for DNS; workers_list for Workers"],
+ ["Zapier","Zapier","yes, three Teams connections",1,"Teams posts to the ICT Monitoring team and read actions are Tier 1; enabling new write actions is Tier 2. FINDING: a 2024 Teams connection under the shared admin365.ross login is still authorised (watchlist).","Action result plus a read of the target"],
+ ["Raisely","Raisely","reached, identity not exposed",2,"Token is app scope mcp; privilege unknown until checked in Raisely admin. Reads Tier 1, writes Tier 2. Organisation and webhook endpoints answer 403.","list_campaigns count and re-read"],
+ ["Ortto","Ortto","yes, instance birdlife",2,"Reads Tier 1. Campaign and asset writes belong to Marketing's named owner.","get_asset_html re-read"],
+ ["Atlassian (Confluence, Jira)","Atlassian Rovo","yes, site birdlife-ict",1,"ICT space only. Confluence is a published copy; the repo is the knowledge base of record (ADR 0004).","getConfluencePage re-read"],
+ ["Canva","Canva","yes, flagship brand kit",1,"ICT collateral from the flagship kit. Brand template publish is Tier 2 to Marketing.","read-design re-read"],
+ ["Miro","Miro","yes",1,"ICT boards. Sharing outside the team is Tier 2.","board_list_items re-read"],
+ ["Zoom","Zoom for Claude","yes",1,"Mathew's own meetings. Zoom admin (SSO, SCIM, app cleanup) has no connector: Tier 2 per IT-INT-003.","search_meetings re-read"],
+ ["Granola","Granola","yes, workspace Birdlife",1,"Read only. Meeting content stays in the session.","n/a"],
+ ["AWS (Birdata)","AWS API MCP Server (desktop bridge)","NOT reached: no credentials",0,"Bridge has no credential profile. EKS support fees and root MFA cannot be checked from here until an IAM profile is configured on h20blacks.","sts get-caller-identity"],
+ ["GitHub","none in Cowork","NOT connected",0,"On the approved list, absent from sessions. Patches queue in OneDrive Birdlife/Claude/repo-inbox for a manual git am.","git log after apply"],
+ ["Google Workspace (Drive, Gmail, Calendar)","Google Drive, Gmail, Google Calendar","present, personal account",1,"Personal account (ADR 0006 exception E1): the Birdlife working folder only. No BirdLife Workspace admin reach.","n/a"],
+ ["Claude estate (routines, artefacts, skills)","claude-code-remote, Artifact","yes",1,"birdlife-os change control: passport first, budget 12 of 12, backup before retire, register row same session.","list_triggers and the register row"]
+];
+function activeLens(){ const id=recall("lens")||"itadmin"; return LENSES.find(l=>l.id===id)||LENSES[0]; }
+function renderLens(){
+  const bar=$("#lensbar"), host=$("#lens-host"); if(!bar||!host) return;
+  const cur=activeLens();
+  bar.innerHTML="";
+  LENSES.forEach(l=>{
+    const b=el("button",null,`${esc(l.name)}<small>${l.status==="live"?"live":"stub"}</small>`);
+    b.setAttribute("role","tab"); b.setAttribute("aria-selected",String(l.id===cur.id));
+    b.addEventListener("click",()=>{ remember("lens",l.id); renderLens(); try{updateTicker();}catch(e){} });
+    bar.append(b);
+  });
+  $("#lens-asof").textContent="active: "+cur.name+(cur.status==="stub"?" (stub)":"");
+  host.innerHTML="";
+  const card=el("div","lenscard",`<b>${esc(cur.name)}</b> <span class="tag ${cur.status==="live"?"read":"gov"}">${cur.status}</span>
+    <dl><dt>Who</dt><dd>${esc(cur.who)}</dd><dt>Systems</dt><dd>${esc(cur.systems)}</dd><dt>Question</dt><dd>${esc(cur.question)}</dd><dt>Outputs</dt><dd>${esc(cur.outputs)}</dd><dt>Skills</dt><dd class="mono">${esc(cur.skills)}</dd></dl>`);
+  const acts=el("div","rowacts");
+  const a1=el("button",null,"ask jarvis through this lens"); a1.addEventListener("click",()=>jAsk("Through the "+cur.name+" lens: what should I look at first right now, and what is the one action you would take? Use the live snapshots."));
+  const a2=el("button",null,"copy session opener"); a2.addEventListener("click",()=>copyText("Act through the BirdLife OS "+cur.name+" lens (IT-GOV-004). Load "+cur.skills+". State the tier for every action before doing it.",a2));
+  acts.append(a1,a2); card.append(acts); host.append(card);
+  if(cur.id==="itadmin"){
+    const usable=ITADMIN_MATRIX.filter(r=>r[3]>0).length, t1=ITADMIN_MATRIX.filter(r=>r[3]===1).length, t2=ITADMIN_MATRIX.filter(r=>r[3]===2).length, t3=ITADMIN_MATRIX.filter(r=>r[3]===3).length, dead=ITADMIN_MATRIX.filter(r=>r[3]===0).length;
+    const tiles=el("div","tiles");
+    const tile=(v,l,cls)=>tiles.append(el("div","tile"+(cls?" "+cls:""),`<div class="v">${v}</div><div class="l">${esc(l)}</div>`));
+    tile(ITADMIN_MATRIX.length,"systems in the matrix"); tile(usable,"reached and usable","ok"); tile(t1,"tier 1: execute after approval","ok"); tile(t2,"tier 2: prepare for a runner","warn"); tile(t3,"tier 3: design only","crit"); tile(dead,"not usable from here",dead?"crit":"ok");
+    host.append(tiles);
+    host.append(el("div","grouphead","IT Admin capability matrix · verified live 8 Sep 2026 · a row older than 30 days is a baseline, re-probe it"));
+    const wrap=el("div","tablewrap");
+    const tbl=el("table","reg",`<thead><tr><th>System</th><th>Connector</th><th>Reached</th><th>Tier</th><th>Rule</th><th>Proof</th></tr></thead><tbody>${ITADMIN_MATRIX.map(([sy,c,r,t,rule,proof],i)=>`<tr class="clicky" data-i="${i}"><td><b>${esc(sy)}</b></td><td class="mono">${esc(c)}</td><td>${esc(r)}</td><td><span class="pill tier${t}">${t===0?"n/a":"tier "+t}</span></td><td>${esc(rule)}</td><td class="mono">${esc(proof)}</td></tr>`).join("")}</tbody>`);
+    wrap.append(tbl); host.append(wrap);
+    tbl.querySelectorAll("tr.clicky").forEach(tr=>tr.addEventListener("click",()=>{ const r=ITADMIN_MATRIX[+tr.dataset.i]; jPre("As IT Admin in "+r[0]+" ("+r[1]+", tier "+(r[3]||"not usable")+"): "); }));
+    host.append(el("p","schednote","Twenty-two rows, 20 reached. Open findings from the probe: F1 Entra write connector live but ADR 0002 says pending (ADR 0019 gate); F2 shared admin365.ross Teams connection in Zapier; F3 AWS bridge without credentials; F4 GitHub not connected; F5 Raisely token privilege unknown; F6 three overlapping Salesforce read paths. Full record: OneDrive Birdlife/Claude/IT-GOV-004_BirdLife_OS_Lens_Model.md."));
+  } else {
+    const tab=cur.id==="security"?"Security":cur.id==="finance"?"Money":"Command";
+    host.append(el("div","degraded","<b>Stub.</b> This lens is named, owned and wired to its skills, and not yet given its own live matrix or page behaviour. It gets built the way IT Admin was: probe live, write the matrix, prove one action, record. Until then the "+tab+" tab is the working surface, and Jarvis already answers in this persona while it is active."));
+  }
+}
+
 // ---------- helpers ----------
 const $ = s => document.querySelector(s);
 const el = (t,c,h) => {const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e;};
@@ -646,13 +771,14 @@ function jAsk(q){ if(JarvisBus.ask) JarvisBus.ask(q); else if(JarvisBus.prefill)
 function jPre(q){ if(JarvisBus.prefill) JarvisBus.prefill(q); }
 
 // ---------- tabs ----------
-const VIEWS=["command","today","board","money","security","fixes","system","schedule","registers","rules"];
+const VIEWS=["command","lens","today","board","money","security","fixes","system","schedule","registers","rules"];
 const tabs=[...document.querySelectorAll('nav.tabs button')];
 function showView(v){
   if(!VIEWS.includes(v)) return;
   tabs.forEach(b=>b.setAttribute('aria-selected', String(b.dataset.view===v)));
   VIEWS.forEach(id=>{$("#view-"+id).hidden = id!==v;});
   remember("tab",v);
+  if(v==="lens") renderLens();
   if(v==="money" && typeof loadMoney==="function") loadMoney(false);
   if(v==="security" && typeof loadSecurity==="function") loadSecurity(false);
   if(v==="fixes"){ try{ renderFixes(); }catch(e){ /* declarations later in the script; rendered again once they exist */ } }
@@ -741,7 +867,7 @@ function rcard(r){
 }
 (function(){
   const host=$("#reg-routines");
-  host.append(el("div","grouphead","Active recurring · 13 of a budget of 12 · decision open"));
+  host.append(el("div","grouphead","Active recurring · 12 of a budget of 12 · budget resolved 3 Sep"));
   const list=el("div","rlist"); R.forEach(r=>list.append(rcard(r))); host.append(list);
   host.append(el("div","grouphead","One-shots · exempt from the budget"));
   const l2=el("div","rlist");
@@ -816,7 +942,7 @@ document.querySelectorAll('.panel li[data-ask]').forEach(li=>li.addEventListener
 })();
 
 // ================= LIVE (mcp) =================
-const SF_SERVER="Salesforce Production", AS_SERVER="Asana", PROJECT="1211042432693678";
+const SF_SERVER="Salesforce Production", AS_SERVER="Asana", PROJECT="1211042432693678", ZEUS_GROUP="00GRF000001s1RZ2AY"; // Zeus public group = the ICT team (charter rule 4)
 const Q_OPEN="SELECT Id, CaseNumber, Subject, Status, Type, Owner.Name, CreatedDate FROM Case WHERE IsClosed = false AND RecordType.DeveloperName = 'Zeus' ORDER BY CreatedDate ASC LIMIT 200";
 const AS_INPUT={projects_any:PROJECT, completed:false, limit:100, opt_fields:"name,assignee.name,due_on,memberships.section.name,modified_at"};
 const M365_SERVER="Microsoft 365";
@@ -975,6 +1101,7 @@ function renderCommand(){
   if(dec && !dec.dataset.built){
     dec.dataset.built="1";
     const items=[
+      ["Entra write gate: ADR 0019 proposes four Tier 1 actions after one proven write","ADR 0019 proposes promoting four Entra actions to Tier 1 with approval once one reversible write is proven. Lay out the first proof write, its rollback, and what I say to Andrew and Keith."],
       ["WooCommerce key rotation, open since August","What exactly do I need to do to verify the WooCommerce key rotation from the August exposure, and how do I close it off the watchlist?"],
       ["Three Blocked items are decision debt (portal email, Plauti permissions, duplicate management)","The three decision-debt items in Blocked: lay out each decision, the options, and what you would decide in my shoes. Then draft the comment to post on each."],
       ["Dashboard estate: retire the department suite or share this console with the team","Should I retire the department dashboard suite or share this console with the team instead? Lay out both paths with effort and impact, and recommend one."]
@@ -1359,7 +1486,7 @@ $("#sec-refresh")&&$("#sec-refresh").addEventListener("click",()=>loadSecurity(t
 
 
 // ================= FIXES (AI-suggested fixes, technical and process) =================
-// Seeded from the skills' verified findings; Jarvis appends live suggestions via fix_propose.
+// Seeded from the skills' verified findings; Jarvis appends live suggestions via the fixes tool (action propose).
 // sev 1 critical, 2 high, 3 medium. tier 1 execute, 2 prepare for an admin, 3 design (SF config). effort minutes|hours|project.
 const FIXES_SEED=[
  {id:"wp-selfreg",title:"Turn off public self-registration defaulting to Shop Manager",system:"WordPress",cat:"security",sev:1,tier:2,effort:"minutes",owner:"Nina Lewis",
@@ -1522,6 +1649,10 @@ const FIXES_SEED=[
   why:"Atlassian, Canva, Miro, Zoom, Granola, Gmail, Google Drive and Calendar are connected with no skill and no routine using them; each is credentialed attack surface.",
   people:"A connector nobody uses is a door nobody watches.",
   steps:["At the Monday audit, each connector names the routine or session task it serves.","Disconnect the ones with no answer; register the rest.","Re-check quarterly."],src:"birdlife-os"},
+ {id:"sf-readonly-users",title:"Make the two Salesforce read-only integration users actually read-only",system:"Salesforce",cat:"security",sev:2,tier:1,effort:"minutes",owner:"Mathew Hema",
+  why:"integration.readonly and Keith Readonly carry the MCP Read Only permission set but sit on the Standard User profile, which grants edit on 49 objects and delete on Account and Contact (verified 4 Sep 2026).",
+  people:"A connector believed to be read-only can alter donor records; whoever holds that token holds more than anyone signed off.",
+  steps:["Change both users' profile to Minimum Access - Salesforce (updateSobjectRecord on User, one at a time, approval each).","Create or assign a permission set granting API Enabled so the MCP connection keeps working.","Re-test the read-only MCP connection; record the outcome in the credential watchlist."],src:"birdlife-salesforce"},
  {id:"sec-exception-register",title:"Fill the IT-SEC-001 service account exception register",system:"Entra ID",cat:"process",sev:3,tier:1,effort:"minutes",owner:"Mathew Hema",
   why:"Only discovery.centre is populated and its site and owner fields are blank; the standard exists and is not being kept.",
   people:"A no-MFA account with no owner is nobody's job to remove.",
@@ -1616,7 +1747,7 @@ function renderFixes(){
   }
   renderList();
   host.append(el("p","schednote","Seeded from the skills' verified findings (dated Jun to Sep 2026) plus anything Jarvis proposes from live reads. Status and Jarvis additions are stored in this browser only. Tier 2 and 3 fixes are prepared for an admin, never faked; tracking into Asana goes through an approval card."));
-  const sug=$("#fx-suggest"); if(sug && !sug.dataset.wired){ sug.dataset.wired="1"; sug.addEventListener("click",()=>jAsk("Look at the live snapshots (queue, board, money, security) and the fixes catalogue. Propose up to three NEW fixes that are not already listed, each with title, system, category, severity, tier, effort, why, impact on people, steps and owner, and add each with fix_propose. Then tell me the one you would do first and why.")); }
+  const sug=$("#fx-suggest"); if(sug && !sug.dataset.wired){ sug.dataset.wired="1"; sug.addEventListener("click",()=>jAsk("Look at the live snapshots (queue, board, money, security) and the fixes catalogue. Propose up to three NEW fixes that are not already listed, each with title, system, category, severity, tier, effort, why, impact on people, steps and owner, and add each with the fixes tool (action propose). Then tell me the one you would do first and why.")); }
   const rst=$("#fx-reset"); if(rst && !rst.dataset.wired){ rst.dataset.wired="1"; rst.addEventListener("click",()=>{Object.assign(fxFilter,{q:"",cat:"all",sev:"all",tier:"all",status:"open",sort:"rank"}); renderFixes();}); }
 }
 function fxCard(f){
@@ -1636,7 +1767,7 @@ function fxCard(f){
     `<h4>Owner</h4><div class="owner">${esc(f.owner)} · source: ${esc(f.src)} · ${f.tier===1?"tier 1, the console or a session can execute after approval":f.tier===2?"tier 2, prepared as exact commands for an admin":"tier 3, designed for a Salesforce admin or developer to build"}</div>`);
   const acts=el("div","rowacts");
   const mk=(label,fn)=>{const b=el("button",null,esc(label)); b.addEventListener("click",e=>{e.stopPropagation();fn();}); acts.append(b);};
-  mk("prepare with jarvis",()=>jAsk("Prepare fix \""+f.title+"\" (id "+f.id+", "+f.system+", tier "+f.tier+"). Read it from fixes_catalog. Give me the exact commands, click-paths or SOQL an admin runs, in order, what to verify afterwards, and the one-line message to the owner ("+f.owner+") in my voice. If any step is within your action tools, offer to run it through an approval card."));
+  mk("prepare with jarvis",()=>jAsk("Prepare fix \""+f.title+"\" (id "+f.id+", "+f.system+", tier "+f.tier+"). Read it from the fixes tool (action list). Give me the exact commands, click-paths or SOQL an admin runs, in order, what to verify afterwards, and the one-line message to the owner ("+f.owner+") in my voice. If any step is within your action tools, offer to run it through an approval card."));
   mk("track in asana",()=>jAsk("Track fix \""+f.title+"\" (id "+f.id+") in Asana using fix_track: Backlog/Requests section, notes from the runbook, owner "+f.owner+", due date two weeks from today unless the fix has a hard deadline sooner."));
   mk("draft the nudge",()=>jAsk("Draft a short message from me to "+f.owner+" about fix \""+f.title+"\": what, why it matters to people, the first step, and a date. Register B, my voice, ready to paste into Teams or an email draft."));
   mk("copy runbook",async()=>{try{await navigator.clipboard.writeText(fxRunbook(f));}catch(e){}});
@@ -1647,6 +1778,7 @@ function fxCard(f){
 }
 window.FixesBus={all:fxAll,get:fxGet,status:fxStat,setStatus:fxSetStatus,add:fxAdd,remove:fxRemoveExtra,runbook:fxRunbook};
 if(recall("tab")==="fixes") renderFixes();
+if(recall("tab")==="lens") renderLens();
 
 // ================= JARVIS =================
 let updateTicker=()=>{};
@@ -1663,7 +1795,7 @@ let updateTicker=()=>{};
       if(cf.newOld.length) f.push(cf.newOld.length+" in New past 2 business days");}
     if(liveTasks){const tf=taskFacts(); if(tf.overdue.length) f.push(tf.overdue.length+" board items overdue");}
     if(liveMail){const mf=mailFacts(); if(mf.unread.length) f.push(mf.unread.length+" unread from people");}
-    f.push("12 routines on watch");
+    f.push("12 routines on watch"); f.push("lens: "+activeLens().name);
     tickerFacts=f.length?f:["systems nominal"];
   };
   setInterval(()=>{ sub.textContent=tickerFacts[tickerI++%tickerFacts.length]; },5000);
@@ -1681,12 +1813,15 @@ let updateTicker=()=>{};
     credentials_watchlist: CREDS.map(([n,s,a])=>({item:n,status:s.split("|")[1],action:a})),
     rules: RULES.map(([t,b,w],i)=>({n:i+1,rule:t,detail:b,why:w})),
     open_decisions:[
+      "ADR 0019 (Proposed, 8 Sep): Entra stays Tier 2 until one reversible write is proven under an approval card; then disable, revoke sessions, licence removal and group removal become Tier 1 with approval.",
       "WooCommerce key rotation from the August exposure still not verified done.",
       "Dashboard estate: retire the department suite or share this console with the team (each viewer would need their own connector grants). Recorded 3 Sep in os/registers.md.",
       "Routine budget resolved 3 Sep at 12 of 12 (Top 10 email draft retired)."],
     watching:["Thu 3 Sep 7:04am first deep slot of merged weekday job","Weekend 5-7 Sep first run of merged weekend job incl Sunday security refresh","Mon 8 Sep 6am first weekly audit self-run"],
     governance_loop:["Propose exact change","Mathew approves","Execute and verify","Record in os/registers.md, same commit"],
     automation_signals: AUTOMATION_SIGNALS,
+    lenses: LENSES.map(l=>({lens:l.name,status:l.status,who:l.who,systems:l.systems,question:l.question,outputs:l.outputs,skills:l.skills})),
+    it_admin_matrix_verified_8_sep_2026: ITADMIN_MATRIX.map(([sy,c,r,t,rule,proof])=>({system:sy,connector:c,reached:r,tier:t||"not usable",rule,proof})),
     case_model:{scope:"Cases live on RecordType.DeveloperName='Zeus' (ALWAYS scope Case queries with it). Owner.Name='Zeus' is the unassigned intake queue, not a person. Asana project gid 1211042432693678.",
       statuses:STATUSES, close_reasons:CLOSE_REASONS,
       closing:"Closing needs Status='Closed' AND Case_Closed_Reason__c from the list. Set Type too if blank (Admin, Troubleshooting, IAM, New User, Departing Staff, New Feature, Purchase/Renew, Spam)."},
@@ -1700,12 +1835,12 @@ let updateTicker=()=>{};
     "MANAGER LENS: Mathew's standing question is how to be a better ICT manager and iterate faster. When coaching or prioritising, rank by his own weighting: money first (revenue at risk or recoverable), efficiencies second (what blocks other people, aging cases, recurring time sinks), then risk and security, then the rest. Call out what he is neglecting, frankly.\n" +
     "DECIDE AS MATHEW: when he asks you to decide, or what he would do, make the call the way he would: apply the weighting above plus the OS rules (propose then write, one job per outcome, no bulk, evidence over assumption). State the decision in one line, the single reason, and whether it is reversible. Then, if it is within your action tools, execute it through the approval card in the same turn; otherwise hand him the exact session ask. A cancelled card means he overruled you: accept it and say what you would watch instead. Never chain more than one write per approval.\n" +
     "Tools, when available: get_today_snapshot first for anything about the queue, board, inbox or Teams (it carries case numbers, task gids, the board sections map with gids, recent inbox emails with message ids, and recent Teams messages). salesforce_read for other Salesforce reads (one SOQL SELECT, always LIMIT, always RecordType.DeveloperName='Zeus' on Case queries). asana_search for board lookups. show to navigate the page.\n" +
-    "ACTIONS you can execute, each behind an approval card the user must tap: case_internal_note, case_reply (public comment the requester can see, optionally set a new Status such as Waiting Response-External), case_close (close reason from the exact list; set Type if blank), case_assign (ONLY to Andrew Dunn, Keith Tsui, Nina Lewis or Mathew Hema; team members have duplicate User records, so if the tool returns candidate records, show them with usernames and recent-case counts, ask which, and call again with user_id, never pick one yourself), task_comment, task_complete, task_move (section gids from board.sections), and email_draft_reply (creates an Outlook reply DRAFT threaded on the original, never sends; Mathew reviews and sends from Outlook). Triage flow: for 'triage the queue to the team', go one case at a time, propose who gets it and why, and use case_assign per case, each with its own approval. Teams has NO send API: for a Teams reply, write the message text in a reply of its own so the copy button grabs it cleanly, and say to paste it into Teams. Before calling a write tool, state in one or two lines exactly what you are about to do. Draft replies warm and plain in Mathew's voice: direct, no corporate filler, commitments like 'I will come back to you either way', sign-off 'Thanks'. If the approval card is cancelled, accept it and stop. Report the verified result the tool returns, never assume success. Never bulk actions: one record at a time. SENDING email, assigning cases to anyone outside the four ICT team members, Entra or M365 admin, and Salesforce config are NOT yours: give the exact ask for a Claude session on mathewruahema-beep/Birdlife instead.\n" +
+    "ACTIONS you can execute, each behind an approval card the user must tap: case_comment (public=false is an internal note; public=true is a reply the requester can see and may set a new Status such as Waiting Response-External), case_close (close reason from the exact list; set Type if blank), case_assign (ONLY to members of the ICT team, which the tool checks live against the Zeus public group in Salesforce; today Andrew Dunn, Keith Tsui, Nina Lewis, Mathew Hema. If Mathew names anyone else, say the rule and stop. Team members have duplicate User records, so if the tool returns candidate records, show them with usernames and recent-case counts, ask which, and call again with user_id, never pick one yourself), task_action (action comment, complete or move; section gids from board.sections), and email_draft_reply (creates an Outlook reply DRAFT threaded on the original, never sends; Mathew reviews and sends from Outlook). Triage flow: for 'triage the queue to the team', go one case at a time, propose who gets it and why, and use case_assign per case, each with its own approval. Teams has NO send API: for a Teams reply, write the message text in a reply of its own so the copy button grabs it cleanly, and say to paste it into Teams. Before calling a write tool, state in one or two lines exactly what you are about to do. Draft replies warm and plain in Mathew's voice: direct, no corporate filler, commitments like 'I will come back to you either way', sign-off 'Thanks'. If the approval card is cancelled, accept it and stop. Report the verified result the tool returns, never assume success. Never bulk actions: one record at a time. SENDING email, assigning cases to anyone outside the four ICT team members, Entra or M365 admin, and Salesforce config are NOT yours: give the exact ask for a Claude session on mathewruahema-beep/Birdlife instead.\n" +
     "MONEY: for any money question call money_snapshot first. Doctrine: Stripe, Salesforce and NetSuite rarely agree and the gap IS the finding; always name the lens a number came from (opportunity close date vs payment date vs Stripe settlement). Five livemode Stripe accounts exist (eCommerce, Memberships, Ausbirdfund, BLP, eStore/AOC). NEVER touch stripe_api_write or propose it; a mistaken write is real donor money. Money page tools are read only.\n" +
     "SECURITY: for posture questions call security_snapshot first. Its content is confidential: keep it to this conversation, name overdue items bluntly, and treat a never-logged-in or bot sysadmin as a finding. What the page cannot see, say plainly and point to the Sunday security dashboard.\n" +
     "REPORTS: you write Mathew's reports on request, register C voice, plain text ready to paste. Library: 'weekly ICT status' (queue and board movement, money line, security line, decisions made and open, next week), 'money state' (the three lenses, gaps, bridges, one action), 'security posture' (live posture, deadlines by urgency, two fixes), 'exec brief' (five sentences, money first). Method: pull the needed snapshots first, lead with the conclusion, concrete numbers with their lens named, every action gets an owner and a date, end before any sign-off. For a polished Word or PDF document, give Mathew the one-line session ask instead (a repo session has the docx skill).\n" +
-    "FIXES: the Fixes tab is the catalogue of suggested fixes, technical and process, ranked money first then what blocks people then risk. For any 'what should we fix', 'quick wins', 'prepare fix X' or 'track fix X' question call fixes_catalog first. Preparing a fix means the exact commands, click-paths or SOQL in order, what to verify, and a one-line message to the owner in Mathew's voice; tier 2 and 3 fixes are prepared for an admin, never claimed as done. fix_track creates one Asana task behind an approval card. When asked to suggest new fixes, read the live snapshots and the catalogue, propose at most three that are genuinely not listed, add each with fix_propose (steps concrete, impact on people stated, owner named), and say which you would do first. fix_status records progress; only mark done when Mathew says it is done.\n" +
-    "Finding automations: use automation_signals plus live data. Propose at most 3, each with name, schedule, exact write posture and hard caps, connectors, which existing routine could absorb it (rule 2), and budget impact (rule 3, currently 13 of 12). End with the session ask to create the best one through the OS change control.\n" +
+    "FIXES: the Fixes tab is the catalogue of suggested fixes, technical and process, ranked money first then what blocks people then risk. For any 'what should we fix', 'quick wins', 'prepare fix X' or 'track fix X' question call the fixes tool (action list) first. Preparing a fix means the exact commands, click-paths or SOQL in order, what to verify, and a one-line message to the owner in Mathew's voice; tier 2 and 3 fixes are prepared for an admin, never claimed as done. fix_track creates one Asana task behind an approval card. When asked to suggest new fixes, read the live snapshots and the catalogue, propose at most three that are genuinely not listed, add each with the fixes tool (action propose) (steps concrete, impact on people stated, owner named), and say which you would do first. the fixes tool (action status) records progress; only mark done when Mathew says it is done.\n" +
+    "Finding automations: use automation_signals plus live data. Propose at most 3, each with name, schedule, exact write posture and hard caps, connectors, which existing routine could absorb it (rule 2), and budget impact (rule 3, currently 12 of 12). End with the session ask to create the best one through the OS change control.\n" +
     "If something is not in the state pack or reachable by a tool, say so in one line and point at os/registers.md or a session; never guess.\n\nSTATE PACK:\n";
 
   const turns = [];
@@ -1743,7 +1878,26 @@ let updateTicker=()=>{};
       log.append(card); log.classList.add("on"); log.scrollTop=log.scrollHeight;
     });
   }
+  function utf8Bytes(str){ try{ return new TextEncoder().encode(str).length; }catch(e){ return String(str).length*2; } }
+  function buildInput(framing){
+    // One alternating conversation: the framing is folded into the FIRST user turn (never two user turns in a row),
+    // and older turns are dropped in pairs until the whole input fits the platform's byte cap with margin.
+    let hist=turns.slice();
+    if(!hist.length || hist[0].role!=="user") hist=[{role:"user",content:input.value||"Hello"}];
+    const cap=(sampleLimits && sampleLimits.maxPromptBytes) || 65536, margin=6000;
+    const size=()=>utf8Bytes(framing)+hist.reduce((n,t)=>n+utf8Bytes(t.content)+24,0);
+    while(hist.length>1 && size()>cap-margin) hist.splice(0,2);
+    const merged=[{role:"user",content:framing+"\n\nMATHEW SAYS:\n"+hist[0].content}].concat(hist.slice(1));
+    const out=[];
+    merged.forEach(m=>{ const last=out[out.length-1]; const c=String(m.content||"").trim()||"(empty)";
+      if(last && last.role===m.role) last.content+="\n\n"+c; else out.push({role:m.role,content:c}); });
+    if(out[out.length-1].role!=="user") out.push({role:"user",content:"Continue."});
+    return out;
+  }
   const ERRCOPY = {
+    invalid_request:"The page built a request Claude refused. This is a page bug, not you; the detail below goes to the next repo session.",
+    transform_error:"The page could not prepare the request. Page bug; detail below.",
+    queue_overflow:"Too many requests before the runtime started. Reload the page.",
     rate_limited:"Rate limited. Give it a minute and try again.",
     session_expired:"Your Claude session expired. Sign in again and retry.",
     refused:"Claude declined that one. Rephrase and try again.",
@@ -1816,7 +1970,7 @@ let updateTicker=()=>{};
          finally{ tn.remove(); }
        }},
       {name:"show",
-       description:"Navigates this page. tab is one of command, today, board, money, security, fixes, system, schedule, registers, rules; day (0=Mon..6=Sun) optionally selects a schedule day.",
+       description:"Navigates this page. tab is one of command, lens, today, board, money, security, fixes, system, schedule, registers, rules; day (0=Mon..6=Sun) optionally selects a schedule day.",
        inputSchema:{type:"object",properties:{tab:{type:"string"},day:{type:"number"}},required:["tab"]},
        execute(input){
          const tab=String(input.tab||"").toLowerCase();
@@ -1852,33 +2006,31 @@ let updateTicker=()=>{};
            not_readable:"Secure Score, Entra MFA/CA, Intune/BitLocker, Defender, WP 2FA, AWS root MFA, Google 2SV (weekly Security dashboard covers them)",
            watchlist:"WooCommerce key rotation from August still unverified"},12000);
        }},
-      {name:"fixes_catalog",
-       description:"Returns the suggested-fixes catalogue: every known technical and process fix (id, title, system, category, severity 1-3, tier, effort, owner, why, impact on people, steps, source) with its current status (proposed, accepted, in_progress, done, dismissed). Optional filters: status, cat, sev, system, q (text). Use before preparing, tracking or proposing fixes.",
-       inputSchema:{type:"object",properties:{status:{type:"string"},cat:{type:"string"},sev:{type:"number"},system:{type:"string"},q:{type:"string"}}},
+      {name:"fixes",
+       description:"The suggested-fixes catalogue on the Fixes tab. action 'list' returns every known fix (id, title, system, cat, sev 1-3, tier, effort, owner, why, people, steps, src, status) with optional filters status|cat|sev|system|q. action 'propose' adds a NEW fix (title, why, people, steps required; optional id, system, cat security|process|money|data|estate, sev, tier, effort, owner), stored on this device, never a duplicate title. action 'status' sets a fix's status (id, status: proposed|accepted|in_progress|done|dismissed). No external writes.",
+       inputSchema:{type:"object",properties:{action:{type:"string"},id:{type:"string"},status:{type:"string"},cat:{type:"string"},sev:{type:"number"},system:{type:"string"},q:{type:"string"},title:{type:"string"},tier:{type:"number"},effort:{type:"string"},owner:{type:"string"},why:{type:"string"},people:{type:"string"},steps:{type:"array",items:{type:"string"}}},required:["action"]},
        execute(input){
-         let list=fxAll().map(f=>Object.assign({status:fxStat(f)},f));
-         if(input&&input.status) list=list.filter(f=>input.status==="open"?!["done","dismissed"].includes(f.status):f.status===input.status);
-         if(input&&input.cat) list=list.filter(f=>f.cat===input.cat);
-         if(input&&input.sev) list=list.filter(f=>f.sev===Number(input.sev));
-         if(input&&input.system) list=list.filter(f=>f.system.toLowerCase().includes(String(input.system).toLowerCase()));
-         if(input&&input.q){ const q=String(input.q).toLowerCase(); list=list.filter(f=>(f.title+" "+f.why+" "+f.people+" "+f.steps.join(" ")).toLowerCase().includes(q)); }
-         return clip({count:list.length, fixes:list},14000);
+         const a=String(input.action||"list").toLowerCase();
+         if(a==="list"){
+           let list=fxAll().map(f=>Object.assign({status:fxStat(f)},f));
+           if(input.status) list=list.filter(f=>input.status==="open"?!["done","dismissed"].includes(f.status):f.status===input.status);
+           if(input.cat) list=list.filter(f=>f.cat===input.cat);
+           if(input.sev) list=list.filter(f=>f.sev===Number(input.sev));
+           if(input.system) list=list.filter(f=>f.system.toLowerCase().includes(String(input.system).toLowerCase()));
+           if(input.q){ const q=String(input.q).toLowerCase(); list=list.filter(f=>(f.title+" "+f.why+" "+f.people+" "+f.steps.join(" ")).toLowerCase().includes(q)); }
+           return clip({count:list.length, fixes:list},14000);
+         }
+         if(a==="propose"){
+           const dup=fxAll().find(f=>f.title.toLowerCase()===String(input.title||"").toLowerCase());
+           if(dup) throw new Error("Already listed as "+dup.id+"; do not add a duplicate");
+           const f=fxAdd(input); showView("fixes");
+           return "Added fix "+f.id+" (\""+f.title+"\", severity "+f.sev+", tier "+f.tier+"). It shows on the Fixes tab tagged jarvis.";
+         }
+         if(a==="status"){ const st=fxSetStatus(String(input.id),String(input.status)); return "Fix "+input.id+" is now "+st+"."; }
+         throw new Error("Unknown action "+a+"; use list, propose or status");
        }},
-      {name:"fix_propose",
-       description:"Adds a NEW suggested fix to the Fixes page (stored on this device, no external write). Use after reading live snapshots and fixes_catalog so you never duplicate an existing fix. Required: title, why, steps (array), people (impact on people). Optional: id (kebab-case), system, cat (security|process|money|data|estate), sev (1 critical, 2 high, 3 medium), tier (1 execute, 2 prepare for admin, 3 design), effort (minutes|hours|project), owner.",
-       inputSchema:{type:"object",properties:{id:{type:"string"},title:{type:"string"},system:{type:"string"},cat:{type:"string"},sev:{type:"number"},tier:{type:"number"},effort:{type:"string"},owner:{type:"string"},why:{type:"string"},people:{type:"string"},steps:{type:"array",items:{type:"string"}}},required:["title","why","people","steps"]},
-       execute(input){
-         const dup=fxAll().find(f=>f.title.toLowerCase()===String(input.title||"").toLowerCase());
-         if(dup) throw new Error("Already listed as "+dup.id+"; do not add a duplicate");
-         const f=fxAdd(input); showView("fixes");
-         return "Added fix "+f.id+" (\""+f.title+"\", severity "+f.sev+", tier "+f.tier+"). It shows on the Fixes tab tagged jarvis.";
-       }},
-      {name:"fix_status",
-       description:"Sets the status of a fix on the Fixes page (proposed, accepted, in_progress, done, dismissed). Local to this device, no external write. Provide id and status.",
-       inputSchema:{type:"object",properties:{id:{type:"string"},status:{type:"string"}},required:["id","status"]},
-       execute(input){ const st=fxSetStatus(String(input.id),String(input.status)); return "Fix "+input.id+" is now "+st+"."; }},
       {name:"fix_track",
-       description:"Creates ONE Asana task on the IT Operations Project Plan for a fix, after the user approves. Provide id (from fixes_catalog); optional section (default Backlog/Requests), assignee (email of Andrew Dunn, Keith Tsui, Nina Lewis or Mathew Hema), due_on (YYYY-MM-DD). Notes are the fix runbook. Verified by re-reading the board; sets the fix status to accepted. Never creates more than one task per call.",
+       description:"Creates ONE Asana task on the IT Operations Project Plan for a fix, after the user approves. Provide id (from the fixes tool (action list)); optional section (default Backlog/Requests), assignee (email of Andrew Dunn, Keith Tsui, Nina Lewis or Mathew Hema), due_on (YYYY-MM-DD). Notes are the fix runbook. Verified by re-reading the board; sets the fix status to accepted. Never creates more than one task per call.",
        inputSchema:{type:"object",properties:{id:{type:"string"},section:{type:"string"},assignee:{type:"string"},due_on:{type:"string"}},required:["id"]},
        async execute(input,context){
          if(!mcpNS) throw new Error("Live connectors are not available in this view");
@@ -1905,31 +2057,25 @@ let updateTicker=()=>{};
          return "Done. Task created and verified: "+name+" (gid "+gid+") in "+secName+". https://app.asana.com/1/443963187362944/project/"+PROJECT+"/task/"+gid+" Fix marked accepted.";
        }},
       // ---- write actions, each behind an approval card ----
-      {name:"case_internal_note",
-       description:"Adds an INTERNAL comment to an Ask Zeus case (not visible to the requester) after the user approves. Provide case_number and note. Returns the verified result.",
-       inputSchema:{type:"object",properties:{case_number:{type:"string"},note:{type:"string"}},required:["case_number","note"]},
+      {name:"case_comment",
+       description:"Adds a comment to an Ask Zeus case after the user approves. public=false (default) is an INTERNAL note the requester cannot see. public=true posts a reply the requester sees and may also set a new Status (exact values: New, In Progress, Pending, On Hold-Internal, Waiting Response-External, Response Received). Provide case_number, text, optional public, optional set_status. Verified by re-read.",
+       inputSchema:{type:"object",properties:{case_number:{type:"string"},text:{type:"string"},public:{type:"boolean"},set_status:{type:"string"}},required:["case_number","text"]},
        async execute(input,context){
          if(!mcpNS) throw new Error("Live connectors are not available in this view");
          const c=await resolveCase(input.case_number);
-         const note=String(input.note||"").slice(0,4000);
-         const ok=await requestApproval("Internal note on case "+c.CaseNumber, (c.Subject||"")+"\n\n"+note+"\n\n(Internal only, requester cannot see it.)", context.signal);
-         if(!ok) return "Cancelled by user. Nothing was written.";
-         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:note,IsPublished:false}});
-         afterWrite();
-         return "Done. Internal note added to case "+c.CaseNumber+".";
-       }},
-      {name:"case_reply",
-       description:"Posts a PUBLIC comment on an Ask Zeus case (visible to the requester) after the user approves, and optionally sets a new Status (exact values: New, In Progress, Pending, On Hold-Internal, Waiting Response-External, Response Received). Provide case_number, reply, optional set_status. Verified by re-read.",
-       inputSchema:{type:"object",properties:{case_number:{type:"string"},reply:{type:"string"},set_status:{type:"string"}},required:["case_number","reply"]},
-       async execute(input,context){
-         if(!mcpNS) throw new Error("Live connectors are not available in this view");
-         const c=await resolveCase(input.case_number);
-         const reply=String(input.reply||"").slice(0,4000);
-         const st=input.set_status?String(input.set_status):null;
+         const text=String(input.text||"").slice(0,4000);
+         const pub=input.public===true||String(input.public).toLowerCase()==="true";
+         const st=pub&&input.set_status?String(input.set_status):null;
          if(st && !STATUSES.includes(st)) throw new Error("Unknown status '"+st+"'. Exact values: "+STATUSES.join(", "));
-         const ok=await requestApproval("Public reply on case "+c.CaseNumber, (c.Subject||"")+"\n\n"+reply+(st?"\n\nThen set Status: "+c.Status+" -> "+st:"")+"\n\n(Public, the requester can see this.)", context.signal);
+         if(!pub){
+           const ok=await requestApproval("Internal note on case "+c.CaseNumber, (c.Subject||"")+"\n\n"+text+"\n\n(Internal only, requester cannot see it.)", context.signal);
+           if(!ok) return "Cancelled by user. Nothing was written.";
+           await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:text,IsPublished:false}});
+           afterWrite(); return "Done. Internal note added to case "+c.CaseNumber+".";
+         }
+         const ok=await requestApproval("Public reply on case "+c.CaseNumber, (c.Subject||"")+"\n\n"+text+(st?"\n\nThen set Status: "+c.Status+" -> "+st:"")+"\n\n(Public, the requester can see this.)", context.signal);
          if(!ok) return "Cancelled by user. Nothing was written.";
-         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:reply,IsPublished:true}});
+         await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:text,IsPublished:true}});
          if(st) await mcpNS.callTool(SF_SERVER,"updateSobjectRecord",{"sobject-name":"Case",id:c.Id,body:{Status:st}});
          await mcpNS.callTool(SF_SERVER,"createSobjectRecord",{"sobject-name":"CaseComment",body:{ParentId:c.Id,CommentBody:"[via BirdLife Claude OS console] Reply posted"+(st?", Status set to "+st:"")+".",IsPublished:false}});
          const v=await sfQ("SELECT Status FROM Case WHERE Id = '"+c.Id+"' LIMIT 1");
@@ -1958,11 +2104,15 @@ let updateTicker=()=>{};
          return "Done. Case "+c.CaseNumber+" verified: Status "+(vr.Status||"unknown")+", reason "+(vr.Case_Closed_Reason__c||"unknown")+".";
        }},
       {name:"case_assign",
-       description:"Assigns an Ask Zeus case to a team member after the user approves. assignee must be exactly one of: Andrew Dunn, Keith Tsui, Nina Lewis, Mathew Hema. Team members have MULTIPLE active Salesforce User records; this tool resolves the working record as the one that owns recent Ask Zeus cases. If it cannot resolve to exactly one record it returns the candidates with usernames; present them to the user, ask which, then call again with user_id instead of assignee. Optional note is added as an internal comment.",
+       description:"Assigns an Ask Zeus case to an ICT team member after the user approves. The team is defined live as the members of the Salesforce public group Zeus (Andrew Dunn, Keith Tsui, Nina Lewis, Mathew Hema today) with birdlife.org.au usernames; anyone else is refused (charter rule 4). Provide assignee (full name). Team members have duplicate external User records; the tool keeps only group members and, if more than one remains, resolves by recent Ask Zeus case ownership or returns candidates for the user to choose (then call again with user_id). Optional note is added as an internal comment.",
        inputSchema:{type:"object",properties:{case_number:{type:"string"},assignee:{type:"string"},user_id:{type:"string"},note:{type:"string"}},required:["case_number"]},
        async execute(input,context){
          if(!mcpNS) throw new Error("Live connectors are not available in this view");
-         const TEAM=["Andrew Dunn","Keith Tsui","Nina Lewis","Mathew Hema"];
+         // Charter rule 4: the ICT team is the live membership of the Zeus public group, birdlife.org.au usernames only.
+         const g=await sfQ("SELECT UserOrGroupId FROM GroupMember WHERE GroupId = '"+ZEUS_GROUP+"' LIMIT 50");
+         const team=new Set(((g&&g.records)||[]).map(r=>r.UserOrGroupId));
+         if(!team.size) throw new Error("Could not read the Zeus public group membership; assignment refused rather than guessed.");
+         const inTeam=u=>team.has(u.Id) && /@birdlife\.org\.au$/i.test(u.Username||"");
          const c=await resolveCase(input.case_number);
          let target=null;
          if(input.user_id){
@@ -1970,14 +2120,14 @@ let updateTicker=()=>{};
            const p=await sfQ("SELECT Id, Name, Username FROM User WHERE Id = '"+uid+"' AND IsActive = true LIMIT 1");
            const u=(p&&p.records&&p.records[0])||null;
            if(!u) throw new Error("No active User with Id "+uid);
-           if(!TEAM.includes(u.Name)) throw new Error("That User record belongs to "+u.Name+", not an ICT team member. Assignment is restricted to: "+TEAM.join(", "));
+           if(!inTeam(u)) throw new Error("That User record ("+u.Name+", "+u.Username+") is not an ICT team member (Zeus public group, birdlife.org.au username). Assignment outside the team is a human decision; nothing was written.");
            target=u;
          }else{
-           const name=String(input.assignee||"");
-           if(!TEAM.includes(name)) throw new Error("assignee must be exactly one of: "+TEAM.join(", "));
-           const p=await sfQ("SELECT Id, Name, Username FROM User WHERE Name = '"+name+"' AND IsActive = true LIMIT 5");
-           const actives=(p&&p.records)||[];
-           if(!actives.length) throw new Error("No active Salesforce User named "+name);
+           const name=String(input.assignee||"").trim();
+           if(!name) throw new Error("assignee (full name) is required");
+           const p=await sfQ("SELECT Id, Name, Username FROM User WHERE Name = '"+name.replace(/'/g,"\\'")+"' AND IsActive = true LIMIT 10");
+           const actives=((p&&p.records)||[]).filter(inTeam);
+           if(!actives.length) throw new Error("No active ICT team member named "+name+" (must be in the Zeus public group with a birdlife.org.au username). Assignment outside the team is a human decision; nothing was written.");
            if(actives.length===1) target=actives[0];
            else{
              const ids=actives.map(u=>"'"+u.Id+"'").join(",");
@@ -2002,46 +2152,37 @@ let updateTicker=()=>{};
          const vn=(v&&v.records&&v.records[0]&&v.records[0].Owner&&v.records[0].Owner.Name)||"unknown";
          return "Done. Case "+c.CaseNumber+" verified: Owner is now "+vn+".";
        }},
-      {name:"task_comment",
-       description:"Adds a comment to an Asana task on the IT Operations Project Plan after the user approves. Provide task_gid (from get_today_snapshot or asana_search), task_name (for the approval card), and text.",
-       inputSchema:{type:"object",properties:{task_gid:{type:"string"},task_name:{type:"string"},text:{type:"string"}},required:["task_gid","task_name","text"]},
+      {name:"task_action",
+       description:"One Asana write on the IT Operations Project Plan, behind an approval card. action 'comment' (task_gid, task_name, text), 'complete' (task_gid, task_name), or 'move' (task_gid, task_name, section_gid, section_name; gids from get_today_snapshot board.sections). Reports Asana's succeeded or failed result. One task per call.",
+       inputSchema:{type:"object",properties:{action:{type:"string"},task_gid:{type:"string"},task_name:{type:"string"},text:{type:"string"},section_gid:{type:"string"},section_name:{type:"string"}},required:["action","task_gid","task_name"]},
        async execute(input,context){
          if(!mcpNS) throw new Error("Live connectors are not available in this view");
+         const a=String(input.action||"").toLowerCase();
          const gid=String(input.task_gid||"").replace(/[^0-9]/g,"");
          if(!gid) throw new Error("No task gid given");
-         const text=String(input.text||"").slice(0,3000);
-         const ok=await requestApproval("Comment on task: "+String(input.task_name||gid), text, context.signal);
-         if(!ok) return "Cancelled by user. Nothing was written.";
-         await mcpNS.callTool(AS_SERVER,"add_comment",{task_id:gid,text});
-         afterWrite();
-         return "Done. Comment added to \""+String(input.task_name||gid)+"\".";
-       }},
-      {name:"task_complete",
-       description:"Marks an Asana task complete on the IT Operations Project Plan after the user approves. Provide task_gid and task_name. Reports Asana's succeeded or failed result.",
-       inputSchema:{type:"object",properties:{task_gid:{type:"string"},task_name:{type:"string"}},required:["task_gid","task_name"]},
-       async execute(input,context){
-         if(!mcpNS) throw new Error("Live connectors are not available in this view");
-         const gid=String(input.task_gid||"").replace(/[^0-9]/g,"");
-         if(!gid) throw new Error("No task gid given");
-         const ok=await requestApproval("Complete task: "+String(input.task_name||gid), "Marks the task complete on the IT Operations Project Plan.", context.signal);
-         if(!ok) return "Cancelled by user. Nothing was written.";
-         const r=await mcpNS.callTool(AS_SERVER,"update_tasks",{tasks:[{task:gid,completed:true}]});
-         afterWrite();
-         return "Asana result: "+clip(r.payload,1500);
-       }},
-      {name:"task_move",
-       description:"Moves an Asana task to a section of the IT Operations Project Plan after the user approves. Provide task_gid, task_name, section_gid and section_name. Get gids from get_today_snapshot (board.sections maps section names to gids; tasks carry their gid). Reports Asana's succeeded or failed result.",
-       inputSchema:{type:"object",properties:{task_gid:{type:"string"},task_name:{type:"string"},section_gid:{type:"string"},section_name:{type:"string"}},required:["task_gid","task_name","section_gid","section_name"]},
-       async execute(input,context){
-         if(!mcpNS) throw new Error("Live connectors are not available in this view");
-         const gid=String(input.task_gid||"").replace(/[^0-9]/g,"");
-         const sec=String(input.section_gid||"").replace(/[^0-9]/g,"");
-         if(!gid||!sec) throw new Error("Task gid and section gid are both required");
-         const ok=await requestApproval("Move task: "+String(input.task_name||gid), "To section: "+String(input.section_name||sec)+" on the IT Operations Project Plan.", context.signal);
-         if(!ok) return "Cancelled by user. Nothing was written.";
-         const r=await mcpNS.callTool(AS_SERVER,"update_tasks",{tasks:[{task:gid,add_projects:[{project_id:PROJECT,section_id:sec}]}]});
-         afterWrite();
-         return "Asana result: "+clip(r.payload,1500);
+         const name=String(input.task_name||gid);
+         if(a==="comment"){
+           const text=String(input.text||"").slice(0,3000); if(!text) throw new Error("No comment text");
+           const ok=await requestApproval("Comment on task: "+name, text, context.signal);
+           if(!ok) return "Cancelled by user. Nothing was written.";
+           await mcpNS.callTool(AS_SERVER,"add_comment",{task_id:gid,text});
+           afterWrite(); return "Done. Comment added to \""+name+"\".";
+         }
+         if(a==="complete"){
+           const ok=await requestApproval("Complete task: "+name, "Marks the task complete on the IT Operations Project Plan.", context.signal);
+           if(!ok) return "Cancelled by user. Nothing was written.";
+           const r=await mcpNS.callTool(AS_SERVER,"update_tasks",{tasks:[{task:gid,completed:true}]});
+           afterWrite(); return "Asana result: "+clip(r.payload,1500);
+         }
+         if(a==="move"){
+           const sec=String(input.section_gid||"").replace(/[^0-9]/g,"");
+           if(!sec) throw new Error("section_gid is required for a move");
+           const ok=await requestApproval("Move task: "+name, "To section: "+String(input.section_name||sec)+" on the IT Operations Project Plan.", context.signal);
+           if(!ok) return "Cancelled by user. Nothing was written.";
+           const r=await mcpNS.callTool(AS_SERVER,"update_tasks",{tasks:[{task:gid,add_projects:[{project_id:PROJECT,section_id:sec}]}]});
+           afterWrite(); return "Asana result: "+clip(r.payload,1500);
+         }
+         throw new Error("Unknown action "+a+"; use comment, complete or move");
        }},
       {name:"email_draft_reply",
        description:"Creates an Outlook reply DRAFT threaded on an inbox email, after the user approves. NEVER sends; the draft lands in Mathew's Drafts folder for him to review and send from Outlook. Provide message_id (from get_today_snapshot inbox), to (the sender, for the approval card), subject, and reply_text (plain text, written in Mathew's voice). Returns the draft confirmation with its Outlook link.",
@@ -2066,6 +2207,8 @@ let updateTicker=()=>{};
          return "Draft created in Outlook Drafts (not sent)."+(p&&p.webLink?" Open: "+p.webLink:(raw?" "+clip(raw,400):""));
        }}
     ];
+    const maxTools=(sampleLimits.tools&&sampleLimits.tools.maxCount)||tools.length;
+    if(tools.length>maxTools){ try{console.warn("Jarvis: platform allows "+maxTools+" tools; offering the first "+maxTools);}catch(e){} return tools.slice(0,maxTools); }
     return tools;
   }
 
@@ -2082,7 +2225,7 @@ let updateTicker=()=>{};
     ctl = new AbortController();
     try{
       const {text, truncated} = await sample(
-        [{role:"user", content: INSTRUCTIONS + KNOWLEDGE}, ...turns],
+        buildInput(activeLens().framing + "\n\n" + INSTRUCTIONS + KNOWLEDGE),
         {cache:false, modelTier:"quick", signal:ctl.signal, tools:buildTools(),
          onText:({text})=>{out.textContent = text; log.scrollTop = log.scrollHeight;}});
       out.textContent = text + (truncated ? "\n\n[cut short, ask for less at a time]" : "");
@@ -2101,8 +2244,12 @@ let updateTicker=()=>{};
         turns.pop();
       }else{
         out.className = "jmsg err";
-        out.textContent = (e && e.text) ? e.text + "\n\n" + (ERRCOPY[e.code]||ERRCOPY.upstream_error)
-                                        : (ERRCOPY[e && e.code] || ERRCOPY.upstream_error);
+        const code=(e && e.code) || "upstream_error";
+        const known=ERRCOPY[code];
+        const detail=(!known || code==="invalid_request" || code==="transform_error" || code==="prompt_too_large" || code==="queue_overflow") && e && e.message
+          ? "\n["+code+"] "+String(e.message).slice(0,400) : "";
+        out.textContent = ((e && e.text) ? e.text + "\n\n" : "") + (known || ERRCOPY.upstream_error) + detail;
+        try{console.warn("Jarvis error", e);}catch(x){}
         turns.pop();
       }
     }finally{
@@ -2115,7 +2262,8 @@ let updateTicker=()=>{};
   sendBtn.addEventListener("click", ()=>{ if(busy){ ctl?.abort(); } else ask(); });
   input.addEventListener("keydown", e=>{ if(e.key==="Enter" && !busy) ask(); });
 
-  [["Catch me up","Catch me up: unread inbox from people, latest Teams messages, and anything urgent on the queue or board. Use the live snapshot, brief and prioritised."],
+  [["What can I do here?","Through the active lens, list the systems where I can execute after approval today, the ones I can only prepare for, and the one system I should probe again because its row is stale."],
+   ["Catch me up","Catch me up: unread inbox from people, latest Teams messages, and anything urgent on the queue or board. Use the live snapshot, brief and prioritised."],
    ["Triage my queue","Triage my queue: what needs action right now and in what order? Use the live snapshot."],
    ["Find automations","Find automation candidates for us, using the automation signals and the live queue and board."],
    ["Work the worst case","Look at the live queue, pick the case most needing action, summarise it, and propose the move. If it warrants a reply or close, draft it and I will approve."],
@@ -2123,8 +2271,8 @@ let updateTicker=()=>{};
    ["Coach me","Coach me: look at the live queue, board, inbox and the patterns, and give me the three highest-leverage moves I should make this week as Senior Manager ICT. Be frank about what I am neglecting."],
    ["Money state","Give me the money state: use the money snapshot, lead with the lens gap and the reconciliation bridges, and tell me what has moved since I last looked."],
    ["Security posture","Give me the security posture: use the security snapshot, admins first, then the deadlines in date order with days remaining. Flag anything overdue in the first line."],
-   ["Quick wins","From fixes_catalog, give me the five quickest high-impact fixes still open, who owns each, and which one I should do in the next hour."],
-   ["Suggest fixes","Look at the live snapshots and the fixes catalogue. Propose up to three new fixes not already listed, add each with fix_propose, and tell me the one you would do first."],
+   ["Quick wins","From the fixes tool (action list), give me the five quickest high-impact fixes still open, who owns each, and which one I should do in the next hour."],
+   ["Suggest fixes","Look at the live snapshots and the fixes catalogue. Propose up to three new fixes not already listed, add each with the fixes tool (action propose), and tell me the one you would do first."],
    ["Weekly report","Write my weekly ICT status report: queue and board movement, money state, security posture, and the decisions I owe. Pull fresh snapshots first, one page, in my voice, each action with an owner and a date."]
   ].forEach(([label,q])=>{
     const c = el("button",null,esc(label));
@@ -2210,3 +2358,4 @@ let updateTicker=()=>{};
   setTimeout(()=>note.classList.remove("on"), 14000);
 })();
 </script>
+

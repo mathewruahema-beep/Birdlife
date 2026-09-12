@@ -300,7 +300,10 @@ memory/                              episodic memory: journal/ (decisions, done,
 os/README.md                         the Claude Operating System — rules, budgets, cadence for managing the Claude estate itself
 os/registers.md                      state-of-record registers: routines, skills, connectors, artefacts, credential watchlist
 os/claude-os-overview.html           source of the BirdLife Australia console (Jarvis); artifact URL in os/registers.md
-.claude/skills/                      the twenty-four operator-knowledge skills (versioned); SKILL.md is doctrine, references/facts.md the lookup values
+os/lenses.md                         the lens model (IT-GOV-004): who acts, in which system, at what tier
+docs/manager/                        weekly manager reviews and the learning log (IT-GOV-003)
+docs/brain-v1/                       the August 2026 plugin's README, GOVERNANCE and CONNECTORS (history)
+.claude/skills/                      the thirty-three operator-knowledge skills (versioned); birdlife-core is the doctrine and carries the ADR decision log; SKILL.md is doctrine, references/facts.md the lookup values
 docs/using-the-assistant.md          remote access channels + prompt playbook
 README.md                            findings, admin runbook, routine consolidation
 routines/routines-backup-2026-08-07.json   all 10 routine definitions (credentials redacted)
